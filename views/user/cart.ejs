@@ -1,0 +1,245 @@
+<%- include('../../views/partials/user/header', { user: user }) %>
+
+<div class="cart-container" style="display: flex; justify-content: space-between; padding: 20px;">
+  <!-- Left container (shopping cart items) -->
+  <div class="cart-items bg-white p-4 rounded" style="width: 70%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h2>Shopping Cart</h2>
+        <span class="text-muted pe-5" style="text-align: right;">Price</span>
+    </div>
+    <hr />
+    <% cartItems.forEach(item => { %>
+      <div class="cart-item" style="display: flex; align-items: center; margin-bottom: 20px;">
+        <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" style="width: 100px; height: 100px; object-fit: cover; margin-right: 15px;" />
+        <div class="item-details" style="flex-grow: 1;">
+          <h3><%= item.productName %></h3>
+          <% if (item.productStock > 0) { %>
+            <p>In Stock</p>
+          <% } else { %>
+            <p class="text-danger">Out of Stock</p>
+          <% } %>
+          <!-- Quantity Control -->
+          <div class="quantity-control d-flex align-items-center mb-4">
+            <% if (item.cartQuantity === 1) { %>
+          <a href="" class="text-dark delete-item"><i class="bi bi-trash"></i></a>
+              <% } else { %>
+            <button class="btn btn-light decrease-quantity">
+              <i class="bi bi-dash"></i>
+            </button>
+            <% } %>
+            <input
+              type="text"
+              class="form-control mx-2 quantity-input"
+              value="<%= item.cartQuantity %>"
+              readonly
+              style="width: 60px; text-align: center"
+              data-product-id="<%= item.productId %>"
+              data-max-quantity="<%= item.productStock %>"
+            />
+            <button class="btn btn-light increase-quantity">
+              <i class="bi bi-plus"></i>
+            </button>
+            
+
+          </div>
+          <div>
+            <a href="" class="text-danger delete-item">Delete</a>
+
+            </div>
+        </div>
+        <div class="price-details" style="text-align: right; padding-left: 20px;">
+          <h3>&#8377; <%= item.salePrice %></h3>
+          <% if(item.productOffer > 0) { %>
+            <small class="text-danger"><%= item.productOffer %>% off</small>
+            <% } %>
+        </div>
+      </div>
+      <hr />
+    <% }) %>
+  </div>
+
+  <!-- Right container (subtotal & proceed to buy) -->
+  <div class="subtotal bg-white p-4 rounded ml-4" style="width: 30%; padding: 20px; height: 50%;">
+    <h3>Subtotal: (<%= cartItems.length %> items)</h3>
+    <hr />
+    <div>
+      <% let subtotal = 0; %>
+      <% cartItems.forEach(item => { %>
+        <% subtotal += item.salePrice * item.cartQuantity; %>
+      <% }) %>
+      <p><strong>Total: &#8377; <%= subtotal %>.00</strong></p>
+    </div>
+    <button class="proceed-to-buy" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer;">
+      Proceed to Buy
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const increaseButtons = document.querySelectorAll('.increase-quantity');
+    const decreaseButtons = document.querySelectorAll('.decrease-quantity');
+
+    increaseButtons.forEach(button => {
+      button.addEventListener('click', async (event) => {
+        const inputField = event.target.closest('.quantity-control').querySelector('.quantity-input');
+        const productId = inputField.getAttribute('data-product-id');
+        const maxQuantity = parseInt(inputField.getAttribute('data-max-quantity'));
+        let quantity = parseInt(inputField.value);
+
+        // Increase quantity
+        if (quantity < maxQuantity) {
+          quantity += 1;
+          
+
+        // Send request to update quantity in the database
+        const response = await fetch(`/cart/update-quantity/${productId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ productId, quantity }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Update the input field
+          inputField.value = quantity;
+
+          // Update subtotal
+          updateSubtotal();
+          location.reload();
+        } else {
+          alert('Failed to update quantity');
+        }
+      } else {
+        alert(`Ooops, You cannot add further more`);
+      }
+    });
+  });
+
+    decreaseButtons.forEach(button => {
+      button.addEventListener('click', async (event) => {
+        const inputField = event.target.closest('.quantity-control').querySelector('.quantity-input');
+        const productId = inputField.getAttribute('data-product-id');
+        let quantity = parseInt(inputField.value);
+
+        // Decrease quantity only if greater than 1
+        if (quantity > 1) {
+          quantity -= 1;
+
+          // Send request to update quantity in the database
+          const response = await fetch(`/cart/update-quantity/${productId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, quantity }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Update the input field
+            inputField.value = quantity;
+
+            // Update subtotal
+            updateSubtotal();
+            location.reload();
+          } else {
+            alert('Failed to update quantity');
+          }
+        } else {
+          alert('You should select one quantity!')
+        }
+      });
+    });
+
+    const deleteButtons = document.querySelectorAll('.delete-item');
+
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', async (event) => {
+      event.preventDefault(); // Prevent default link behavior
+
+      const productId = event.target.closest('.cart-item').querySelector('.quantity-input').getAttribute('data-product-id');
+      
+      // Show SweetAlert confirmation dialog
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'You are removing an item from cart!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+      });
+
+      if (result.isConfirmed) {
+        try {
+          // Send DELETE request to remove item from the cart
+          const response = await fetch(`/cart/delete-item/${productId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Item deleted successfully, remove it from the UI
+            event.target.closest('.cart-item').remove();
+
+            // Update the subtotal
+            updateSubtotal();
+
+            // Show success message
+            Swal.fire(
+              'Deleted!',
+              'Your item has been removed from the cart.',
+              'success'
+            ). then(() => {
+              location.reload();
+            });
+          } else {
+            // If there's an issue deleting the item, show an error
+            Swal.fire(
+              'Error!',
+              'There was an issue deleting the item. Please try again.',
+              'error'
+            );
+          }
+        } catch (error) {
+          console.log(error);
+          Swal.fire(
+            'Error!',
+            'Failed to communicate with the server. Please try again.',
+            'error'
+          );
+        }
+      }
+    });
+  });
+
+    function updateSubtotal() {
+      let subtotal = 0;
+      const cartItems = document.querySelectorAll('.cart-item');
+
+      cartItems.forEach(item => {
+        const price = parseFloat(item.querySelector('.price-details h3').innerText.replace('₹', '').trim());
+        const quantity = parseInt(item.querySelector('.quantity-input').value);
+        subtotal += price * quantity;
+      });
+
+      const subtotalElement = document.querySelector('.subtotal p strong');
+      if(subtotalElement) {
+        subtotalElement.innerHTML = `Total: ₹ ${subtotal}.00`;
+      }
+    }
+  });
+</script> 
+
+<%- include('../../views/partials/user/footer') %>

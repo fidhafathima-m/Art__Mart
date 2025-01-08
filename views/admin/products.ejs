@@ -1,0 +1,274 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container">
+    <h1 class="my-4">Manage Products</h1>
+
+    <form method="GET" class="d-flex justify-content-between mb-3">
+      <div class="input-group col-md-8">
+        <input
+          type="text"
+          class="form-control"
+          name="search"
+          placeholder="Search by name"
+          aria-label="Search"
+          aria-describedby="basic-addon2"
+        />
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+
+      <button class="btn btn-dark" style="width: 150px" type="button">
+        <a
+          href="/admin/add-product"
+          class="text-white"
+          style="text-decoration: none"
+          >Add Product</a
+        >
+      </button>
+    </form>
+
+    <!-- Table Container -->
+    <div class="table-container">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Regular Price</th>
+            <th>Sale Price</th>
+            <th>Added On</th>
+            <th>Offer %</th>
+            <th>Add/Remove Offer</th>
+            <th>Block/Unblock</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="userTable">
+          <% for(let i = 0; i < product.length; i++) { %>
+          <tr id="<%= product[i]._id %>">
+            <td><%= product[i].productName %></td>
+            <td><%= product[i].category.name %></td>
+            <td><%= product[i].quantity %></td>
+            <td><%= product[i].regularPrice %></td>
+            <td><%= product[i].salePrice %></td>
+            <td>
+              <%= new Date(product[i].createdAt).toLocaleString('en-US') %>
+            </td>
+
+            <td>
+              <% if (product[i].productOffer) { %> <%= product[i].productOffer
+              %> <% } else { %> 0% <% } %>
+            </td>
+            <td>
+              <% if (product[i].productOffer === 0) { %>
+              <button
+                class="btn btn-info"
+                onclick="addOffer('<%= product[i]._id %>')"
+                style="width: 100px"
+              >
+                Add
+              </button>
+              <% } else { %>
+              <button
+                class="btn btn-danger"
+                onclick="removeOffer('<%= product[i]._id %>')"
+                style="width: 100px"
+              >
+                Remove
+              </button>
+
+              <% } %>
+            </td>
+
+            <td>
+              <% if (product[i].isBlocked === false) { %>
+              <button
+                class="btn btn-warning block-btn"
+                data-id="<%= product[i]._id %>"
+                style="width: 80px"
+              >
+                Block
+              </button>
+              <% } else { %>
+              <button
+                class="btn btn-success unblock-btn"
+                data-id="<%= product[i]._id %>"
+                style="width: 80px"
+              >
+                Unblock
+              </button>
+              <% } %>
+            </td>
+
+            <td>
+              <button class="btn btn-secondary" style="width: 80px">
+                <a
+                  href="/admin/edit-product?id=<%= product[i]._id %>"
+                  class="text-white"
+                  style="text-decoration: none"
+                  >Edit</a
+                >
+              </button>
+            </td>
+            <td>
+              <% if (product[i].isDeleted === false) { %>
+              <!-- Check if product is not deleted -->
+              <button
+                class="btn btn-danger"
+                style="width: 80px"
+                onclick="deleteProduct('<%= product[i]._id %>')"
+              >
+                Delete
+              </button>
+              <% } else { %>
+              <!-- If the product is deleted -->
+              <button
+                class="btn btn-success"
+                style="width: 80px"
+                onclick="restoreProduct('<%= product[i]._id %>')"
+              >
+                Restore
+              </button>
+              <% } %>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="container mt-3 mb-3">
+        <nav aria-label="Page navigation">
+          <ul
+            class="pagination justify-content-center mb-20"
+            style="margin-right: 200px"
+          >
+            <% for(let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="/js/custom.js"></script>
+
+<script>
+  // Block Product with Confirmation
+  $(document).on("click", ".block-btn", function () {
+    var productId = $(this).data("id");
+
+    // Show confirmation dialog
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to block this product!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Block!",
+      cancelButtonText: "No, Cancel",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // If confirmed, make AJAX request to block the product
+        $.ajax({
+          type: "POST",
+          url: "/admin/block-product",
+          data: { id: productId },
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Product Blocked Successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                location.reload(); // Reload the page to update the UI
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurred while blocking the product. Please try again.",
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Request Failed",
+              text: "There was an issue connecting to the server. Please try again.",
+            });
+          },
+        });
+      } else {
+        // If the user clicks Cancel
+        Swal.fire("Cancelled", "Product blocking was cancelled.", "info");
+      }
+    });
+  });
+
+  // Unblock Product with Confirmation
+  $(document).on("click", ".unblock-btn", function () {
+    var productId = $(this).data("id");
+
+    // Show confirmation dialog
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to unblock this product!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Unblock!",
+      cancelButtonText: "No, Cancel",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // If confirmed, make AJAX request to unblock the product
+        $.ajax({
+          type: "POST",
+          url: "/admin/unblock-product",
+          data: { id: productId },
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Product Unblocked Successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                location.reload(); // Reload the page to update the UI
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurred while unblocking the product. Please try again.",
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Request Failed",
+              text: "There was an issue connecting to the server. Please try again.",
+            });
+          },
+        });
+      } else {
+        // If the user clicks Cancel
+        Swal.fire("Cancelled", "Product unblocking was cancelled.", "info");
+      }
+    });
+  });
+</script>

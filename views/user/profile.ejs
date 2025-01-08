@@ -1,0 +1,206 @@
+<head>
+  <style>
+
+.sidebar a.active {
+    background-color: #007bff;  /* Change to your preferred color */
+    color: white;
+  }
+
+  .sidebar a.active i {
+    color: white;  /* Optional: Change icon color when active */
+  }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      background-color: #f8f9fa;
+      padding-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    /* .content {
+      padding: 20px;
+    } */
+
+    .sidebar a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+
+    .sidebar a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .alert {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<%- include('../../views/partials/user/header') %>
+
+<div class="wrapper">
+  <div class="row">
+    <!-- Sidebar -->
+    <%- include('../../views/partials/user/sidebar', { currentPage: currentPage }) %>
+
+    <!-- Main Content -->
+    <div class="ml-5 col-md-8">
+      <h2 class="mt-4 text-center mb-4">
+        <%= section === 'addresses' ? 'Your Addresses' : section === 'orders' ? 'Your Orders' : 'Your Profile' %>
+      </h2>
+
+      <!-- Render the content based on the section -->
+      <% if (section === 'addresses') { %>
+        <!-- Add New Address Button -->
+         <div class="d-flex justify-content-end mt-3">
+          <a href="/profile/address/add" class="btn btn-primary mb-3">
+            <i class="fas fa-plus"></i> Add New Address
+          </a>
+        </div>
+        <!-- Show the addresses in cards -->
+        <% if (addresses && addresses.length > 0) { %>
+          <div class="d-flex flex-wrap justify-content-start"> <!-- Using flexbox to wrap and align items -->
+            <% addresses.forEach((address, index) => { %> <!-- Loop through each address -->
+              <% address.address.forEach((addr, addrIndex) => { %> <!-- Loop through address types inside each address -->
+                <div class="card p-4 mb-5 me-4 shadow" style="flex: 1 1 30%;"> <!-- Flexbox for responsiveness -->
+                  <div class="card-title text-center mt-2">Address <%= (index * address.address.length) + addrIndex + 1 %> - <%= addr.addressType %></div> <!-- Dynamic card title -->
+                  <div class="card-body">
+                    <div class="address-card">
+                      <p><strong>Name:</strong> <%= addr.name %></p>
+                      <p><strong>City:</strong> <%= addr.city %></p>
+                      <p><strong>Landmark:</strong> <%= addr.landMark %></p>
+                      <p><strong>State:</strong> <%= addr.state %></p>
+                      <p><strong>Pincode:</strong> <%= addr.pincode %></p>
+                      <p><strong>Phone:</strong> <%= addr.phone %></p>
+                      <p><strong>Alt Phone:</strong> <%= addr.altPhone %></p>
+                      <!-- Edit and Delete links -->
+                      <div class="d-flex justify-content-end">
+                        <a href="/profile/address/edit?id=<%= addr._id %>" class="card-link">
+                          <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="javascript:void(0);" 
+   class="card-link text-danger ms-3" 
+   data-id="<%= addr._id %>" 
+   id="deleteAddressLink">
+  <i class="fas fa-trash"></i> Delete
+</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% }) %> <!-- End of address types loop -->
+            <% }) %> <!-- End of addresses loop -->
+          </div> <!-- End of flex container -->
+        <% } else { %>
+          <p>No addresses found.</p>
+        <% } %>
+      
+        
+      
+      
+
+      <% } else if (section === 'orders') { %>
+        <!-- Show the orders table -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Your Orders</h5>
+            <!-- Orders content goes here -->
+          </div>
+        </div>
+      <% } else { %>
+        <!-- Dashboard content -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Welcome to Your Dashboard</h5>
+            <div class="col-md-9 content">
+              <h2 class="mb-4 text-center">Hello <%= user.name %>!</h2>
+      
+             
+      
+              <!-- Profile Information -->
+              <div class="card mb-4">
+                <div class="card-body">
+                  <h5 class="card-title">Profile Information</h5>
+                  <p><strong>Email:</strong> <%= user.email %></p>
+                  <p><strong>Phone Number:</strong> <%= user.phone %></p>
+                  <a href="/profile/change-email" class="btn btn-primary">Change Email</a>
+                  <a href="/profile/change-password" class="btn btn-warning">Change Password</a>
+                </div>
+              </div>
+      
+              
+              
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../../views/partials/user/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+   // When clicking on the delete button
+  document.querySelectorAll("#deleteAddressLink").forEach((link) => {
+    link.addEventListener('click', function(event) {
+      // Prevent the default link behavior
+      event.preventDefault();
+
+      const addressId = link.getAttribute('data-id');  // Get the address ID from the data attribute
+
+      // Show SweetAlert confirmation
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Proceed with the deletion if confirmed using AJAX
+          deleteAddress(addressId);
+        }
+      });
+    });
+  });
+
+  // Function to handle address deletion via AJAX
+  function deleteAddress(addressId) {
+    $.ajax({
+      url: `/profile/address/delete?id=${addressId}`,
+      method: 'GET', // Use GET for this delete operation
+      success: function(response) {
+        // Show success alert
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'The address has been deleted successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          // Redirect to user profile page to show updated list of addresses
+          window.location.href = '/userProfile?section=addresses';
+        });
+      },
+      error: function(error) {
+        // Show error alert if something goes wrong
+        Swal.fire({
+          title: 'Error!',
+          text: 'An error occurred while deleting the address. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
+</script>

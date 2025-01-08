@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/signup_style.css" type="text/css" />
+  </head>
+  <body>
+    <h1 class="text-center pt-5 pb-0 head">
+      Start Your Creative Adventure Today
+    </h1>
+    <div class="container">
+      <div class="signup-container row">
+        <!-- Left Image -->
+        <div class="col-12 col-md-6 d-flex justify-content-center">
+          <img src="img/illustrations/signup.png" alt="Creative Tools Image" />
+        </div>
+
+        <!-- Right Form -->
+        <div class="form-container col-12 col-md-6">
+          <p class="text-center">
+            Sign up and discover the tools to bring your artistic vision to
+            life.
+          </p>
+
+          <!-- Sign-Up Form -->
+          <form id="signup-form" action="/signup" method="POST">
+            <!-- Input Fields -->
+
+            <% if (locals.message && message.length > 0) {%>
+
+            <div class="alert alert-danger text-center"><%= message %></div>
+
+            <% } %>
+
+            <div class="form-group">
+              <input
+                type="text"
+                name="name"
+                id="name"
+                class="input-line"
+                placeholder="Full Name"
+              />
+              <div class="error-message" id="name-error"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="email"
+                name="email"
+                id="email"
+                class="input-line"
+                placeholder="Email Address"
+              />
+              <div class="error-message" id="email-error"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="text"
+                name="phone"
+                id="phone"
+                class="input-line"
+                placeholder="Phone Number"
+              />
+              <div class="error-message" id="phone-error"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="password"
+                name="password"
+                id="password"
+                class="input-line"
+                placeholder="Password"
+              />
+              <div class="error-message" id="password-error"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="password"
+                name="confirm_password"
+                id="confirm_password"
+                class="input-line"
+                placeholder="Confirm Password"
+              />
+              <div class="error-message" id="confirm-password-error"></div>
+            </div>
+
+            <!-- Sign Up Button -->
+            <button type="submit" class="primary-btn">Sign Up</button>
+
+            <a href="/auth/google" class="google-btn">
+              <i class="fab fa-google"></i> Sign Up with Google
+            </a>
+
+            <div class="text-center" style="margin-top: 20px">
+              <p>Already have an account? <a href="/login">Login here</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+      const nameId = document.getElementById("name");
+      const phoneId = document.getElementById("phone");
+      const emailId = document.getElementById("email");
+      const passId = document.getElementById("password");
+      const cPassId = document.getElementById("confirm_password");
+      const nameErr = document.getElementById("name-error");
+      const phoneErr = document.getElementById("phone-error");
+      const emailErr = document.getElementById("email-error");
+      const passErr = document.getElementById("password-error");
+      const cPassErr = document.getElementById("confirm-password-error");
+      const form = document.getElementById("signup-form");
+
+      function showError(element, message) {
+        element.style.display = "block";
+        element.innerHTML = message;
+      }
+
+      function hideError(element) {
+        element.style.display = "none";
+        element.innerHTML = "";
+      }
+
+      function nameValidaterChecking() {
+        const nameVal = nameId.value;
+        const namePattern = /^[A-Za-z\s]+$/;
+
+        if (nameVal.trim() === "") {
+          showError(nameErr, "Please enter a valid name");
+        } else if (!namePattern.test(nameVal)) {
+          showError(nameErr, "Name can only contain alphabets and spaces");
+        } else {
+          hideError(nameErr);
+        }
+      }
+
+      function emailValidaterChecking() {
+        const emailVal = emailId.value;
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+        if (!emailPattern.test(emailVal)) {
+          showError(emailErr, "Invalid format");
+        } else {
+          hideError(emailErr);
+        }
+      }
+
+      function phoneValidaterChecking() {
+        const phoneVal = phoneId.value;
+
+        if (phoneVal.trim() === "") {
+          showError(phoneErr, "Please enter a valid Phone Number");
+        } else if (phoneVal.length !== 10) {
+          showError(phoneErr, "Enter a 10-digit Phone number");
+        } else {
+          hideError(phoneErr);
+        }
+      }
+
+      function passValidaterChecking() {
+        const passVal = passId.value;
+        const cPassVal = cPassId.value;
+        const alpha = /^[A-Za-z]/;
+        const digit = /\d/;
+
+        if (passVal.length < 8) {
+          showError(passErr, "Should contain at least 8 characters");
+        } else if (!alpha.test(passVal) || !digit.test(passVal)) {
+          showError(passErr, "Should contain numbers and alphabets");
+        } else {
+          hideError(passErr);
+        }
+
+        if (passVal !== cPassVal && cPassVal !== "") {
+          showError(cPassErr, "Passwords didn't match");
+        } else {
+          hideError(cPassErr);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          nameValidaterChecking();
+          emailValidaterChecking();
+          phoneValidaterChecking();
+          passValidaterChecking();
+
+          if (
+            nameErr.innerHTML ||
+            emailErr.innerHTML ||
+            phoneErr.innerHTML ||
+            passErr.innerHTML ||
+            cPassErr.innerHTML
+          ) {
+            return;
+          }
+
+          form.submit();
+        });
+
+        if (
+          !nameId ||
+          !emailId ||
+          !phoneId ||
+          !nameErr ||
+          !phoneErr ||
+          !emailErr ||
+          !passErr ||
+          !cPassErr ||
+          !form
+        ) {
+          console.log("One or more elements not found");
+        }
+      });
+    </script>
+  </body>
+</html>

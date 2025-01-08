@@ -1,0 +1,70 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container">
+    <h1 class="my-4">Add New Coupon</h1>
+
+    <form id="addCouponForm" method="POST" enctype="multipart/form-data">
+      <div class="form-group mb-3">
+        <label for="name">Coupon Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          name="name"
+          required
+          placeholder="Enter coupon name"
+        />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="expireOn">Expiration Date</label>
+        <input
+          type="datetime-local"
+          class="form-control"
+          id="expireOn"
+          name="expireOn"
+          required
+        />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="offerPrice">Offer Price</label>
+        <input
+          type="number"
+          class="form-control"
+          id="offerPrice"
+          name="offerPrice"
+          required
+          min="0"
+          placeholder="Enter offer price"
+        />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="minPurchaseAmount">Minimum Purchase Amount</label>
+        <input
+          type="number"
+          class="form-control"
+          id="minPurchaseAmount"
+          name="minPurchaseAmount"
+          required
+          min="0"
+          placeholder="Enter minimum purchase amount"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary">Add Coupon</button>
+      <a href="/admin/coupons" class="btn btn-danger">Cancel</a>
+    </form>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="/js/custom.js"></script>

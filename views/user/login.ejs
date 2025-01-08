@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log In</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/signup_style.css" type="text/css" />
+  </head>
+  <body>
+    <h1 class="text-center pt-5 pb-0 head">Log In & Explore More</h1>
+    <div class="container">
+      <div class="signup-container row">
+        <!-- Left Image -->
+        <div class="col-12 col-md-6 d-flex justify-content-center">
+          <img src="img/illustrations/login.png" alt="Creative Tools Image" />
+        </div>
+
+        <!-- Right Form -->
+        <div class="form-container col-12 col-md-6">
+          <p class="text-center">
+            Log in for personalized recommendations and exclusive offers!
+          </p>
+
+          <!-- Sign-Up Form -->
+          <form id="signup-form" action="/login" method="POST">
+            <!-- Input Fields -->
+
+            <% if (locals.message && message.length > 0) {%>
+
+            <div class="alert alert-danger text-center"><%= message %></div>
+
+            <% } %>
+
+            <div class="form-group">
+              <input
+                type="email"
+                name="email"
+                id="email"
+                class="input-line"
+                placeholder="Email Address"
+                required
+              />
+              <div class="error-message" id="email-error"></div>
+            </div>
+
+            <div class="form-group">
+              <input
+                type="password"
+                name="password"
+                id="password"
+                class="input-line"
+                placeholder="Password"
+                required
+              />
+              <div class="error-message" id="password-error"></div>
+            </div>
+
+            <div class="form-group d-flex justify-content-end">
+              <a href="/forgot-password" class="f-pass ms-auto"
+                >Forgot password?</a
+              >
+            </div>
+
+            <!-- Login Button -->
+            <button type="submit" class="primary-btn">Log In</button>
+
+            <a href="/auth/google" class="google-btn">
+              <i class="fab fa-google"></i> Login with Google
+            </a>
+
+            <div class="text-center" style="margin-top: 20px">
+              <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+      const emailId = document.getElementById("email");
+      const passId = document.getElementById("password");
+      const emailErr = document.getElementById("email-error");
+      const passErr = document.getElementById("password-error");
+      const form = document.getElementById("signup-form");
+
+      function showError(element, message) {
+        element.style.display = "block";
+        element.innerHTML = message;
+      }
+
+      function hideError(element) {
+        element.style.display = "none";
+        element.innerHTML = "";
+      }
+
+      function emailValidaterChecking() {
+        const emailVal = emailId.value;
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+        if (!emailPattern.test(emailVal)) {
+          showError(emailErr, "Invalid format");
+        } else {
+          hideError(emailErr);
+        }
+      }
+
+      function passValidaterChecking() {
+        const passVal = passId.value;
+        const alpha = /^[A-Za-z]/;
+        const digit = /\d/;
+
+        if (passVal.length < 8) {
+          showError(passErr, "Should contain at least 8 characters");
+        } else if (!alpha.test(passVal) || !digit.test(passVal)) {
+          showError(passErr, "Should contain numbers and alphabets");
+        } else {
+          hideError(passErr);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          console.log("Form submit triggered");
+
+          emailValidaterChecking();
+          passValidaterChecking();
+
+          if (emailErr.innerHTML || passErr.innerHTML) {
+            return;
+          }
+
+          form.submit();
+        });
+
+        if (!emailId || !passErr || !form) {
+          console.log("One or more elements not found");
+        }
+      });
+    </script>
+  </body>
+</html>
