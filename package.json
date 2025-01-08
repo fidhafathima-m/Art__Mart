@@ -10,10 +10,7 @@
   "bugs": {
     "url": "https://github.com/fidhafathima-m/Art-Mart/issues"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fidhafathima-m/Art-Mart.git"
-  },
+  
   "license": "ISC",
   "author": "Fidha Fathima M",
   "type": "commonjs",
