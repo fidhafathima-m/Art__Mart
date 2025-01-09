@@ -1,5 +1,6 @@
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
+const Cart = require('../../models/cartSchema');
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
@@ -139,10 +140,13 @@ const resetPassword = async (req, res) => {
     const { password, confirmPassword } = req.body;
     const email = req.session.email;
 
+    console.log('Email in session:', email);
+
     if (password === confirmPassword) {
       const passwordHash = await securePassword(password);
 
-      await User.updateOne({ email: email }, { password: passwordHash });
+      const updated = await User.updateOne({ email: email }, { password: passwordHash });
+
 
       // Send JSON response indicating success
       res.json({ success: true, message: "Password reset successfully." });
@@ -194,13 +198,17 @@ const loadUserProfile = async(req, res) => {
       // Default content for the dashboard (could be profile stats, etc.)
       content = { userProfile: true };
     }
+    const cart = await Cart.findOne({ userId: userId });
+        const cartItems = cart ? cart.items : [];
 
     // Render the profile page with the fetched data
     res.render('profile', {
       user: userData, 
       ...content, 
       section, 
-      currentPage: section
+      currentPage: section,
+      activePage: 'userProfile',
+      cartItems:cartItems
     });
 
   } catch (error) {
@@ -211,45 +219,87 @@ const loadUserProfile = async(req, res) => {
 
 const loadChangeEmail = async(req, res) => {
   try {
-    res.render('change-email', {user: req.session.user || null});
+
+    const user = req.session.user;
+
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
+
+    res.render('change-email', {
+      user: user || null, 
+      activePage: 'userProfile',
+      cartItems: cartItems
+
+    });
   } catch (error) {
-    console.log('Error in changing email');
+    console.log('Error in changing email', error);
     res.redirect('/userProfile');  
   }
 }
 
-const changeEmail = async(req, res) => {
+const changeEmail = async (req, res) => {
   try {
-    
-    const {currentEmail} = req.body;
-    const userExists = await User.findOne({email: currentEmail});
-    if (userExists) {
-      const otp = generateOtp();
-      const emailSent = await sendVeificationMail(currentEmail, otp);
+    const user = req.session.user;
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
 
-      if(emailSent) {
-        req.session.userOtp = otp;
-        req.session.userData = req.body;
-        req.session.email = currentEmail;
-        res.render('change-email-otp', {user: req.session.user || null});
-        console.log('Email sent: ', currentEmail);
-        console.log('otp: ', otp);
-      } else{
-        cosnole.log('Email error')
-      } 
-    } else {
-      res.render('change-email', {message: 'User with this mail doesn\'t exists'});
+    const { currentEmail } = req.body;
+    const userData = await User.findById(user);
+
+    // Check if the entered email is the current user's email
+    if (userData.email !== currentEmail) {
+      // Send response with failure message
+      return res.json({
+        success: false,
+        message: 'This is not your current email address.',
+      });
     }
 
+    // Continue with OTP process if email matches
+    const otp = generateOtp();
+    const emailSent = await sendVeificationMail(currentEmail, otp);
+
+    if (emailSent) {
+      req.session.userOtp = otp;
+      req.session.userData = req.body;
+      req.session.email = currentEmail;
+
+      return res.json({
+        success: true,
+        message: 'OTP sent successfully. Please check your email.',
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: 'Error sending OTP. Please try again later.',
+      });
+    }
   } catch (error) {
     console.log('error', error);
-    res.redirect('/pageNotFound');
+    res.json({
+      success: false,
+      message: 'An unexpected error occurred. Please try again.',
+    });
+  }
+};
+
+const otpPage = async(req, res) => {
+  try {
+    
+    const userId = req.session.user;
+    res.render('change-email-otp', {user: userId});
+
+  } catch (error) {
+    console.log('error: ', error)
   }
 }
 
 
+
 const verifyEmailOtp = async (req, res) => {
   try {
+
+    const user = req.session.user
     // Log full request body and session data for detailed inspection
     console.log('Request body:', req.body);
     console.log('Session userOtp:', req.session.userOtp);
@@ -262,6 +312,8 @@ const verifyEmailOtp = async (req, res) => {
     console.log('Session OTP:', sessionOtp);
 
     console.log('Is OTP equal?', otp === sessionOtp);  // Direct comparison result
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
 
 
     // Check if both OTPs are present before proceeding
@@ -270,6 +322,9 @@ const verifyEmailOtp = async (req, res) => {
       return res.render('change-email-otp', {
         message: "OTP not received or session expired",
         userData: req.session.userData,
+        activePage: 'userProfile',
+        cartItems: cartItems
+
       });
     }
 
@@ -299,7 +354,18 @@ const verifyEmailOtp = async (req, res) => {
 
 const loadNewMail = async(req, res) => {
   try {
-    res.render('new-email', {user: req.session.user || null});
+
+    const user = req.session.user
+
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
+
+    res.render('new-email', {
+      user: req.session.user || null,
+       activePage: 'userProfile',
+       cartItems: cartItems
+
+      });
   } catch (error) {
     console.log('Error in loading', error);
     res.redirect('/pageNotFound');
@@ -313,11 +379,17 @@ const updateEmail = async (req, res) => {
 
     // Check if the new email already exists in the database
     const existingUser = await User.findOne({ email: newEmail });
+
+    const cart = await Cart.findOne({ userId: userId });
+    const cartItems = cart ? cart.items : [];
     
     if (existingUser) {
       // If email already exists, send a response with an error message
       return res.render('new-email', {
-        message: 'This email is already in use. Please choose a different one.',
+        message: 'This email is already in use. Please choose a different one.', 
+        activePage: 'userProfile',
+        cartItems: cartItems
+
       });
     }
 
@@ -334,7 +406,16 @@ const updateEmail = async (req, res) => {
 
 const loadEmailPageforPassChange = async(req, res) => {
   try {
-    res.render('change-pass', {user: req.session.user || null});
+    const user = req.session.user
+
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
+    res.render('change-pass', {
+      user: req.session.user || null, 
+      activePage: 'userProfile',
+      cartItems: cartItems
+
+    });
   } catch (error) {
     console.log('Error in loading', error);
     res.redirect('/pageNotFound');
@@ -343,37 +424,72 @@ const loadEmailPageforPassChange = async(req, res) => {
 
 const changePassValid = async (req, res) => {
   try {
-    const { newEmail } = req.body; // Assuming the email field in your form is called "newEmail"
-    
-    // Check if the email is already taken
-    const userExists = await User.findOne({ email: newEmail });
+    const user = req.session.user;
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
 
-    if (userExists) {
-      // If email doesn't exist, generate OTP and send it
-      const otp = generateOtp();
-      const emailSent = await sendVeificationMail(newEmail, otp);
+    const { newEmail } = req.body;  // The email entered by the user
+    const userData = await User.findById(user);  // Get the current user's data
 
-      if (emailSent) {
-        req.session.userOtp = otp;
-        req.session.userData = { email: newEmail }; // Store email in session for OTP verification
-        res.render('change-pass-otp', {user: req.session.user || null});  // Redirect to OTP page
-        console.log('OTP sent:', otp);
-      } else {
-        res.json({ success: false, message: 'Failed to send OTP' });
-      }
+    // Check if the entered email matches the current user's email
+    if (userData.email !== newEmail) {
+      return res.json({
+        success: false,
+        message: 'This is not your current email address.',  // Email mismatch message
+      });
+    }
+
+    // If the email matches, proceed with OTP generation and sending
+    const otp = generateOtp();
+    const emailSent = await sendVeificationMail(newEmail, otp);
+
+    if (emailSent) {
+      // Store OTP and email in session
+      req.session.userOtp = otp;
+      req.session.userData = req.body;
+      req.session.email = newEmail;
+
+      // Return success response with message
+      return res.json({
+        success: true,
+        message: 'OTP sent successfully. Please check your email.',
+      });
+    } else {
+      // If OTP sending fails
+      return res.json({
+        success: false,
+        message: 'Error sending OTP. Please try again later.',
+      });
     }
   } catch (error) {
-    console.log('Error in change password validation', error);
-    res.redirect('/pageNotFound');
+    console.log('Error in change password validation:', error);
+    // In case of unexpected errors
+    res.json({
+      success: false,
+      message: 'An unexpected error occurred. Please try again.',
+    });
   }
 };
+
+const passOtpPage = async(req, res) => {
+  try {
+    
+    const userId = req.session.user;
+    res.render('change-pass-otp', {user: userId});
+
+  } catch (error) {
+    console.log('error: ', error)
+  }
+}
 
 const verifyChangePassOtp = async(req, res) => {
   try {
     
     const {otp} = req.body;
+
+
     if(otp === req.session.userOtp) {
-      req.session.email = req.session.userData.email;
+      req.session.email = req.session.userData.newEmail;
       res.json({success: true, redirectUrl: '/reset-password'});
     } else {
       res.json({success: false, message: 'OTP not matching'});
@@ -388,8 +504,17 @@ const verifyChangePassOtp = async(req, res) => {
 const loadAddAddress = async (req, res) => {
   try {
 
+    
     const user = req.session.user;
-    res.render('add-address', {user: user})
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
+
+    res.render('add-address', {
+      user: user, 
+      activePage: 'userProfile',
+      cartItems: cartItems
+
+    })
 
   } catch (error) {
     console.error("Error loading:", error);
@@ -494,9 +619,17 @@ const loadEditAddress = async (req, res) => {
       console.log('Address data not found');
       return res.redirect('/pageNotFound');
     }
+    const cart = await Cart.findOne({ userId: user });
+        const cartItems = cart ? cart.items : [];
 
     // Render the edit address page
-    res.render('edit-address', { address: addressData, user: user });
+    res.render('edit-address', { 
+      address: addressData, 
+      user: user, 
+      activePage: 'userProfile', 
+      cartItems: cartItems
+
+    });
 
   } catch (error) {
     console.error('Error loading address:', error);
@@ -584,11 +717,13 @@ module.exports = {
   loadUserProfile,
   loadChangeEmail,
   changeEmail,
+  otpPage,
   verifyEmailOtp,
   loadNewMail,
   updateEmail,
   loadEmailPageforPassChange,
   changePassValid,
+  passOtpPage,
   verifyChangePassOtp,
   loadAddAddress,
   addAddress,

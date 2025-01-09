@@ -55,12 +55,22 @@
         </div>
       </div>
       <hr />
+      <div style="display: flex; justify-content: flex-end; align-items: center;">
+        <span style="margin-right: 10px; margin-top: -16px;">Subtotal(<%= cartItems.length %> items): </span>
+        <% let subtotal = 0; %>
+        <% cartItems.forEach(item => { %>
+          <% subtotal += item.salePrice * item.cartQuantity; %>
+        <% }) %>
+        <p><strong> &#8377; <%= subtotal %>.00</strong></p>
+      </div>
+      
+
     <% }) %>
   </div>
 
   <!-- Right container (subtotal & proceed to buy) -->
   <div class="subtotal bg-white p-4 rounded ml-4" style="width: 30%; padding: 20px; height: 50%;">
-    <h3>Subtotal: (<%= cartItems.length %> items)</h3>
+    <h3>Subtotal(<%= cartItems.length %> items): </h3>
     <hr />
     <div>
       <% let subtotal = 0; %>
@@ -90,7 +100,7 @@
         let quantity = parseInt(inputField.value);
 
         // Increase quantity
-        if (quantity < maxQuantity) {
+        if (quantity < 5) {
           quantity += 1;
           
 
@@ -116,7 +126,12 @@
           alert('Failed to update quantity');
         }
       } else {
-        alert(`Ooops, You cannot add further more`);
+        Swal.fire({
+        title: 'Limit Reached!',
+        text: 'You can only add a maximum of 5 items of this product.',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+      });
       }
     });
   });

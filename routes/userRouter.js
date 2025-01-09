@@ -42,6 +42,8 @@ router.get("/shop", userController.loadShopping);
 router.get("/filter", userController.filterProduct);
 router.get("/filterPrice", userController.filterByPrice);
 router.get("/search", userController.searchProducts);
+router.get('/sortBy', userController.sortBy);
+router.get('/sortByPrice', userController.sortByPrice);
 
 router.get("/logout", userController.logout);
 
@@ -62,10 +64,12 @@ router.post("/reset-password", profileController.resetPassword);
 router.get('/userProfile', profileController.loadUserProfile);
 router.get('/profile/change-email', profileController.loadChangeEmail);
 router.post('/profile/change-email', profileController.changeEmail);
+router.get('/profile/otp-verification', profileController.otpPage);
 router.post('/profile/verify-email-otp', profileController.verifyEmailOtp);
 router.get('/profile/new-email', profileController.loadNewMail);
 router.post('/profile/update-email', profileController.updateEmail);
 router.get('/profile/change-password', profileController.loadEmailPageforPassChange);
+router.get('/profile/pass-otp-verification', profileController.passOtpPage);
 router.post('/profile/change-password', profileController.changePassValid);
 router.post('/profile/verify-pass-otp', profileController.verifyChangePassOtp);
 

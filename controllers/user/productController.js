@@ -209,6 +209,10 @@ const updateCartQuantity = async (req, res) => {
     const userId = req.session.user;  // Assuming user authentication
     const product = await Product.findOne({_id: productId});
 
+    if (quantity > 5) {
+      return res.status(400).json({ success: false, message: 'Cannot add more than 5 of this product.' });
+    }
+
     // Find the cart for the user
     let cart = await Cart.findOne({ userId });
 

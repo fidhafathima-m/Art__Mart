@@ -24,229 +24,147 @@
 </section>
 <!-- Breadcrumb Section End -->
 
+<div class="mt-5">
+  <!-- Search Bar -->
+<form method="GET" action="/search">
+  <div class="input-group mb-3">
+    <input
+      type="text"
+      class="form-control"
+      name="search"
+      placeholder="Search ..."
+      aria-label="Search"
+      aria-describedby="basic-addon2"
+    />
+    <button class="btn btn-primary p-2" type="submit">
+      Search
+    </button>
+  </div>
+</form>
+</div>
+
 <section class="shop spad">
   <div class="container">
     <div class="row">
       <div class="col-lg-3">
         <div class="shop__sidebar">
-          <div class="shop__sidebar__search">
-            <!-- Search Bar -->
-            <form method="GET" action="/search">
-              <div class="input-group mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  name="search"
-                  placeholder="Search ..."
-                  aria-label="Search"
-                  aria-describedby="basic-addon2"
-                />
-                <button class="btn btn-primary p-2" type="submit">
-                  Search
-                </button>
-              </div>
-            </form>
-          </div>
           <div class="shop__sidebar__accordion">
             <div class="accordion" id="accordionExample">
+              
+              <!-- Sort By Section -->
               <div class="card">
                 <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseOne"
-                    >Categories</a
-                  >
+                  <a data-toggle="collapse" data-target="#collapseSortBy" class="accordion-header">Sort By</a>
                 </div>
-                <div
-                  id="collapseOne"
-                  class="collapse show"
-                  data-parent="#accordionExample"
-                >
+                <div id="collapseSortBy" class="collapse show" data-parent="#accordionExample">
+                  <div class="card-body">
+                    <div class="shop__sidebar__sort">
+                      <ul class="sidebar-list">
+                        <li>
+                          <a href="/sortBy?sortBy=featured&page=1" class="sidebar-link <%= sortBy === 'featured' ? 'active' : '' %>">Featured</a>
+                        </li>
+                        <li>
+                          <a href="/sortBy?sortBy=newArrivals&page=1" class="sidebar-link <%= sortBy === 'newArrivals' ? 'active' : '' %>">New Arrivals</a>
+                        </li>
+                        <li>
+                          <a href="/sortBy?sortBy=aToZ&page=1" class="sidebar-link <%= sortBy === 'aToZ' ? 'active' : '' %>">A - Z</a>
+                        </li>
+                        <li>
+                          <a href="/sortBy?sortBy=zToA&page=1" class="sidebar-link <%= sortBy === 'zToA' ? 'active' : '' %>">Z - A</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+      
+              <!-- Categories Section -->
+              <div class="card">
+                <div class="card-heading">
+                  <a data-toggle="collapse" data-target="#collapseOne" class="accordion-header">Categories</a>
+                </div>
+                <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
                   <div class="card-body">
                     <div class="shop__sidebar__categories">
-                      <ul class="nice-scroll">
+                      <ul class="sidebar-list">
                         <% for (let i = 0; i < categories.length; i++) { %>
-                        <li>
-                          <a href="/filter?category=<%= categories[i]._id %>"
-                            ><%= categories[i].name %></a
-                          >
-                        </li>
+                          <li>
+                            <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
+                              <%= categories[i].name %>
+                            </a>
+                          </li>
                         <% } %>
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              <!-- <div class="card">
-                                <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseTwo">Branding</a>
-                                </div>
-                                <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
-                                    <div class="card-body">
-                                        <div class="shop__sidebar__brand">
-                                            <ul>
-                                                <li><a href="#">Louis Vuitton</a></li>
-                                                <li><a href="#">Chanel</a></li>
-                                                <li><a href="#">Hermes</a></li>
-                                                <li><a href="#">Gucci</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
+      
+              <!-- Filter Price Section -->
               <div class="card">
                 <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseThree"
-                    >Filter Price</a
-                  >
+                  <a data-toggle="collapse" data-target="#collapseThree" class="accordion-header">Filter Price</a>
                 </div>
-                <div
-                  id="collapseThree"
-                  class="collapse show"
-                  data-parent="#accordionExample"
-                >
+                <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
                   <div class="card-body">
                     <div class="shop__sidebar__price">
-                      <ul>
+                      <ul class="sidebar-list">
                         <li>
-                          <a href="/filterPrice?gt=0&lt=500"
-                            >Under &#8377; 500.00</a
-                          >
+                          <a href="/filterPrice?gt=0&lt=500" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
                         </li>
                         <li>
-                          <a href="/filterPrice?gt=500&lt=1000"
-                            >&#8377; 500.00 - &#8377; 1000.00</a
-                          >
+                          <a href="/filterPrice?gt=500&lt=1000" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
                         </li>
                         <li>
-                          <a href="/filterPrice?gt=1000&lt=1500"
-                            >&#8377; 1000.00 - &#8377; 1500.00</a
-                          >
+                          <a href="/filterPrice?gt=1000&lt=1500" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
                         </li>
                         <li>
-                          <a href="/filterPrice?gt=1500&lt=100000"
-                            >&#8377; 1500.00+</a
-                          >
+                          <a href="/filterPrice?gt=1500&lt=100000" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
                         </li>
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              <!-- <div class="card">
-                                <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseFour">Size</a>
-                                </div>
-                                <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
-                                    <div class="card-body">
-                                        <div class="shop__sidebar__size">
-                                            <label for="xs">xs
-                                                <input type="radio" id="xs">
-                                            </label>
-                                            <label for="sm">s
-                                                <input type="radio" id="sm">
-                                            </label>
-                                            <label for="md">m
-                                                <input type="radio" id="md">
-                                            </label>
-                                            <label for="xl">xl
-                                                <input type="radio" id="xl">
-                                            </label>
-                                            <label for="2xl">2xl
-                                                <input type="radio" id="2xl">
-                                            </label>
-                                            <label for="xxl">xxl
-                                                <input type="radio" id="xxl">
-                                            </label>
-                                            <label for="3xl">3xl
-                                                <input type="radio" id="3xl">
-                                            </label>
-                                            <label for="4xl">4xl
-                                                <input type="radio" id="4xl">
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
-                                </div>
-                                <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
-                                    <div class="card-body">
-                                        <div class="shop__sidebar__color">
-                                            <label class="c-1" for="sp-1">
-                                                <input type="radio" id="sp-1">
-                                            </label>
-                                            <label class="c-2" for="sp-2">
-                                                <input type="radio" id="sp-2">
-                                            </label>
-                                            <label class="c-3" for="sp-3">
-                                                <input type="radio" id="sp-3">
-                                            </label>
-                                            <label class="c-4" for="sp-4">
-                                                <input type="radio" id="sp-4">
-                                            </label>
-                                            <label class="c-5" for="sp-5">
-                                                <input type="radio" id="sp-5">
-                                            </label>
-                                            <label class="c-6" for="sp-6">
-                                                <input type="radio" id="sp-6">
-                                            </label>
-                                            <label class="c-7" for="sp-7">
-                                                <input type="radio" id="sp-7">
-                                            </label>
-                                            <label class="c-8" for="sp-8">
-                                                <input type="radio" id="sp-8">
-                                            </label>
-                                            <label class="c-9" for="sp-9">
-                                                <input type="radio" id="sp-9">
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card">
-                                <div class="card-heading">
-                                    <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
-                                </div>
-                                <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
-                                    <div class="card-body">
-                                        <div class="shop__sidebar__tags">
-                                            <a href="#">Product</a>
-                                            <a href="#">Bags</a>
-                                            <a href="#">Shoes</a>
-                                            <a href="#">Fashio</a>
-                                            <a href="#">Clothing</a>
-                                            <a href="#">Hats</a>
-                                            <a href="#">Accessories</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
+      
             </div>
           </div>
         </div>
       </div>
-      <div class="col-lg-9">
-        <!-- <div class="shop__product__option">
+      
+          
+      <div class="col-lg-9" style="margin-top: -70px;">
+        <div class="shop__product__option">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="shop__product__option__left">
+                            <!-- <div class="shop__product__option__left">
                                 <p>Showing 1–12 of 100 results</p>
-                            </div>
+                            </div> -->
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="shop__product__option__right">
-                                <p>Sort by Price:</p>
-                                <select>
-                                    <option value="">Low To High</option>
-                                    <option value="">&#8377 100 - &#8377 1000</option>
-                                    <option value="">&#8377 1000 - &#8377 2000</option>
-                                </select>
-                            </div>
-                        </div>
+                        <!-- Sorting Dropdown -->
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                      <div class="shop__product__option__right">
+                        <p class="mr-2">Sort by Price:</p>
+                        <select id="sortDropdown" onchange="location = this.value;">
+                          <option value="?sortBy=lowToHigh&page=<%= currentPage %>" <%= sortBy === 'lowToHigh' ? 'selected' : '' %>>Low To High</option>
+                          <option value="?sortBy=highToLow&page=<%= currentPage %>" <%= sortBy === 'highToLow' ? 'selected' : '' %>>High To Low</option>
+                        </select>
+                      </div>
                     </div>
-                </div> -->
+
+                      
+                    </div>
+                </div>
         <div class="row">
+          <!-- Display message if no products are found -->
+          <% if (noProductsMessage) { %>
+            <h4 class="text-danger">Oops!</h4>
+            <p><%= noProductsMessage %></p>
+          <% } %>
+          <% if (noProductsinCategory) { %>
+            <h4 class="text-danger">Oops!</h4>
+            <p><%= noProductsinCategory %></p>
+          <% } %>
           <% for (let i = 0; i < products.length; i++) { %>
           <div class="col-lg-4 col-md-6 col-sm-6">
             <div class="product__item">
@@ -303,21 +221,20 @@
       </div>
     </div>
 
-    <!-- Pagination -->
-    <div class="container mt-3">
-      <nav aria-label="Page navigation">
-        <ul
-          class="pagination justify-content-center mb-20"
-          style="margin-right: 200px"
-        >
-          <% for(let i = 1; i <= totalPages; i++) { %>
-          <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-          </li>
-          <% } %>
-        </ul>
-      </nav>
-    </div>
+   <!-- Pagination -->
+<div class="container mt-3">
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center mb-20" style="margin-right: 200px">
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>&sortBy=<%= sortBy %>"><%= i %></a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+</div>
+
+
   </div>
 </section>
 

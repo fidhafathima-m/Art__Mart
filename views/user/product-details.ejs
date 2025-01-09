@@ -60,7 +60,7 @@
             </h5>
             <span class="small">
               <%= new Date(review.review_date).toLocaleDateString() %></span>
-            <span class="badge bg-warning"><%= review.rating %> / 5</span>
+            <span class="bg-warning rounded p-1" style="font-size: 10px;"><%= review.rating %> / 5</span>
             <p class="mt-2"><%= review.review_text %></p>
           </div>
           <% }) %>
