@@ -41,6 +41,7 @@ router.post("/login", userController.login);
 router.get("/shop", userController.loadShopping);
 router.get("/filter", userController.filterProduct);
 router.get("/filterPrice", userController.filterByPrice);
+router.get("/filterRating", userController.filterRating);
 router.get("/search", userController.searchProducts);
 router.get('/sortBy', userController.sortBy);
 router.get('/sortByPrice', userController.sortByPrice);

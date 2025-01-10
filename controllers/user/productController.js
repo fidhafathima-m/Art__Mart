@@ -70,8 +70,8 @@ const loadProductDetails = async (req, res) => {
       randomProducts: randomProducts,
       reviews: reviews,
       avgRating: avgRating,
-      cartItems: cartItems
-
+      cartItems: cartItems,
+      activePage: 'shop'
     });
   } catch (error) {
     console.log(error);
@@ -98,6 +98,7 @@ const loadCart = async (req, res) => {
         cartItems: [],
         subtotal: 0,
         user: userData,
+        activePage: 'shop'
       });
     }
 
@@ -123,6 +124,7 @@ const loadCart = async (req, res) => {
       user: userData,
       cartItems,
       subtotal,
+      activePage: 'shop'
     });
   } catch (error) {
     console.error(error);

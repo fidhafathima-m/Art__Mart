@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Cart = require('../../models/cartSchema');
+const Review = require('../../models/reviewSchema');
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
@@ -336,6 +337,8 @@ const loadShopping = async (req, res) => {
     let lt = '';
     let noProductsMessage = '';
     let noProductsinCategory = ''
+    let rating = ''
+    let averageRating = '';
 
     const categoryWithIds = categories.map((category) => ({
       _id: category._id,
@@ -357,8 +360,9 @@ const loadShopping = async (req, res) => {
       noProductsinCategory,
       noProductsMessage,
       selectedCategory,
-      gt, lt,
-      activePage: 'shop'
+      gt, lt, rating,
+      activePage: 'shop',
+      averageRating
     });
   } catch (error) {
     console.log("Error fetching data:", error);
@@ -474,7 +478,8 @@ const filterProduct = async (req, res) => {
       noProductsinCategory, // Pass the category specific message to the view
       sortBy,
       gt, lt,
-      cartItems: cartItems
+      cartItems: cartItems,
+      activePage: 'shop'
 
     });
   } catch (error) {
@@ -555,7 +560,8 @@ const filterByPrice = async (req, res) => {
       selectedCategory: selectedCategory,
       gt: gt,
       lt: lt,
-      cartItems: cartItems
+      cartItems: cartItems,
+      activePage: 'shop'
 
     });
   } catch (error) {
@@ -563,6 +569,109 @@ const filterByPrice = async (req, res) => {
     res.redirect("/pageNotFound");
   }
 };
+
+const filterRating = async (req, res) => {
+  try {
+    const user = req.session.user;
+    const userData = await User.findOne({ _id: user });
+    const categories = await Category.find({ isListed: true }).lean();
+
+    // Extract rating filter (from 1 to 5)
+    const rating = parseFloat(req.query.rating) || 0; // Default to 0 (no rating filter)
+
+    let gt = '', lt = '', noProductsinCategory = '';
+
+    // Extract sorting preference
+    const sortBy = req.query.sortBy || 'lowToHigh'; // Default to 'lowToHigh'
+    const selectedCategory = req.query.category || null; // Default to no selected category
+    let sortQuery = {};
+
+    if (sortBy === 'lowToHigh') {
+      sortQuery = { salePrice: 1 }; // Ascending order (low to high)
+    } else if (sortBy === 'highToLow') {
+      sortQuery = { salePrice: -1 }; // Descending order (high to low)
+    }
+
+    // Step 1: Find all products
+    let findProducts = await Product.find({
+      isBlocked: false,
+      isDeleted: false,
+    }).sort(sortQuery).lean();
+
+    // Step 2: Filter products by the selected rating
+    let filteredProducts = [];
+    for (let product of findProducts) {
+      const reviews = await Review.find({
+        product_id: product._id,
+        verified_purchase: true, // Only consider verified purchases
+      }).lean();
+
+      // Calculate the average rating for this product
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+      }
+
+      // Attach averageRating to the product object
+      product.averageRating = averageRating;
+
+      // Check if the average rating matches the filter
+      if (rating === 0 || averageRating >= rating) {
+        filteredProducts.push(product);
+      }
+    }
+
+    // Define noProductsMessage if no products found with the selected rating
+    let noProductsMessage = '';
+    if (filteredProducts.length === 0) {
+      noProductsMessage = "So sorry! No products available with the selected rating!";
+    }
+
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
+
+    // Pagination setup
+    let itemsPerPage = 6;
+    let currentPage = parseInt(req.query.page) || 1;
+
+    if (isNaN(currentPage) || currentPage < 1) {
+      currentPage = 1;
+    }
+
+    let startIndex = (currentPage - 1) * itemsPerPage;
+    let endIndex = startIndex + itemsPerPage;
+    let totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const currentProduct = filteredProducts.slice(startIndex, endIndex);
+
+    req.session.filteredProducts = filteredProducts;
+
+    // Render the page with the appropriate messages and filters
+    res.render("shop", {
+      user: userData,
+      products: currentProduct,
+      categories: categories,
+      totalPages,
+      currentPage,
+      sortBy, // Pass sortBy to the view
+      noProductsMessage, // Pass rating filter message to the view
+      selectedCategory, // Pass selected category to the view
+      rating, // Pass the selected rating filter to the view
+      cartItems, // Pass cart items
+      activePage: 'shop',
+      gt, lt,
+      noProductsinCategory
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.redirect("/pageNotFound");
+  }
+};
+
+
+
+
+
 
 
 const sortBy = async (req, res) => {
@@ -642,7 +751,8 @@ const sortBy = async (req, res) => {
       gt, lt,
       noProductsMessage,
       noProductsinCategory,
-      cartItems: cartItems
+      cartItems: cartItems,
+      activePage: 'shop'
 
     });
   } catch (error) {
@@ -698,7 +808,8 @@ const sortByPrice = async (req, res) => {
       totalPages,
       currentPage,
       sortBy,
-      cartItems: cartItems
+      cartItems: cartItems,
+      activePage: 'shop'
     });
 
   } catch (error) {
@@ -779,7 +890,8 @@ const searchProducts = async (req, res) => {
       selectedCategory,
       noProductsinCategory,
       noProductsMessage,
-      gt, lt
+      gt, lt,
+      activePage: 'shop'
     });
   } catch (error) {
     console.log(error);
@@ -817,6 +929,7 @@ module.exports = {
   loadShopping,
   filterProduct,
   filterByPrice,
+  filterRating,
   sortBy,
   sortByPrice,
   searchProducts,

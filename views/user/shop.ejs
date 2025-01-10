@@ -126,11 +126,45 @@
                   </div>
                 </div>
               </div>
-      
+
+              <!-- Rating Filter Accordion -->
+              <div class="card">
+                <div class="card-heading">
+                  <a data-toggle="collapse" data-target="#collapseRating" class="accordion-header">Filter by Rating</a>
+                </div>
+                <div id="collapseRating" class="collapse show" data-parent="#accordionExample">
+                  <div class="card-body">
+                    <div class="shop__sidebar__rating">
+                      <ul class="sidebar-list">
+                        <!-- Rating filter options -->
+                        <li>
+                          <a href="/filterRating?rating=1" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
+                        </li>
+                        <li>
+                          <a href="/filterRating?rating=2" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
+                        </li>
+                        <li>
+                          <a href="/filterRating?rating=3" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
+                        </li>
+                        <li>
+                          <a href="/filterRating?rating=4" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
+                        </li>
+                        <li>
+                          <a href="/filterRating?rating=5" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+            
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
       
           
       <div class="col-lg-9" style="margin-top: -70px;">
@@ -213,6 +247,32 @@
                     <s>&#8377; <%= products[i].regularPrice.toLocaleString('en-IN') %></s>
                   </p>
                 <% } %>
+
+                 <!-- Display Stars Below Price -->
+                  <div class="rating">
+                    <% 
+                      let averageRating = products[i].averageRating || 0; // Default to 0 if no rating
+                      let fullStars = Math.floor(averageRating); // Number of full stars
+                      let halfStar = averageRating % 1 >= 0.5 ? 1 : 0; // Check for half star
+                      let emptyStars = 5 - fullStars - halfStar; // Remaining empty stars
+                    %>
+                    
+                    <!-- Full Stars -->
+                    <% for (let i = 0; i < fullStars; i++) { %>
+                      <i class="bi bi-star-fill" style="color: #4f4b4b;"></i> <!-- Full Star -->
+                    <% } %>
+                    
+                    <!-- Half Star -->
+                    <% if (halfStar) { %>
+                      <i class="bi bi-star-half" style="color: #4f4b4b;"></i> <!-- Half Star -->
+                    <% } %>
+                    
+                    <!-- Empty Stars -->
+                    <% for (let i = 0; i < emptyStars; i++) { %>
+                      <i class="bi bi-star" style="color: #4f4b4b;"></i> <!-- Empty Star -->
+                    <% } %>
+                  </div>
+
               </div>
             </div>
           </div>
