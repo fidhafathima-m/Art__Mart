@@ -1,3 +1,5 @@
+
+
 <%- include("../../views/partials/user/header") %>
 <div class="mt-4 ps-4 ">
     <!-- Breadcrumbs -->
@@ -20,9 +22,10 @@
                 <option value="Office">Office</option>
                 <option value="Other">Other</option>
             </select>
-         </div>
+        </div>
+        
            <div class="form-group col-md-4">
-               <label for="name">Name:</label>
+               <label for="name">House Name:</label>
                <input type="text" class="form-control border-3" id="name" name="name" required>
            </div>
            <div class="form-group col-md-4">
@@ -36,9 +39,48 @@
                <input type="text" class="form-control border-3" id="landMark" name="landMark" required>
            </div>
            <div class="form-group col-md-4">
-               <label for="state">State:</label>
-               <input type="text" class="form-control border-3" id="state" name="state" required>
-           </div>
+            <label for="state">State:</label>
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle form-control border-3" type="button" id="stateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select State
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="stateDropdown" style="max-height: 200px; overflow-y: auto;">
+                    <li><a class="dropdown-item" href="#" data-value="Andhra Pradesh">Andhra Pradesh</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Arunachal Pradesh">Arunachal Pradesh</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Assam">Assam</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Bihar">Bihar</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Chhattisgarh">Chhattisgarh</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Goa">Goa</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Gujarat">Gujarat</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Haryana">Haryana</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Himachal Pradesh">Himachal Pradesh</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Jharkhand">Jharkhand</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Karnataka">Karnataka</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Kerala">Kerala</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Madhya Pradesh">Madhya Pradesh</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Maharashtra">Maharashtra</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Manipur">Manipur</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Meghalaya">Meghalaya</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Mizoram">Mizoram</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Nagaland">Nagaland</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Odisha">Odisha</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Punjab">Punjab</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Rajasthan">Rajasthan</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Sikkim">Sikkim</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Tamil Nadu">Tamil Nadu</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Telangana">Telangana</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Tripura">Tripura</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Uttar Pradesh">Uttar Pradesh</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="Uttarakhand">Uttarakhand</a></li>
+                    <li><a class="dropdown-item" href="#" data-value="West Bengal">West Bengal</a></li>
+                </ul>
+            </div>
+            <input type="hidden" id="state" name="state" />
+        </div>
+        
+        
+        
+        
            <div class="form-group col-md-4">
                <label for="pincode">Pincode:</label>
                <input type="number" class="form-control border-3" id="pincode" name="pincode" required>
@@ -51,9 +93,17 @@
            </div>
            <div class="form-group col-md-4">
                <label for="altPhone">Alternate Phone:</label>
-               <input type="number" class="form-control border-3" id="altPhone" name="altPhone" required>
+               <input type="number" class="form-control border-3" id="altPhone" name="altPhone">
            </div>
        </div>
+
+       <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="isDefault" name="isDefault">
+        <label class="form-check-label pb-4" for="isDefault">
+          Set this as the default address
+        </label>
+      </div>
+
        <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
        <a href="/userProfile?section=addresses" class="btn btn-danger">Cancel</a>
 
@@ -61,122 +111,143 @@
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 
 <script>
-    document.getElementById('addressForm').addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevent default form submission
 
-    // Validate the form first
-    if (validateForm()) {
-        const formData = new FormData(document.getElementById('addressForm'));
-        const dataObject = {};
-
-        // Convert form data to a plain object
-        formData.forEach((value, key) => {
-            dataObject[key] = value;
+document.addEventListener("DOMContentLoaded", function () {
+    // Handle the dropdown for state selection
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    const stateDropdownBtn = document.getElementById('stateDropdown');
+    const stateInput = document.getElementById('state');  // Get the hidden state input field
+    
+    // Update state dropdown when a state is clicked
+    dropdownItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+            const selectedState = item.getAttribute('data-value');
+            stateDropdownBtn.textContent = selectedState; // Update button text
+            stateInput.value = selectedState; // Set the hidden input value
         });
+    });
 
-        // Make the Ajax call
-        fetch('/profile/address/addAddress', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataObject)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // If the address is successfully added
-                Swal.fire({
-                    title: 'Address Added!',
-                    text: 'Your address has been added successfully.',
-                    icon: 'success',
-                    confirmButtonText: 'Ok'
-                }).then(() => {
-                    // Redirect to the user profile page after success
-                    window.location.href = '/userProfile?section=addresses';
-                });
-            } else {
-                // Show error alert if address already exists
+    // Form submit handler
+    document.getElementById('addressForm').addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent default form submission
+
+        // Validate the form first
+        if (validateForm()) {
+            const formData = new FormData(document.getElementById('addressForm'));
+            const dataObject = {};
+
+            // Convert form data to a plain object
+            formData.forEach((value, key) => {
+                dataObject[key] = value;
+            });
+
+            // Make the Ajax call
+            fetch('/profile/address/addAddress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataObject)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // If the address is successfully added
+                    Swal.fire({
+                        title: 'Address Added!',
+                        text: 'Your address has been added successfully.',
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    }).then(() => {
+                        // Redirect to the user profile page after success
+                        window.location.href = '/userProfile?section=addresses';
+                    });
+                } else {
+                    // Show error alert if address already exists
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            })
+            .catch(error => {
+                // Handle any other errors
+                console.error('Error:', error);  // Log error to console
                 Swal.fire({
                     title: 'Error!',
-                    text: data.message,
+                    text: 'Something went wrong. Please try again.',
                     icon: 'error',
                     confirmButtonText: 'Ok'
                 });
-            }
-        })
-        .catch(error => {
-            // Handle any other errors
-            console.error('Error:', error);  // Log error to console
-            Swal.fire({
-                title: 'Error!',
-                text: 'Something went wrong. Please try again.',
-                icon: 'error',
-                confirmButtonText: 'Ok'
             });
-        });
-    }
-});
-
-// Form validation function
-function validateForm() {
-    let isValid = true;
-    const requiredFields = ["addressType", "name", "city", "landMark", "state", "pincode", "phone", "altPhone"];
-    const errorMessages = [];
-
-    requiredFields.forEach(function(field) {
-        const input = document.getElementById(field);
-        if (input.value.trim() === "") {
-            errorMessages.push(`Please fill the ${field} field.`);
-            isValid = false;
         }
     });
 
-    // Additional validation checks
-    const namePattern = /^[A-Za-z\s]+$/;
-    const pincodePattern = /^\d{6}$/;
-    const phonePattern = /^\d{10}$/;
-    const name = document.getElementById('name').value;
-    const city = document.getElementById('city').value;
-    const landMark = document.getElementById('landMark').value;
-    const state = document.getElementById('state').value;
-    const pincode = document.getElementById('pincode').value;
-    const phone = document.getElementById('phone').value;
-    const altPhone = document.getElementById('altPhone').value;
+    // Form validation function
+    function validateForm() {
+        let isValid = true;
+        const requiredFields = ["addressType", "name", "city", "landMark", "state", "pincode", "phone", "altPhone"];
+        const errorMessages = [];
 
-    if (!namePattern.test(name) || !namePattern.test(city) || !namePattern.test(landMark) || !namePattern.test(state)) {
-        errorMessages.push('Name, City, Landmark, and State should contain alphabets only.');
-        isValid = false;
-    }
-
-    if (!pincodePattern.test(pincode)) {
-        errorMessages.push('Pincode should be a 6-digit number.');
-        isValid = false;
-    }
-
-    if (!phonePattern.test(phone) || !phonePattern.test(altPhone)) {
-        errorMessages.push('Phone and Alternate Phone should be 10-digit numbers.');
-        isValid = false;
-    }
-
-    if (phone === altPhone) {
-        errorMessages.push('Phone and Alternate Phone numbers should be different.');
-        isValid = false;
-    }
-
-    if (!isValid) {
-        Swal.fire({
-            title: 'Error!',
-            text: errorMessages.join(' '),
-            icon: 'error',
-            confirmButtonText: 'Ok'
+        requiredFields.forEach(function(field) {
+            const input = document.getElementById(field);
+            if (input.value.trim() === "") {
+                errorMessages.push(`Please fill the ${field} field.`);
+                isValid = false;
+            }
         });
-    }
 
-    return isValid;
-}
+        // Additional validation checks
+        const namePattern = /^[A-Za-z\s]+$/;
+        const pincodePattern = /^\d{6}$/;
+        const phonePattern = /^\d{10}$/;
+        const name = document.getElementById('name').value;
+        const city = document.getElementById('city').value;
+        const landMark = document.getElementById('landMark').value;
+        const state = document.getElementById('state').value;
+        const pincode = document.getElementById('pincode').value;
+        const phone = document.getElementById('phone').value;
+        const altPhone = document.getElementById('altPhone').value;
+
+        if (!namePattern.test(name) || !namePattern.test(city) || !namePattern.test(landMark) || !namePattern.test(state)) {
+            errorMessages.push('Name, City, Landmark, and State should contain alphabets only.');
+            isValid = false;
+        }
+
+        if (!pincodePattern.test(pincode)) {
+            errorMessages.push('Pincode should be a 6-digit number.');
+            isValid = false;
+        }
+
+        if (!phonePattern.test(phone) || !phonePattern.test(altPhone)) {
+            errorMessages.push('Phone and Alternate Phone should be 10-digit numbers.');
+            isValid = false;
+        }
+
+        if (phone === altPhone) {
+            errorMessages.push('Phone and Alternate Phone numbers should be different.');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            Swal.fire({
+                title: 'Error!',
+                text: errorMessages.join(' '),
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            });
+        }
+
+        return isValid;
+    }
+});
+
 </script>
 
 <%- include("../../views/partials/user/footer") %>

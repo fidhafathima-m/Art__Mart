@@ -79,26 +79,53 @@
               </div>
       
               <!-- Categories Section -->
-              <div class="card">
-                <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseOne" class="accordion-header">Categories</a>
-                </div>
-                <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
-                  <div class="card-body">
-                    <div class="shop__sidebar__categories">
-                      <ul class="sidebar-list">
-                        <% for (let i = 0; i < categories.length; i++) { %>
-                          <li>
-                            <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
-                              <%= categories[i].name %>
-                            </a>
-                          </li>
-                        <% } %>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
+<!-- Categories Section -->
+<div class="card">
+  <div class="card-heading">
+    <a data-toggle="collapse" data-target="#collapseOne" class="accordion-header">Categories</a>
+  </div>
+  <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+    <div class="card-body">
+      <div class="shop__sidebar__categories">
+        <ul class="sidebar-list">
+          <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %> <!-- Only show 3 categories initially -->
+            <li>
+              <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
+                <%= categories[i].name %>
+              </a>
+            </li>
+          <% } %>
+        </ul>
+
+        <!-- Show More Button if there are more than 3 categories -->
+        <% if (categories.length > 3) { %>
+          <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
+        <% } %>
+
+        <!-- Extra Categories, initially hidden -->
+        <div id="extraCategories" style="display:none;">
+          <ul class="sidebar-list">
+            <% for (let i = 3; i < categories.length; i++) { %> <!-- Show the rest of the categories -->
+              <li>
+                <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
+                  <%= categories[i].name %>
+                </a>
+              </li>
+            <% } %>
+          </ul>
+
+          <!-- Show Less Link -->
+          <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
       
               <!-- Filter Price Section -->
               <div class="card">
@@ -128,35 +155,36 @@
               </div>
 
               <!-- Rating Filter Accordion -->
-              <div class="card">
-                <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseRating" class="accordion-header">Filter by Rating</a>
-                </div>
-                <div id="collapseRating" class="collapse show" data-parent="#accordionExample">
-                  <div class="card-body">
-                    <div class="shop__sidebar__rating">
-                      <ul class="sidebar-list">
-                        <!-- Rating filter options -->
-                        <li>
-                          <a href="/filterRating?rating=1" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
-                        </li>
-                        <li>
-                          <a href="/filterRating?rating=2" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
-                        </li>
-                        <li>
-                          <a href="/filterRating?rating=3" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
-                        </li>
-                        <li>
-                          <a href="/filterRating?rating=4" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
-                        </li>
-                        <li>
-                          <a href="/filterRating?rating=5" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
+<div class="card">
+  <div class="card-heading">
+    <a data-toggle="collapse" data-target="#collapseRating" class="accordion-header">Filter by Rating</a>
+  </div>
+  <div id="collapseRating" class="collapse show" data-parent="#accordionExample">
+    <div class="card-body">
+      <div class="shop__sidebar__rating">
+        <ul class="sidebar-list">
+          <!-- Rating filter options -->
+          <li>
+            <a href="/shop?rating=1" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=2" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=3" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=4" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=5" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -268,9 +296,7 @@
                     <% } %>
                     
                     <!-- Empty Stars -->
-                    <% for (let i = 0; i < emptyStars; i++) { %>
-                      <i class="bi bi-star" style="color: #4f4b4b;"></i> <!-- Empty Star -->
-                    <% } %>
+                    
                   </div>
 
               </div>
@@ -302,6 +328,31 @@
 
 
 <script>
+
+//  JavaScript to toggle "Show More" 
+// Show More Button click event
+document.getElementById('showMoreBtn')?.addEventListener('click', function() {
+    // Show the extra categories
+    document.getElementById('extraCategories').style.display = 'block';
+    
+    // Hide the Show More button
+    document.getElementById('showMoreBtn').style.display = 'none';
+    
+    // Show the Show Less button
+    document.getElementById('showLessBtn').style.display = 'inline';
+  });
+
+  // Show Less Button click event
+  document.getElementById('showLessBtn')?.addEventListener('click', function() {
+    // Hide the extra categories
+    document.getElementById('extraCategories').style.display = 'none';
+    
+    // Show the Show More button again
+    document.getElementById('showMoreBtn').style.display = 'inline';
+    
+    // Hide the Show Less button
+    document.getElementById('showLessBtn').style.display = 'none';
+  });
     document.addEventListener('DOMContentLoaded', () => {
       const addToCartButtons = document.querySelectorAll('.add-cart');
     

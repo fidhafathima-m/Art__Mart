@@ -30,7 +30,7 @@ const addressSchema = new Schema({
         required: true,
       },
       pincode: {
-        type: String,
+        type: Number,
         required: true,
       },
       phone: {
@@ -39,8 +39,12 @@ const addressSchema = new Schema({
       },
       altPhone: {
         type: String,
-        required: true,
+        required: false,
       },
+      isDefault: {
+         type: Boolean, 
+         default: false 
+        }, 
     },
   ],
 });

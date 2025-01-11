@@ -306,7 +306,7 @@ const loadShopping = async (req, res) => {
     // Get the sortBy query parameter (default to 'lowToHigh')
     const sortBy = req.query.sortBy || 'lowToHigh';
 
-    // Fetch products based on the sorting option
+    // Prepare the base query for fetching products
     let productsQuery = Product.find({
       isBlocked: false,
       isDeleted: false,
@@ -323,21 +323,49 @@ const loadShopping = async (req, res) => {
       productsQuery = productsQuery.sort({ createdAt: -1 });
     }
 
-    const products = await productsQuery.skip(skip).limit(limit);
+    const allProducts = await productsQuery.lean();
 
-    const totalProducts = await Product.countDocuments({
-      isBlocked: false,
-      isDeleted: false,
-      category: { $in: categoryIds },
-    });
+    const rating = parseInt(req.query.rating) || 0;
+
+    // Filter products by the selected rating before pagination
+    let filteredProducts = [];
+    for (let product of allProducts) {
+      const reviews = await Review.find({
+        product_id: product._id,
+        verified_purchase: true,
+      }).lean();
+
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+      }
+
+      product.averageRating = averageRating;
+
+      // Rating filter logic: Check if the average rating is >= the selected rating
+      if (rating === 0 || averageRating >= rating) {
+        filteredProducts.push(product);
+      }
+    }
+
+
+    // Now apply pagination to the filtered products
+    const totalProducts = filteredProducts.length;
     const totalPages = Math.ceil(totalProducts / limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    // Get the products for the current page
+    const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
 
     let selectedCategory = '';
     let gt = '';
     let lt = '';
     let noProductsMessage = '';
-    let noProductsinCategory = ''
-    let rating = ''
+    let noProductsinCategory = '';
     let averageRating = '';
 
     const categoryWithIds = categories.map((category) => ({
@@ -345,13 +373,10 @@ const loadShopping = async (req, res) => {
       name: category.name,
     }));
 
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
-
     res.render('shop', {
       user: userData,
       categories: categoryWithIds,
-      products: products,
+      products: filteredProducts, // Use filtered products after applying rating filter
       totalProducts: totalProducts,
       currentPage: page,
       totalPages: totalPages,
@@ -439,6 +464,27 @@ const filterProduct = async (req, res) => {
       currentPage = 1;
     }
 
+    const rating = parseInt(req.query.rating) || 0;
+    // Filter products by the selected rating
+    let filteredProducts = [];
+    for (let product of findProducts) {
+      const reviews = await Review.find({
+        product_id: product._id,
+        verified_purchase: true,
+      }).lean();
+
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+      }
+
+      product.averageRating = averageRating;
+
+      if (rating === 0 || averageRating >= rating) {
+        filteredProducts.push(product);
+      }
+    }
+
     let startIndex = (currentPage - 1) * itemsPerPage;
     let endIndex = startIndex + itemsPerPage;
     let totalPages = Math.ceil(findProducts.length / itemsPerPage);
@@ -479,8 +525,8 @@ const filterProduct = async (req, res) => {
       sortBy,
       gt, lt,
       cartItems: cartItems,
-      activePage: 'shop'
-
+      activePage: 'shop',
+      rating
     });
   } catch (error) {
     console.log(error);
@@ -535,6 +581,27 @@ const filterByPrice = async (req, res) => {
     if (isNaN(currentPage) || currentPage < 1) {
       currentPage = 1;
     }
+    const rating = parseInt(req.query.rating) || 0;
+    // Filter products by the selected rating
+    let filteredProducts = [];
+    for (let product of findProducts) {
+      const reviews = await Review.find({
+        product_id: product._id,
+        verified_purchase: true,
+      }).lean();
+
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+      }
+
+      product.averageRating = averageRating;
+
+      if (rating === 0 || averageRating >= rating) {
+        filteredProducts.push(product);
+      }
+    }
+
 
     let startIndex = (currentPage - 1) * itemsPerPage;
     let endIndex = startIndex + itemsPerPage;
@@ -561,8 +628,8 @@ const filterByPrice = async (req, res) => {
       gt: gt,
       lt: lt,
       cartItems: cartItems,
-      activePage: 'shop'
-
+      activePage: 'shop',
+      rating
     });
   } catch (error) {
     console.log(error);
@@ -577,7 +644,7 @@ const filterRating = async (req, res) => {
     const categories = await Category.find({ isListed: true }).lean();
 
     // Extract rating filter (from 1 to 5)
-    const rating = parseFloat(req.query.rating) || 0; // Default to 0 (no rating filter)
+    x // Default to 0 (no rating filter)
 
     let gt = '', lt = '', noProductsinCategory = '';
 
@@ -717,6 +784,29 @@ const sortBy = async (req, res) => {
     let lt = '';
     let noProductsMessage = '';
     let noProductsinCategory = ''
+    
+    
+    const rating = parseInt(req.query.rating) || 0;
+    // Filter products by the selected rating
+    let filteredProducts = [];
+    for (let product of findProducts) {
+      const reviews = await Review.find({
+        product_id: product._id,
+        verified_purchase: true,
+      }).lean();
+
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+      }
+
+      product.averageRating = averageRating;
+
+      if (rating === 0 || averageRating >= rating) {
+        filteredProducts.push(product);
+      }
+    }
+
 
     const cart = await Cart.findOne({ userId: user });
     
@@ -752,8 +842,8 @@ const sortBy = async (req, res) => {
       noProductsMessage,
       noProductsinCategory,
       cartItems: cartItems,
-      activePage: 'shop'
-
+      activePage: 'shop',
+      rating
     });
   } catch (error) {
     console.log(error);
@@ -796,6 +886,29 @@ const sortByPrice = async (req, res) => {
 
     // Calculate total pages
     const totalPages = Math.ceil(findProducts.length / itemsPerPage);
+    
+    
+    const rating = parseInt(req.query.rating) || 0;
+    // Filter products by the selected rating
+    let filteredProducts = [];
+    for (let product of findProducts) {
+      const reviews = await Review.find({
+        product_id: product._id,
+        verified_purchase: true,
+      }).lean();
+
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+      }
+
+      product.averageRating = averageRating;
+
+      if (rating === 0 || averageRating >= rating) {
+        filteredProducts.push(product);
+      }
+    }
+
 
     // Slice the array to get the products for the current page
     const currentProducts = findProducts.slice(startIndex, endIndex);
@@ -809,7 +922,8 @@ const sortByPrice = async (req, res) => {
       currentPage,
       sortBy,
       cartItems: cartItems,
-      activePage: 'shop'
+      activePage: 'shop',
+      rating
     });
 
   } catch (error) {
@@ -840,7 +954,34 @@ const searchProducts = async (req, res) => {
     let gt = '';
     let lt = '';
     let noProductsMessage = '';
-    let noProductsinCategory = ''
+    let noProductsinCategory = '';
+    
+    let findProducts = await Product.find({
+      isBlocked: false,
+      isDeleted: false,
+    }).lean();
+    
+    const rating = parseInt(req.query.rating) || 0;
+    // Filter products by the selected rating
+    let filteredProducts = [];
+    for (let product of findProducts) {
+      const reviews = await Review.find({
+        product_id: product._id,
+        verified_purchase: true,
+      }).lean();
+
+      let averageRating = 0;
+      if (reviews.length > 0) {
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
+      }
+
+      product.averageRating = averageRating;
+
+      if (rating === 0 || averageRating >= rating) {
+        filteredProducts.push(product);
+      }
+    }
+
 
     if (req.session.filteredProducts && req.session.filteredProducts.length > 0) {
       searchResult = req.session.filteredProducts.filter((product) =>
@@ -891,7 +1032,8 @@ const searchProducts = async (req, res) => {
       noProductsinCategory,
       noProductsMessage,
       gt, lt,
-      activePage: 'shop'
+      activePage: 'shop',
+      rating
     });
   } catch (error) {
     console.log(error);

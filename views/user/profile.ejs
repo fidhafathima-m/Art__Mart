@@ -66,18 +66,29 @@
         </div>
         <!-- Show the addresses in cards -->
         <% if (addresses && addresses.length > 0) { %>
-          <div class="d-flex flex-wrap justify-content-start"> <!-- Using flexbox to wrap and align items -->
+          <div class="d-flex flex-wrap justify-content-start"> 
+            <% if (!defaultAddress) { %>
+              <span class="alert alert-warning" role="alert">
+                You don't have a default address. Please set one as your default.
+              </span>
+            <% } %>
             <% addresses.forEach((address, index) => { %> <!-- Loop through each address -->
               <% address.address.forEach((addr, addrIndex) => { %> <!-- Loop through address types inside each address -->
-                <div class="card p-4 mb-5 me-4 shadow" style="flex: 1 1 30%;"> <!-- Flexbox for responsiveness -->
-                  <div class="card-title text-center mt-2">Address <%= (index * address.address.length) + addrIndex + 1 %> - <%= addr.addressType %></div> <!-- Dynamic card title -->
+                <div class="card p-4 mb-5 me-4 shadow" style="flex: 1 1 40%;"> <!-- Flexbox for responsiveness -->
+                  <div class="card-title text-center mt-2">
+                    <% if (addr.isDefault === true) { %>
+                      Default
+                    <% } else { %>
+                      Address <%= (index * address.address.length) + addrIndex + 1 %> 
+                      <% } %>
+                      - <%= addr.addressType %>
+                  </div> <!-- Dynamic card title -->
                   <div class="card-body">
                     <div class="address-card">
-                      <p><strong>Name:</strong> <%= addr.name %></p>
-                      <p><strong>City:</strong> <%= addr.city %></p>
-                      <p><strong>Landmark:</strong> <%= addr.landMark %></p>
-                      <p><strong>State:</strong> <%= addr.state %></p>
-                      <p><strong>Pincode:</strong> <%= addr.pincode %></p>
+                      <p><strong><%= user.name %></strong> </p>
+                      <p><%= addr.name %></p>
+                      <p><%= addr.city %>, <%= addr.landMark %></p>
+                      <p><%= addr.state %>, <%= addr.pincode %></p>
                       <p><strong>Phone:</strong> <%= addr.phone %></p>
                       <p><strong>Alt Phone:</strong> <%= addr.altPhone %></p>
                       <!-- Edit and Delete links -->
@@ -86,11 +97,11 @@
                           <i class="fas fa-edit"></i> Edit
                         </a>
                         <a href="javascript:void(0);" 
-   class="card-link text-danger ms-3" 
-   data-id="<%= addr._id %>" 
-   id="deleteAddressLink">
-  <i class="fas fa-trash"></i> Delete
-</a>
+                          class="card-link text-danger ms-3" 
+                          data-id="<%= addr._id %>" 
+                          id="deleteAddressLink">
+                          <i class="fas fa-trash"></i> Remove
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -101,10 +112,6 @@
         <% } else { %>
           <p>No addresses found.</p>
         <% } %>
-      
-        
-      
-      
 
       <% } else if (section === 'orders') { %>
         <!-- Show the orders table -->

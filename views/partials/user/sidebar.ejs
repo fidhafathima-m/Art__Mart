@@ -5,14 +5,13 @@
   rel="stylesheet"
 />
 
-<div class="col-md-3 sidebar">
-  <a href="/userProfile?section=dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %>" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Profile</a>
-  <a href="/userProfile?section=addresses" class="<%= currentPage === 'addresses' ? 'active' : '' %>" id="addressesLink"><i class="fas fa-address-book"></i> My Addresses</a>
-  <a href="#" class="<%= currentPage === '/profile/orders' ? 'active' : '' %>" id="ordersLink"><i class="fas fa-box"></i> Orders</a>
-  <a href="#" class="<%= currentPage === '/profile/cart' ? 'active' : '' %>" id="cartLink"><i class="fas fa-box"></i> Shopping Cart</a>
-  <a href="#" class="<%= currentPage === '/profile/wishlist' ? 'active' : '' %>" id="wishlistLink"><i class="fas fa-box"></i> Wishlist</a>
-  <a href="#" class="<%= currentPage === '/profile/wallet' ? 'active' : '' %>" id="walletLink"><i class="fas fa-box"></i> Wallet</a>
-  <a href="#" class="<%= currentPage === '/profile/referrals' ? 'active' : '' %>" id="referralsLink"><i class="fas fa-box"></i> Referrals</a>
+<div class="col-md-3 sidebar pt-5" style="max-height: 600px;">
+  <a href="/userProfile?section=dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %> py-3" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Profile</a>
+  <a href="/userProfile?section=addresses" class="<%= currentPage === 'addresses' ? 'active' : '' %> py-3" id="addressesLink"><i class="fas fa-address-book"></i> My Addresses</a>
+  <a href="#" class="<%= currentPage === '/profile/orders' ? 'active' : '' %> py-3" id="ordersLink"><i class="fas fa-box"></i> Orders</a>
+  <a href="#" class="<%= currentPage === '/profile/wishlist' ? 'active' : '' %> py-3" id="wishlistLink"><i class="fas fa-box"></i> Wishlist</a>
+  <a href="#" class="<%= currentPage === '/profile/wallet' ? 'active' : '' %> py-3" id="walletLink"><i class="fas fa-box"></i> Wallet</a>
+  <a href="#" class="<%= currentPage === '/profile/referrals' ? 'active' : '' %> py-3" id="referralsLink"><i class="fas fa-box"></i> Referrals</a>
   <a href="/logout" id="logout"><i class="fas fa-box"></i> Logout</a>
 </div>
 

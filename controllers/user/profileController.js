@@ -189,7 +189,15 @@ const loadUserProfile = async(req, res) => {
           // console.log("Address Object:", address.address); // Log the nested 'address' array
         });
       }
-      content = { addresses };
+
+      const userAddresses = await Address.findOne({ userId: userId });
+      const defaultAddress = userAddresses.address.find(addr => addr.isDefault === true);
+      if (!defaultAddress) {
+        console.log('No default address found');
+      }
+
+      console.log('..: ',defaultAddress)
+      content = { addresses, defaultAddress };
     } else if (section === 'orders') {
       // Fetch user's orders (optional, if you have this section)
       const orders = await Order.find({ userId });
@@ -532,11 +540,11 @@ const addAddress = async (req, res) => {
     }
 
     // Destructure required fields from req.body for the new address
-    const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body;
+    const { addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault  } = req.body;
 
 
     // Check if all required fields for the new address are present
-    if (!addressType || !name || !city || !state || !pincode || !phone || !altPhone) {
+    if (!addressType || !name || !city || !state || !pincode || !phone ) {
       return res.status(400).json({ success: false, message: 'All required fields must be filled' });
     }
 
@@ -559,8 +567,17 @@ const addAddress = async (req, res) => {
       state,
       pincode,
       phone,
-      altPhone
+      altPhone,
+      isDefault: isDefault === 'on'
     };
+
+    if (newAddress.isDefault) {
+      // If the new address is default, update the user's other addresses to set isDefault = false
+      await Address.updateMany(
+        { userId: userData._id, 'address.isDefault': true },
+        { $set: { 'address.$.isDefault': false } }
+      );
+    }
 
     // Find the user's address document
     const userAddress = await Address.findOne({ userId: userData._id });
@@ -599,6 +616,8 @@ const loadEditAddress = async (req, res) => {
     if (!user) {
       return res.redirect('/login'); // Or wherever the login page is
     }
+
+    
 
     // Find the address by address ID
     const currAddress = await Address.findOne({
@@ -643,6 +662,8 @@ const editAddress = async (req, res) => {
     const addressId = req.query.id; // Getting the address ID from the query string
     const user = req.session.user;
 
+
+
     // Find the address to update
     const findAddress = await Address.findOne({'address._id': addressId});
     if (!findAddress) {
@@ -650,7 +671,30 @@ const editAddress = async (req, res) => {
       return res.status(404).json({success: false, message: 'Address not found'});
     }
 
-    // Update the address
+    const addressExists = await Address.findOne({
+      'address.pincode': data.pincode,  // Use the number version of the pincode
+      'address._id': { $ne: addressId },  // Exclude the current address being edited
+      userId: user // Ensure we're only checking addresses for the current user
+    });
+
+
+    if (addressExists) {
+      return res.status(400).json({ success: false, message: 'This pincode is already associated with another address' });
+    } else {
+      console.log('Pincode is unique, proceeding to update');
+    }
+
+    const isDefault = data.isDefault === 'on';
+
+    if (isDefault) {
+      // If this is the default address, unmark all other default addresses
+      await Address.updateMany(
+        { userId: user, 'address.isDefault': true },
+        { $set: { 'address.$.isDefault': false } }
+      );
+    }
+
+    // Update the address if the pincode is unique
     const updated = await Address.updateOne(
       {'address._id': addressId},
       {$set: {
@@ -659,11 +703,12 @@ const editAddress = async (req, res) => {
           addressType: data.addressType,
           name: data.name,
           city: data.city,
-          landmark: data.landmark,
+          landMark: data.landMark,  // Fix key casing inconsistency (landmark => landMark)
           state: data.state,
-          pincode: data.pincode,
+          pincode: data.pincode, // Ensure pincode is stored as number
           phone: data.phone,
-          altPhone: data.altPhone
+          altPhone: data.altPhone,
+          isDefault: isDefault
         }
       }}
     );
@@ -678,6 +723,8 @@ const editAddress = async (req, res) => {
     res.status(500).json({success: false, message: 'An error occurred, please try again.' });
   }
 }
+
+
 
 const deleteAddress = async(req, res) => {
   try {

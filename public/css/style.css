@@ -4394,7 +4394,7 @@ h5 {
 .sidebar-link {
   display: block;
   padding: 5px;
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 400;
   color: #333;
   text-decoration: none;
@@ -4525,6 +4525,15 @@ h5 {
   transition: all 0.3s ease-in-out; /* Smooth transition effect */
 }
 
+/* Example of ensuring label is above input/select */
+label {
+  display: block; /* Ensures the label takes up full width and is stacked above the select */
+  margin-bottom: 0.5rem; /* Optional: Adds some space between label and select */
+}
+
+
+
+
 /* Input Field Focus Styling */
 .input-group .form-control:focus {
   border-color: #3798ff; /* Change border color on focus */
@@ -4633,3 +4642,27 @@ h5 {
   }
 }
 
+.show-more {
+  color: #4972cb;
+  font-size: 13px;
+}
+.show-more:hover {
+  color: #1b234a;
+}
+.show-less {
+  color: #4972cb;
+  font-size: 13px;
+}
+.show-less:hover {
+  color: #1b234a;
+}
+
+
+/* profile styles */
+
+.card-link {
+  color: #606060;
+}
+.card-link:hover {
+  color: #0a0909;
+}

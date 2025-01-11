@@ -1,5 +1,13 @@
 <%- include('../../views/partials/user/header', { user: user }) %>
 
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb ps-4">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Cart</li>
+  </ol>
+</nav>
+
 <div class="cart-container" style="display: flex; justify-content: space-between; padding: 20px;">
   <!-- Left container (shopping cart items) -->
   <div class="cart-items bg-white p-4 rounded" style="width: 70%;">
@@ -73,12 +81,12 @@
   <div class="subtotal bg-white p-4 rounded ml-4" style="width: 30%; padding: 20px; height: 50%;">
     <h3>Subtotal(<%= cartItems.length %> items): </h3>
     <hr />
-    <div>
+    <div class="pb-5">
       <% subtotal = 0; %>
       <% cartItems.forEach(item => { %>
         <% subtotal += item.salePrice * item.cartQuantity; %>
       <% }) %>
-      <p><strong>Total: &#8377; <%= subtotal %>.00</strong></p>
+      <p style="font-size: 20px;"><strong>Total: &#8377; <%= subtotal %>.00</strong></p>
     </div>
     <button class="proceed-to-buy" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer;">
       Proceed to Buy
@@ -104,7 +112,7 @@
         if (quantity < 5) {
           quantity += 1;
           
-
+          
         // Send request to update quantity in the database
         const response = await fetch(`/cart/update-quantity/${productId}`, {
           method: 'POST',
