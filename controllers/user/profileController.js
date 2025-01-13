@@ -196,7 +196,6 @@ const loadUserProfile = async(req, res) => {
         console.log('No default address found');
       }
 
-      console.log('..: ',defaultAddress)
       content = { addresses, defaultAddress };
     } else if (section === 'orders') {
       // Fetch user's orders (optional, if you have this section)
@@ -753,6 +752,71 @@ const deleteAddress = async(req, res) => {
   }
 }
 
+const editAddressInCheckout = async (req, res) => {
+  try {
+    const data = req.body;
+    const addressId = new mongoose.Types.ObjectId(data.addressId);
+    console.log('Address ID:', addressId);
+
+    const user = req.session.user;
+
+    if (!mongoose.Types.ObjectId.isValid(addressId)) {
+      return res.status(400).json({ success: false, message: 'Invalid address ID' });
+    }
+
+    console.log('Address ID:', data.addressId);
+
+
+    // Find the address to update
+    const findAddress = await Address.findOne({'address._id': addressId});
+    if (!findAddress) {
+      console.log('Address not found');
+      return res.status(404).json({success: false, message: 'Address not found'});
+    }
+
+    const addressExists = await Address.findOne({
+      'address.pincode': data.pincode,  // Use the number version of the pincode
+      'address._id': { $ne: addressId },  // Exclude the current address being edited
+      userId: user // Ensure we're only checking addresses for the current user
+    });
+
+
+    if (addressExists) {
+      return res.status(400).json({ success: false, message: 'This pincode is already associated with another address' });
+    } else {
+      console.log('Pincode is unique, proceeding to update');
+    }
+
+    // Update the address if the pincode is unique
+    const updated = await Address.updateOne(
+      {'address._id': addressId},
+      {$set: {
+        'address.$': {
+          _id: addressId,
+          addressType: data.addressType,
+          name: data.name,
+          city: data.city,
+          landMark: data.landMark,  // Fix key casing inconsistency (landmark => landMark)
+          state: data.state,
+          pincode: data.pincode, // Ensure pincode is stored as number
+          phone: data.phone,
+          altPhone: data.altPhone,
+          isDefault: true
+        }
+      }}
+    );
+
+    updated ? console.log('Updated') : console.log('not updated');
+
+    // Respond with a redirect instead of JSON
+    res.json({success: true, message: 'Address updated successfully', updatedAddress: updated});  // This should work fine with ajax
+
+  } catch (error) {
+    console.log('Error in editing address', error);
+    res.status(500).json({success: false, message: 'An error occurred, please try again.' });
+  }
+}
+
 
 module.exports = {
   getForgetPass,
@@ -777,4 +841,5 @@ module.exports = {
   loadEditAddress,
   editAddress,
   deleteAddress,
+  editAddressInCheckout
 };

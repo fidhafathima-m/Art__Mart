@@ -1,0 +1,587 @@
+<%- include("../../views/partials/user/header") %>
+<div class="mt-4 ps-4">
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item item"><a href="/cart">Cart</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+    </ol>
+  </nav>
+  
+  <div class="cart-container" style="display: flex; justify-content: space-between; padding: 20px;">
+    <!-- Left container (checkout details) -->
+    <div class="checkout-details bg-white p-4 rounded" style="width: 70%;">
+      <h2>Checkout</h2>
+      
+      <!-- Shipping Address -->
+      <div class="row mt-4">
+        <div class="shipping-address mb-4 col-md-3">
+          <h5 class="text-black">Shipping Address</h5>
+        </div>
+
+        <% if (defaultAddress && defaultAddress.name) { %>
+          <div class="address-details col-md-5">
+            <p><strong><%= defaultAddress.name %></strong><br>
+            <%= defaultAddress.addressType %><br>
+            <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %><br>Phone: <%= defaultAddress.phone %></p>
+          </div>
+      
+          <div class="col-md-4 text-end">
+            <button id="editAddressBtn" class="btn btn-link">Edit Address</button>
+            <button id="changeAddressBtn" class="btn btn-link">Change Address</button>
+          </div>
+        <% } else { %>
+          <div class="address-details col-md-5">
+            <p>No address set to default</p>
+          </div>
+      
+          <div class="col-md-4 text-end">
+            <button id="changeAddressBtn" class="btn btn-link">Select Address</button>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Edit Address Modal -->
+<div id="editAddressModal" class="modal fade" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editAddressModalLabel">Edit Address</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editAddressForm">
+          <!-- Address Form Fields (populate with existing address data) -->
+          <div class="mb-3">
+            <label for="editAddressType" class="form-label">Address Type</label>
+            <select class="form-control" id="editAddressType" name="addressType" required>
+              <option value="Home">Home</option>
+              <option value="Office">Office</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editName" class="form-label"><br><br>House Name</label>
+            <input type="text" class="form-control" id="editName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="editCity" class="form-label">City</label>
+            <input type="text" class="form-control" id="editCity" name="city" required>
+          </div>
+          <div class="mb-3">
+            <label for="editLandMark" class="form-label">Landmark</label>
+            <input type="text" class="form-control" id="editLandMark" name="landMark">
+          </div>
+          <div class="mb-3">
+            <label for="editState" class="form-label">State</label>
+            <div class="dropdown">
+              <button class="btn btn-light dropdown-toggle form-control border-3" type="button" id="editStateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select State
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="editStateDropdown" style="max-height: 200px; overflow-y: auto;">
+                  <li><a class="dropdown-item" href="#" data-value="Andhra Pradesh">Andhra Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Arunachal Pradesh">Arunachal Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Assam">Assam</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Bihar">Bihar</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Chhattisgarh">Chhattisgarh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Goa">Goa</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Gujarat">Gujarat</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Haryana">Haryana</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Himachal Pradesh">Himachal Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Jharkhand">Jharkhand</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Karnataka">Karnataka</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Kerala">Kerala</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Madhya Pradesh">Madhya Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Maharashtra">Maharashtra</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Manipur">Manipur</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Meghalaya">Meghalaya</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Mizoram">Mizoram</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Nagaland">Nagaland</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Odisha">Odisha</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Punjab">Punjab</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Rajasthan">Rajasthan</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Sikkim">Sikkim</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Tamil Nadu">Tamil Nadu</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Telangana">Telangana</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Tripura">Tripura</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Uttar Pradesh">Uttar Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Uttarakhand">Uttarakhand</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="West Bengal">West Bengal</a></li>
+              </ul>
+          </div>
+          <input type="hidden" id="editState" name="state" />
+          </div>
+          <div class="mb-3">
+            <label for="editPincode" class="form-label">Pincode</label>
+            <input type="number" class="form-control" id="editPincode" name="pincode" required>
+          </div>
+          <div class="mb-3">
+            <label for="editPhone" class="form-label">Phone</label>
+            <input type="number" class="form-control" id="editPhone" name="phone" required>
+          </div>
+          <div class="mb-3">
+            <label for="editAltPhone" class="form-label">Alternate Phone</label>
+            <input type="number" class="form-control" id="editAltPhone" name="altPhone">
+          </div>
+
+          <input type="hidden" name="addressId" id="addressId" value="<%= defaultAddress._id %>" />
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <!-- Change Address Modal -->
+<div id="changeAddressModal" class="modal fade" tabindex="-1" aria-labelledby="changeAddressModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeAddressModalLabel">Select Address</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addressForm">
+          <% addresses.forEach(function(address) { %>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="address" id="address<%= address._id %>" value="<%= address._id %>" <%= address.isDefault ? 'checked' : '' %> />
+              <label class="form-check-label" for="address<%= address._id %>">
+                <%= address.name %>, <%= address.addressType %>, <%= address.city %>, <%= address.state %> - <%= address.pincode %>
+              </label>
+            </div>
+          <% }) %>
+        </form>
+        <a href="#" class="btn btn-link" id="addNewAddressBtn">Add New Address</a>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="useThisAddressBtn">Use This Address</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add New Address Modal -->
+<div id="addNewAddressModal" class="modal fade" tabindex="-1" aria-labelledby="addNewAddressModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-black" id="addNewAddressModalLabel">Add New Address</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addAddressForm">
+          <!-- Address Form Fields (same as the one you already have) -->
+          <div class="mb-3">
+            <label for="newAddressType" class="form-label">Address Type</label>
+            <select class="form-control" id="newAddressType" name="addressType" required>
+              <option value="Home">Home</option>
+              <option value="Office">Office</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="newName" class="form-label"><br><br>House Name</label>
+            <input type="text" class="form-control" id="newName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="newCity" class="form-label">City</label>
+            <input type="text" class="form-control" id="newCity" name="city" required>
+          </div>
+          <div class="mb-3">
+            <label for="newLandMark" class="form-label">Landmark</label>
+            <input type="text" class="form-control" id="newLandMark" name="landMark">
+          </div>
+          <div class="mb-3">
+            <label for="newState" class="form-label">State</label>
+            <div class="dropdown">
+              <button class="btn btn-light dropdown-toggle form-control border-3" type="button" id="stateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  Select State
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="stateDropdown" style="max-height: 200px; overflow-y: auto;">
+                  <li><a class="dropdown-item" href="#" data-value="Andhra Pradesh">Andhra Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Arunachal Pradesh">Arunachal Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Assam">Assam</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Bihar">Bihar</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Chhattisgarh">Chhattisgarh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Goa">Goa</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Gujarat">Gujarat</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Haryana">Haryana</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Himachal Pradesh">Himachal Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Jharkhand">Jharkhand</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Karnataka">Karnataka</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Kerala">Kerala</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Madhya Pradesh">Madhya Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Maharashtra">Maharashtra</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Manipur">Manipur</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Meghalaya">Meghalaya</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Mizoram">Mizoram</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Nagaland">Nagaland</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Odisha">Odisha</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Punjab">Punjab</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Rajasthan">Rajasthan</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Sikkim">Sikkim</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Tamil Nadu">Tamil Nadu</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Telangana">Telangana</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Tripura">Tripura</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Uttar Pradesh">Uttar Pradesh</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="Uttarakhand">Uttarakhand</a></li>
+                  <li><a class="dropdown-item" href="#" data-value="West Bengal">West Bengal</a></li>
+              </ul>
+          </div>
+          <input type="hidden" id="state" name="state" />
+          </div>
+          <div class="mb-3">
+            <label for="newPincode" class="form-label">Pincode</label>
+            <input type="number" class="form-control" id="newPincode" name="pincode" required>
+          </div>
+          <div class="mb-3">
+            <label for="newPhone" class="form-label">Phone</label>
+            <input type="number" class="form-control" id="newPhone" name="phone" required>
+          </div>
+          <div class="mb-3">
+            <label for="newAltPhone" class="form-label">Alternate Phone</label>
+            <input type="number" class="form-control" id="newAltPhone" name="altPhone">
+          </div>
+          <button type="submit" class="btn btn-primary">Add Address</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+      <!-- Payment Method -->
+      <div class="payment-method mt-4 bg-white p-4 rounded">
+        <hr>
+        <div class="row">
+          <!-- Payment Method Heading -->
+          <div class="col-md-3">
+            <h5 class="text-black">Payment Method</h5>
+          </div>
+
+          <!-- Payment Options (radio buttons) -->
+          <div class="col-md-6">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay" checked />
+              <label class="form-check-label" for="razorpay">Razorpay</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" />
+              <label class="form-check-label" for="cod">Cash on Delivery</label>
+            </div>
+          </div>
+          
+          
+        </div>
+      </div>
+    </div>
+
+    <!-- Right container (Order Summary) -->
+    <div class="order-summary bg-white p-4 rounded" style="width: 30%; height: 50%; margin-left: 20px;">
+      <h3>Order Summary</h3>
+      <hr />
+      <div id="orderItems">
+        <% let totalPrice = 0; %>
+    <% cartItems.forEach(function(item) { %>
+      <% let itemTotal = item.price * item.quantity; %>
+      <div class="row mb-2">
+        <!-- Product Name (first column) -->
+        <div class="col-8">
+          <p style="font-size: 14px; font-weight: 600;"><%= item.productId.productName %><span class="text-muted"> (<%= item.quantity %>)</span></p>
+        </div>
+        <!-- Item Total (second column) -->
+        <div class="col-4 text-end">
+          <p class="text-muted"><%= itemTotal %></p>
+        </div>
+      </div>
+      <% totalPrice += itemTotal; %> <!-- Accumulate the total price -->
+    <% }) %>
+    <div class="row mb-2">
+      <div class="col-8">
+        <p>Discount:</p>
+      </div>
+      <div class="col-4 text-end">
+        <p>0</p>
+      </div>
+    </div>
+    <hr />
+    <div class="row">
+      <div class="col-8" >
+        <p style="font-size: 20px;"><strong>Total:</strong></p>
+      </div>
+      <div class="col-4 text-end">
+        <p style="font-size: 20px;"><strong><%= totalPrice %></strong></p>
+      </div>
+    </div>
+      <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">Poceed</button>
+    </div>
+  </div>
+
+</div>
+
+<%- include("../../views/partials/user/footer") %>
+
+<script>
+  document.getElementById('changeAddressBtn').addEventListener('click', function() {
+    const changeAddressModal = new bootstrap.Modal(document.getElementById('changeAddressModal'));
+    changeAddressModal.show();
+  });
+
+  document.getElementById('useThisAddressBtn').addEventListener('click', function() {
+    console.log("Use This Address button clicked");
+  const selectedAddress = document.querySelector('input[name="address"]:checked').value;
+  
+  // Perform an API call to update the default address for the user.
+  fetch(`/update-default-address`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ addressId: selectedAddress })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Update the shipping address without reloading the page
+      const selectedAddressElement = document.querySelector(`label[for="address${selectedAddress}"]`).textContent;
+      const addressParts = selectedAddressElement.split(',');
+
+      // Dynamically update the shipping address section
+      document.querySelector('.address-details').innerHTML = `
+        <strong>${addressParts[0]}</strong><br>
+        ${addressParts[1]}<br>
+        ${addressParts[2]}, ${addressParts[3]} - ${addressParts[4]}<br>
+        ${addressParts[5] || 'N/A'}`;
+        location.reload();
+
+      // Close the modal
+      const changeAddressModal = bootstrap.Modal.getInstance(document.getElementById('changeAddressModal'));
+      changeAddressModal.hide();
+      
+    } else {
+      alert('Error setting default address');
+    }
+  })
+  .catch(error => console.error('Error:', error));
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+
+ // Handle the dropdown for state selection
+const dropdownItems = document.querySelectorAll('.dropdown-item');
+const stateDropdownBtn = document.getElementById('stateDropdown');
+const stateInput = document.getElementById('state');  // The hidden state input field
+
+// Update state dropdown when a state is clicked
+dropdownItems.forEach(function (item) {
+  item.addEventListener('click', function () {
+    const selectedState = item.getAttribute('data-value');
+    stateDropdownBtn.textContent = selectedState;  // Update the dropdown button text
+    stateInput.value = selectedState;  // Set the hidden input value
+  });
+});
+
+
+
+  /// Handle Add New Address button click
+document.getElementById('addNewAddressBtn').addEventListener('click', function() {
+  // Reset state dropdown and input value when the modal is opened
+  document.getElementById('stateDropdown').textContent = 'Select State';
+  document.getElementById('state').value = '';
+
+  const addNewAddressModal = new bootstrap.Modal(document.getElementById('addNewAddressModal'));
+  addNewAddressModal.show();
+});
+
+  // Handle Add New Address form submission
+  document.getElementById('addAddressForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(document.getElementById('addAddressForm'));
+    const dataObject = {};
+    formData.forEach((value, key) => {
+      dataObject[key] = value;
+    });
+
+    // Submit the form via fetch to save the new address
+    fetch('/profile/address/addAddress', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dataObject),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        
+        // Close the Add New Address Modal
+        const addNewAddressModal = bootstrap.Modal.getInstance(document.getElementById('addNewAddressModal'));
+        addNewAddressModal.hide();
+
+        location.reload();
+
+        // Add new address to the address list and select it
+        const newAddress = data.newAddress;
+        const addressListContainer = document.getElementById('addressForm'); // Address list in the change address modal
+        const newAddressElement = document.createElement('div');
+        newAddressElement.classList.add('form-check');
+        newAddressElement.innerHTML = `
+          <input class="form-check-input" type="radio" name="address" id="address${newAddress._id}" value="${newAddress._id}" checked />
+          <label class="form-check-label" for="address${newAddress._id}">
+            ${newAddress.name}, ${newAddress.addressType}, ${newAddress.city}, ${newAddress.state} - ${newAddress.pincode}
+          </label>
+        `;
+        addressListContainer.appendChild(newAddressElement);
+        const changeAddressModal = bootstrap.Modal.getInstance(document.getElementById('changeAddressModal'));
+        changeAddressModal.show();
+      } else {
+        alert('Error adding address: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error adding address:', error);
+    });
+  });
+
+  // Handle selecting an address in the main modal
+  document.getElementById('useThisAddressBtn').addEventListener('click', function() {
+    const selectedAddressId = document.querySelector('input[name="address"]:checked').value;
+    console.log('Selected Address:', selectedAddressId);
+
+    // Make an API call to set the selected address as the default
+    fetch(`/update-default-address`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ addressId: selectedAddressId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update the shipping address displayed on the page
+        const selectedAddress = data.selectedAddress;
+        document.querySelector('.address-details').innerHTML = `
+          <strong>${selectedAddress.name}</strong><br>
+          ${selectedAddress.addressType}<br>
+          ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}<br>
+          Phone: ${selectedAddress.phone}
+        `;
+        const changeAddressModal = bootstrap.Modal.getInstance(document.getElementById('changeAddressModal'));
+        changeAddressModal.hide();
+      } else {
+        alert('Error updating address');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  });
+});
+
+document.getElementById('editAddressBtn').addEventListener('click', function() {
+  // Get the current default address details
+  const address = {
+    name: '<%= defaultAddress.name %>',
+    addressType: '<%= defaultAddress.addressType %>',
+    city: '<%= defaultAddress.city %>',
+    landMark: '<%= defaultAddress.landMark %>',
+    state: '<%= defaultAddress.state %>',
+    pincode: '<%= defaultAddress.pincode %>',
+    phone: '<%= defaultAddress.phone %>',
+    altPhone: '<%= defaultAddress.altPhone %>',
+  };
+
+  // Populate the modal fields with the current address
+  document.getElementById('editName').value = address.name;
+  document.getElementById('editAddressType').value = address.addressType;
+  document.getElementById('editCity').value = address.city;
+  document.getElementById('editLandMark').value = address.landMark || '';
+  document.getElementById('editPincode').value = address.pincode;
+  document.getElementById('editPhone').value = address.phone;
+  document.getElementById('editAltPhone').value = address.altPhone || '';
+
+  // Set the state (update the dropdown)
+  document.getElementById('editState').value = address.state;
+  document.getElementById('editStateDropdown').textContent = address.state;
+
+  // Loop through dropdown items to pre-select the state
+  const dropdownItems = document.querySelectorAll('.dropdown-item');
+  dropdownItems.forEach(item => {
+    if (item.getAttribute('data-value') === address.state) {
+      document.getElementById('editStateDropdown').textContent = item.textContent;
+    }
+  });
+
+  // Show the Edit Address modal
+  const editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
+  editAddressModal.show();
+});
+
+// Handle dropdown for selecting state in Edit Address
+const dropdownItems = document.querySelectorAll('.dropdown-item');
+const stateDropdownBtn = document.getElementById('editStateDropdown');
+const stateInput = document.getElementById('editState');  // The hidden state input field
+
+// // Update state dropdown when a state is clicked
+dropdownItems.forEach(function (item) {
+  item.addEventListener('click', function () {
+    const selectedState = item.getAttribute('data-value');
+    stateDropdownBtn.textContent = selectedState;  // Update dropdown button text
+    stateInput.value = selectedState;  // Set the hidden input value
+  });
+});
+
+document.getElementById('editAddressForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const addressId = document.getElementById('addressId').value;
+  console.log('Address ID:', addressId);
+
+  const formData = new FormData(document.getElementById('editAddressForm'));
+  const dataObject = {};
+  formData.forEach((value, key) => {
+    dataObject[key] = value;
+  });
+
+  // Send the updated address to the server
+  fetch('/profile/address/editAddress', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(dataObject),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Server response data:', data);
+    if (data.success) {
+      // Update the address on the page without reloading
+      document.querySelector('.address-details').innerHTML = `
+        <strong>${data.updatedAddress.name}</strong><br>
+        ${data.updatedAddress.addressType}<br>
+        ${data.updatedAddress.city}, ${data.updatedAddress.state} - ${data.updatedAddress.pincode}<br>
+        Phone: ${data.updatedAddress.phone}
+      `;
+
+      const editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
+
+      // Close the modal
+      editAddressModal.hide();
+
+      // Reload the page after the modal is hidden (with a delay)
+      setTimeout(() => {
+        location.reload();
+      }, 500);  // 500 ms delay to ensure modal has time to hide before reload
+    } else {
+      alert('Error updating address');
+    }
+  })
+  .catch(error => console.error('Error updating address:', error));
+});
+
+
+
+</script>

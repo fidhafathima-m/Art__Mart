@@ -3,6 +3,7 @@ const Category = require("../../models/categorySchema");
 const User = require("../../models/userSchema");
 const Coupon = require("../../models/couponSchema");
 const Review = require("../../models/reviewSchema");
+const Address = require('../../models/addressSchema');
 const Cart = require("../../models/cartSchema");
 const mongoose = require("mongoose");
 
@@ -310,6 +311,78 @@ const deletFromCart = async (req, res) => {
   }
 };
 
+const loadCheckout = async (req, res) => {
+  try {
+    const userId = req.session.user;
+
+    // Fetch user's cart
+    const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
+    
+    // Fetch user's address document
+    const userAddress = await Address.findOne({ userId: userId }).select('address');
+    
+    // Extract the default address from the address array
+    const defaultAddress = userAddress ? userAddress.address.find(addr => addr.isDefault) : null;
+
+    // If no default address, log it or handle accordingly
+    if (!defaultAddress) {
+      console.log('No default address found for the user.');
+    }
+
+    // If the cart doesn't exist for the user, return an empty cart
+    const cartItems = cart ? cart.items : [];
+
+    // Render checkout page with the extracted default address
+    res.render('checkout', {
+      activePage: 'shop',
+      user: userId,
+      cartItems: cartItems,
+      addresses: userAddress ? userAddress.address : [],  // Pass all addresses for the modal
+      defaultAddress: defaultAddress || {}  // Pass the default address (if any)
+    });
+  } catch (error) {
+    console.log('Error loading checkout: ', error);
+    res.redirect('/pageNotFound');
+  }
+};
+
+
+const updateDefaultAddress = async (req, res) => {
+  try {
+    const { addressId } = req.body;
+    const userId = req.session.user;
+
+    // Check if user is authenticated
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'User is not authenticated' });
+    }
+
+    // Step 1: Set all addresses' isDefault to false
+    await Address.updateMany(
+      { userId: userId },
+      { $set: { "address.$[].isDefault": false } }
+    );
+
+    // Step 2: Set the selected address as the default
+    const updatedAddress = await Address.updateOne(
+      { userId: userId, "address._id": addressId },
+      { $set: { "address.$.isDefault": true } }
+    );
+
+    // If no address was updated, return an error
+    if (updatedAddress.nModified === 0) {
+      return res.status(400).json({ success: false, message: 'Address not found or already set as default' });
+    }
+
+    // Successfully updated default address
+    res.status(200).json({ success: true, message: 'Default address updated successfully' });
+  } catch (error) {
+    console.error('Error updating default address:', error);
+    res.status(500).json({ success: false, message: 'An error occurred' });
+  }
+};
+
+
 
 module.exports = {
   loadProductDetails,
@@ -317,4 +390,6 @@ module.exports = {
   addToCart,
   updateCartQuantity,
   deletFromCart,
+  loadCheckout,
+  updateDefaultAddress,
 };

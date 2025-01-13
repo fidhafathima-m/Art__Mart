@@ -48,7 +48,6 @@
                 id="email"
                 class="input-line"
                 placeholder="Email Address"
-                required
               />
               <div class="error-message" id="email-error"></div>
             </div>
@@ -60,7 +59,6 @@
                 id="password"
                 class="input-line"
                 placeholder="Password"
-                required
               />
               <div class="error-message" id="password-error"></div>
             </div>
@@ -112,7 +110,11 @@
         const emailVal = emailId.value;
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-        if (!emailPattern.test(emailVal)) {
+        if(!emailVal) {
+          showError(emailErr, "Please Enter an Email Address");
+        }
+
+         else if (!emailPattern.test(emailVal)) {
           showError(emailErr, "Invalid format");
         } else {
           hideError(emailErr);
@@ -124,7 +126,10 @@
         const alpha = /^[A-Za-z]/;
         const digit = /\d/;
 
-        if (passVal.length < 8) {
+        if(!passVal) {
+          showError(passErr, "Please Enter a password");
+        }
+         else if (passVal.length < 8) {
           showError(passErr, "Should contain at least 8 characters");
         } else if (!alpha.test(passVal) || !digit.test(passVal)) {
           showError(passErr, "Should contain numbers and alphabets");

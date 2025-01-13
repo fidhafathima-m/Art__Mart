@@ -80,6 +80,7 @@ router.post('/profile/address/addAddress', profileController.addAddress);
 router.get('/profile/address/edit', profileController.loadEditAddress);
 router.post('/profile/address/edit', profileController.editAddress);
 router.get('/profile/address/delete', profileController.deleteAddress);
+router.post('/profile/address/editAddress', profileController.editAddressInCheckout);
 
 // Product Managemrnt
 router.get("/product-details", productController.loadProductDetails);
@@ -89,5 +90,9 @@ router.get("/cart", productController.loadCart);
 router.post('/addToCart', productController.addToCart);
 router.post('/cart/update-quantity/:productId', productController.updateCartQuantity);
 router.delete('/cart/delete-item/:productId', productController.deletFromCart);
+
+//checkout
+router.get('/checkout', productController.loadCheckout);
+router.post('/update-default-address', productController.updateDefaultAddress);
 
 module.exports = router;

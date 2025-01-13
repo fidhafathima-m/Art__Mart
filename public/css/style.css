@@ -4666,3 +4666,7 @@ label {
 .card-link:hover {
   color: #0a0909;
 }
+
+.breadcrumb {
+  background-color: #E0EDFD;
+}
