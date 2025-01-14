@@ -94,5 +94,7 @@ router.delete('/cart/delete-item/:productId', productController.deletFromCart);
 //checkout
 router.get('/checkout', productController.loadCheckout);
 router.post('/update-default-address', productController.updateDefaultAddress);
+router.post('/checkout/place-order', productController.codPlaceOrder);
+router.get('/checkout/orderSuccess', productController.codOrderSuccess);
 
 module.exports = router;

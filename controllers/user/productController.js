@@ -5,7 +5,81 @@ const Coupon = require("../../models/couponSchema");
 const Review = require("../../models/reviewSchema");
 const Address = require('../../models/addressSchema');
 const Cart = require("../../models/cartSchema");
+const Order = require('../../models/orderSchema');
 const mongoose = require("mongoose");
+const nodemailer = require('nodemailer');
+
+
+const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
+  try {
+    // Fetch product details for the ordered items
+    const productIds = order.ordereditems.map(item => item.product);
+    const products = await Product.find({ _id: { $in: productIds } }); // Assuming you have a Product model
+
+    // Create a map of product IDs to product names
+    const productMap = {};
+    products.forEach(product => {
+      productMap[product._id] = product.productName; // Assuming productName is the field for the name
+    });
+
+    // Construct an HTML list of items with product names
+    const orderedItems = order.ordereditems.map(item => 
+      `<li>${productMap[item.product]} (Qty: ${item.quantity}) - ₹${item.price}</li>`
+    ).join(""); 
+
+    const totalAmount = order.finalAmount; // Total price to pay
+    const paymentMethod = "Cash on Delivery (COD)"; // Payment method is COD in your case
+
+    // Create the delivery address section
+    const deliveryAddress = `
+      <p><b>Delivery Address:</b></p>
+      <p>${defaultAddress.name}</p>
+      <p>${defaultAddress.city}, ${defaultAddress.state} - ${defaultAddress.pincode}</p>
+      <p>Phone: ${defaultAddress.phone}</p>
+      ${defaultAddress.altPhone ? `<p>Alternate Phone: ${defaultAddress.altPhone}</p>` : ""}
+    `;
+
+    // Create email content
+    const emailContent = `
+      <h3>Order Confirmation</h3>
+      <p>Thank you for your order! Below are your order details:</p>
+      <p><b>Order ID:</b> ${order._id}</p>
+      <p><b>Payment Method:</b> ${paymentMethod}</p>
+      <p><b>Items Ordered:</b></p>
+      <ul>
+        ${orderedItems}
+      </ul>
+      <p><b>Total Amount:</b> ₹${totalAmount}</p>
+      ${deliveryAddress}
+      <p>We will notify you once your order is out for delivery. Thank you for shopping with us!</p>
+    `;
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: email,
+      subject: "Order Confirmation - Thank you for your purchase!",
+      html: emailContent,
+    });
+
+    return info.accepted.length > 0; // Check if email was accepted
+  } catch (error) {
+    console.error("Error sending email", error);
+    throw new Error("Failed to send confirmation email");
+  }
+};
+
+
 
 const loadProductDetails = async (req, res) => {
   try {
@@ -382,6 +456,108 @@ const updateDefaultAddress = async (req, res) => {
   }
 };
 
+const codPlaceOrder = async (req, res) => {
+  try {
+
+    // Extract the order details from the request body
+    const { ordereditems, totalprice, finalAmount, address, discount, status, couponApplied } = req.body;
+
+    // Assuming user information is available (e.g., from session or JWT)
+    const userId = req.session.user; // User ID from session or JWT
+
+    // Fetch the address for the user from the Address model
+    const userAddresses = await Address.find({ userId: userId });
+
+    // Check if the user has addresses
+    if (!userAddresses || userAddresses.length === 0) {
+      return res.status(400).json({success: false, message: "No addresses found for the user" });
+    }
+
+    // Find the default address (where isDefault: true)
+    const defaultAddress = userAddresses
+      .flatMap(addr => addr.address) // Flatten the address array to get all addresses
+      .find(addr => addr.isDefault === true);
+
+    // If no default address exists, return an error
+    if (!defaultAddress) {
+      return res.status(400).json({success: false, message: "No default address found" });
+    }
+
+
+    // Proceed with creating the order using the default address
+    const newOrder = new Order({
+      ordereditems,
+      totalprice,
+      finalAmount,
+      address: defaultAddress._id, // Use the default address's _id
+      status: status || "Pending", // Default status is "Pending"
+      createdOn: new Date(),
+      invoiceDate: new Date(),
+      couponApplied,
+      discount,
+    });
+
+
+    // Save the order to the database
+    const savedOrder = await newOrder.save();
+    console.log('saved data id: ', savedOrder._id);
+
+    const userData = await User.findOne({_id: userId});
+
+    const userEmail = userData.email; // Ensure you have user email in session or order details
+    console.log('user email: ', userEmail);
+    const emailSent = await sendOrderConfirmationEmail(userEmail, savedOrder, defaultAddress);
+
+    if (!emailSent) {
+      return res.status(500).json({success: false, message: "Failed to send order confirmation email." });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Order placed successfully!",
+      orderId: savedOrder._id,
+    });
+
+    
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "An error occurred while placing the order. Please try again." });
+  }
+};
+
+
+const codOrderSuccess = async (req, res) => {
+  try {
+    console.log('Query parameters:', req.query);
+    const { orderId } = req.query;
+
+    const user = req.session.user;
+    const cart = await Cart.findOne({ userId: user });
+
+    const cartItems = cart ? cart.items : [];
+
+    const order = await Order.findById(orderId); 
+    console.log('Populated Order:', order);
+
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+
+
+    res.render('order-success', {
+      order,
+      message: "Your order has been successfully placed!",
+      activePage: 'shop',
+      user: user,
+      cartItems: cartItems,
+    });
+  } catch (error) {
+    console.error("Error retrieving order:", error);
+    return res.status(500).json({ message: "An error occurred while fetching the order details." });
+  }
+};
 
 
 module.exports = {
@@ -392,4 +568,6 @@ module.exports = {
   deletFromCart,
   loadCheckout,
   updateDefaultAddress,
+  codPlaceOrder,
+  codOrderSuccess,
 };

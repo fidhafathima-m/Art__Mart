@@ -61,7 +61,7 @@ const orderSchema = new Schema({
   createdOn: {
     type: Date,
     required: true,
-    default: date.now,
+    default: Date.now,
   },
   couponApplied: {
     type: Boolean,
