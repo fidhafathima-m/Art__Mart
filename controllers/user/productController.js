@@ -532,7 +532,7 @@ const codPlaceOrder = async (req, res) => {
     const userData = await User.findOne({_id: userId});
 
     const userEmail = userData.email; // Ensure you have user email in session or order details
-    console.log('user email: ', userEmail);
+    // console.log('user email: ', userEmail);
     const emailSent = await sendOrderConfirmationEmail(userEmail, savedOrder, defaultAddress);
 
     if (!emailSent) {
@@ -555,7 +555,7 @@ const codPlaceOrder = async (req, res) => {
 
 const codOrderSuccess = async (req, res) => {
   try {
-    console.log('Query parameters:', req.query);
+    // console.log('Query parameters:', req.query);
     const { orderId } = req.query;
 
     const user = req.session.user;
@@ -564,8 +564,6 @@ const codOrderSuccess = async (req, res) => {
     const cartItems = cart ? cart.items : [];
 
     const order = await Order.findById(orderId); 
-    console.log('Populated Order:', order);
-
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -590,12 +588,13 @@ const loadReview = async(req, res) => {
   try {
     
     const orderId = req.params.orderId;
+    const productId = req.query.product_id;
     const user = req.session.user;
 
     const orders = await Order.findById(orderId).populate('ordereditems.product')  
     .exec();
-    const orderedItem = orders.ordereditems[0];
-    const product = orderedItem.product;
+    const product = orders.ordereditems.find(item => item.product._id.toString() === productId).product;
+
 
     const cart = await Cart.findOne({ userId: user });
 
@@ -617,8 +616,9 @@ const loadReview = async(req, res) => {
 const postReview = async(req,res) => {
   try {
     const orderId = req.params.orderId;
-    console.log('body: ', req.body)
-    const { rating, review_text, product_id } = req.body; // Extract review data from the form
+    const productId = req.body.product_id;
+
+    const { rating, review_text } = req.body; // Extract review data from the form
     
     // Check if the rating is within the acceptable range
     if (rating < 1 || rating > 5) {
@@ -633,17 +633,16 @@ const postReview = async(req,res) => {
     }
 
     // Check if the order contains the product the user is reviewing
-    const orderedItem = order.ordereditems.find(item => item.product._id.toString() === product_id);
+    const orderedItem = order.ordereditems.find(item => item.product._id.toString() === productId);
 
     if (!orderedItem) {
         return res.status(400).send("Product not found in this order");
     }
 
-    console.log('userId in order: ', order.userId);
 
     // Create the review document
     const newReview = new Review({
-        product_id: product_id,
+        product_id: productId,
         user_id: order.userId,  // Assuming the address field is used to identify the user who placed the order
         rating: rating,
         review_date: Date.now(),
@@ -654,7 +653,7 @@ const postReview = async(req,res) => {
     // Save the review in the database
     await newReview.save();
 
-    const product = await Product.findById(product_id);
+    const product = await Product.findById(productId);
     product.reviews.push(newReview._id); // Push the review to the product's reviews array
     await product.save();
 

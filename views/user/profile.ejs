@@ -1,14 +1,13 @@
 <head>
   <style>
+    .sidebar a.active {
+      background-color: #007bff;  /* Change to your preferred color */
+      color: white;
+    }
 
-.sidebar a.active {
-    background-color: #007bff;  /* Change to your preferred color */
-    color: white;
-  }
-
-  .sidebar a.active i {
-    color: white;  /* Optional: Change icon color when active */
-  }
+    .sidebar a.active i {
+      color: white;  /* Optional: Change icon color when active */
+    }
 
     .sidebar {
       position: fixed;
@@ -20,10 +19,6 @@
       padding-top: 20px;
       margin-bottom: 30px;
     }
-
-    /* .content {
-      padding: 20px;
-    } */
 
     .sidebar a {
       display: block;
@@ -145,13 +140,15 @@
                             statusColor = 'green';
                           } else if (order.status === 'Pending') {
                             statusColor = 'yellow';
+                          } else if (order.status === 'Cancelled') {
+                            statusColor = 'red';
                           }
                         %>
                         <!-- Status Dot with Calculated Color -->
                         <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span>
                         <span class="card-text  ml-3"> <%= order.status %></span>
                         <% if (order.status === 'Delivered') { %>
-                          <p><a href="/profile/order/<%= order._id %>/review" class="mt-4 text-muted fw-bolder">Rate & Review</a></p>
+                          <p><a href="/profile/order/<%= order._id %>/review?product_id=<%= item.product._id %>" class="mt-4 text-muted fw-bolder">Rate & Review</a></p>
                         <% } %>
                       </div>
         
@@ -173,8 +170,6 @@
             <div class="col-md-9 content">
               <h2 class="mb-4 text-center">Hello <%= user.name %>!</h2>
       
-             
-      
               <!-- Profile Information -->
               <div class="card mb-4">
                 <div class="card-body">
@@ -185,9 +180,6 @@
                   <a href="/profile/change-password" class="btn btn-warning">Change Password</a>
                 </div>
               </div>
-      
-              
-              
             </div>
           </div>
         </div>
