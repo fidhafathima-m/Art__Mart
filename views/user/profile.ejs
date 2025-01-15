@@ -114,26 +114,30 @@
         <% } %>
 
       <% } else if (section === 'orders') { %>
-          <div class="d-flex flex-wrap justify-content-start">
+        <div class="d-flex flex-wrap justify-content-start">
           <% if (orders && orders.length > 0) { %>
             <% orders.forEach(order => { %> <!-- Loop through each order -->
               <% order.ordereditems.forEach(item => { %> <!-- Loop through each item in the order -->
-                <div class="card mb-4 shadow" style="width: 100%; max-width: 600px;">
+                <div class="card mb-4 shadow p-2" style="width: 100%; max-width: 900px;">
                   <div class="card-body">
-                    <div class="d-flex">
+                    <div class="row align-items-center">
+                      
                       <!-- Product Image -->
-                      <div style="flex: 1 1 80px;">
-                        <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="img-fluid" style="max-height: 80px; width: auto;">
+                      <div class="col-2">
+                        <a href="/product-details?id=<%= item.product._id %>"><img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="img-fluid" style="max-height: 80px; width: auto;"></a>
+                      </div>
+        
+                      <!-- Product Name & Price -->
+                      <div class="col-5" style="padding-left: 10px;">
+                        <a href="/product-details?id=<%= item.product._id %>"><p class="card-text text-black"><%= item.product.productName %></p></a>
                       </div>
 
-                      <!-- Product Name & Price -->
-                      <div style="flex: 2; padding-left: 10px;">
-                        <h5 class="card-title"><%= item.product.productName %></h5>
+                      <div class="col-2" style="padding-left: 10px;">
                         <p class="card-text">Price: ₹<%= item.price %></p>
                       </div>
-
+        
                       <!-- Status & Rating Link -->
-                      <div style="flex: 1; text-align: right;">
+                      <div class="col-3 text-end">
                         <% 
                           // Determine the status color based on the order status
                           let statusColor = 'gray';
@@ -144,12 +148,13 @@
                           }
                         %>
                         <!-- Status Dot with Calculated Color -->
-                        <!-- <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span> -->
-                        <p class="card-text mt-2"><strong>Status:</strong> <%= order.status %></p>
+                        <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span>
+                        <span class="card-text  ml-3"> <%= order.status %></span>
                         <% if (order.status === 'Delivered') { %>
-                          <a href="/profile/order/<%= order._id %>/review" class="btn btn-success btn-sm">Rate & Review</a>
+                          <p><a href="/profile/order/<%= order._id %>/review" class="mt-4 text-muted fw-bolder">Rate & Review</a></p>
                         <% } %>
                       </div>
+        
                     </div>
                   </div>
                 </div>
@@ -159,6 +164,7 @@
             <p>No orders placed yet.</p>
           <% } %>
         </div>
+        
       <% } else { %>
         <!-- Dashboard content -->
         <div class="card">

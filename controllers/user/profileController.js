@@ -183,25 +183,38 @@ const loadUserProfile = async(req, res) => {
     if (section === 'addresses') {
       // Fetch user's addresses from the Address collection
       const addresses = await Address.find({ userId });
-      // console.log("Fetched Addresses:", addresses); // Log the entire address object
-      // Check the structure of the 'address' field
+      console.log("Fetched Addresses:", addresses); // Log the entire address object to check its structure
+  
+      // Check if the addresses array is empty
       if (addresses && addresses.length > 0) {
-        addresses.forEach(address => {
-          // console.log("Address Object:", address.address); // Log the nested 'address' array
-        });
+          addresses.forEach(address => {
+              console.log("Address Object:", address); // Log each address
+          });
+      } else {
+          console.log("No addresses found for this user.");
       }
-
+  
+      // Get a single address (the one document)
       const userAddresses = await Address.findOne({ userId: userId });
-      const defaultAddress = userAddresses.address.find(addr => addr.isDefault === true);
-      if (!defaultAddress) {
-        console.log('No default address found');
+  
+      if (userAddresses) {
+          // Find the default address if available
+          const defaultAddress = userAddresses.address.find(addr => addr.isDefault === true);
+  
+          if (!defaultAddress) {
+              console.log('No default address found');
+          }
+  
+          content = { addresses, defaultAddress };
+      } else {
+          console.log("No user address found.");
+          content = { addresses: [], defaultAddress: null }; // Fallback if no user addresses found
       }
-
-      content = { addresses, defaultAddress };
+  
     } else if (section === 'orders') {
       const orders = await Order.find({ userId })
-        // .populate('ordereditems.product', 'productName salePrice productImage') // Populate product details
-        // .exec();
+        .populate('ordereditems.product', 'productName salePrice productImage') // Populate product details
+        .exec();
 
         console.log('orders: ', orders)
       content = { orders };

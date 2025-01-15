@@ -97,4 +97,8 @@ router.post('/update-default-address', productController.updateDefaultAddress);
 router.post('/checkout/place-order', productController.codPlaceOrder);
 router.get('/checkout/orderSuccess', productController.codOrderSuccess);
 
+//review
+router.get('/profile/order/:orderId/review', productController.loadReview);
+router.post('/profile/order/:orderId/review', productController.postReview);
+
 module.exports = router;

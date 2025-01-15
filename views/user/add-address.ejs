@@ -36,7 +36,7 @@
        <div class="row mb-3">
            <div class="form-group col-md-4">
                <label for="landMark">Landmark:</label>
-               <input type="text" class="form-control border-3" id="landMark" name="landMark" required>
+               <input type="text" class="form-control border-3" id="landMark" name="landMark">
            </div>
            <div class="form-group col-md-4">
             <label for="state">State:</label>
@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Form validation function
     function validateForm() {
         let isValid = true;
-        const requiredFields = ["addressType", "name", "city", "landMark", "state", "pincode", "phone", "altPhone"];
+        const requiredFields = ["addressType", "name", "city", "state", "pincode", "phone"];
         const errorMessages = [];
 
         requiredFields.forEach(function(field) {
@@ -209,13 +209,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const phonePattern = /^\d{10}$/;
         const name = document.getElementById('name').value;
         const city = document.getElementById('city').value;
-        const landMark = document.getElementById('landMark').value;
+        // const landMark = document.getElementById('landMark').value;
         const state = document.getElementById('state').value;
         const pincode = document.getElementById('pincode').value;
         const phone = document.getElementById('phone').value;
-        const altPhone = document.getElementById('altPhone').value;
+        // const altPhone = document.getElementById('altPhone').value;
 
-        if (!namePattern.test(name) || !namePattern.test(city) || !namePattern.test(landMark) || !namePattern.test(state)) {
+        if (!namePattern.test(name) || !namePattern.test(city) || !namePattern.test(state)) {
             errorMessages.push('Name, City, Landmark, and State should contain alphabets only.');
             isValid = false;
         }
@@ -225,15 +225,15 @@ document.addEventListener("DOMContentLoaded", function () {
             isValid = false;
         }
 
-        if (!phonePattern.test(phone) || !phonePattern.test(altPhone)) {
+        if (!phonePattern.test(phone)) {
             errorMessages.push('Phone and Alternate Phone should be 10-digit numbers.');
             isValid = false;
         }
 
-        if (phone === altPhone) {
-            errorMessages.push('Phone and Alternate Phone numbers should be different.');
-            isValid = false;
-        }
+        // if (phone === altPhone) {
+        //     errorMessages.push('Phone and Alternate Phone numbers should be different.');
+        //     isValid = false;
+        // }
 
         if (!isValid) {
             Swal.fire({

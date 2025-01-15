@@ -41,6 +41,7 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
 
     // Create email content
     const emailContent = `
+      <h2>Order from Art Mart</h2>
       <h3>Order Confirmation</h3>
       <p>Thank you for your order! Below are your order details:</p>
       <p><b>Order ID:</b> ${order._id}</p>
@@ -123,6 +124,7 @@ const loadProductDetails = async (req, res) => {
     const reviews = await Review.find({ product_id: productId })
       .populate("user_id", "name")
       .sort({ review_date: -1 });
+
     // Calculate average rating
     const averageRating = await Review.aggregate([
       { $match: { product_id: new mongoose.Types.ObjectId(productId) } },
@@ -486,6 +488,7 @@ const codPlaceOrder = async (req, res) => {
 
     // Proceed with creating the order using the default address
     const newOrder = new Order({
+      userId: userId, 
       ordereditems,
       totalprice,
       finalAmount,
@@ -583,6 +586,89 @@ const codOrderSuccess = async (req, res) => {
   }
 };
 
+const loadReview = async(req, res) => {
+  try {
+    
+    const orderId = req.params.orderId;
+    const user = req.session.user;
+
+    const orders = await Order.findById(orderId).populate('ordereditems.product')  
+    .exec();
+    const orderedItem = orders.ordereditems[0];
+    const product = orderedItem.product;
+
+    const cart = await Cart.findOne({ userId: user });
+
+    const cartItems = cart ? cart.items : [];
+
+    res.render('review', {
+      orders,
+      product,
+      activePage: 'profile',
+      user: user,
+      cartItems: cartItems,
+    });
+
+  } catch (error) {
+    
+  }
+}
+
+const postReview = async(req,res) => {
+  try {
+    const orderId = req.params.orderId;
+    console.log('body: ', req.body)
+    const { rating, review_text, product_id } = req.body; // Extract review data from the form
+    
+    // Check if the rating is within the acceptable range
+    if (rating < 1 || rating > 5) {
+        return res.status(400).send("Rating must be between 1 and 5");
+    }
+
+    // Find the order by ID to check if the user is authorized to review this order
+    const order = await Order.findById(orderId).populate('ordereditems.product');
+    
+    if (!order) {
+        return res.status(404).send("Order not found");
+    }
+
+    // Check if the order contains the product the user is reviewing
+    const orderedItem = order.ordereditems.find(item => item.product._id.toString() === product_id);
+
+    if (!orderedItem) {
+        return res.status(400).send("Product not found in this order");
+    }
+
+    console.log('userId in order: ', order.userId);
+
+    // Create the review document
+    const newReview = new Review({
+        product_id: product_id,
+        user_id: order.userId,  // Assuming the address field is used to identify the user who placed the order
+        rating: rating,
+        review_date: Date.now(),
+        review_text: review_text,
+        verified_purchase: true, // Assuming the user has purchased the product
+    });
+
+    // Save the review in the database
+    await newReview.save();
+
+    const product = await Product.findById(product_id);
+    product.reviews.push(newReview._id); // Push the review to the product's reviews array
+    await product.save();
+
+    // Redirect the user to their order details page or a confirmation page
+    res.status(200).json({
+      success: true,
+      message: "Thank you for your review!",
+      review: newReview
+  });
+} catch (error) {
+    console.error(error);
+    res.status(500).send("Something went wrong while submitting your review");
+}
+}
 
 module.exports = {
   loadProductDetails,
@@ -594,4 +680,6 @@ module.exports = {
   updateDefaultAddress,
   codPlaceOrder,
   codOrderSuccess,
+  loadReview,
+  postReview,
 };

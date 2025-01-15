@@ -54,9 +54,9 @@
         <div class="reviews">
           <%= reviews.length === 0 ? 'No reviews yet.' : '' %> 
           <% reviews.forEach(review => { %>
-          <div class="review mb-3">
+          <div class="review mb-3 mt-4">
             <h5 class="text-secondary" style="text-align: left">
-              <%= review.user_id.name %>
+              <%= review.user_id ? review.user_id.name : 'Anonymous' %>
             </h5>
             <span class="small">
               <%= new Date(review.review_date).toLocaleDateString() %></span>
