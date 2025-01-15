@@ -1,6 +1,7 @@
 const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
 const Cart = require('../../models/cartSchema');
+const Order = require('../../models/orderSchema');
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
@@ -198,8 +199,11 @@ const loadUserProfile = async(req, res) => {
 
       content = { addresses, defaultAddress };
     } else if (section === 'orders') {
-      // Fetch user's orders (optional, if you have this section)
-      const orders = await Order.find({ userId });
+      const orders = await Order.find({ userId })
+        // .populate('ordereditems.product', 'productName salePrice productImage') // Populate product details
+        // .exec();
+
+        console.log('orders: ', orders)
       content = { orders };
     } else {
       // Default content for the dashboard (could be profile stats, etc.)

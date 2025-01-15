@@ -114,12 +114,50 @@
         <% } %>
 
       <% } else if (section === 'orders') { %>
-        <!-- Show the orders table -->
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Your Orders</h5>
-            <!-- Orders content goes here -->
-          </div>
+          <div class="d-flex flex-wrap justify-content-start">
+          <% if (orders && orders.length > 0) { %>
+            <% orders.forEach(order => { %> <!-- Loop through each order -->
+              <% order.ordereditems.forEach(item => { %> <!-- Loop through each item in the order -->
+                <div class="card mb-4 shadow" style="width: 100%; max-width: 600px;">
+                  <div class="card-body">
+                    <div class="d-flex">
+                      <!-- Product Image -->
+                      <div style="flex: 1 1 80px;">
+                        <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="img-fluid" style="max-height: 80px; width: auto;">
+                      </div>
+
+                      <!-- Product Name & Price -->
+                      <div style="flex: 2; padding-left: 10px;">
+                        <h5 class="card-title"><%= item.product.productName %></h5>
+                        <p class="card-text">Price: ₹<%= item.price %></p>
+                      </div>
+
+                      <!-- Status & Rating Link -->
+                      <div style="flex: 1; text-align: right;">
+                        <% 
+                          // Determine the status color based on the order status
+                          let statusColor = 'gray';
+                          if (order.status === 'Delivered') {
+                            statusColor = 'green';
+                          } else if (order.status === 'Pending') {
+                            statusColor = 'yellow';
+                          }
+                        %>
+                        <!-- Status Dot with Calculated Color -->
+                        <!-- <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span> -->
+                        <p class="card-text mt-2"><strong>Status:</strong> <%= order.status %></p>
+                        <% if (order.status === 'Delivered') { %>
+                          <a href="/profile/order/<%= order._id %>/review" class="btn btn-success btn-sm">Rate & Review</a>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% }) %> <!-- End of ordered items loop -->
+            <% }) %> <!-- End of orders loop -->
+          <% } else { %>
+            <p>No orders placed yet.</p>
+          <% } %>
         </div>
       <% } else { %>
         <!-- Dashboard content -->

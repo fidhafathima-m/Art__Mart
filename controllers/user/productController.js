@@ -500,7 +500,31 @@ const codPlaceOrder = async (req, res) => {
 
     // Save the order to the database
     const savedOrder = await newOrder.save();
-    console.log('saved data id: ', savedOrder._id);
+    // console.log('saved data id: ', savedOrder._id);
+
+    // Update Product Quantity
+    for (const item of ordereditems) {
+      const productId = item.product;
+      const orderedQuantity = item.quantity;
+
+      // Find the product and update its quantity
+      const product = await Product.findById(productId);
+      if (product) {
+        // Ensure sufficient quantity is available
+        if (product.quantity < orderedQuantity) {
+          return res.status(400).json({ success: false, message: `Not enough stock for product ${product.productName}` });
+        }
+        // Deduct the quantity
+        product.quantity -= orderedQuantity;
+        await product.save();
+      }
+    }
+
+    // Remove items from Cart
+    await Cart.findOneAndUpdate(
+      { userId: userId },
+      { $pull: { items: { productId: { $in: ordereditems.map(item => item.product) } } } }
+    );
 
     const userData = await User.findOne({_id: userId});
 

@@ -16,6 +16,7 @@
         <span class="text-muted pe-5" style="text-align: right;">Price</span>
     </div>
     <hr />
+    <% if (cartItems.length > 0) { %>
     <% cartItems.forEach(item => { %>
       <div class="cart-item" style="display: flex; align-items: center; margin-bottom: 20px;">
         <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" style="width: 100px; height: 100px; object-fit: cover; margin-right: 15px;" />
@@ -72,9 +73,9 @@
         <% }) %>
         <p><strong> &#8377; <%= subtotal %>.00</strong></p>
       </div>
-      
-
-    
+      <% } else { %>
+        <h5 class="text-center text-black mt-4">Oops! There is nothing in your Cart!!</h5>
+        <% } %>
   </div>
 
   <!-- Right container (subtotal & proceed to buy) -->
