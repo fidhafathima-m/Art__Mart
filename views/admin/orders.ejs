@@ -1,0 +1,136 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container">
+    <h1 class="my-4">Manage Orders</h1>
+
+    <!-- Search Bar -->
+    <form method="GET">
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          class="form-control col-6"
+          name="search"
+          placeholder="Search by order ID, user ID, or status"
+          aria-label="Search"
+          aria-describedby="basic-addon2"
+        />
+        <button class="btn btn-primary" type="submit">Search</button>
+      </div>
+    </form>
+
+    <!-- Table Container -->
+    <div class="table-container">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>User ID</th>
+            <th>Total Price</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="orderTable">
+          <% for(let i = 0; i < data.length; i++) { %>
+          <tr>
+            <td><%= data[i].orderId %></td>
+            <td><%= data[i].userId ? data[i].userId.name : 'N/A' %></td> <!-- Assuming user has a 'name' field -->
+            <td><%= data[i].totalprice %></td>
+            <td><%= data[i].status %></td>
+            <td>
+                <% if (data[i].status !== 'Processing' && data[i].status !== 'Cancelled' && data[i].status !== 'Shipped' && data[i].status !== 'Delivered') { %>
+              <button class="btn btn-info status-btn" data-id="<%= data[i].orderId %>" data-status="Processing" style="width: 100px">Process</button>
+              <% } %>
+              <% if (data[i].status !== 'Shipped' && data[i].status !== 'Cancelled' && data[i].status !== 'Delivered') { %>
+              <button class="btn btn-warning status-btn" data-id="<%= data[i].orderId %>" data-status="Shipped" style="width: 100px">Ship</button>
+                <% } %>
+                <% if (data[i].status !== 'Delivered' && data[i].status !== 'Cancelled') { %>
+              <button class="btn btn-success status-btn" data-id="<%= data[i].orderId %>" data-status="Delivered" style="width: 100px">Deliver</button>
+              <% } %>
+              <% if (data[i].status !== 'Cancelled') { %>
+              <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Cancelled" style="width: 100px">Cancel</button>
+              <% } %>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div class="container mt-3">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center mb-20">
+            <% for(let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            </li>
+            <% } %>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  // Update Order Status with Confirmation
+  $(document).on("click", ".status-btn", function () {
+    var orderId = $(this).data("id");
+    var status = $(this).data("status");
+
+    // Show confirmation dialog
+    Swal.fire({
+      title: `Are you sure you want to mark this order as ${status}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${status}!`,
+      cancelButtonText: "No, Cancel",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // If confirmed, make AJAX request to update order status
+        $.ajax({
+          type: "POST",
+          url: "/admin/updateOrderStatus",
+          data: { orderId: orderId, status: status },
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: response.message,
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                location.reload(); // Reload the page to update the UI
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurred while updating the order status. Please try again.",
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Request Failed",
+              text: "There was an issue connecting to the server. Please try again.",
+            });
+          },
+        });
+      } else {
+        // If the user clicks Cancel
+        Swal.fire("Cancelled", `Order status change was cancelled.`, "info");
+      }
+    });
+  });
+</script>

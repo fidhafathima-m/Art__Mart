@@ -9,6 +9,7 @@ const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const couponController = require("../controllers/admin/couponController");
+const orderController = require('../controllers/admin/orderController');
 
 router.get("/pageError", adminController.pageError);
 router.get("/login", adminAuth.isLogout, adminController.loadLogin);
@@ -155,5 +156,9 @@ router.get("/listCoupon", adminAuth.isLogin, couponController.listCoupon);
 router.get("/unlistCoupon", adminAuth.isLogin, couponController.unlistCoupon);
 router.get("/edit-coupon", adminAuth.isLogin, couponController.loadEditCoupon);
 router.post("/edit-coupon/:id", adminAuth.isLogin, couponController.editCoupon);
+
+// Order Management
+router.get('/orders', adminAuth.isLogin, orderController.loadOrder);
+router.post('/updateOrderStatus', adminAuth.isLogin, orderController.updateOrderStatus);
 
 module.exports = router;
