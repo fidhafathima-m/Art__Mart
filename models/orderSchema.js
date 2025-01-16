@@ -28,6 +28,14 @@ const orderSchema = new Schema({
         type: Number,
         default: 0,
       },
+      status: { 
+        type: String, 
+        default: 'Pending' 
+      },  // Product-level status
+      returnStatus: { 
+        type: String, 
+        default: 'Not Requested' 
+      }
     },
   ],
   totalprice: {
@@ -71,6 +79,14 @@ const orderSchema = new Schema({
   couponApplied: {
     type: Boolean,
     default: false,
+  },
+  deliveredAt: {
+    type: Date,
+    required: false,
+  },
+  firstDeliveredAt: {   
+    type: Date,
+    required: false,
   },
 });
 

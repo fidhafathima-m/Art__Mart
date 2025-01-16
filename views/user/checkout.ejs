@@ -30,6 +30,9 @@
             <%= defaultAddress.addressType %><br />
             <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%=
             defaultAddress.pincode %><br />Phone: <%= defaultAddress.phone %>
+            <%if (defaultAddress.altPhone) {%>
+              Alternative Phone: <%= defaultAddress.altPhone %>
+              <% } %>
           </p>
         </div>
 
@@ -1045,6 +1048,8 @@
         document.getElementById("editPincode").value = address.pincode;
         document.getElementById("editPhone").value = address.phone;
         document.getElementById("editAltPhone").value = address.altPhone || "";
+
+        console.log('alt phone: ',address.altPhone )
 
         // Set the state (update the dropdown)
         document.getElementById("editState").value = address.state;

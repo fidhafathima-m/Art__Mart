@@ -28,7 +28,7 @@ router.get(
     failureRedirect: "/signup",
   }),
   (req, res) => {
-    console.log("Authenticated user:", req.user); // For debugging
+    // console.log("Authenticated user:", req.user); // For debugging
     req.session.user = req.user._id;
     res.redirect("/");
   }
@@ -73,6 +73,7 @@ router.get('/profile/change-password', profileController.loadEmailPageforPassCha
 router.get('/profile/pass-otp-verification', profileController.passOtpPage);
 router.post('/profile/change-password', profileController.changePassValid);
 router.post('/profile/verify-pass-otp', profileController.verifyChangePassOtp);
+router.get('/profile/order/:orderId', profileController.viewOrderDetails);
 
 //address management
 router.get('/profile/address/add', profileController.loadAddAddress);

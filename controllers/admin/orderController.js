@@ -11,7 +11,7 @@ const loadOrder = async (req, res) => {
 
     // Step 1: Find users that match the username search
     const users = await User.find({
-      username: new RegExp(search, 'i'),  // Use regex to search case-insensitively
+      name: new RegExp(search, 'i'),  // Use regex to search case-insensitively
     });
 
     // Step 2: Extract userIds from the matching users
@@ -27,6 +27,7 @@ const loadOrder = async (req, res) => {
     })
       .populate('userId')  // Populate user details
       .populate('ordereditems.product')  // Populate product details in ordered items
+      .sort({createdOn: -1})
       .skip(skip)
       .limit(limit);
 
@@ -51,30 +52,44 @@ const loadOrder = async (req, res) => {
   }
 };
 
-const updateOrderStatus = async(req, res) => {
-    try {
-        const { orderId, status } = req.body;
-        const validStatuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return Request", "Returned"];
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body;
+    const validStatuses = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Return Request", "Returned"];
     
-        if (!validStatuses.includes(status)) {
-          return res.status(400).send('Invalid status');
-        }
+    if (!validStatuses.includes(status)) {
+      return res.status(400).send('Invalid status');
+    }
+
+    const order = await Order.findOne({ orderId });
     
-        const order = await Order.findOne({ orderId });
-        
-        if (!order) {
-          return res.status(404).send('Order not found');
-        }
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    if (status === 'Delivered' && !order.firstDeliveredAt) {
+      // If it hasn't been delivered before, set the firstDeliveredAt timestamp
+      order.firstDeliveredAt = Date.now();
+    }
+
+    // Update order status
+    order.status = status;
     
-        order.status = status;
-        await order.save();
-    
-        res.json({ success: true, message: `Order status updated to ${status}` });
-      } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
-      }
-}
+    // Check if the new status is 'Delivered'
+    if (status === "Delivered") {
+      order.deliveredAt = Date.now(); // Set the deliveredAt timestamp
+    }
+
+    // Save the updated order
+    await order.save();
+
+    res.json({ success: true, message: `Order status updated to ${status}` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+};
+
 
 module.exports = {
     loadOrder,

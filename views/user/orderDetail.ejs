@@ -1,0 +1,81 @@
+<%- include('../../views/partials/user/header') %>
+
+<div class="ml-5">
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/userProfile">Profile</a></li>
+      <li class="breadcrumb-item"><a href="/userProfile?section=orders">Order</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+    </ol>
+  </nav>
+</div>
+
+<div class="container mt-4 mb-5">
+  <h3 class="text-center">Order Details</h3>
+  <h5 class="text-black-50 my-2">Id: <%= order._id %></h5>
+  <p class="text-center"><strong>Placed on:</strong> <%= new Date(order.createdOn).toLocaleDateString() %></p>
+
+  <div class="d-flex justify-content-center">
+    <div class="col-12 col-md-8"> <!-- Optional: Limits the max-width -->
+        <% order.ordereditems.forEach(item => { %>
+        <div class="card mb-4 shadow p-2" style="width: 100%; max-width: 900px;">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    
+                    <!-- Product Image -->
+                    <div class="col-2">
+                        <a href="/product-details?id=<%= item.product._id %>">
+                            <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="img-fluid" style="max-height: 80px; width: auto;">
+                        </a>
+                    </div>
+                    
+                    <!-- Product Name & Price -->
+                    <div class="col-5">
+                        <a href="/product-details?id=<%= item.product._id %>">
+                            <p><%= item.product.productName %></p>
+                        </a>
+                        <!-- Status & Rating Link -->
+                      
+                        <p>Price: ₹<%= item.price %></p>
+                    </div>
+                    
+                    <!-- Rating Link -->
+                    <div class="col-3 text-end">
+                        <div class=" text-end justify-content-center">
+                            <% 
+                              // Determine the status color based on the order status
+                              let statusColor = 'gray';
+                              if (order.status === 'Delivered') {
+                                statusColor = 'green';
+                              } else if (order.status === 'Processing') {
+                                statusColor = 'yellow';
+                              } else if (order.status === 'Cancelled') {
+                                statusColor = 'red';
+                              }
+                            %>
+                            <!-- Status Dot with Calculated Color -->
+                            <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span>
+                            <span class="card-text  ml-3"> <%= order.status %></span>
+                            </div>
+                        <% if (order.status === 'Delivered') { %>
+                            <% if (!item.product.existingReview) { %>
+                                <p><a href="/profile/order/<%= order._id %>/review?product_id=<%= item.product._id %>" class="mt-4 text-muted fw-bolder">Rate & Review</a></p>
+                            <% } else { %>
+                                <p class="text-warning" style="font-size: 13px;">Already reviewed</p>
+                            <% } %>
+                        <% } %>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <% }) %>
+    </div>
+</div>
+</div>
+
+
+<%- include('../../views/partials/user/footer') %>
+

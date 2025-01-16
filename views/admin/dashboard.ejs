@@ -6,10 +6,143 @@
 
   <!-- Main content -->
   <div class="main-content">
-    <h1>Welcome to the Admin Dashboard</h1>
-    <!-- <p>Your content goes here. You can add more text or components as needed.</p> -->
+    <h1 class="my-4">Welcome, Admin</h1>
+
+    <!-- Cards for Daily Stats (Today's Sales, Delivered, Low Stock) -->
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card border-info mb-3">
+          <div class="card-header">Orders Placed Today</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= ordersPlacedToday %></h5>
+            <p class="card-text">Number of orders placed today</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-success mb-3">
+          <div class="card-header">Orders Delivered Today</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= ordersDeliveredToday %></h5>
+            <p class="card-text">Number of orders delivered today</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-warning mb-3">
+          <div class="card-header">Low Stock Products</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= lowStockProducts %></h5>
+            <p class="card-text">Number of products with low stock</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cards for Overview (Total Products, Categories, Users, Orders) -->
+    <div class="row">
+      <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+          <div class="card-header">Total Products</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= totalProducts %></h5>
+            <p class="card-text">Total number of products in stock</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+          <div class="card-header">Total Categories</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= totalCategories %></h5>
+            <p class="card-text">Total number of product categories</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+          <div class="card-header">Total Users</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= totalUsers %></h5>
+            <p class="card-text">Total number of registered users</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3">
+          <div class="card-header">Processing Orders</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= totalPendingOrders %></h5>
+            <p class="card-text">Total number of orders yet to be shipped</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    
+
+    <!-- Total Sales per Month Graph -->
+<div class="row"">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">Total Sales This Year</div>
+      <div class="card-body">
+        <canvas id="salesChart""></canvas>
+      </div>
+    </div>
   </div>
+</div>
+
+    <!-- Most Sold Categories (Progress Bars) -->
+<div class="row mt-3">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">Most Sold Categories</div>
+      <div class="card-body">
+        <!-- Loop through categories and sales data to display progress bars -->
+        <% for(let i = 0; i < categoryLabels.length; i++) { %>
+        <div class="mb-3">
+          <label for="category<%= i %>" class="form-label"><%= categoryLabels[i] %></label>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: <%= categorySalesData[i] %>%" aria-valuenow="<%= categorySalesData[i] %>" aria-valuemin="0" aria-valuemax="100"></div>
+            
+          </div>
+          <p style="text-align: right;"><%= categorySalesData[i].toFixed(2) %>%</p>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 </div>
 
 <!-- footer -->
 <%- include('../../views/partials/admin/footer') %>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var ctx = document.getElementById('salesChart').getContext('2d');
+  var salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: <%- JSON.stringify(months) %>, // Month names
+      datasets: [{
+        label: 'Total Sales (Units Sold)',
+        data: <%= JSON.stringify(salesDataPerMonth) %>, // Sales data for each month
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>

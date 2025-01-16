@@ -600,12 +600,19 @@ const loadReview = async(req, res) => {
 
     const cartItems = cart ? cart.items : [];
 
+    // Check if the user has already submitted a review for this product in this order
+    const existingReview = await Review.findOne({ 
+      product_id: productId, 
+      user_id: user._id 
+    });
+
     res.render('review', {
       orders,
       product,
       activePage: 'profile',
       user: user,
       cartItems: cartItems,
+      existingReview, existingReview,
     });
 
   } catch (error) {

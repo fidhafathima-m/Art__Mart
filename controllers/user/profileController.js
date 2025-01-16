@@ -2,6 +2,7 @@ const User = require("../../models/userSchema");
 const Address = require("../../models/addressSchema");
 const Cart = require('../../models/cartSchema');
 const Order = require('../../models/orderSchema');
+const Review = require('../../models/reviewSchema');
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
@@ -178,6 +179,7 @@ const loadUserProfile = async(req, res) => {
 
     const section = req.query.section || 'dashboard';
     let content = {};
+     
 
     // Fetch different sections of user data based on the section parameter
     if (section === 'addresses') {
@@ -212,11 +214,12 @@ const loadUserProfile = async(req, res) => {
       }
   
     } else if (section === 'orders') {
+
+      
       const orders = await Order.find({ userId })
-        .populate('ordereditems.product', 'productName salePrice productImage') // Populate product details
+        .populate('ordereditems.product', 'productName productImage') // Only fetch product name and image
         .exec();
 
-        console.log('orders: ', orders)
       content = { orders };
     } else {
       // Default content for the dashboard (could be profile stats, etc.)
@@ -834,6 +837,35 @@ const editAddressInCheckout = async (req, res) => {
   }
 }
 
+const viewOrderDetails = async (req, res) => {
+  try {
+    const orderId = req.params.orderId; // Get order ID from URL
+    const userId = req.session.user;
+
+    // Find the order by ID, including all product details
+    const order = await Order.findById(orderId)
+      .populate('ordereditems.product', 'productName productImage salePrice') // Get detailed info for products
+      .exec();
+
+    if (!order || order.userId.toString() !== userId) {
+      return res.redirect('/profile/orders'); // Redirect if order not found or doesn't belong to the user
+    }
+    const cart = await Cart.findOne({ userId: userId });
+    const cartItems = cart ? cart.items : [];
+
+    // Render the order detail page
+    res.render('orderDetail', {
+      order,
+      user: userId,
+      activePage: 'profile',
+      cartItems: cartItems
+    });
+  } catch (error) {
+    console.error('Error loading order details:', error);
+    res.redirect('/pageNotFound');
+  }
+};
+
 
 module.exports = {
   getForgetPass,
@@ -858,5 +890,6 @@ module.exports = {
   loadEditAddress,
   editAddress,
   deleteAddress,
-  editAddressInCheckout
+  editAddressInCheckout,
+  viewOrderDetails
 };

@@ -111,52 +111,36 @@
       <% } else if (section === 'orders') { %>
         <div class="d-flex flex-wrap justify-content-start">
           <% if (orders && orders.length > 0) { %>
-            <% orders.forEach(order => { %> <!-- Loop through each order -->
-              <% order.ordereditems.forEach(item => { %> <!-- Loop through each item in the order -->
-                <div class="card mb-4 shadow p-2" style="width: 100%; max-width: 900px;">
-                  <div class="card-body">
-                    <div class="row align-items-center">
-                      
-                      <!-- Product Image -->
-                      <div class="col-2">
-                        <a href="/product-details?id=<%= item.product._id %>"><img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="img-fluid" style="max-height: 80px; width: auto;"></a>
-                      </div>
-        
-                      <!-- Product Name & Price -->
-                      <div class="col-5" style="padding-left: 10px;">
-                        <a href="/product-details?id=<%= item.product._id %>"><p class="card-text text-black"><%= item.product.productName %></p></a>
-                      </div>
-
-                      <div class="col-2" style="padding-left: 10px;">
-                        <p class="card-text">Price: ₹<%= item.price %></p>
-                      </div>
-        
-                      <!-- Status & Rating Link -->
-                      <div class="col-3 text-end">
-                        <% 
-                          // Determine the status color based on the order status
-                          let statusColor = 'gray';
-                          if (order.status === 'Delivered') {
-                            statusColor = 'green';
-                          } else if (order.status === 'Processing') {
-                            statusColor = 'yellow';
-                          } else if (order.status === 'Cancelled') {
-                            statusColor = 'red';
-                          }
-                        %>
-                        <!-- Status Dot with Calculated Color -->
-                        <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span>
-                        <span class="card-text  ml-3"> <%= order.status %></span>
-                        <% if (order.status === 'Delivered') { %>
-                          <p><a href="/profile/order/<%= order._id %>/review?product_id=<%= item.product._id %>" class="mt-4 text-muted fw-bolder">Rate & Review</a></p>
-                        <% } %>
-                      </div>
-        
+            <% orders.forEach(order => { %>
+              <div class="card mb-4 shadow p-2" style="width: 100%; max-width: 900px;">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    
+                    <!-- Order ID and Date -->
+                    <div class="col-12">
+                      <h5>Order ID: <%= order._id %></h5>
+                      <p>Placed on: <%= new Date(order.createdOn).toLocaleDateString() %></p>
+                    </div>
+                    
+                    <!-- Item Overview: Show a small list of item names -->
+                    <div class="col-12">
+                      <p><strong>Items: </strong>
+                        <% order.ordereditems.forEach((item, index) => { %>
+                          <span><%= item.product.productName %><%= index < order.ordereditems.length - 1 ? ', ' : '' %></span>
+                        <% }) %>
+                      </p>
+                    </div>
+                    
+                    <!-- Link to Order Details Page -->
+                    <div class="col-12 text-end">
+                      <a href="/profile/order/<%= order._id %>" class="btn btn-primary">View Order Details</a>
                     </div>
                   </div>
                 </div>
-              <% }) %> <!-- End of ordered items loop -->
-            <% }) %> <!-- End of orders loop -->
+              </div>
+            <% }) %>
+            
+            
           <% } else { %>
             <p>No orders placed yet.</p>
           <% } %>

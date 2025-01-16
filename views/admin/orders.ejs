@@ -13,7 +13,7 @@
           type="text"
           class="form-control col-6"
           name="search"
-          placeholder="Search by order ID, user ID, or status"
+          placeholder="Search by order ID, user name, or status"
           aria-label="Search"
           aria-describedby="basic-addon2"
         />
@@ -27,8 +27,8 @@
         <thead>
           <tr>
             <th>Order ID</th>
-            <th>User ID</th>
-            <th>Total Price</th>
+            <th>User Name</th>
+            <th>Total Price(&#8377;)</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -41,15 +41,17 @@
             <td><%= data[i].totalprice %></td>
             <td><%= data[i].status %></td>
             <td>
-                <% if (data[i].status !== 'Processing' && data[i].status !== 'Cancelled' && data[i].status !== 'Shipped' && data[i].status !== 'Delivered') { %>
+                <% if (data[i].status === 'Pending') { %>
               <button class="btn btn-info status-btn" data-id="<%= data[i].orderId %>" data-status="Processing" style="width: 100px">Process</button>
-              <% } %>
-              <% if (data[i].status !== 'Shipped' && data[i].status !== 'Cancelled' && data[i].status !== 'Delivered') { %>
+              <% } else if (data[i].status === 'Processing') { %>
               <button class="btn btn-warning status-btn" data-id="<%= data[i].orderId %>" data-status="Shipped" style="width: 100px">Ship</button>
-                <% } %>
-                <% if (data[i].status !== 'Delivered' && data[i].status !== 'Cancelled') { %>
+                <% } else if (data[i].status === 'Shipped') { %>
               <button class="btn btn-success status-btn" data-id="<%= data[i].orderId %>" data-status="Delivered" style="width: 100px">Deliver</button>
-              <% } %>
+              <% } else if (data[i].status === 'Delivered') { %>
+              <button class="btn btn-warning status-btn" data-id="<%= data[i].orderId %>" data-status="Return Request" style="width: 100px">Return Request</button>
+              <% } else if (data[i].status === 'Return Request') { %>
+              <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Returned" style="width: 100px">Return</button>
+                <% } %>
               <% if (data[i].status !== 'Cancelled') { %>
               <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Cancelled" style="width: 100px">Cancel</button>
               <% } %>
