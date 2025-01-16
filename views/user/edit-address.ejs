@@ -89,7 +89,7 @@
            </div>
            <div class="form-group col-md-4">
                <label for="altPhone">Alternate Phone:</label>
-               <input type="number" class="form-control border-3" id="altPhone" value="<%= address.altPhone %>" name="altPhone" required>
+               <input type="number" class="form-control border-3" id="altPhone" value="<%= address.altPhone %>" name="altPhone">
            </div>
        </div>
 
@@ -111,56 +111,46 @@
 
 <script>
 
-document.addEventListener("DOMContentLoaded", function () {
-    // Handle the dropdown for state selection
+document.addEventListener("DOMContentLoaded", function () { 
     const dropdownItems = document.querySelectorAll('.dropdown-item');
     const stateDropdownBtn = document.getElementById('stateDropdown');
-    const stateInput = document.getElementById('state');  // Get the hidden state input field
-    
-    // Set the initial selected state in the dropdown
+    const stateInput = document.getElementById('state');   
+     
     const initialState = stateInput.value;
     if (initialState) {
-        stateDropdownBtn.textContent = initialState; // Update button text to the existing state value
+        stateDropdownBtn.textContent = initialState;  
     }
-
-    // Update state dropdown when a state is clicked
+ 
     dropdownItems.forEach(function (item) {
         item.addEventListener('click', function () {
             const selectedState = item.getAttribute('data-value');
-            stateDropdownBtn.textContent = selectedState; // Update button text
-            stateInput.value = selectedState; // Set the hidden input value
+            stateDropdownBtn.textContent = selectedState;  
+            stateInput.value = selectedState;  
         });
     });
 
-
-   // Event listener for form submission
-   $("#addressForm").submit(function (event) {
-       // Prevent default form submission
+ 
+   $("#addressForm").submit(function (event) { 
        event.preventDefault(); 
-
-       // Validate the form first
-       if (validateForm()) {
-           // If form is valid, send the Ajax request
-           var formData = $(this).serialize(); // Serialize form data
+ 
+       if (validateForm()) { 
+           var formData = $(this).serialize();  
 
            $.ajax({
                url: $(this).attr('action'),
                method: 'POST',
                data: formData,
-               success: function (response) {
-                   // Show success alert
+               success: function (response) { 
                    Swal.fire({
                        title: 'Address Updated!',
                        text: 'Your address has been updated successfully.',
                        icon: 'success',
                        confirmButtonText: 'Ok'
-                   }).then(function() {
-                       // Redirect to user profile page after the alert is closed
+                   }).then(function() { 
                        window.location.href = '/userProfile?section=addresses';
                    });
                },
-               error: function (error) {
-                   // Show error alert if something goes wrong
+               error: function (error) { 
                    Swal.fire({
                        title: 'Error!',
                        text: 'Something went wrong. Please try again.',
@@ -171,15 +161,13 @@ document.addEventListener("DOMContentLoaded", function () {
            });
        }
    });
-
-   // Form validation function
+ 
    function validateForm() {
        let isValid = true;
-       const requiredFields = ["addressType", "name", "city", "state", "pincode", "phone", "altPhone"];
+       const requiredFields = ["addressType", "name", "city", "state", "pincode", "phone"];
        requiredFields.forEach(function (field) {
            const input = document.getElementById(field);
-           if (input.value.trim() === "") {
-               // Show validation error alert
+           if (input.value.trim() === "") { 
                Swal.fire({
                    title: 'Error',
                    text: 'Please fill all the fields.',

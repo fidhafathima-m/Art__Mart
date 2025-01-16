@@ -11,26 +11,22 @@ const nodemailer = require('nodemailer');
 
 
 const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
-  try {
-    // Fetch product details for the ordered items
+  try { 
     const productIds = order.ordereditems.map(item => item.product);
-    const products = await Product.find({ _id: { $in: productIds } }); // Assuming you have a Product model
-
-    // Create a map of product IDs to product names
+    const products = await Product.find({ _id: { $in: productIds } });  
+ 
     const productMap = {};
     products.forEach(product => {
-      productMap[product._id] = product.productName; // Assuming productName is the field for the name
+      productMap[product._id] = product.productName;  
     });
-
-    // Construct an HTML list of items with product names
+ 
     const orderedItems = order.ordereditems.map(item => 
       `<li>${productMap[item.product]} (Qty: ${item.quantity}) - ₹${item.price}</li>`
     ).join(""); 
 
-    const totalAmount = order.finalAmount; // Total price to pay
-    const paymentMethod = "Cash on Delivery (COD)"; // Payment method is COD in your case
-
-    // Create the delivery address section
+    const totalAmount = order.finalAmount;  
+    const paymentMethod = "Cash on Delivery (COD)";  
+ 
     const deliveryAddress = `
       <p><b>Delivery Address:</b></p>
       <p>${defaultAddress.name}</p>
@@ -38,8 +34,7 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
       <p>Phone: ${defaultAddress.phone}</p>
       ${defaultAddress.altPhone ? `<p>Alternate Phone: ${defaultAddress.altPhone}</p>` : ""}
     `;
-
-    // Create email content
+ 
     const emailContent = `
       <h2>Order from Art Mart</h2>
       <h3>Order Confirmation</h3>
@@ -73,7 +68,7 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
       html: emailContent,
     });
 
-    return info.accepted.length > 0; // Check if email was accepted
+    return info.accepted.length > 0;  
   } catch (error) {
     console.error("Error sending email", error);
     throw new Error("Failed to send confirmation email");
@@ -110,14 +105,14 @@ const loadProductDetails = async (req, res) => {
       {
         $match: {
           _id: {
-            $nin: [...relatedProductIds, product._id], // Exclude both related products and the currently viewed product
+            $nin: [...relatedProductIds, product._id],   
           },
           isBlocked: false,
           isDeleted: false,
         },
       },
       {
-        $sample: { size: 4 }, // Randomly sample 4 products
+        $sample: { size: 4 },  
       },
     ]);
 
@@ -133,8 +128,7 @@ const loadProductDetails = async (req, res) => {
     const avgRating = averageRating.length > 0 ? averageRating[0].avgRating : 0;
 
     const cart = await Cart.findOne({ userId: userId });
-    
-    // If the cart doesn't exist for the user, return an empty cart
+     
     const cartItems = cart ? cart.items : [];
 
     res.render("product-details", {
@@ -159,17 +153,14 @@ const loadProductDetails = async (req, res) => {
 
 const loadCart = async (req, res) => {
   try {
-    const userId = req.session.user; // Assuming you have the user ID from the session or JWT
-    // Fetch the user's data
+    const userId = req.session.user;   
     const userData = await User.findOne({ _id: userId });
-    
-    // Fetch the user's cart, and populate product details, including stock quantity
+     
     const cart = await Cart.findOne({ userId }).populate({
       path: "items.productId",
       model: Product,
     });
-
-    // If cart does not exist, return an empty cart (or redirect to a different page)
+ 
     if (!cart) {
       return res.render("cart", {
         cartItems: [],
@@ -178,25 +169,22 @@ const loadCart = async (req, res) => {
         activePage: 'shop'
       });
     }
-
-    // Extract cart items with product details and available stock quantity
+ 
     const cartItems = cart.items.map(item => ({
       productName: item.productId.productName,
       productImage: item.productId.productImage,
-      cartQuantity: item.quantity,  // Cart quantity
-      productStock: item.productId.quantity, // Product available stock quantity
+      cartQuantity: item.quantity,   
+      productStock: item.productId.quantity,  
       salePrice: item.productId.salePrice,
       productOffer: item.productId.productOffer,
-      productId: item.productId._id, // Make sure product ID is passed to JS for future updates
+      productId: item.productId._id,  
     }));
-
-    // Calculate subtotal
+ 
     let subtotal = 0;
     cartItems.forEach(item => {
       subtotal += item.salePrice * item.cartQuantity;
     });
-
-    // Render the cart page with the data
+ 
     res.render("cart", {
       user: userData,
       cartItems,
@@ -212,69 +200,61 @@ const loadCart = async (req, res) => {
 
 const addToCart = async(req, res) => {
   try {
-    const userId = req.session.user; // Assuming userId is stored in session
+    const userId = req.session.user;  
 
     if (!userId) {
       return res.status(401).json({
         success: false,
         message: 'Please log in to add items to the cart.'
       });
-    }
+    } 
 
-    // Get the product ID from the query string
-    const productId = req.body.productId; // Assuming you are passing the product ID in the URL like ?id=...
+    const productId = req.body.productId;  
     
-    // Fetch the product using the productId
+ 
     const product = await Product.findById(productId);
 
     if (!product) {
       return res.status(404).send('Product not found');
     }
-
-    // Fetch the user's cart or create a new one if it doesn't exist
+ 
     let cart = await Cart.findOne({ userId });
 
-    if (!cart) {
-      // If cart doesn't exist, create a new cart
+    if (!cart) { 
       cart = new Cart({
         userId,
         items: [
           {
             productId: product._id,
-            quantity: 1,  // Default to 1 for new products
+            quantity: 1,  
             price: product.salePrice,
-            totalPrice: product.salePrice * 1, // Default total price for one item
-            status: 1, // Assuming 1 means active
-            cancellationReason: 0, // Placeholder for cancellation reason
+            totalPrice: product.salePrice * 1, 
+            status: 1,  
+            cancellationReason: 0,  
           },
         ],
       });
-    } else {
-      // If cart exists, check if product is already in the cart
+    } else { 
       const productIndex = cart.items.findIndex(item => item.productId.toString() === product._id.toString());
 
-      if (productIndex === -1) {
-        // If product is not in cart, add it
+      if (productIndex === -1) { 
         cart.items.push({
           productId: product._id,
-          quantity: 1, // Default to 1 for new products
+          quantity: 1,  
           price: product.salePrice,
-          totalPrice: product.salePrice * 1, // Default total price for one item
-          status: 1, // Assuming 1 means active
-          cancellationReason: 0, // Placeholder for cancellation reason
+          totalPrice: product.salePrice * 1,  
+          status: 1,  
+          cancellationReason: 0,  
         });
-      } else {
-        // If product is already in cart, update the quantity
+      } else { 
         cart.items[productIndex].quantity += 1;
         cart.items[productIndex].totalPrice = cart.items[productIndex].price * cart.items[productIndex].quantity;
       }
     }
-
-    // Save the cart
+ 
     await cart.save();
-
-    // Redirect the user to the cart page or another page as needed
-    res.json({ success: true, message: "Item added to cart" }); // Redirect to cart page after adding the product
+ 
+    res.json({ success: true, message: "Item added to cart" });  
 
   } catch (error) {
     console.error(error);
@@ -285,40 +265,36 @@ const addToCart = async(req, res) => {
 const updateCartQuantity = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
-    const userId = req.session.user;  // Assuming user authentication
+    const userId = req.session.user;   
     const product = await Product.findOne({_id: productId});
 
     if (quantity > 5) {
       return res.status(400).json({ success: false, message: 'Cannot add more than 5 of this product.' });
     }
-
-    // Find the cart for the user
+ 
     let cart = await Cart.findOne({ userId });
 
-    if (!cart) {
-      // If the cart doesn't exist, create a new one
+    if (!cart) { 
       cart = await Cart.create({
         userId,
         items: [{
           productId,
           quantity,
-          price: product.salePrice/* Fetch the product price from the Product model */,
-          totalPrice: product.salePrice * quantity/* Calculate total price based on quantity and price */,
-          status: 1, // or whatever status you want to set
-          cancellationReason: null, // or whatever default value you want
+          price: product.salePrice ,
+          totalPrice: product.salePrice * quantity ,
+          status: 1,  
+          cancellationReason: null,  
         }],
       });
-    } else {
-      // Find the item in the cart
+    } else { 
       const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId);
 
-      if (itemIndex > -1) {
-        // If the item exists, update the quantity
+      if (itemIndex > -1) { 
         cart.items[itemIndex].quantity = quantity;
-        cart.items[itemIndex].totalPrice = cart.items[itemIndex].price * quantity; // Update total price
+        cart.items[itemIndex].totalPrice = cart.items[itemIndex].price * quantity;  
       } else {
-        // If the item doesn't exist, add it to the cart
-        const productPrice = product.salePrice/* Fetch the product price from the Product model */;
+         
+        const productPrice = product.salePrice ;
         cart.items.push({
           productId,
           quantity,
@@ -328,15 +304,14 @@ const updateCartQuantity = async (req, res) => {
           cancellationReason: null,
         });
       }
-      await cart.save(); // Save the updated cart
+      await cart.save();  
     }
-
-    // Return a success response with updated cart items
+ 
     const updatedCartItems = await Cart.find({ userId });
 
     res.json({
       success: true,
-      updatedCartItems,  // Optionally return the updated cart items
+      updatedCartItems,   
     });
   } catch (error) {
     console.error(error);
@@ -345,21 +320,18 @@ const updateCartQuantity = async (req, res) => {
 };
 
 const deleteItem = async function(userId, productId) {
-  try {
-    // Find the cart by userId
+  try { 
     const cart = await Cart.findOne({ userId: userId });
 
     if (!cart) {
       throw new Error('Cart not found');
     }
-
-    // Remove the item with matching productId from the cart's items array
+ 
     const updatedCart = await Cart.updateOne(
       { userId: userId },
       { $pull: { items: { productId: new mongoose.Types.ObjectId(productId) } } }
     );
-
-    // Return true if modification was successful
+ 
     return updatedCart.modifiedCount > 0;
   } catch (error) {
     console.error('Error deleting item from cart:', error);
@@ -369,11 +341,10 @@ const deleteItem = async function(userId, productId) {
 
 const deletFromCart = async (req, res) => {
   const productId = req.params.productId;
-  const userId = req.session.user; // Get the userId from session (ensure user is logged in)
+  const userId = req.session.user;  
   
 
-  try {
-    // Call the deleteItem method from the Cart model
+  try { 
     const result = await deleteItem(userId, productId);
 
     if (result) {
@@ -390,31 +361,25 @@ const deletFromCart = async (req, res) => {
 const loadCheckout = async (req, res) => {
   try {
     const userId = req.session.user;
-
-    // Fetch user's cart
+ 
     const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
-    
-    // Fetch user's address document
+     
     const userAddress = await Address.findOne({ userId: userId }).select('address');
-    
-    // Extract the default address from the address array
+     
     const defaultAddress = userAddress ? userAddress.address.find(addr => addr.isDefault) : null;
-
-    // If no default address, log it or handle accordingly
+ 
     if (!defaultAddress) {
       console.log('No default address found for the user.');
     }
-
-    // If the cart doesn't exist for the user, return an empty cart
+ 
     const cartItems = cart ? cart.items : [];
-
-    // Render checkout page with the extracted default address
+ 
     res.render('checkout', {
       activePage: 'shop',
       user: userId,
       cartItems: cartItems,
-      addresses: userAddress ? userAddress.address : [],  // Pass all addresses for the modal
-      defaultAddress: defaultAddress || {}  // Pass the default address (if any)
+      addresses: userAddress ? userAddress.address : [],   
+      defaultAddress: defaultAddress || {}   
     });
   } catch (error) {
     console.log('Error loading checkout: ', error);
@@ -427,30 +392,25 @@ const updateDefaultAddress = async (req, res) => {
   try {
     const { addressId } = req.body;
     const userId = req.session.user;
-
-    // Check if user is authenticated
+ 
     if (!userId) {
       return res.status(401).json({ success: false, message: 'User is not authenticated' });
     }
-
-    // Step 1: Set all addresses' isDefault to false
+ 
     await Address.updateMany(
       { userId: userId },
       { $set: { "address.$[].isDefault": false } }
     );
-
-    // Step 2: Set the selected address as the default
+ 
     const updatedAddress = await Address.updateOne(
       { userId: userId, "address._id": addressId },
       { $set: { "address.$.isDefault": true } }
     );
-
-    // If no address was updated, return an error
+ 
     if (updatedAddress.nModified === 0) {
       return res.status(400).json({ success: false, message: 'Address not found or already set as default' });
     }
-
-    // Successfully updated default address
+ 
     res.status(200).json({ success: true, message: 'Default address updated successfully' });
   } catch (error) {
     console.error('Error updating default address:', error);
@@ -460,70 +420,56 @@ const updateDefaultAddress = async (req, res) => {
 
 const codPlaceOrder = async (req, res) => {
   try {
-
-    // Extract the order details from the request body
+ 
     const { ordereditems, totalprice, finalAmount, address, discount, status, couponApplied } = req.body;
-
-    // Assuming user information is available (e.g., from session or JWT)
-    const userId = req.session.user; // User ID from session or JWT
-
-    // Fetch the address for the user from the Address model
+ 
+    const userId = req.session.user;  
+ 
     const userAddresses = await Address.find({ userId: userId });
-
-    // Check if the user has addresses
+ 
     if (!userAddresses || userAddresses.length === 0) {
       return res.status(400).json({success: false, message: "No addresses found for the user" });
     }
-
-    // Find the default address (where isDefault: true)
+ 
     const defaultAddress = userAddresses
-      .flatMap(addr => addr.address) // Flatten the address array to get all addresses
+      .flatMap(addr => addr.address)  
       .find(addr => addr.isDefault === true);
-
-    // If no default address exists, return an error
+ 
     if (!defaultAddress) {
       return res.status(400).json({success: false, message: "No default address found" });
     }
 
-
-    // Proceed with creating the order using the default address
+ 
     const newOrder = new Order({
       userId: userId, 
       ordereditems,
       totalprice,
       finalAmount,
-      address: defaultAddress._id, // Use the default address's _id
-      status: status || "Pending", // Default status is "Pending"
+      address: defaultAddress._id,  
+      status: status || "Pending",  
       createdOn: new Date(),
       invoiceDate: new Date(),
       couponApplied,
       discount,
     });
 
-
-    // Save the order to the database
-    const savedOrder = await newOrder.save();
-    // console.log('saved data id: ', savedOrder._id);
-
-    // Update Product Quantity
+ 
+    const savedOrder = await newOrder.save(); 
+ 
     for (const item of ordereditems) {
       const productId = item.product;
       const orderedQuantity = item.quantity;
-
-      // Find the product and update its quantity
+ 
       const product = await Product.findById(productId);
-      if (product) {
-        // Ensure sufficient quantity is available
+      if (product) { 
         if (product.quantity < orderedQuantity) {
           return res.status(400).json({ success: false, message: `Not enough stock for product ${product.productName}` });
-        }
-        // Deduct the quantity
+        } 
         product.quantity -= orderedQuantity;
         await product.save();
       }
     }
-
-    // Remove items from Cart
+ 
     await Cart.findOneAndUpdate(
       { userId: userId },
       { $pull: { items: { productId: { $in: ordereditems.map(item => item.product) } } } }
@@ -531,8 +477,7 @@ const codPlaceOrder = async (req, res) => {
 
     const userData = await User.findOne({_id: userId});
 
-    const userEmail = userData.email; // Ensure you have user email in session or order details
-    // console.log('user email: ', userEmail);
+    const userEmail = userData.email;   
     const emailSent = await sendOrderConfirmationEmail(userEmail, savedOrder, defaultAddress);
 
     if (!emailSent) {
@@ -554,8 +499,7 @@ const codPlaceOrder = async (req, res) => {
 
 
 const codOrderSuccess = async (req, res) => {
-  try {
-    // console.log('Query parameters:', req.query);
+  try { 
     const { orderId } = req.query;
 
     const user = req.session.user;
@@ -600,7 +544,7 @@ const loadReview = async(req, res) => {
 
     const cartItems = cart ? cart.items : [];
 
-    // Check if the user has already submitted a review for this product in this order
+    // Checking if the user has already submitted a review for this product in this order
     const existingReview = await Review.findOne({ 
       product_id: productId, 
       user_id: user._id 
@@ -625,46 +569,41 @@ const postReview = async(req,res) => {
     const orderId = req.params.orderId;
     const productId = req.body.product_id;
 
-    const { rating, review_text } = req.body; // Extract review data from the form
-    
-    // Check if the rating is within the acceptable range
+    const { rating, review_text } = req.body;  
+     
     if (rating < 1 || rating > 5) {
         return res.status(400).send("Rating must be between 1 and 5");
     }
-
-    // Find the order by ID to check if the user is authorized to review this order
+ 
     const order = await Order.findById(orderId).populate('ordereditems.product');
     
     if (!order) {
         return res.status(404).send("Order not found");
     }
-
-    // Check if the order contains the product the user is reviewing
+ 
     const orderedItem = order.ordereditems.find(item => item.product._id.toString() === productId);
 
     if (!orderedItem) {
         return res.status(400).send("Product not found in this order");
     }
 
-
-    // Create the review document
+ 
     const newReview = new Review({
         product_id: productId,
-        user_id: order.userId,  // Assuming the address field is used to identify the user who placed the order
+        user_id: order.userId,   
         rating: rating,
         review_date: Date.now(),
         review_text: review_text,
-        verified_purchase: true, // Assuming the user has purchased the product
+        verified_purchase: true,  
     });
 
-    // Save the review in the database
+ 
     await newReview.save();
 
     const product = await Product.findById(productId);
-    product.reviews.push(newReview._id); // Push the review to the product's reviews array
+    product.reviews.push(newReview._id);  
     await product.save();
-
-    // Redirect the user to their order details page or a confirmation page
+ 
     res.status(200).json({
       success: true,
       message: "Thank you for your review!",

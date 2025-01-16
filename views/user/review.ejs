@@ -33,31 +33,46 @@
 <%- include('../../views/partials/user/header') %>
 
 <div class="container mt-4">
-  <!-- Product and Rating Section -->
   <div class="row">
-    <!-- Left: Heading with Rating and Review -->
     <div class="col-12 col-md-6">
       <h2>Rate & Review</h2>
       <p>Your feedback matters to us!</p>
     </div>
 
-    <!-- Right: Product Image and Name -->
     <div class="col-12 col-md-6 text-end">
-  <a href="/product-details?id=<%= product._id %>">
-    <span class="text-black"><%= product.productName %></span>
-  </a>
-  <a href="/product-details?id=<%= product._id %>">
-    <img src="<%= product.productImage[0] %>" alt="<%= product.productName %>" class="img-fluid" style="max-height: 70px" />
-  </a>
+      <a href="/product-details?id=<%= product._id %>">
+        <span class="text-black"><%= product.productName %></span>
+      </a>
+      <a href="/product-details?id=<%= product._id %>">
+        <img
+          src="<%= product.productImage[0] %>"
+          alt="<%= product.productName %>"
+          class="img-fluid"
+          style="max-height: 70px"
+        />
+      </a>
     </div>
   </div>
 
   <hr />
 
-  <form method="POST" action="/profile/order/<%= orders._id %>/review" id="reviewForm">
-    <input type="hidden" name="orderId" id="orderId" value="<%= orders._id %>" />
-    <input type="hidden" name="product_id" id="productId" value="<%= product._id %>" />
-    <!-- Rating Section -->
+  <form
+    method="POST"
+    action="/profile/order/<%= orders._id %>/review"
+    id="reviewForm"
+  >
+    <input
+      type="hidden"
+      name="orderId"
+      id="orderId"
+      value="<%= orders._id %>"
+    />
+    <input
+      type="hidden"
+      name="product_id"
+      id="productId"
+      value="<%= product._id %>"
+    />
     <div class="row">
       <div class="col-12">
         <h4>Rate the Product</h4>
@@ -74,15 +89,18 @@
 
     <hr />
 
-    <!-- Review Section -->
     <div class="row">
       <div class="col-12">
         <h4>Write Your Review</h4>
-        <textarea class="form-control mt-4" rows="4" name="review_text" placeholder="Share your experience with the product..."></textarea>
+        <textarea
+          class="form-control mt-4"
+          rows="4"
+          name="review_text"
+          placeholder="Share your experience with the product..."
+        ></textarea>
       </div>
     </div>
 
-    <!-- Submit Button -->
     <div class="d-flex justify-content-end mt-3">
       <button type="submit" class="btn btn-primary mt-3">Submit Review</button>
     </div>
@@ -93,104 +111,95 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  document.getElementById('reviewForm').addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevent default form submission
+  document
+    .getElementById("reviewForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
 
-    // Get the orderId from the form or URL (adjust according to your actual implementation)
-    const orderId = window.location.pathname.split('/')[3];  // or retrieve from URL, e.g., via window.location
+      const orderId = window.location.pathname.split("/")[3];
 
-    
-        const formData = new FormData(document.getElementById('reviewForm'));
-        const dataObject = {};
+      const formData = new FormData(document.getElementById("reviewForm"));
+      const dataObject = {};
 
-        // Convert form data to a plain object
-        formData.forEach((value, key) => {
-            dataObject[key] = value;
-        });
+      formData.forEach((value, key) => {
+        dataObject[key] = value;
+      });
 
-        // Make the Ajax call to the updated route
-        fetch(`/profile/order/${orderId}/review`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataObject)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // If the review is successfully submitted
-                Swal.fire({
-                    title: 'Thank You for Your Review!',
-                    text: 'Your review has been submitted successfully.',
-                    icon: 'success',
-                    confirmButtonText: 'Ok'
-                }).then(() => {
-                    // Redirect to the user orders page after success
-                    window.location.href = '/userProfile?section=orders';
-                });
-            } else {
-                // Show error alert if there's an issue with the review submission
-                Swal.fire({
-                    title: 'Error!',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                });
-            }
-        })
-        .catch(error => {
-            // Handle any other errors
-            console.error('Error:', error);  // Log error to console
+      fetch(`/profile/order/${orderId}/review`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataObject),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
             Swal.fire({
-                title: 'Error!',
-                text: 'Something went wrong. Please try again.',
-                icon: 'error',
-                confirmButtonText: 'Ok'
+              title: "Thank You for Your Review!",
+              text: "Your review has been submitted successfully.",
+              icon: "success",
+              confirmButtonText: "Ok",
+            }).then(() => {
+              window.location.href = "/userProfile?section=orders";
             });
+          } else {
+            Swal.fire({
+              title: "Error!",
+              text: data.message,
+              icon: "error",
+              confirmButtonText: "Ok",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          Swal.fire({
+            title: "Error!",
+            text: "Something went wrong. Please try again.",
+            icon: "error",
+            confirmButtonText: "Ok",
+          });
         });
-    
-});
-
-
-
-    let selectedRating = 0;
-const stars = document.querySelectorAll('.star');
-const ratingInput = document.getElementById('rating'); // Get the hidden rating input
-
-stars.forEach(star => {
-    star.addEventListener('mouseenter', function() {
-        const value = parseInt(star.getAttribute('data-value'));
-        for (let i = 0; i < stars.length; i++) {
-            if (i < value) {
-                stars[i].style.color = 'lightblue'; // Hover effect color
-            } else {
-                stars[i].style.color = 'grey';
-            }
-        }
     });
 
-    star.addEventListener('mouseleave', function() {
-        for (let i = 0; i < stars.length; i++) {
-            if (i < selectedRating) {
-                stars[i].style.color = 'blue'; // Keep filled color
-            } else {
-                stars[i].style.color = 'grey'; // Default grey color
-            }
+  let selectedRating = 0;
+  const stars = document.querySelectorAll(".star");
+  const ratingInput = document.getElementById("rating");
+
+  stars.forEach((star) => {
+    star.addEventListener("mouseenter", function () {
+      const value = parseInt(star.getAttribute("data-value"));
+      for (let i = 0; i < stars.length; i++) {
+        if (i < value) {
+          stars[i].style.color = "lightblue";
+        } else {
+          stars[i].style.color = "grey";
         }
+      }
     });
 
-    star.addEventListener('click', function() {
-        selectedRating = parseInt(star.getAttribute('data-value'));
-        ratingInput.value = selectedRating; // Update the hidden input with the selected rating
-
-        for (let i = 0; i < stars.length; i++) {
-            if (i < selectedRating) {
-                stars[i].style.color = 'blue'; // Filled color when clicked
-            } else {
-                stars[i].style.color = 'grey'; // Default grey color
-            }
+    star.addEventListener("mouseleave", function () {
+      for (let i = 0; i < stars.length; i++) {
+        if (i < selectedRating) {
+          stars[i].style.color = "blue";
+        } else {
+          stars[i].style.color = "grey";
         }
+      }
     });
-});
+
+    star.addEventListener("click", function () {
+      selectedRating = parseInt(star.getAttribute("data-value"));
+      ratingInput.value = selectedRating;
+
+      for (let i = 0; i < stars.length; i++) {
+        if (i < selectedRating) {
+          stars[i].style.color = "blue";
+        } else {
+          stars[i].style.color = "grey";
+        }
+      }
+    });
+  });
 </script>

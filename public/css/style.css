@@ -4113,7 +4113,7 @@ h5 {
 .main-img-container {
   position: relative;
   width: 100%;
-  max-width: 600px; /* Adjust as necessary */
+  max-width: 600px;  
   margin: 0 auto;
   overflow: hidden;
   background-color: #f9f9f9;
@@ -4123,17 +4123,14 @@ h5 {
 
 /* Styling the Main Image */
 .main-image {
-  width: 100%; /* Ensure the image fits the container */
+  width: 100%;  
   height: auto;
   display: block;
   border-radius: 8px;
-  object-fit: cover; /* Makes sure the image covers the container without distorting */
+  object-fit: cover; 
   transition: transform 0.3s ease-in-out;
 }
-
-
-
-
+ 
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -4142,51 +4139,47 @@ h5 {
   }
 
   .main-image {
-    object-fit: contain; /* Adjust the image fitting for smaller screens */
+    object-fit: contain;  
   }
 }
-
-/* Styling the Thumbnail Images */
+ 
 .thumbnails {
   margin-top: 20px;
   
 }
 
 .thumbnail {
-  width: 100%; /* Ensure the image fits the container */
+  width: 100%;  
   height: auto;
-  border-radius: 5px; /* Rounded corners for each thumbnail */
-  transition: transform 0.3s ease-in-out, border 0.3s ease; /* Smooth zoom and border effect */
-  cursor: pointer; /* Indicating the image is clickable */
-  border: 2px solid transparent; /* Transparent border initially */
+  border-radius: 5px;  
+  transition: transform 0.3s ease-in-out, border 0.3s ease;  
+  cursor: pointer;  
+  border: 2px solid transparent;  
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 
 }
-
-/* Hover effect for the thumbnails */
+ 
 .thumbnail:hover {
-  transform: scale(1.05); /* Slight zoom effect on hover */
-  border: 2px solid #3798ff; /* Add a blue border on hover to highlight */
+  transform: scale(1.05);  
+  border: 2px solid #3798ff;  
 }
-
-/* Styling the row and columns */
+ 
 .row {
   margin: 0;
 }
 
 .col-3 {
-  padding: 0 10px; /* Spacing between the thumbnails */
+  padding: 0 10px; 
   margin-bottom: 15px;
 }
 
-/* Responsive Design for Thumbnails */
 @media (max-width: 768px) {
   .col-3 {
     padding: 0 5px;
   }
 
   .thumbnail {
-    border-radius: 4px; /* Slightly smaller radius for smaller screens */
+    border-radius: 4px;
   }
 }
 
@@ -4226,11 +4219,14 @@ h5 {
   width: 100%;
   height: 61%;
   background-color: #33a3ff30;
-  border: 1px solid #000000; /* A subtle border to emphasize the magnified area */
+  border: 1px solid #000000;  
   box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.25), -10px -10px 20px rgba(0, 0, 0, 0.15);
   transform: scale(0.5);
   opacity: 0;
   z-index: 10;
+  background-size: 200%;  
+  background-repeat: no-repeat;
+  background-position: center;
 }
 .magnified-image.active {
   opacity: 1;
@@ -4286,7 +4282,7 @@ h5 {
 }
 
 .coupon-section input[type="text"]:focus {
-  border-color: #4caf50; /* Green color on focus */
+  border-color: #4caf50;  
 }
 
 .coupon-section button {
@@ -4339,8 +4335,7 @@ h5 {
 
 
 /* .accordian */
-
-/* Sidebar Accordion Styling */
+ 
 .shop__sidebar__accordion {
   margin-top: 20px;
 }
@@ -4352,10 +4347,9 @@ h5 {
   background-color: #f9f9f9;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
-/* Hide the accordion toggle button */
+ 
 .accordion-button {
-  display: none; /* This will hide the toggle button */
+  display: none;  
 }
 
 
@@ -4505,30 +4499,27 @@ h5 {
   }
 }
 
-
-/* Search Bar Container */
+ 
 .input-group {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  border-radius: 30px; /* Add border-radius to the container for rounded edges */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Light shadow effect */
+  border-radius: 30px;  
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);  
 }
-
-/* Input Field Styling */
+ 
 .input-group .form-control {
-  border-radius: 30px; /* Round corners for input */
-  padding-left: 20px; /* Space for the text */
-  font-size: 16px; /* Adjust text size */
-  height: 50px; /* Increase height for better aesthetics */
-  border: 1px solid #ccc; /* Light border */
-  transition: all 0.3s ease-in-out; /* Smooth transition effect */
+  border-radius: 30px;  
+  padding-left: 20px;  
+  font-size: 16px;  
+  height: 50px;  
+  border: 1px solid #ccc; 
+  transition: all 0.3s ease-in-out;  
 }
-
-/* Example of ensuring label is above input/select */
+ 
 label {
-  display: block; /* Ensures the label takes up full width and is stacked above the select */
-  margin-bottom: 0.5rem; /* Optional: Adds some space between label and select */
+  display: block;  
+  margin-bottom: 0.5rem;  
 }
 
 
@@ -4536,39 +4527,39 @@ label {
 
 /* Input Field Focus Styling */
 .input-group .form-control:focus {
-  border-color: #3798ff; /* Change border color on focus */
-  box-shadow: 0 0 5px rgba(57, 152, 255, 0.5); /* Add a glowing shadow effect */
-  outline: none; /* Remove default outline */
+  border-color: #3798ff;  
+  box-shadow: 0 0 5px rgba(57, 152, 255, 0.5);  
+  outline: none; 
 }
 
 /* Search Button Styling */
 .input-group .btn {
-  background-color: #3798ff; /* Blue background color */
-  border-radius: 30px; /* Round corners for button */
-  padding: 25px 25px; /* Adjust padding */
+  background-color: #3798ff;  
+  border-radius: 30px;  
+  padding: 25px 25px;  
   height: 50px;
   width: 100px;
-  font-size: 16px; /* Text size for button */
-  color: white; /* Text color */
-  border: none; /* Remove border */
-  transition: background-color 0.3s ease-in-out; /* Smooth transition */
+  font-size: 16px;  
+  color: white;  
+  border: none;  
+  transition: background-color 0.3s ease-in-out;  
   margin-top: 0px;
 }
 
 /* Search Button Hover Effect */
 .input-group .btn:hover {
-  background-color: #2c79e7; /* Darker shade of blue on hover */
+  background-color: #2c79e7;  
 }
 
 /* Input Group Responsive Design */
 @media (max-width: 768px) {
   .input-group {
-    width: 90%; /* Use 90% width for small screens */
+    width: 90%;  
   }
 
   .input-group .form-control,
   .input-group .btn {
-    font-size: 14px; /* Smaller font size for mobile */
+    font-size: 14px; 
   }
 }
 

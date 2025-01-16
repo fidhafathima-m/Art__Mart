@@ -165,42 +165,34 @@ const resetPassword = async (req, res) => {
 const loadUserProfile = async(req, res) => {
   try {
     const userId = req.session.user;
-    
-    // Check if userId exists in the session
+     
     if (!userId) {
       return res.redirect('/login');
     }
-
-    // Fetch user data from the User collection
+ 
     const userData = await User.findOne({ _id: userId });
     if (!userData) {
-      return res.redirect('/login'); // User not found, redirect to login
+      return res.redirect('/login');  
     }
 
     const section = req.query.section || 'dashboard';
     let content = {};
      
-
-    // Fetch different sections of user data based on the section parameter
-    if (section === 'addresses') {
-      // Fetch user's addresses from the Address collection
+ 
+    if (section === 'addresses') { 
       const addresses = await Address.find({ userId });
-      console.log("Fetched Addresses:", addresses); // Log the entire address object to check its structure
-  
-      // Check if the addresses array is empty
+      // console.log("Fetched Addresses:", addresses); 
       if (addresses && addresses.length > 0) {
           addresses.forEach(address => {
-              console.log("Address Object:", address); // Log each address
+              // console.log("Address Object:", address);  
           });
       } else {
           console.log("No addresses found for this user.");
       }
-  
-      // Get a single address (the one document)
+   
       const userAddresses = await Address.findOne({ userId: userId });
   
-      if (userAddresses) {
-          // Find the default address if available
+      if (userAddresses) { 
           const defaultAddress = userAddresses.address.find(addr => addr.isDefault === true);
   
           if (!defaultAddress) {
@@ -210,25 +202,24 @@ const loadUserProfile = async(req, res) => {
           content = { addresses, defaultAddress };
       } else {
           console.log("No user address found.");
-          content = { addresses: [], defaultAddress: null }; // Fallback if no user addresses found
+          content = { addresses: [], defaultAddress: null };  
       }
   
     } else if (section === 'orders') {
 
       
       const orders = await Order.find({ userId })
-        .populate('ordereditems.product', 'productName productImage') // Only fetch product name and image
+        .populate('ordereditems.product', 'productName productImage')  
+        .sort({createdOn: -1})
         .exec();
 
       content = { orders };
-    } else {
-      // Default content for the dashboard (could be profile stats, etc.)
+    } else { 
       content = { userProfile: true };
     }
     const cart = await Cart.findOne({ userId: userId });
         const cartItems = cart ? cart.items : [];
-
-    // Render the profile page with the fetched data
+ 
     res.render('profile', {
       user: userData, 
       ...content, 
@@ -272,17 +263,14 @@ const changeEmail = async (req, res) => {
 
     const { currentEmail } = req.body;
     const userData = await User.findById(user);
-
-    // Check if the entered email is the current user's email
-    if (userData.email !== currentEmail) {
-      // Send response with failure message
+ 
+    if (userData.email !== currentEmail) { 
       return res.json({
         success: false,
         message: 'This is not your current email address.',
       });
     }
-
-    // Continue with OTP process if email matches
+ 
     const otp = generateOtp();
     const emailSent = await sendVeificationMail(currentEmail, otp);
 
@@ -326,24 +314,21 @@ const otpPage = async(req, res) => {
 const verifyEmailOtp = async (req, res) => {
   try {
 
-    const user = req.session.user
-    // Log full request body and session data for detailed inspection
+    const user = req.session.user 
     console.log('Request body:', req.body);
     console.log('Session userOtp:', req.session.userOtp);
-
-    // Retrieve OTPs from request and session, trimming them to ensure no spaces
+ 
     const otp = req.body.otp ? req.body.otp.trim() : undefined;
     const sessionOtp = req.session.userOtp ? req.session.userOtp.trim() : undefined;
 
     console.log('Received OTP:', otp);
     console.log('Session OTP:', sessionOtp);
 
-    console.log('Is OTP equal?', otp === sessionOtp);  // Direct comparison result
+    console.log('Is OTP equal?', otp === sessionOtp);  
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
 
-
-    // Check if both OTPs are present before proceeding
+ 
     if (!otp || !sessionOtp) {
       console.log('OTP or session OTP not found.');
       return res.render('change-email-otp', {
@@ -354,21 +339,20 @@ const verifyEmailOtp = async (req, res) => {
 
       });
     }
-
-    // Additional log to show that both OTPs are being compared
+ 
     if (otp === sessionOtp) {
       console.log('OTP match successful!');
       req.session.userData = req.body.userData;
       res.json({
-        success: true,  // Send success flag
-        message: 'OTP verified successfully',  // Optional message for the client
-        redirectUrl: '/profile/new-email',  // Optionally send a redirect URL
+        success: true,  
+        message: 'OTP verified successfully',   
+        redirectUrl: '/profile/new-email',  
       });
     } else {
       console.log('OTP mismatch!');
       res.json({
-        success: false,  // Send failure flag
-        message: 'OTP not matching',  // Send error message
+        success: false,   
+        message: 'OTP not matching',  
       });
     }
     
@@ -403,15 +387,13 @@ const updateEmail = async (req, res) => {
   try {
     const newEmail = req.body.newEmail;
     const userId = req.session.user;
-
-    // Check if the new email already exists in the database
+ 
     const existingUser = await User.findOne({ email: newEmail });
 
     const cart = await Cart.findOne({ userId: userId });
     const cartItems = cart ? cart.items : [];
     
-    if (existingUser) {
-      // If email already exists, send a response with an error message
+    if (existingUser) { 
       return res.render('new-email', {
         message: 'This email is already in use. Please choose a different one.', 
         activePage: 'userProfile',
@@ -419,11 +401,9 @@ const updateEmail = async (req, res) => {
 
       });
     }
-
-    // Update email if it doesn't already exist
+ 
     await User.findByIdAndUpdate(userId, { email: newEmail });
-
-    // Redirect to the user profile page after successful update
+ 
     res.redirect('/userProfile');
   } catch (error) {
     console.log('Error in updating mail', error);
@@ -455,42 +435,36 @@ const changePassValid = async (req, res) => {
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
 
-    const { newEmail } = req.body;  // The email entered by the user
-    const userData = await User.findById(user);  // Get the current user's data
-
-    // Check if the entered email matches the current user's email
+    const { newEmail } = req.body;   
+    const userData = await User.findById(user);   
+ 
     if (userData.email !== newEmail) {
       return res.json({
         success: false,
-        message: 'This is not your current email address.',  // Email mismatch message
+        message: 'This is not your current email address.',  
       });
     }
-
-    // If the email matches, proceed with OTP generation and sending
+ 
     const otp = generateOtp();
     const emailSent = await sendVeificationMail(newEmail, otp);
 
-    if (emailSent) {
-      // Store OTP and email in session
+    if (emailSent) { 
       req.session.userOtp = otp;
       req.session.userData = req.body;
       req.session.email = newEmail;
-
-      // Return success response with message
+ 
       return res.json({
         success: true,
         message: 'OTP sent successfully. Please check your email.',
       });
-    } else {
-      // If OTP sending fails
+    } else { 
       return res.json({
         success: false,
         message: 'Error sending OTP. Please try again later.',
       });
     }
   } catch (error) {
-    console.log('Error in change password validation:', error);
-    // In case of unexpected errors
+    console.log('Error in change password validation:', error); 
     res.json({
       success: false,
       message: 'An unexpected error occurred. Please try again.',
@@ -552,22 +526,19 @@ const loadAddAddress = async (req, res) => {
 const addAddress = async (req, res) => {
   try {
     console.log("Request Body:", req.body);
-    const userId = req.session.user; // Get userId from session
-    const userData = await User.findOne({ _id: userId }); // Find user from DB
+    const userId = req.session.user;  
+    const userData = await User.findOne({ _id: userId });  
     if (!userData) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-
-    // Destructure required fields from req.body for the new address
+ 
     const { addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault  } = req.body;
 
-
-    // Check if all required fields for the new address are present
+ 
     if (!addressType || !name || !city || !state || !pincode || !phone ) {
       return res.status(400).json({ success: false, message: 'All required fields must be filled' });
     }
-
-    // Check if the address with the same pincode already exists for this user
+ 
     const addressExists = await Address.findOne({ 
       'address.pincode': pincode, 
       userId: userData._id 
@@ -576,13 +547,12 @@ const addAddress = async (req, res) => {
     if (addressExists) {
       return res.status(400).json({ success: false, message: 'This location address already exists' });
     }
-
-    // Construct the new address object
+ 
     const newAddress = {
       addressType,
       name,
       city,
-      landMark: landMark || '',  // Optional field, can be empty if not provided
+      landMark: landMark || '',   
       state,
       pincode,
       phone,
@@ -590,31 +560,26 @@ const addAddress = async (req, res) => {
       isDefault: isDefault === 'on'
     };
 
-    if (newAddress.isDefault) {
-      // If the new address is default, update the user's other addresses to set isDefault = false
+    if (newAddress.isDefault) { 
       await Address.updateMany(
         { userId: userData._id, 'address.isDefault': true },
         { $set: { 'address.$.isDefault': false } }
       );
     }
-
-    // Find the user's address document
+ 
     const userAddress = await Address.findOne({ userId: userData._id });
 
-    if (!userAddress) {
-      // If no existing address document, create a new one
+    if (!userAddress) { 
       const newAddressDoc = new Address({
         userId: userData._id,
         address: [newAddress]
       });
       await newAddressDoc.save();
-    } else {
-      // If user has existing addresses, push the new one
+    } else { 
       userAddress.address.push(newAddress);
       await userAddress.save();
     }
-
-    // Respond with success
+ 
     res.status(200).json({ success: true, message: 'Address added successfully' });
 
   } catch (error) {
@@ -630,15 +595,13 @@ const loadEditAddress = async (req, res) => {
   try {
     const addressId = req.query.id;
     const user = req.session.user;
-
-    // Check if user is logged in
+ 
     if (!user) {
-      return res.redirect('/login'); // Or wherever the login page is
+      return res.redirect('/login');  
     }
 
     
-
-    // Find the address by address ID
+ 
     const currAddress = await Address.findOne({
       'address._id': addressId
     });
@@ -649,8 +612,7 @@ const loadEditAddress = async (req, res) => {
       console.log('Address not found');
       return res.redirect('/pageNotFound');
     }
-
-    // Find the specific address data
+ 
     const addressData = currAddress.address.find((item) => item._id.equals(addressId));
 
     if (!addressData) {
@@ -659,8 +621,7 @@ const loadEditAddress = async (req, res) => {
     }
     const cart = await Cart.findOne({ userId: user });
         const cartItems = cart ? cart.items : [];
-
-    // Render the edit address page
+ 
     res.render('edit-address', { 
       address: addressData, 
       user: user, 
@@ -678,12 +639,11 @@ const loadEditAddress = async (req, res) => {
 const editAddress = async (req, res) => {
   try {
     const data = req.body;
-    const addressId = req.query.id; // Getting the address ID from the query string
+    const addressId = req.query.id;  
     const user = req.session.user;
 
 
-
-    // Find the address to update
+ 
     const findAddress = await Address.findOne({'address._id': addressId});
     if (!findAddress) {
       console.log('Address not found');
@@ -691,10 +651,11 @@ const editAddress = async (req, res) => {
     }
 
     const addressExists = await Address.findOne({
-      'address.pincode': data.pincode,  // Use the number version of the pincode
-      'address._id': { $ne: addressId },  // Exclude the current address being edited
-      userId: user // Ensure we're only checking addresses for the current user
+      'address.pincode': data.pincode,   
+      'address._id': { $ne: addressId },   
+      userId: user  
     });
+    
 
 
     if (addressExists) {
@@ -705,15 +666,13 @@ const editAddress = async (req, res) => {
 
     const isDefault = data.isDefault === 'on';
 
-    if (isDefault) {
-      // If this is the default address, unmark all other default addresses
+    if (isDefault) { 
       await Address.updateMany(
         { userId: user, 'address.isDefault': true },
         { $set: { 'address.$.isDefault': false } }
       );
     }
-
-    // Update the address if the pincode is unique
+ 
     const updated = await Address.updateOne(
       {'address._id': addressId},
       {$set: {
@@ -722,9 +681,9 @@ const editAddress = async (req, res) => {
           addressType: data.addressType,
           name: data.name,
           city: data.city,
-          landMark: data.landMark,  // Fix key casing inconsistency (landmark => landMark)
+          landMark: data.landMark,   
           state: data.state,
-          pincode: data.pincode, // Ensure pincode is stored as number
+          pincode: data.pincode,  
           phone: data.phone,
           altPhone: data.altPhone,
           isDefault: isDefault
@@ -733,9 +692,8 @@ const editAddress = async (req, res) => {
     );
 
     updated ? console.log('Updated') : console.log('not updated');
-
-    // Respond with a redirect instead of JSON
-    res.json({success: true, message: 'Address updated successfully'});  // This should work fine with ajax
+ 
+    res.json({success: true, message: 'Address updated successfully'});   
 
   } catch (error) {
     console.log('Error in editing address', error);
@@ -747,7 +705,7 @@ const editAddress = async (req, res) => {
 
 const deleteAddress = async(req, res) => {
   try {
-    const addressId = req.query.id; // Getting the address ID from the query string
+    const addressId = req.query.id;  
 
     const findAddress = await Address.findOne({'address._id': addressId});
     if (!findAddress) {
@@ -763,8 +721,7 @@ const deleteAddress = async(req, res) => {
         }
       }}
     );
-    
-    // Respond with a success message
+     
     res.json({success: true, message: 'Address deleted successfully'});
   } catch (error) {
     console.log('Error in deleting address', error);
@@ -786,8 +743,7 @@ const editAddressInCheckout = async (req, res) => {
 
     console.log('Address ID:', data.addressId);
 
-
-    // Find the address to update
+ 
     const findAddress = await Address.findOne({'address._id': addressId});
     if (!findAddress) {
       console.log('Address not found');
@@ -795,9 +751,9 @@ const editAddressInCheckout = async (req, res) => {
     }
 
     const addressExists = await Address.findOne({
-      'address.pincode': data.pincode,  // Use the number version of the pincode
-      'address._id': { $ne: addressId },  // Exclude the current address being edited
-      userId: user // Ensure we're only checking addresses for the current user
+      'address.pincode': data.pincode,  
+      'address._id': { $ne: addressId },  
+      userId: user  
     });
 
 
@@ -806,8 +762,7 @@ const editAddressInCheckout = async (req, res) => {
     } else {
       console.log('Pincode is unique, proceeding to update');
     }
-
-    // Update the address if the pincode is unique
+ 
     const updated = await Address.updateOne(
       {'address._id': addressId},
       {$set: {
@@ -816,9 +771,9 @@ const editAddressInCheckout = async (req, res) => {
           addressType: data.addressType,
           name: data.name,
           city: data.city,
-          landMark: data.landMark,  // Fix key casing inconsistency (landmark => landMark)
+          landMark: data.landMark,   
           state: data.state,
-          pincode: data.pincode, // Ensure pincode is stored as number
+          pincode: data.pincode,  
           phone: data.phone,
           altPhone: data.altPhone,
           isDefault: true
@@ -827,9 +782,8 @@ const editAddressInCheckout = async (req, res) => {
     );
 
     updated ? console.log('Updated') : console.log('not updated');
-
-    // Respond with a redirect instead of JSON
-    res.json({success: true, message: 'Address updated successfully', updatedAddress: updated});  // This should work fine with ajax
+ 
+    res.json({success: true, message: 'Address updated successfully', updatedAddress: updated});  
 
   } catch (error) {
     console.log('Error in editing address', error);
@@ -839,30 +793,118 @@ const editAddressInCheckout = async (req, res) => {
 
 const viewOrderDetails = async (req, res) => {
   try {
-    const orderId = req.params.orderId; // Get order ID from URL
+    const orderId = req.params.orderId;  
     const userId = req.session.user;
-
-    // Find the order by ID, including all product details
+ 
+    // Fetch order and populate ordered items along with review information
     const order = await Order.findById(orderId)
-      .populate('ordereditems.product', 'productName productImage salePrice') // Get detailed info for products
+      .populate('ordereditems.product', 'productName productImage salePrice reviews')  // Populate reviews as well
       .exec();
 
     if (!order || order.userId.toString() !== userId) {
-      return res.redirect('/profile/orders'); // Redirect if order not found or doesn't belong to the user
+      return res.redirect('/profile/userProfile?section=orders');  
     }
+
     const cart = await Cart.findOne({ userId: userId });
     const cartItems = cart ? cart.items : [];
 
-    // Render the order detail page
+    const reviews = [];
+    for (let item of order.ordereditems) {
+      const existingReview = await Review.findOne({ 
+        product_id: item.product._id,  // Access product ID from the ordered item
+        user_id: userId
+      });
+
+      // Add the review status (existing or not) for each product
+      reviews.push({
+        productId: item.product._id,
+        existingReview: existingReview ? true : false
+      });
+    }
+
     res.render('orderDetail', {
       order,
       user: userId,
       activePage: 'profile',
-      cartItems: cartItems
+      cartItems: cartItems,
+      reviews,
     });
   } catch (error) {
     console.error('Error loading order details:', error);
     res.redirect('/pageNotFound');
+  }
+};
+
+const cancelOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const userId = req.session.user;
+
+    // Find the order by ID and check if it belongs to the user
+    const order = await Order.findById(orderId);
+    
+    if (!order || order.userId.toString() !== userId) {
+      return res.status(404).json({ success: false, message: 'Order not found or you are not authorized to cancel this order.' });
+    }
+
+    // Check if the order can be canceled (e.g., status is Pending or Processing)
+    if (order.status !== 'Pending' && order.status !== 'Processing') {
+      return res.status(400).json({ success: false, message: 'Order cannot be canceled at this stage.' });
+    }
+
+    // Update the order status to 'Cancelled'
+    order.status = 'Cancelled';
+    await order.save();
+
+    // Return success response
+    res.json({ success: true, message: 'Order has been cancelled.' });
+  } catch (error) {
+    console.error('Error cancelling order:', error);
+    res.status(500).json({ success: false, message: 'An error occurred while cancelling the order.' });
+  }
+};
+
+
+
+const loadEditProfile = async(req, res) => {
+  try {
+    const user = req.session.user;
+    const userData = await User.findById(user);
+
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
+    res.render('edit-profile', {
+      user: userData, 
+      activePage: 'profile',
+      currentPage: 'dashboard',
+      cartItems: cartItems,
+    });
+  } catch (error) {
+    console.log(error);
+    res.redirect('/pageNotFound');
+  }
+}
+
+const editProfile = async (req, res) => {
+  try {
+    const { name, phone } = req.body; // Extract the new values from the form
+
+    const user = req.session.user;
+    const userData = await User.findById(user);
+
+    // Update the user's profile with the new data
+    userData.name = name;
+    userData.phone = phone;
+
+    // Save the updated user data in the database
+    await userData.save();
+
+    // Send a success response as JSON
+    res.json({ success: true, message: 'Profile updated successfully!' });
+  } catch (error) {
+    console.log(error);
+    // Send an error response as JSON
+    res.json({ success: false, message: 'An error occurred. Please try again.' });
   }
 };
 
@@ -891,5 +933,8 @@ module.exports = {
   editAddress,
   deleteAddress,
   editAddressInCheckout,
-  viewOrderDetails
+  viewOrderDetails,
+  cancelOrder,
+  loadEditProfile,
+  editProfile
 };

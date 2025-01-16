@@ -81,26 +81,26 @@ const loadDashboard = async (req, res) => {
           }
         },
         {
-          $unwind: "$ordereditems" // Unwind the ordered items array
+          $unwind: "$ordereditems" 
         },
         {
           $group: {
-            _id: { $month: "$createdOn" }, // Group by month
-            totalSales: { $sum: "$ordereditems.quantity" } // Sum the quantity sold
+            _id: { $month: "$createdOn" }, 
+            totalSales: { $sum: "$ordereditems.quantity" } 
           }
         },
         {
-          $sort: { _id: 1 } // Sort by month (1 = ascending)
+          $sort: { _id: 1 } 
         }
       ]);
 
-      // Prepare data for the graph (total sales per month)
+      // Data for graph
       const months = [
         'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
       ];
-      const salesDataPerMonth = Array(12).fill(0); // Initialize array to hold sales data for each month
+      const salesDataPerMonth = Array(12).fill(0); 
       salesPerMonthData.forEach(item => {
-        salesDataPerMonth[item._id - 1] = item.totalSales; // Store the sales data per month
+        salesDataPerMonth[item._id - 1] = item.totalSales; 
       });
 
       // progress bar for most sold categories
@@ -108,30 +108,27 @@ const loadDashboard = async (req, res) => {
       const categoryLabels = [];
       const categorySalesData = [];
 
-      // Initialize a dictionary to store sales data per category
       const categorySalesMap = {};
 
-      // Loop through categories and fetch sales data
       for (const category of categories) {
-        // Aggregate sales data for each category
         const salesData = await Order.aggregate([
           { 
-            $unwind: "$ordereditems"  // Unwind the ordered items array in the order
+            $unwind: "$ordereditems"  
           },
           { 
             $lookup: {
-              from: "products",   // Join the 'products' collection
-              localField: "ordereditems.product",  // Reference to product in the order
-              foreignField: "_id",  // Matching product ID from the 'Product' collection
-              as: "product"   // Alias for the product details
+              from: "products",   
+              localField: "ordereditems.product",  
+              foreignField: "_id",  
+              as: "product"   
             }
           },
           { 
-            $unwind: "$product"  // Unwind the resulting product data
+            $unwind: "$product"  
           },
           { 
             $match: {
-              "product.category": category._id,  // Filter by category ID
+              "product.category": category._id, 
               $or: [ 
                 { status: "Delivered" },
                 { status: "Return Request" },
@@ -141,27 +138,24 @@ const loadDashboard = async (req, res) => {
           },
           { 
             $group: {
-              _id: "$product.category",  // Group by category
-              totalSales: { $sum: "$ordereditems.quantity" }  // Sum the quantity sold
+              _id: "$product.category",  
+              totalSales: { $sum: "$ordereditems.quantity" }  
             }
           }
         ]);
 
-        // If sales data exists, store it in the categorySalesMap
         const totalSales = salesData.length > 0 ? salesData[0].totalSales : 0;
         categorySalesMap[category._id] = totalSales;
       }
 
-      // Sort categories by total sales and limit to the top 4
       const sortedCategories = Object.keys(categorySalesMap)
         .map(categoryId => ({
           categoryId,
           totalSales: categorySalesMap[categoryId]
         }))
-        .sort((a, b) => b.totalSales - a.totalSales) // Sort in descending order
-        .slice(0, 4); // Get top 4 categories
+        .sort((a, b) => b.totalSales - a.totalSales) 
+        .slice(0, 4); 
 
-      // Fetch category names asynchronously
       const categoryDetails = await Promise.all(sortedCategories.map(async (category) => {
         const categoryDoc = await Category.findById(category.categoryId);
         return {
@@ -170,17 +164,14 @@ const loadDashboard = async (req, res) => {
         };
       }));
 
-      // Prepare the categoryLabels and categorySalesData for the chart
       categoryDetails.forEach(category => {
         categoryLabels.push(category.name);
         categorySalesData.push(category.sales);
       });
 
-      // Calculate percentages if you want to show the proportion of each category's sales
       const totalSalesOverall = categorySalesData.reduce((acc, val) => acc + val, 0);
       const categoryPercentages = categorySalesData.map(sales => (sales / totalSalesOverall) * 100);
 
-      // Render the dashboard with the data
       res.render('dashboard', {
         totalProducts,
         totalCategories,
@@ -191,8 +182,8 @@ const loadDashboard = async (req, res) => {
         lowStockProducts,
         categoryLabels,
         categorySalesData: categoryPercentages,
-        salesDataPerMonth, // Send the sales data for the graph
-        months,    // Send the month names for the graph
+        salesDataPerMonth, 
+        months,    
       });
     } catch (error) {
       console.error(error);

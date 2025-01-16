@@ -37,7 +37,7 @@
           <% for(let i = 0; i < data.length; i++) { %>
           <tr>
             <td><%= data[i].orderId %></td>
-            <td><%= data[i].userId ? data[i].userId.name : 'N/A' %></td> <!-- Assuming user has a 'name' field -->
+            <td><%= data[i].userId ? data[i].userId.name : 'N/A' %></td>  
             <td><%= data[i].totalprice %></td>
             <td><%= data[i].status %></td>
             <td>
@@ -82,13 +82,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script>
-  // Update Order Status with Confirmation
+<script> 
   $(document).on("click", ".status-btn", function () {
     var orderId = $(this).data("id");
     var status = $(this).data("status");
-
-    // Show confirmation dialog
+ 
     Swal.fire({
       title: `Are you sure you want to mark this order as ${status}?`,
       icon: "warning",
@@ -97,8 +95,7 @@
       cancelButtonText: "No, Cancel",
       reverseButtons: true,
     }).then((result) => {
-      if (result.isConfirmed) {
-        // If confirmed, make AJAX request to update order status
+      if (result.isConfirmed) { 
         $.ajax({
           type: "POST",
           url: "/admin/updateOrderStatus",
@@ -111,7 +108,7 @@
                 showConfirmButton: false,
                 timer: 1500,
               }).then(() => {
-                location.reload(); // Reload the page to update the UI
+                location.reload(); 
               });
             } else {
               Swal.fire({
@@ -129,8 +126,7 @@
             });
           },
         });
-      } else {
-        // If the user clicks Cancel
+      } else { 
         Swal.fire("Cancelled", `Order status change was cancelled.`, "info");
       }
     });

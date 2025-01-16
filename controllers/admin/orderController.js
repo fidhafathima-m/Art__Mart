@@ -9,24 +9,21 @@ const loadOrder = async (req, res) => {
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    // Step 1: Find users that match the username search
     const users = await User.find({
-      name: new RegExp(search, 'i'),  // Use regex to search case-insensitively
+      name: new RegExp(search, 'i'),   
     });
-
-    // Step 2: Extract userIds from the matching users
+ 
     const userIds = users.map(user => user._id);
-
-    // Step 3: Find orders based on userIds and other search criteria
+ 
     const orders = await Order.find({
       $or: [
         { orderId: new RegExp(search, 'i') },
-        { userId: { $in: userIds } },  // Search for orders by userId from matching users
+        { userId: { $in: userIds } },  
         { status: new RegExp(search, 'i') },
       ]
     })
-      .populate('userId')  // Populate user details
-      .populate('ordereditems.product')  // Populate product details in ordered items
+      .populate('userId')   
+      .populate('ordereditems.product')   
       .sort({createdOn: -1})
       .skip(skip)
       .limit(limit);
@@ -67,20 +64,16 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).send('Order not found');
     }
 
-    if (status === 'Delivered' && !order.firstDeliveredAt) {
-      // If it hasn't been delivered before, set the firstDeliveredAt timestamp
+    if (status === 'Delivered' && !order.firstDeliveredAt) { 
       order.firstDeliveredAt = Date.now();
     }
-
-    // Update order status
+ 
     order.status = status;
-    
-    // Check if the new status is 'Delivered'
+     
     if (status === "Delivered") {
-      order.deliveredAt = Date.now(); // Set the deliveredAt timestamp
+      order.deliveredAt = Date.now();  
     }
-
-    // Save the updated order
+ 
     await order.save();
 
     res.json({ success: true, message: `Order status updated to ${status}` });

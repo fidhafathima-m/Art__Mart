@@ -82,12 +82,12 @@
     
 
     <!-- Total Sales per Month Graph -->
-<div class="row"">
+<div class="row">
   <div class="col-md-12">
     <div class="card">
       <div class="card-header">Total Sales This Year</div>
       <div class="card-body">
-        <canvas id="salesChart""></canvas>
+        <canvas id="salesChart"></canvas>
       </div>
     </div>
   </div>
@@ -98,8 +98,7 @@
   <div class="col-md-12">
     <div class="card">
       <div class="card-header">Most Sold Categories</div>
-      <div class="card-body">
-        <!-- Loop through categories and sales data to display progress bars -->
+      <div class="card-body"> 
         <% for(let i = 0; i < categoryLabels.length; i++) { %>
         <div class="mb-3">
           <label for="category<%= i %>" class="form-label"><%= categoryLabels[i] %></label>
@@ -127,10 +126,10 @@
   var salesChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: <%- JSON.stringify(months) %>, // Month names
+      labels: <%- JSON.stringify(months) %>,  
       datasets: [{
         label: 'Total Sales (Units Sold)',
-        data: <%= JSON.stringify(salesDataPerMonth) %>, // Sales data for each month
+        data: <%= JSON.stringify(salesDataPerMonth) %>,  
         backgroundColor: 'rgba(54, 162, 235, 0.2)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1

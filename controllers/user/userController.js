@@ -72,32 +72,28 @@ const loadHomePage = async (req, res) => {
       isBlocked: false,
       category: { $in: categories.map((category) => category._id) },
       // quantity: { $gt: 0 }
-    }) // Optimize fields
-
-    // Sort products by creation date
+    })  
+ 
     productsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    productsData = productsData.slice(0, 4); // Limit to 4 products
+    productsData = productsData.slice(0, 4); 
 
     if (productsData.length === 0) {
       console.log("No products found");
       return res.render("home", {
-        user: req.session.user || null,  // Pass user data or null if user is not logged in
+        user: req.session.user || null,   
         product: [],
         message: "No products available at the moment"
       });
     }
-
-    // If user is logged in, fetch user data, otherwise set it to null
+ 
     const userData = user ? await User.findOne({ _id: user }) : null;
 
     const cart = await Cart.findOne({ userId: user });
-    
-    // If the cart doesn't exist for the user, return an empty cart
+     
     const cartItems = cart ? cart.items : [];
-
-    // Render the page with user data if the user is logged in, or pass null if not logged in
+ 
     if (userData) {
-      res.locals.user = userData; // Store the user data in locals for global access
+      res.locals.user = userData;  
       res.render("home", { 
         user: userData, 
         product: productsData,
@@ -105,7 +101,7 @@ const loadHomePage = async (req, res) => {
         activePage: 'home'
       });
     } else {
-      res.render("home", { product: productsData, user: null, activePage: 'home' });  // Pass null if user is not logged in
+      res.render("home", { product: productsData, user: null, activePage: 'home' });   
     }
   } catch (error) {
     console.log("Error loading home page", error.message);
@@ -294,10 +290,7 @@ const loadShopping = async (req, res) => {
   try {
     const user = req.session.user;
     const userData = await User.findOne({ _id: user });
-    const categories = await Category.find({
-      isListed: true,
-      isDeleted: false,
-    });
+    const categories = await Category.find({ isListed: true, isDeleted: false });
     const categoryIds = categories.map((category) => category._id.toString());
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
@@ -305,29 +298,25 @@ const loadShopping = async (req, res) => {
 
     // Get the sortBy query parameter (default to 'lowToHigh')
     const sortBy = req.query.sortBy || 'lowToHigh';
-
-    // Prepare the base query for fetching products
+ 
     let productsQuery = Product.find({
       isBlocked: false,
       isDeleted: false,
       category: { $in: categoryIds },
     });
-
-    // Sort the products based on the selected sorting option
+ 
     if (sortBy === 'lowToHigh') {
       productsQuery = productsQuery.sort({ salePrice: 1 }); // Sort low to high by salePrice
     } else if (sortBy === 'highToLow') {
       productsQuery = productsQuery.sort({ salePrice: -1 }); // Sort high to low by salePrice
     } else {
-      // Default sorting (e.g., latest)
       productsQuery = productsQuery.sort({ createdAt: -1 });
     }
 
     const allProducts = await productsQuery.lean();
 
     const rating = parseInt(req.query.rating) || 0;
-
-    // Filter products by the selected rating before pagination
+ 
     let filteredProducts = [];
     for (let product of allProducts) {
       const reviews = await Review.find({
@@ -341,32 +330,24 @@ const loadShopping = async (req, res) => {
       }
 
       product.averageRating = averageRating;
-
-      // Rating filter logic: Check if the average rating is >= the selected rating
+ 
       if (rating === 0 || averageRating >= rating) {
         filteredProducts.push(product);
       }
     }
 
 
-    // Now apply pagination to the filtered products
+    let selectedCategory = '', gt = '', lt = ''
+
+    // Pagination: Calculate total pages and slice products for the current page
     const totalProducts = filteredProducts.length;
     const totalPages = Math.ceil(totalProducts / limit);
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-
-    // Get the products for the current page
     const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
-
-    let selectedCategory = '';
-    let gt = '';
-    let lt = '';
-    let noProductsMessage = '';
-    let noProductsinCategory = '';
-    let averageRating = '';
 
     const categoryWithIds = categories.map((category) => ({
       _id: category._id,
@@ -376,18 +357,17 @@ const loadShopping = async (req, res) => {
     res.render('shop', {
       user: userData,
       categories: categoryWithIds,
-      products: filteredProducts, // Use filtered products after applying rating filter
+      products: currentProducts,  
       totalProducts: totalProducts,
       currentPage: page,
       totalPages: totalPages,
       cartItems: cartItems,
       sortBy: sortBy,
-      noProductsinCategory,
-      noProductsMessage,
-      selectedCategory,
-      gt, lt, rating,
+      noProductsinCategory: '',
+      noProductsMessage: '',
       activePage: 'shop',
-      averageRating
+      rating,gt, lt,
+      selectedCategory
     });
   } catch (error) {
     console.log("Error fetching data:", error);
@@ -396,12 +376,13 @@ const loadShopping = async (req, res) => {
 };
 
 
+
 const filterProduct = async (req, res) => {
   try {
     const user = req.session.user;
     const category = req.query.category;
-    const sortBy = req.query.sortBy || "newest"; // Default to 'newest' sorting
-    const priceRange = req.query.gt && req.query.lt; // Check if price range filter is applied
+    const sortBy = req.query.sortBy || "newest";  
+    const priceRange = req.query.gt && req.query.lt;  
 
     let findCategory = null;
     if (category && mongoose.Types.ObjectId.isValid(category)) {
@@ -416,13 +397,11 @@ const filterProduct = async (req, res) => {
     if (findCategory) {
       query.category = findCategory._id;
     }
-
-    // Price Filter: Only if the price range is provided (gt and lt)
+ 
     if (priceRange) {
       query.salePrice = { $gt: req.query.gt, $lt: req.query.lt };
     }
-
-    // Finding products based on query and sorting them based on sortBy parameter
+ 
     let findProducts = [];
     if (sortBy === "newest") {
       findProducts = await Product.find(query).sort({ createdAt: -1 }).lean();
@@ -431,24 +410,20 @@ const filterProduct = async (req, res) => {
     } else if (sortBy === "highToLow") {
       findProducts = await Product.find(query).sort({ salePrice: -1 }).lean();
     }
-
-    // Define message variables
+ 
     let noProductsMessage = '';
     let noProductsinCategory = '';
-
-    // If no products are found based on price range filter, set message
+ 
     if (priceRange && findProducts.length === 0) {
       noProductsMessage = "Sorry, there is no products found in the selected price range.";
     }
-
-    // If no products are found based on category filter, set message
+ 
     if (category && findProducts.length === 0) {
       noProductsinCategory = "Sorry, there is no products available in this category now.";
     }
 
     const categories = await Category.find({ isListed: true });
-
-    // Pagination setup
+ 
     let itemsPerPage = 6;
     let currentPage = parseInt(req.query.page) || 1;
 
@@ -456,16 +431,13 @@ const filterProduct = async (req, res) => {
     let lt = '';
 
     const cart = await Cart.findOne({ userId: user });
-    
-    // If the cart doesn't exist for the user, return an empty cart
-    const cartItems = cart ? cart.items : [];
-    // Validate currentPage
+     
+    const cartItems = cart ? cart.items : []; 
     if (isNaN(currentPage) || currentPage < 1) {
       currentPage = 1;
     }
 
-    const rating = parseInt(req.query.rating) || 0;
-    // Filter products by the selected rating
+    const rating = parseInt(req.query.rating) || 0; 
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
@@ -520,8 +492,8 @@ const filterProduct = async (req, res) => {
       totalPages,
       currentPage,
       selectedCategory: category || null,
-      noProductsMessage, // Pass the no products message to the view
-      noProductsinCategory, // Pass the category specific message to the view
+      noProductsMessage,  
+      noProductsinCategory,  
       sortBy,
       gt, lt,
       cartItems: cartItems,
@@ -540,49 +512,42 @@ const filterByPrice = async (req, res) => {
     const user = req.session.user;
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true }).lean();
+ 
+    const gt = parseFloat(req.query.gt) || 0;  
+    const lt = parseFloat(req.query.lt) || 100000;  
 
-    // Extract price range values
-    const gt = parseFloat(req.query.gt) || 0; // Minimum price filter
-    const lt = parseFloat(req.query.lt) || 100000; // Maximum price filter
-
-    const sortBy = req.query.sortBy || 'lowToHigh'; // Default to 'lowToHigh'
-    const selectedCategory = req.query.category || null; // Default sorting by low to high
+    const sortBy = req.query.sortBy || 'lowToHigh';  
+    const selectedCategory = req.query.category || null;  
     let sortQuery = {};
 
     if (sortBy === 'lowToHigh') {
-      sortQuery = { salePrice: 1 }; // Ascending order (low to high)
+      sortQuery = { salePrice: 1 };  
     } else if (sortBy === 'highToLow') {
-      sortQuery = { salePrice: -1 }; // Descending order (high to low)
+      sortQuery = { salePrice: -1 };  
     }
-
-    // Find products in the selected price range
+ 
     let findProducts = await Product.find({
       salePrice: { $gt: gt, $lt: lt },
       isBlocked: false,
       isDeleted: false,
     }).sort(sortQuery).lean();
-
-    // Define noProductsMessage if no products found in the price range
+ 
     let noProductsMessage = '';
     if (findProducts.length === 0) {
       noProductsMessage = "So sorry! No products available in this price range!";
     }
 
     const cart = await Cart.findOne({ userId: user });
-    
-    // If the cart doesn't exist for the user, return an empty cart
+     
     const cartItems = cart ? cart.items : [];
-
-    // Pagination setup
+ 
     let itemsPerPage = 6;
     let currentPage = parseInt(req.query.page) || 1;
-
-    // Validate currentPage
+ 
     if (isNaN(currentPage) || currentPage < 1) {
       currentPage = 1;
     }
-    const rating = parseInt(req.query.rating) || 0;
-    // Filter products by the selected rating
+    const rating = parseInt(req.query.rating) || 0; 
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
@@ -609,20 +574,18 @@ const filterByPrice = async (req, res) => {
     const currentProduct = findProducts.slice(startIndex, endIndex);
 
     req.session.filteredProducts = findProducts;
-
-    // Define noProductsinCategory message for the price range filter
+ 
     let noProductsinCategory = '';
     
-
-    // Render the page with the appropriate messages
+ 
     res.render("shop", {
       user: userData,
       products: currentProduct,
       categories: categories,
       totalPages,
       currentPage,
-      sortBy, // Pass sortBy to the view
-      noProductsMessage, // Pass price filter message to the view
+      sortBy,  
+      noProductsMessage,  
       noProductsinCategory,
       selectedCategory: selectedCategory,
       gt: gt,
@@ -642,53 +605,43 @@ const filterRating = async (req, res) => {
     const user = req.session.user;
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true }).lean();
-
-    // Extract rating filter (from 1 to 5)
-    x // Default to 0 (no rating filter)
-
+ 
     let gt = '', lt = '', noProductsinCategory = '';
-
-    // Extract sorting preference
-    const sortBy = req.query.sortBy || 'lowToHigh'; // Default to 'lowToHigh'
-    const selectedCategory = req.query.category || null; // Default to no selected category
+ 
+    const sortBy = req.query.sortBy || 'lowToHigh';  
+    const selectedCategory = req.query.category || null;  
     let sortQuery = {};
 
     if (sortBy === 'lowToHigh') {
-      sortQuery = { salePrice: 1 }; // Ascending order (low to high)
+      sortQuery = { salePrice: 1 };  
     } else if (sortBy === 'highToLow') {
-      sortQuery = { salePrice: -1 }; // Descending order (high to low)
+      sortQuery = { salePrice: -1 };  
     }
-
-    // Step 1: Find all products
+ 
     let findProducts = await Product.find({
       isBlocked: false,
       isDeleted: false,
     }).sort(sortQuery).lean();
-
-    // Step 2: Filter products by the selected rating
+ 
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
         product_id: product._id,
-        verified_purchase: true, // Only consider verified purchases
+        verified_purchase: true,  
       }).lean();
-
-      // Calculate the average rating for this product
+ 
       let averageRating = 0;
       if (reviews.length > 0) {
         averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
       }
-
-      // Attach averageRating to the product object
+ 
       product.averageRating = averageRating;
-
-      // Check if the average rating matches the filter
+ 
       if (rating === 0 || averageRating >= rating) {
         filteredProducts.push(product);
       }
     }
-
-    // Define noProductsMessage if no products found with the selected rating
+ 
     let noProductsMessage = '';
     if (filteredProducts.length === 0) {
       noProductsMessage = "So sorry! No products available with the selected rating!";
@@ -696,8 +649,7 @@ const filterRating = async (req, res) => {
 
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
-
-    // Pagination setup
+ 
     let itemsPerPage = 6;
     let currentPage = parseInt(req.query.page) || 1;
 
@@ -711,19 +663,18 @@ const filterRating = async (req, res) => {
     const currentProduct = filteredProducts.slice(startIndex, endIndex);
 
     req.session.filteredProducts = filteredProducts;
-
-    // Render the page with the appropriate messages and filters
+ 
     res.render("shop", {
       user: userData,
       products: currentProduct,
       categories: categories,
       totalPages,
       currentPage,
-      sortBy, // Pass sortBy to the view
-      noProductsMessage, // Pass rating filter message to the view
-      selectedCategory, // Pass selected category to the view
-      rating, // Pass the selected rating filter to the view
-      cartItems, // Pass cart items
+      sortBy,  
+      noProductsMessage,  
+      selectedCategory,  
+      rating,  
+      cartItems,  
       activePage: 'shop',
       gt, lt,
       noProductsinCategory
@@ -736,42 +687,30 @@ const filterRating = async (req, res) => {
 };
 
 
-
-
-
-
-
 const sortBy = async (req, res) => {
   try {
     const user = req.session.user;
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true }).lean();
-
-    // Get the sorting parameter from the query string
-    const sortBy = req.query.sortBy || 'newArrivals';  // Default sorting by new arrivals
-
-    // Get all products (without price filter)
+ 
+    const sortBy = req.query.sortBy || 'newArrivals'; 
+ 
     let findProducts = await Product.find({
       isBlocked: false,
       isDeleted: false,
     }).lean();
-
-    // Sorting Logic based on the sortBy parameter
-    if (sortBy === 'featured') {
-      // Sort featured products (assuming 'featured' is a boolean or numeric field)
+ 
+    if (sortBy === 'featured') { 
       findProducts.sort((a, b) => b.featured - a.featured);
-    } else if (sortBy === 'newArrivals') {
-      // Sort by most recent products (based on `createdAt` field)
+    } else if (sortBy === 'newArrivals') { 
       findProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    } else if (sortBy === 'aToZ') {
-      // Sort alphabetically (by name), ensure it's not undefined or null
+    } else if (sortBy === 'aToZ') { 
       findProducts.sort((a, b) => {
         const nameA = a.productName || '';
         const nameB = b.productName || '';
         return nameA.localeCompare(nameB);
       });
-    } else if (sortBy === 'zToA') {
-      // Sort reverse alphabetically (by name), ensure it's not undefined or null
+    } else if (sortBy === 'zToA') { 
       findProducts.sort((a, b) => {
         const nameA = a.productName || '';
         const nameB = b.productName || '';
@@ -786,8 +725,7 @@ const sortBy = async (req, res) => {
     let noProductsinCategory = ''
     
     
-    const rating = parseInt(req.query.rating) || 0;
-    // Filter products by the selected rating
+    const rating = parseInt(req.query.rating) || 0; 
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
@@ -809,27 +747,22 @@ const sortBy = async (req, res) => {
 
 
     const cart = await Cart.findOne({ userId: user });
-    
-    // If the cart doesn't exist for the user, return an empty cart
+     
     const cartItems = cart ? cart.items : [];
-    
-    // Pagination setup
-    let itemsPerPage = 6;  // Items per page
+     
+    let itemsPerPage = 6;  
     let currentPage = parseInt(req.query.page) || 1;
-
-    // Validate currentPage
+ 
     if (isNaN(currentPage) || currentPage < 1) {
       currentPage = 1;
     }
-
-    // Pagination logic
+ 
     let startIndex = (currentPage - 1) * itemsPerPage;
     let endIndex = startIndex + itemsPerPage;
     let totalPages = Math.ceil(findProducts.length / itemsPerPage);
     const currentProduct = findProducts.slice(startIndex, endIndex);
 
-
-    // Render the sorted and paginated products
+ 
     res.render("shop", {
       user: userData,
       products: currentProduct,
@@ -856,40 +789,33 @@ const sortByPrice = async (req, res) => {
     const user = req.session.user;
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true }).lean();
-
-    // Get the sortBy parameter from the query string
-    const sortBy = req.query.sortBy || 'lowToHigh'; // Default to 'lowToHigh' if not provided
-
-    // Default product search query (no price filtering)
+ 
+    const sortBy = req.query.sortBy || 'lowToHigh'; 
+ 
     let findProducts = await Product.find({
       isBlocked: false,
       isDeleted: false,
     }).lean();
-
-    // Sort the products based on the selected sorting option
+ 
     if (sortBy === 'lowToHigh') {
-      findProducts.sort((a, b) => a.salePrice - b.salePrice); // Sort low to high
+      findProducts.sort((a, b) => a.salePrice - b.salePrice);  
     } else if (sortBy === 'highToLow') {
-      findProducts.sort((a, b) => b.salePrice - a.salePrice); // Sort high to low
+      findProducts.sort((a, b) => b.salePrice - a.salePrice); 
     }
 
     const cart = await Cart.findOne({ userId: user });
-    
-    // If the cart doesn't exist for the user, return an empty cart
+     
     const cartItems = cart ? cart.items : [];
-
-    // Pagination setup
+ 
     const itemsPerPage = 6;
     const currentPage = parseInt(req.query.page) || 1;
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-
-    // Calculate total pages
+ 
     const totalPages = Math.ceil(findProducts.length / itemsPerPage);
     
     
-    const rating = parseInt(req.query.rating) || 0;
-    // Filter products by the selected rating
+    const rating = parseInt(req.query.rating) || 0; 
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
@@ -909,11 +835,8 @@ const sortByPrice = async (req, res) => {
       }
     }
 
-
-    // Slice the array to get the products for the current page
-    const currentProducts = findProducts.slice(startIndex, endIndex);
-
-    // Render the page with the sorted and paginated products, and pass the sortBy value
+ 
+    const currentProducts = findProducts.slice(startIndex, endIndex); 
     res.render("shop", {
       user: userData,
       products: currentProducts,
@@ -944,11 +867,10 @@ const searchProducts = async (req, res) => {
     let searchResult = [];
 
     const cart = await Cart.findOne({ userId: user });
-    
-    // If the cart doesn't exist for the user, return an empty cart
+     
     const cartItems = cart ? cart.items : [];
 
-    const sortBy = req.query.sortBy || "newest"; // Default sorting is by "newest"
+    const sortBy = req.query.sortBy || "newest";  
 
     let selectedCategory = '';
     let gt = '';
@@ -961,8 +883,7 @@ const searchProducts = async (req, res) => {
       isDeleted: false,
     }).lean();
     
-    const rating = parseInt(req.query.rating) || 0;
-    // Filter products by the selected rating
+    const rating = parseInt(req.query.rating) || 0; 
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
@@ -994,22 +915,18 @@ const searchProducts = async (req, res) => {
         category: { $in: categoryids },
       });
     }
-
-    // Apply sorting logic based on 'sortBy'
+ 
     if (sortBy === "priceLowToHigh") {
       searchResult.sort((a, b) => a.price - b.price);
     } else if (sortBy === "priceHighToLow") {
       searchResult.sort((a, b) => b.price - a.price);
-    } else {
-      // Default sort by date (newest)
+    } else { 
       searchResult.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
-
-    // Pagination setup
+ 
     let itemsPerPage = 6;
     let currentPage = parseInt(req.query.page) || 1;
-
-    // Validate currentPage
+ 
     if (isNaN(currentPage) || currentPage < 1) {
       currentPage = 1;
     }

@@ -1,154 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Change Email</title>
-  <!-- Bootstrap CDN for Styling -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Change Email</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
-  <!-- Font Awesome (optional for icons) -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
 
-  
-  <style>
-    /* Centering the form inside the container */
-    .con {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 60%;
-    }
-  
-    .form-container {
-      width: 100%;
-      max-width: 500px; /* You can adjust this width as needed */
-      padding: 20px;
-    }
-  
-    .alert {
-      display: none;
-    }
-  </style>
-  
-</head>
-<body>
+    <style>
+      .con {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 60%;
+      }
 
-  <!-- Include your header here -->
-  <%- include('../../views/partials/user/header') %>
+      .form-container {
+        width: 100%;
+        max-width: 500px;
+        padding: 20px;
+      }
 
-  <div class="mt-4 ps-4 ">
-    <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/">Home</a></li>
-        <li class="breadcrumb-item"><a href="/userProfile">Profile</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Change password</li>
-      </ol>
-    </nav>
+      .alert {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Include your header here -->
+    <%- include('../../views/partials/user/header') %>
 
+    <div class="mt-4 ps-4">
+      <!-- Breadcrumbs -->
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/userProfile">Profile</a></li>
+          <li class="breadcrumb-item active" aria-current="page">
+            Change password
+          </li>
+        </ol>
+      </nav>
 
-  <div class="container con mt-5">
-    <div class="form-container">
-      <h2>Email</h2>
-      <!-- Alert for Success/Failure -->
-      <!-- <div class="alert alert-success" id="successAlert">
+      <div class="container con mt-5">
+        <div class="form-container">
+          <h2>Email</h2>
+          <!-- Alert for Success/Failure -->
+          <!-- <div class="alert alert-success" id="successAlert">
         <strong>Success!</strong> Your email is valid.
       </div> -->
-      <div class="alert alert-danger" id="errorAlert">
-        <strong>Error!</strong> The email entered is invalid.
-      </div>
+          <div class="alert alert-danger" id="errorAlert">
+            <strong>Error!</strong> The email entered is invalid.
+          </div>
 
-      <!-- Change Email Form -->
-      <form id="changeEmailForm" method="POST" action="/profile/change-password">
-        <div class="mb-3 d-flex flex-column justify-content-center">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control w-100" id="newEmail" name="newEmail" placeholder="Enter your email" required>
+          <form
+            id="changeEmailForm"
+            method="POST"
+            action="/profile/change-password"
+          >
+            <div class="mb-3 d-flex flex-column justify-content-center">
+              <label for="email" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control w-100"
+                id="newEmail"
+                name="newEmail"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="verifyBtn">
+              Verify
+            </button>
+          </form>
         </div>
-  
-        <button type="submit" class="btn btn-primary" id="verifyBtn">Verify</button>
-      </form>
+      </div>
     </div>
-  </div>
-</div>
 
-  <!-- Include Footer -->
-  <%- include('../../views/partials/user/footer') %>
+    <%- include('../../views/partials/user/footer') %>
 
-  <!-- Include Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <script>
-    // Handle form submission with AJAX and validate email format
-    document.getElementById('changeEmailForm').addEventListener('submit', function(e) {
-      e.preventDefault(); // Prevent form from submitting normally
+    <script>
+      document
+        .getElementById("changeEmailForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
 
-      var emailInput = document.getElementById('newEmail').value;
-      var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+          var emailInput = document.getElementById("newEmail").value;
+          var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
-      // Clear previous SweetAlerts
-      if (emailInput) {
-        // Validate the email format
-        if (!emailRegex.test(emailInput)) {
-          // Show error if email format is invalid
-          Swal.fire({
-            icon: 'error',
-            title: 'Invalid Email',
-            text: 'Please enter a valid email address.',
-          });
-        } else {
-            // Proceed with AJAX request to submit the form
-            fetch('/profile/change-password', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ newEmail: emailInput }) // Send the email as JSON
-            })
-            .then(response => response.json())  // Parse JSON response
-            .then(data => {
-              if (data.success) {
-                // Success message on valid server response
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Success',
-                  text: data.message,  // Success message from server
-                }).then(() => {
-                  window.location.href = '/profile/pass-otp-verification';  // Redirect to OTP page
-                });
-              } else {
-                // Error message if server responds with failure
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: data.message,  // Error message from server
-                });
-              }
-            })
-            .catch(error => {
-              // Handle AJAX request errors
+          if (emailInput) {
+            if (!emailRegex.test(emailInput)) {
               Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong. Please try again later.',
+                icon: "error",
+                title: "Invalid Email",
+                text: "Please enter a valid email address.",
               });
+            } else {
+              fetch("/profile/change-password", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ newEmail: emailInput }),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  if (data.success) {
+                    Swal.fire({
+                      icon: "success",
+                      title: "Success",
+                      text: data.message,
+                    }).then(() => {
+                      window.location.href = "/profile/pass-otp-verification";
+                    });
+                  } else {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Error",
+                      text: data.message,
+                    });
+                  }
+                })
+                .catch((error) => {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Something went wrong. Please try again later.",
+                  });
+                });
+            }
+          } else {
+            Swal.fire({
+              icon: "warning",
+              title: "Input Required",
+              text: "Please enter your email.",
             });
-        }
-      } else {
-        // Warning if email field is empty
-        Swal.fire({
-          icon: 'warning',
-          title: 'Input Required',
-          text: 'Please enter your email.',
+          }
         });
-      }
-    });
-  </script>
-  
-</body>
+    </script>
+  </body>
 </html>

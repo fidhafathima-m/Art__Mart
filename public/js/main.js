@@ -163,7 +163,7 @@
 
     const lens = document.querySelector('.magnifier-lens'); 
     const mainImage = document.querySelector('.main-img-container');
-    const mainImageTag = document.querySelector('.main-img-container img');  // Get the image inside the container
+    const mainImageTag = document.querySelector('.main-img-container img'); 
     const magnified = document.querySelector('.magnified-image'); 
     
     function magnify() {

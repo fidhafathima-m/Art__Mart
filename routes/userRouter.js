@@ -74,6 +74,9 @@ router.get('/profile/pass-otp-verification', profileController.passOtpPage);
 router.post('/profile/change-password', profileController.changePassValid);
 router.post('/profile/verify-pass-otp', profileController.verifyChangePassOtp);
 router.get('/profile/order/:orderId', profileController.viewOrderDetails);
+router.post('/order/cancel/:orderId', profileController.cancelOrder);
+router.get('/profile/edit', profileController.loadEditProfile);
+router.post('/profile/edit', profileController.editProfile);
 
 //address management
 router.get('/profile/address/add', profileController.loadAddAddress);
