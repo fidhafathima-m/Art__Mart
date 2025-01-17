@@ -330,6 +330,7 @@ const deleteSingleImage = async (req, res) => {
         .status(404)
         .json({ status: false, message: "Product not found." });
     }
+    
 
     // Find and remove the image from the product's image array
     const imageIndex = product.productImage.indexOf(imageNameToServer);

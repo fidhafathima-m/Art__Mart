@@ -11,7 +11,7 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #e0edfd;
+        background-color: #f4f4f4;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -20,7 +20,7 @@
       }
 
       .container {
-        background-color: #e0edfd;
+        background-color: #f4f4f4;
         padding: 20px;
         width: 400px;
         text-align: center;
@@ -179,12 +179,12 @@
     <script>
       let countdown = 60;
       let timerInterval;
-
+    
       // Start the countdown timer
       function startTimer() {
         timerInterval = setInterval(function () {
           countdown--;
-
+    
           if (countdown < 0) {
             clearInterval(timerInterval);
             document.getElementById("timer").innerText = "00:00";
@@ -192,24 +192,27 @@
             document.getElementById("resend-otp").style.color = "#6BD1FF";
             return;
           }
-
+    
           const minutes = Math.floor(countdown / 60);
           const seconds = countdown % 60;
-          document.getElementById("timer").innerText = `00:${
-            seconds < 10 ? "0" + seconds : seconds
-          }`;
+          document.getElementById("timer").innerText = `00:${seconds < 10 ? "0" + seconds : seconds}`;
         }, 1000);
       }
-
+    
+      // Resend OTP functionality
       function resendOtp() {
-        clearInterval(timerInterval);
+        // Disable the resend link and reset the timer
+        document.getElementById("resend-otp").style.pointerEvents = "none";
+        document.getElementById("resend-otp").style.color = "#B0BEC5"; // Gray out the link
         countdown = 60;
         document.getElementById("timer").classList.remove("expired");
         startTimer();
-
+    
+        // Reset OTP input fields
         const otpInputs = document.querySelectorAll(".otp-input");
         otpInputs.forEach((input) => (input.value = ""));
-
+    
+        // AJAX request to resend OTP
         $.ajax({
           type: "POST",
           url: "/resend-email-otp",
@@ -237,10 +240,11 @@
             });
           },
         });
-
+    
         return false;
       }
-
+    
+      // Move focus to the next OTP input when a digit is entered
       function moveFocus(event, nextInputIndex) {
         if (event.target.value.length === 1) {
           const nextInput =
@@ -250,10 +254,11 @@
           }
         }
       }
-
+    
+      // Validate OTP form before submitting
       function validateOTPForm(event) {
         event.preventDefault();
-
+    
         const otpValues = [
           document.querySelector('input[name="otp1"]').value,
           document.querySelector('input[name="otp2"]').value,
@@ -262,10 +267,10 @@
           document.querySelector('input[name="otp5"]').value,
           document.querySelector('input[name="otp6"]').value,
         ];
-
+    
         const otpString = otpValues.join("");
         console.log(otpString);
-
+    
         if (otpValues.some((val) => val === "")) {
           Swal.fire({
             icon: "error",
@@ -274,7 +279,7 @@
           });
           return false;
         }
-
+    
         $.ajax({
           type: "POST",
           url: "/profile/verify-pass-otp",
@@ -306,11 +311,16 @@
             });
           },
         });
-
+    
         return false;
       }
-
-      window.onload = startTimer;
+    
+      window.onload = function () {
+        startTimer();
+        document.getElementById("resend-otp").style.pointerEvents = "none"; // Initially disable the resend link
+        document.getElementById("resend-otp").style.color = "#B0BEC5"; // Make the link appear disabled
+      };
     </script>
+    
   </body>
 </html>

@@ -11,7 +11,7 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #e0edfd;
+        background-color: #f4f4f4;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -20,7 +20,7 @@
       }
 
       .container {
-        background-color: #e0edfd;
+        background-color: #f4f4f4;
         padding: 20px;
         width: 400px;
         text-align: center;
@@ -77,6 +77,11 @@
         font-size: 14px;
         color: #6bd1ff;
         cursor: pointer;
+      }
+
+      .resend.disabled {
+        color: #b0bec5;
+        pointer-events: none;
       }
 
       .timer {
@@ -163,9 +168,7 @@
 
         <button class="button" type="submit">Verify OTP</button>
 
-        <div class="resend" id="resend-otp" onclick="resendOtp()">
-          Resend OTP
-        </div>
+        <div class="resend" id="resend-otp" onclick="resendOtp()">Resend OTP</div>
         <div class="timer" id="timer">00:60</div>
 
         <div class="login-text">
@@ -180,6 +183,145 @@
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script src="/js/user-custom.js"></script>
+    <script>
+      let countdown = 60;
+      let timerInterval;
+
+      // Start the countdown timer
+      function startTimer() {
+        timerInterval = setInterval(function () {
+          countdown--;
+
+          if (countdown < 0) {
+            clearInterval(timerInterval);
+            document.getElementById("timer").innerText = "00:00";
+            document.getElementById("resend-otp").classList.remove("disabled");
+            return;
+          }
+
+          const minutes = Math.floor(countdown / 60);
+          const seconds = countdown % 60;
+          document.getElementById("timer").innerText = `00:${
+            seconds < 10 ? "0" + seconds : seconds
+          }`;
+        }, 1000);
+      }
+
+      // Resend OTP functionality
+      function resendOtp() {
+        // Disable the resend link and reset the timer
+        document.getElementById("resend-otp").classList.add("disabled");
+        countdown = 60;
+        startTimer();
+
+        // Reset OTP input fields
+        const otpInputs = document.querySelectorAll(".otp-input");
+        otpInputs.forEach((input) => (input.value = ""));
+
+        // Send the request to resend OTP
+        $.ajax({
+          type: "POST",
+          url: "/resend-forgot-otp",
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "OTP Resent Successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurred while resending OTP. Please try again.",
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Request Failed",
+              text: "There was an issue connecting to the server. Please try again.",
+            });
+          },
+        });
+
+        return false;
+      }
+
+      // Move focus to next input box after entering OTP
+      function moveFocus(event, nextInputIndex) {
+        if (event.target.value.length === 1) {
+          const nextInput = document.querySelectorAll(".otp-input")[nextInputIndex];
+          if (nextInput) {
+            nextInput.focus();
+          }
+        }
+      }
+
+      // Validate OTP form before submitting
+      function validateOTPForm(event) {
+        event.preventDefault();
+
+        const otpValues = [
+          document.querySelector('input[name="otp1"]').value,
+          document.querySelector('input[name="otp2"]').value,
+          document.querySelector('input[name="otp3"]').value,
+          document.querySelector('input[name="otp4"]').value,
+          document.querySelector('input[name="otp5"]').value,
+          document.querySelector('input[name="otp6"]').value,
+        ];
+
+        const otpString = otpValues.join("");
+
+        if (otpValues.some((val) => val === "")) {
+          Swal.fire({
+            icon: "error",
+            title: "Please enter all digits",
+            text: "You must fill in all OTP fields.",
+          });
+          return false;
+        }
+
+        $.ajax({
+          type: "POST",
+          url: "/verify-forgotPassOtp",
+          data: { otp: otpString },
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "OTP verified successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                window.location.href = response.redirectUrl;
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Invalid OTP",
+                text: response.message,
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to verify OTP, please try again",
+            });
+          },
+        });
+
+        return false;
+      }
+
+      window.onload = function () {
+        startTimer();
+        document.getElementById("resend-otp").classList.add("disabled"); // Initially disable the resend link
+      };
+    </script>
   </body>
 </html>

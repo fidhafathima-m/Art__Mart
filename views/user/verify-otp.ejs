@@ -11,7 +11,7 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        background-color: #e0edfd;
+        background-color: #f4f4f4;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -20,7 +20,7 @@
       }
 
       .container {
-        background-color: #e0edfd;
+        background-color: #f4f4f4;
         padding: 20px;
         width: 400px;
         text-align: center;
@@ -203,15 +203,15 @@
       // Trigger resend OTP after 1 minute
       function resendOtp() {
         // Logic for resending OTP here
-        clearInterval(timerInterval);
-        countdown = 60; // Reset countdown timer
-        document.getElementById("timer").classList.remove("expired"); // Remove any expired class from the timer
-        startTimer(); // Start the countdown again
-
-        // Optionally, clear the OTP input fields if needed
+        document.getElementById("resend-otp").style.pointerEvents = "none";
+        document.getElementById("resend-otp").style.color = "#B0BEC5"; // Gray out the link
+        countdown = 60;
+        document.getElementById("timer").classList.remove("expired");
+        startTimer();
+    
+        // Reset OTP input fields
         const otpInputs = document.querySelectorAll(".otp-input");
         otpInputs.forEach((input) => (input.value = ""));
-
         // Send AJAX request to resend OTP
         $.ajax({
           type: "POST",
@@ -317,7 +317,11 @@
       }
 
       // Start the timer when the page loads
-      window.onload = startTimer;
+      window.onload = function () {
+        startTimer();
+        document.getElementById("resend-otp").style.pointerEvents = "none"; // Initially disable the resend link
+        document.getElementById("resend-otp").style.color = "#B0BEC5"; // Make the link appear disabled
+      };
     </script>
   </body>
 </html>

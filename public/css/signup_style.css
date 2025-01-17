@@ -1,6 +1,6 @@
 body {
   font-family: "Arial", sans-serif;
-  background-color: #e0edfd; /* Light blue background */
+  background-color: #f4f4f4; /* Light blue background */
 }
 .container {
   display: flex;
@@ -28,7 +28,7 @@ body {
   max-width: 500px;
   text-align: left;
   padding: 20px;
-  background-color: #e0edfd;
+  background-color: #f4f4f4;
   margin-top: 50px;
 }
 .head {
@@ -52,7 +52,7 @@ body {
   padding: 10px 0;
   width: 100%;
   font-size: 16px;
-  background-color: #e0edfd; /* Match background color of the page */
+  background-color: #f4f4f4; /* Match background color of the page */
   transition: all 0.3s ease;
 }
 .input-line:focus {

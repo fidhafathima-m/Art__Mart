@@ -50,7 +50,7 @@ const loadDashboard = async (req, res) => {
       // Get total counts for products, categories, users, and orders
       const totalProducts = await Product.countDocuments();
       const totalCategories = await Category.countDocuments();
-      const totalUsers = await User.countDocuments();
+      const totalUsers = await User.find({isAdmin: false}).countDocuments();
       const totalPendingOrders = await Order.countDocuments({ status: 'Processing' });
 
       // Get today's order stats

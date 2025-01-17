@@ -127,6 +127,7 @@ router.post(
   adminAuth.isLogin,
   productController.deleteSingleImage
 );
+
 router.post(
   "/addProductOffer",
   adminAuth.isLogin,

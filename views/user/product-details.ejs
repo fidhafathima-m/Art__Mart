@@ -30,8 +30,8 @@
           <!-- Thumbnail Images -->
           <div class="thumbnails mt-3">
             <div class="row">
-              <% if (products.productImage && products.productImage.length > 0)
-              { %> <% products.productImage.forEach((image, index) => { %>
+              <% if (products.productImage && products.productImage.length > 0) { %> 
+                <% products.productImage.forEach((image, index) => { %>
               <div class="col-3">
                 <img
                   src="<%= image %>"
@@ -48,15 +48,15 @@
           </div>
         </div>
         <!-- Leave a Review Button -->
-        <button class="btn btn-primary mt-5" id="leave-review-btn">
+        <!-- <button class="btn btn-primary mt-5" id="leave-review-btn">
           Leave a Review
-        </button>
+        </button> -->
 
         <!-- Reviews Section -->
         <h2 class="mt-3">Reviews</h2>
         <div class="reviews">
-          <%= reviews.length === 0 ? 'No reviews yet.' : '' %> <%
-          reviews.forEach(review => { %>
+          <%= reviews.length === 0 ? 'No reviews yet.' : '' %> 
+          <% reviews.forEach(review => { %>
           <div class="review mb-3 mt-4">
             <h5 class="text-secondary" style="text-align: left">
               <%= review.user_id ? review.user_id.name : 'Anonymous' %>
@@ -284,8 +284,8 @@
         <div>
           <h4>Product Highlights</h4>
           <ul class="mt-2">
-            <% if (products.highlights.length > 0) { %> <%
-            products.highlights.forEach(highlight => { %>
+            <% if (products.highlights.length > 0) { %> 
+            <% products.highlights.forEach(highlight => { %>
             <li><%= highlight %></li>
             <% }) %> <% } else { %>
             <li>No highlights available</li>
@@ -301,11 +301,9 @@
           <ul>
             <% coupons.forEach(coupon => { %>
             <li>
-              <b><%= coupon.name %></b>: <% if (coupon.expireOn > Date.now()) {
-              %>
+              <b><%= coupon.name %></b>: <% if (coupon.expireOn > Date.now()) {%>
               <span
-                >Valid Until: <%= coupon.expireOn.toLocaleDateString() %></span
-              >
+                >Valid Until: <%= coupon.expireOn.toLocaleDateString() %></span>
               <% } else { %>
               <span>Expired</span>
               <% } %>
@@ -376,6 +374,8 @@
                 >
               </p>
               <% } %>
+
+              
             </div>
           </div>
         </div>

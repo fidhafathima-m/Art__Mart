@@ -35,7 +35,7 @@ body {
   height: 100%;
   font-family: "Nunito Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #e0edfd;
+  background-color: #f4f4f4;
 }
 
 h1,
@@ -317,7 +317,7 @@ ol {
 -----------------------*/
 
 .header {
-  background-color: #e0edfd;
+  background-color: #f4f4f4;
 }
 
 .header__top {
