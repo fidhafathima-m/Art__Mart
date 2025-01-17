@@ -65,32 +65,43 @@ const getForgetPass = async (req, res) => {
 const forgotPassValid = async (req, res) => {
   try {
     const { email } = req.body;
-    const findUser = await User.findOne({ email: email });
+    const findUser  = await User.findOne({ email: email });
 
-    if (findUser) {
+    if (findUser ) {
       const otp = generateOtp();
       const emailSent = await sendVeificationMail(email, otp);
 
       if (emailSent) {
         req.session.otp = otp;
         req.session.email = email;
-        res.render("forgotPassOtp");
         console.log("OTP: ", otp);
+        return res.json({ success: true });
       } else {
-        res.json({
+        return res.json({
           success: false,
           message: "Failed to send OTP, please try again",
         });
       }
     } else {
-      res.render("forgot-password", {
-        message: "User with this email does not exists.",
+      return res.json({
+        success: false,
+        message: "User  with this email does not exist.",
       });
     }
   } catch (error) {
-    res.redirect("/pageNotFound");
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
+
+const forgotPassOtpLoad = async(req, res) => {
+  try {
+    res.render('forgotPassOtp');
+  } catch (error) {
+    console.log('error: ', error);
+    res.redirect('/pageNotFound');
+  }
+}
 
 const verifyForgetPassOtp = async (req, res) => {
   try {
@@ -362,6 +373,28 @@ const verifyEmailOtp = async (req, res) => {
     res.redirect('/pageNotFound');
   }
 };
+
+const emailResentOtp = async(req, res) => {
+  try {
+    const email = req.session.email;  
+    if (!email) {
+      return res.json({ success: false, message: 'No email found in session' });
+    }
+
+    const otp = generateOtp();  
+    const emailSent = await sendVeificationMail(email, otp); 
+
+    if (emailSent) {
+      req.session.userOtp = otp;  
+      res.json({ success: true, message: 'OTP resent successfully' });
+    } else {
+      res.json({ success: false, message: 'Failed to resend OTP. Please try again.' });
+    }
+  } catch (error) {
+    console.error('Error while resending OTP:', error);
+    res.json({ success: false, message: 'An error occurred. Please try again later.' });
+  }
+}
 
 const loadNewMail = async(req, res) => {
   try {
@@ -911,6 +944,7 @@ const editProfile = async (req, res) => {
 
 module.exports = {
   getForgetPass,
+  forgotPassOtpLoad,
   forgotPassValid,
   verifyForgetPassOtp,
   resendForgetPassOtp,
@@ -920,6 +954,7 @@ module.exports = {
   loadChangeEmail,
   changeEmail,
   otpPage,
+  emailResentOtp,
   verifyEmailOtp,
   loadNewMail,
   updateEmail,

@@ -61,32 +61,43 @@ const getForgetPass = async (req, res) => {
 const forgotPassValid = async (req, res) => {
   try {
     const { email } = req.body;
-    const findUser = await User.findOne({ email: email });
+    const findUser  = await User.findOne({ email: email });
 
-    if (findUser) {
+    if (findUser ) {
       const otp = generateOtp();
       const emailSent = await sendVeificationMail(email, otp);
 
       if (emailSent) {
         req.session.otp = otp;
         req.session.email = email;
-        res.render("admin-forgotPassOtp");
         console.log("OTP: ", otp);
+        return res.json({ success: true });
       } else {
-        res.json({
+        return res.json({
           success: false,
           message: "Failed to send OTP, please try again",
         });
       }
     } else {
-      res.render("admin-forgot-password", {
-        message: "Admin with this email does not exists.",
+      return res.json({
+        success: false,
+        message: "Admin with this email does not exist.",
       });
     }
   } catch (error) {
-    res.redirect("/pageError");
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Internal server error." });
   }
 };
+
+const forgetPassOtpPage = async (req, res) => {
+  try {
+    res.render('admin-forgotPassOtp');
+  } catch (error) {
+    console.log('error: ', error);
+    res.redirect('/pageError');
+  }
+}
 
 const verifyForgetPassOtp = async (req, res) => {
   try {
@@ -153,6 +164,7 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
   getForgetPass,
+  forgetPassOtpPage,
   forgotPassValid,
   verifyForgetPassOtp,
   resendForgetPassOtp,

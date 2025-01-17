@@ -55,6 +55,7 @@ router.get(
   profileController.getForgetPass
 );
 router.post("/forgot-pass-valid", profileController.forgotPassValid);
+router.get("/forgotPassOtp", profileController.forgotPassOtpLoad);
 router.post("/verify-forgotPassOtp", profileController.verifyForgetPassOtp);
 router.post("/resend-forgot-otp", profileController.resendForgetPassOtp);
 router.get(
@@ -66,6 +67,7 @@ router.get('/userProfile', profileController.loadUserProfile);
 router.get('/profile/change-email', profileController.loadChangeEmail);
 router.post('/profile/change-email', profileController.changeEmail);
 router.get('/profile/otp-verification', profileController.otpPage);
+router.post('/resend-email-otp', profileController.emailResentOtp);
 router.post('/profile/verify-email-otp', profileController.verifyEmailOtp);
 router.get('/profile/new-email', profileController.loadNewMail);
 router.post('/profile/update-email', profileController.updateEmail);

@@ -22,6 +22,8 @@ router.get(
   adminProfileController.getForgetPass
 );
 router.post("/forgot-pass-valid", adminProfileController.forgotPassValid);
+router.get("/forgotPassOtp", adminProfileController.forgetPassOtpPage);
+
 router.post(
   "/verify-forgotPassOtp",
   adminProfileController.verifyForgetPassOtp
