@@ -44,15 +44,15 @@
                 <% if (data[i].status === 'Pending') { %>
               <button class="btn btn-info status-btn" data-id="<%= data[i].orderId %>" data-status="Processing" style="width: 100px">Process</button>
               <% } else if (data[i].status === 'Processing') { %>
-              <button class="btn btn-warning status-btn" data-id="<%= data[i].orderId %>" data-status="Shipped" style="width: 100px">Ship</button>
+              <button class="btn btn-secondary status-btn" data-id="<%= data[i].orderId %>" data-status="Shipped" style="width: 100px">Ship</button>
                 <% } else if (data[i].status === 'Shipped') { %>
               <button class="btn btn-success status-btn" data-id="<%= data[i].orderId %>" data-status="Delivered" style="width: 100px">Deliver</button>
               <% } else if (data[i].status === 'Delivered') { %>
               <button class="btn btn-warning status-btn" data-id="<%= data[i].orderId %>" data-status="Return Request" style="width: 100px">Return Request</button>
               <% } else if (data[i].status === 'Return Request') { %>
-              <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Returned" style="width: 100px">Return</button>
+              <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Returned" style="width: 100px">Returned</button>
                 <% } %>
-              <% if (data[i].status !== 'Cancelled') { %>
+              <% if (data[i].status !== 'Cancelled' && data[i].status !== 'Returned') { %>
               <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Cancelled" style="width: 100px">Cancel</button>
               <% } %>
             </td>

@@ -40,6 +40,14 @@
       Search
     </button>
   </div>
+
+  <!-- Hidden inputs for current filters -->
+  <input type="hidden" name="category" value="<%= selectedCategory %>">
+  <input type="hidden" name="gt" value="<%= gt %>">
+  <input type="hidden" name="lt" value="<%= lt %>">
+  <input type="hidden" name="rating" value="<%= rating %>">
+  <input type="hidden" name="sortBy" value="<%= sortBy %>">
+
 </form>
 </div>
 
@@ -207,10 +215,11 @@
                     <div class="col-lg-6 col-md-6 col-sm-6">
                       <div class="shop__product__option__right">
                         <p class="mr-2">Sort by Price:</p>
-                        <select id="sortDropdown" onchange="location = this.value;">
-                          <option value="?sortBy=lowToHigh&page=<%= currentPage %>" <%= sortBy === 'lowToHigh' ? 'selected' : '' %>>Low To High</option>
-                          <option value="?sortBy=highToLow&page=<%= currentPage %>" <%= sortBy === 'highToLow' ? 'selected' : '' %>>High To Low</option>
-                        </select>
+                          <select id="sortDropdown" onchange="location = this.value;">
+                            <option>Choose</option>
+                            <option value="?sortBy=lowToHigh&page=<%= currentPage %>&category=<%= selectedCategory %>&gt=<%= gt %>&lt=<%= lt %>&rating=<%= rating %>" <%= sortBy === 'lowToHigh' ? 'selected' : '' %>>Low To High</option>
+                            <option value="?sortBy=highToLow&page=<%= currentPage %>&category=<%= selectedCategory %>&gt=<%= gt %>&lt=<%= lt %>&rating=<%= rating %>" <%= sortBy === 'highToLow' ? 'selected' : '' %>>High To Low</option>
+                          </select>
                       </div>
                     </div>
 

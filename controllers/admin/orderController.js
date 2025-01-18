@@ -6,7 +6,7 @@ const loadOrder = async (req, res) => {
   try {
     const search = req.query.search || '';
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = 7;
     const skip = (page - 1) * limit;
 
     const users = await User.find({
