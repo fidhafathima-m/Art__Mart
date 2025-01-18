@@ -326,8 +326,8 @@ const verifyEmailOtp = async (req, res) => {
   try {
 
     const user = req.session.user 
-    console.log('Request body:', req.body);
-    console.log('Session userOtp:', req.session.userOtp);
+    // console.log('Request body:', req.body);
+    // console.log('Session userOtp:', req.session.userOtp);
  
     const otp = req.body.otp ? req.body.otp.trim() : undefined;
     const sessionOtp = req.session.userOtp ? req.session.userOtp.trim() : undefined;

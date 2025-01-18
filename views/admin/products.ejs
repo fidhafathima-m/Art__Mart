@@ -51,7 +51,11 @@
           <tr id="<%= product[i]._id %>">
             <td><%= product[i].productName %></td>
             <td><%= product[i].category.name %></td>
-            <td><%= product[i].quantity %></td>
+            <% if (product[i].quantity < 5) { %>
+              <td><span class="badge badge-danger"><%= product[i].quantity %></span></td>
+              <% } else { %>
+                <td><%= product[i].quantity %></td>
+                <% } %>
             <td><%= product[i].regularPrice %></td>
             <td><%= product[i].salePrice %></td>
             <td>

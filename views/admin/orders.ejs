@@ -29,6 +29,7 @@
             <th>Order ID</th>
             <th>User Name</th>
             <th>Total Price(&#8377;)</th>
+            <th>Date & Time</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -39,21 +40,26 @@
             <td><%= data[i].orderId %></td>
             <td><%= data[i].userId ? data[i].userId.name : 'N/A' %></td>  
             <td><%= data[i].totalprice %></td>
+            <td><%= new Date(data[i].createdOn).toLocaleString('en-US', { 
+              weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
+              hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
+          }) %></td>
+          
             <td><%= data[i].status %></td>
             <td>
                 <% if (data[i].status === 'Pending') { %>
-              <button class="btn btn-info status-btn" data-id="<%= data[i].orderId %>" data-status="Processing" style="width: 100px">Process</button>
+              <button class="btn btn-info status-btn mt-2" data-id="<%= data[i].orderId %>" data-status="Processing" style="width: 100px">Process</button>
               <% } else if (data[i].status === 'Processing') { %>
-              <button class="btn btn-secondary status-btn" data-id="<%= data[i].orderId %>" data-status="Shipped" style="width: 100px">Ship</button>
+              <button class="btn btn-secondary status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Shipped" style="width: 100px">Ship</button>
                 <% } else if (data[i].status === 'Shipped') { %>
-              <button class="btn btn-success status-btn" data-id="<%= data[i].orderId %>" data-status="Delivered" style="width: 100px">Deliver</button>
+              <button class="btn btn-success status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Delivered" style="width: 100px">Deliver</button>
               <% } else if (data[i].status === 'Delivered') { %>
-              <button class="btn btn-warning status-btn" data-id="<%= data[i].orderId %>" data-status="Return Request" style="width: 100px">Return Request</button>
+              <button class="btn btn-warning status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Return Request" style="width: 100px">Return Request</button>
               <% } else if (data[i].status === 'Return Request') { %>
-              <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Returned" style="width: 100px">Returned</button>
+              <button class="btn btn-danger status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Returned" style="width: 100px">Returned</button>
                 <% } %>
               <% if (data[i].status !== 'Cancelled' && data[i].status !== 'Returned') { %>
-              <button class="btn btn-danger status-btn" data-id="<%= data[i].orderId %>" data-status="Cancelled" style="width: 100px">Cancel</button>
+              <button class="btn btn-danger status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Cancelled" style="width: 100px">Cancel</button>
               <% } %>
             </td>
           </tr>
