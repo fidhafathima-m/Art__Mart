@@ -12,7 +12,7 @@
   class="cart-container"
   style="display: flex; justify-content: space-between; padding: 20px"
 >
-  <!-- Left container (shopping cart items) -->
+  <!--  (shopping cart items) -->
   <div class="cart-items bg-white p-4 rounded" style="width: 70%">
     <div
       style="
@@ -118,7 +118,7 @@
     <% } %>
   </div>
 
-  <!-- Right container (subtotal & proceed to buy) -->
+  <!--  (subtotal & proceed to buy) -->
   <div
     class="subtotal bg-white p-4 rounded ml-4"
     style="width: 30%; padding: 20px; height: 50%"
@@ -177,7 +177,6 @@
         if (quantity < 5) {
           quantity += 1;
 
-          // Send request to update quantity in the database
           const response = await fetch(`/cart/update-quantity/${productId}`, {
             method: "POST",
             headers: {
@@ -189,10 +188,8 @@
           const data = await response.json();
 
           if (data.success) {
-            // Update the input field
             inputField.value = quantity;
 
-            // Update subtotal
             updateSubtotal();
             location.reload();
           } else {
@@ -221,7 +218,6 @@
         if (quantity > 1) {
           quantity -= 1;
 
-          // Send request to update quantity in the database
           const response = await fetch(`/cart/update-quantity/${productId}`, {
             method: "POST",
             headers: {
@@ -233,10 +229,8 @@
           const data = await response.json();
 
           if (data.success) {
-            // Update the input field
             inputField.value = quantity;
 
-            // Update subtotal
             updateSubtotal();
             location.reload();
           } else {

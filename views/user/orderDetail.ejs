@@ -44,7 +44,6 @@
                 <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span>
                 <span class="card-text ml-3"><%= order.status %></span>
 
-                <!-- Cancel Order Button -->
                 <% if (order.status === 'Processing' || order.status === 'Pending') { %>
                   <button class="btn btn-danger mt-3 cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
                 <% } %>
@@ -93,14 +92,13 @@
       cancelButtonText: 'No, keep it'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Proceed with canceling the order
         $.ajax({
           url: `/order/cancel/${orderId}`,
           method: 'POST',
           success: function (response) {
             if (response.success) {
               Swal.fire('Cancelled!', 'Your order has been cancelled.', 'success').then(() => {
-                location.reload(); // Reload the page to reflect the change
+                location.reload(); 
               });
             } else {
               Swal.fire('Error!', response.message, 'error');

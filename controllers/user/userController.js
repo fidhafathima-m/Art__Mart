@@ -65,7 +65,7 @@ const pageNotFound = async (req, res) => {
 
 const loadHomePage = async (req, res) => {
   try {
-    const user = req.session.user; // Check if user is in session
+    const user = req.session.user; 
     const categories = await Category.find({ isListed: true });
 
     let productsData = await Product.find({
@@ -296,31 +296,26 @@ const loadShopping = async (req, res) => {
     const limit = 6;
     const skip = (page - 1) * limit;
 
-    // Get the sortBy query parameter (default to 'lowToHigh')
     const sortBy = req.query.sortBy;
 
-    // Build the base query for products
     let productsQuery = Product.find({
       isBlocked: false,
       isDeleted: false,
       category: { $in: categoryIds },
     });
 
-    // Apply sorting based on the sortBy parameter
     if (sortBy === 'lowToHigh') {
-      productsQuery = productsQuery.sort({ salePrice: 1 }); // Sort low to high by salePrice
+      productsQuery = productsQuery.sort({ salePrice: 1 }); 
     } else if (sortBy === 'highToLow') {
-      productsQuery = productsQuery.sort({ salePrice: -1 }); // Sort high to low by salePrice
+      productsQuery = productsQuery.sort({ salePrice: -1 }); 
     } else {
-      productsQuery = productsQuery.sort({ createdAt: -1 }); // Default sort by newest
+      productsQuery = productsQuery.sort({ createdAt: -1 }); 
     }
 
-    // Fetch all products based on the query
     const allProducts = await productsQuery.lean();
 
     const rating = parseInt(req.query.rating) || 0;
 
-    // Filter products based on rating
     let filteredProducts = [];
     for (let product of allProducts) {
       const reviews = await Review.find({
@@ -335,13 +330,11 @@ const loadShopping = async (req, res) => {
 
       product.averageRating = averageRating;
 
-      // Only include products that meet the rating criteria
       if (rating === 0 || averageRating >= rating) {
         filteredProducts.push(product);
       }
     }
 
-    // Pagination: Calculate total pages and slice products for the current page
     const totalProducts = filteredProducts.length;
     const totalPages = Math.ceil(totalProducts / limit);
     const startIndex = (page - 1) * limit;
@@ -876,7 +869,6 @@ const searchProducts = async (req, res) => {
     const lt = parseFloat(req.query.lt) || Infinity;  
     const rating = parseInt(req.query.rating) || 0; 
 
-    // Build the query based on filters
     const query = {
       isBlocked: false,
       isDeleted: false,
@@ -884,10 +876,8 @@ const searchProducts = async (req, res) => {
       ...(selectedCategory && { category: selectedCategory }),
     };
 
-    // Fetch products based on the query
     let findProducts = await Product.find(query).lean();
 
-    // Filter products based on rating
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
@@ -907,7 +897,6 @@ const searchProducts = async (req, res) => {
       }
     }
 
-    // Now filter the products based on the search term
     if (filteredProducts.length > 0) {
       searchResult = filteredProducts.filter((product) =>
         product.productName.toLowerCase().includes(search.toLowerCase())
@@ -917,7 +906,6 @@ const searchProducts = async (req, res) => {
     let noProductsMessage  = '';
     let noProductsinCategory = '';
 
-    // Sort the search results
     if (sortBy === "priceLowToHigh") {
       searchResult.sort((a, b) => a.salePrice - b.salePrice);
     } else if (sortBy === "priceHighToLow") {

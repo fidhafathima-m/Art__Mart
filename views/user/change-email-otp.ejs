@@ -202,17 +202,20 @@
       }
 
       function resendOtp() {
-        clearInterval(timerInterval);
+        document.getElementById("resend-otp").style.pointerEvents = "none";
+        document.getElementById("resend-otp").style.color = "#B0BEC5"; 
         countdown = 60;
         document.getElementById("timer").classList.remove("expired");
         startTimer();
-
+    
+        // Reset OTP input fields
         const otpInputs = document.querySelectorAll(".otp-input");
         otpInputs.forEach((input) => (input.value = ""));
+    
 
         $.ajax({
           type: "POST",
-          url: "/resend-email-otp", // Update this to correct endpoint for resending email OTP
+          url: "/resend-email-otp", 
           success: function (response) {
             if (response.success) {
               Swal.fire({
@@ -279,7 +282,7 @@
 
         $.ajax({
           type: "POST",
-          url: "/profile/verify-email-otp", // Correct route for email OTP verification
+          url: "/profile/verify-email-otp",
           contentType: "application/json",
           data: JSON.stringify({ otp: otpString }),
           success: function (response) {
@@ -290,7 +293,7 @@
                 showConfirmButton: false,
                 timer: 1500,
               }).then(() => {
-                window.location.href = response.redirectUrl; // Redirect to the next page after success
+                window.location.href = response.redirectUrl;s
               });
             } else {
               Swal.fire({
@@ -312,7 +315,11 @@
         return false;
       }
 
-      window.onload = startTimer;
+      window.onload = function () {
+        startTimer();
+        document.getElementById("resend-otp").style.pointerEvents = "none";
+        document.getElementById("resend-otp").style.color = "#B0BEC5";
+      };
     </script>
   </body>
 </html>

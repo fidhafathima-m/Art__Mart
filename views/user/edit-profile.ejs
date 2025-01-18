@@ -90,47 +90,40 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  // Submit the form via AJAX
   $('#editProfileForm').on('submit', function (e) {
-    e.preventDefault(); // Prevent the form from submitting normally
+    e.preventDefault(); 
 
-    // Clear any previous error messages
     $('.error').remove();
 
     const name = $('#name').val();
     const phone = $('#phone').val();
 
-    // Validation logic
     let isValid = true;
 
-    // Validate name
     if (name.trim() === "") {
       isValid = false;
       $('#name').after('<span class="error text-danger">Name is required</span>');
     }
 
-    // Validate phone (Optional: Simple validation to check if phone number contains only digits and is of a reasonable length)
+    
     const phoneRegex = /^[0-9]{10}$/;
     if (phone.trim() !== "" && !phoneRegex.test(phone)) {
       isValid = false;
       $('#phone').after('<span class="error text-danger">Please enter a valid phone number</span>');
     }
 
-    // If validation fails, do not submit the form
     if (!isValid) {
       return;
     }
 
-    // Serialize the form data
     const formData = $(this).serialize();
 
     $.ajax({
-      url: '/profile/edit', // Make an AJAX request to the backend
+      url: '/profile/edit', 
       method: 'POST',
       data: formData,
       success: function (response) {
         if (response.success) {
-          // Show a success alert with SweetAlert
           Swal.fire({
             title: 'Success!',
             text: response.message,
@@ -138,12 +131,10 @@
             confirmButtonText: 'OK',
           }).then((result) => {
             if (result.isConfirmed) {
-              // Redirect to profile page after closing the alert
               window.location.href = '/userProfile?section=dashboard';
             }
           });
         } else {
-          // Show an error alert with SweetAlert
           Swal.fire({
             title: 'Error!',
             text: response.message,
@@ -153,7 +144,6 @@
         }
       },
       error: function () {
-        // Show an error alert if the AJAX request fails
         Swal.fire({
           title: 'Error!',
           text: 'An unexpected error occurred. Please try again later.',

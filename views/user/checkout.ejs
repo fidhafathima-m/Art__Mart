@@ -13,7 +13,7 @@
     class="cart-container"
     style="display: flex; justify-content: space-between; padding: 20px"
   >
-    <!-- Left container (checkout details) -->
+    <!--  (checkout details) -->
     <div class="checkout-details bg-white p-4 rounded" style="width: 70%">
       <h2>Checkout</h2>
 
@@ -78,7 +78,6 @@
             </div>
             <div class="modal-body">
               <form id="editAddressForm">
-                <!-- Address Form Fields (populate with existing address data) -->
                 <div class="mb-3">
                   <label for="editAddressType" class="form-label"
                     >Address Type</label
@@ -456,7 +455,6 @@
             </div>
             <div class="modal-body">
               <form id="addAddressForm">
-                <!-- Address Form Fields (same as the one you already have) -->
                 <div class="mb-3">
                   <label for="newAddressType" class="form-label"
                     >Address Type</label
@@ -745,12 +743,10 @@
       <div class="payment-method mt-4 bg-white p-4 rounded">
         <hr />
         <div class="row">
-          <!-- Payment Method Heading -->
           <div class="col-md-3">
             <h5 class="text-black">Payment Method</h5>
           </div>
 
-          <!-- Payment Options (radio buttons) -->
           <div class="col-md-6">
             <div class="form-check">
               <input
@@ -779,7 +775,7 @@
       </div>
     </div>
 
-    <!-- Right container (Order Summary) -->
+    <!--  (Order Summary) -->
     <div
       class="order-summary bg-white p-4 rounded"
       style="width: 30%; height: 50%; margin-left: 20px"
@@ -788,11 +784,9 @@
       <hr />
       <div id="orderItems">
         <% let totalPrice = 0; %> <% let cartItemsData = []; %>
-        <!-- Initialize an empty array for cart items -->
         <% cartItems.forEach(function(item) { %> <% let itemTotal = item.price *
         item.quantity; %>
         <div class="row mb-2">
-          <!-- Product Name (first column) -->
           <div class="col-8">
             <p style="font-size: 14px; font-weight: 600">
               <%= item.productId.productName %><span class="text-muted"
@@ -800,13 +794,11 @@
               >
             </p>
           </div>
-          <!-- Item Total (second column) -->
           <div class="col-4 text-end">
             <p class="text-muted">&#8377; <%= itemTotal %></p>
           </div>
         </div>
         <% totalPrice += itemTotal; %>
-        <!-- Accumulate the total price -->
 
         <!-- Add item to cartItemsData for later use -->
         <% cartItemsData.push({ product: item.productId._id, quantity: item.quantity, price: item.price });%> <% }) %>
@@ -878,7 +870,6 @@
         ${addressParts[5] || "N/A"}`;
               location.reload();
 
-              // Close the modal
               const changeAddressModal = bootstrap.Modal.getInstance(
                 document.getElementById("changeAddressModal")
               );
@@ -891,25 +882,21 @@
       });
 
     document.addEventListener("DOMContentLoaded", function () {
-      // Handle the dropdown for state selection
       const dropdownItems = document.querySelectorAll(".dropdown-item");
       const stateDropdownBtn = document.getElementById("stateDropdown");
-      const stateInput = document.getElementById("state"); // The hidden state input field
+      const stateInput = document.getElementById("state"); 
 
-      // Update state dropdown when a state is clicked
       dropdownItems.forEach(function (item) {
         item.addEventListener("click", function () {
           const selectedState = item.getAttribute("data-value");
-          stateDropdownBtn.textContent = selectedState; // Update the dropdown button text
-          stateInput.value = selectedState; // Set the hidden input value
+          stateDropdownBtn.textContent = selectedState; 
+          stateInput.value = selectedState; 
         });
       });
 
-      /// Handle Add New Address button click
       document
         .getElementById("addNewAddressBtn")
         .addEventListener("click", function () {
-          // Reset state dropdown and input value when the modal is opened
           document.getElementById("stateDropdown").textContent = "Select State";
           document.getElementById("state").value = "";
 
@@ -919,7 +906,6 @@
           addNewAddressModal.show();
         });
 
-      // Handle Add New Address form submission
       document
         .getElementById("addAddressForm")
         .addEventListener("submit", function (event) {
@@ -933,7 +919,6 @@
             dataObject[key] = value;
           });
 
-          // Submit the form via fetch to save the new address
           fetch("/profile/address/addAddress", {
             method: "POST",
             headers: {
@@ -944,7 +929,6 @@
             .then((response) => response.json())
             .then((data) => {
               if (data.success) {
-                // Close the Add New Address Modal
                 const addNewAddressModal = bootstrap.Modal.getInstance(
                   document.getElementById("addNewAddressModal")
                 );
@@ -952,10 +936,9 @@
 
                 location.reload();
 
-                // Add new address to the address list and select it
                 const newAddress = data.newAddress;
                 const addressListContainer =
-                  document.getElementById("addressForm"); // Address list in the change address modal
+                  document.getElementById("addressForm"); 
                 const newAddressElement = document.createElement("div");
                 newAddressElement.classList.add("form-check");
                 newAddressElement.innerHTML = `
@@ -978,7 +961,6 @@
             });
         });
 
-      // Handle selecting an address in the main modal
       document
         .getElementById("useThisAddressBtn")
         .addEventListener("click", function () {
@@ -987,7 +969,6 @@
           ).value;
           console.log("Selected Address:", selectedAddressId);
 
-          // Make an API call to set the selected address as the default
           fetch(`/update-default-address`, {
             method: "POST",
             headers: {
@@ -998,7 +979,6 @@
             .then((response) => response.json())
             .then((data) => {
               if (data.success) {
-                // Update the shipping address displayed on the page
                 const selectedAddress = data.selectedAddress;
                 document.querySelector(".address-details").innerHTML = `
           <strong>${selectedAddress.name}</strong><br>
@@ -1021,7 +1001,6 @@
     document
       .getElementById("editAddressBtn")
       .addEventListener("click", function () {
-        // Get the current default address details
         const address = {
           name: "<%= defaultAddress.name %>",
           addressType: "<%= defaultAddress.addressType %>",
@@ -1034,13 +1013,12 @@
         };
 
         console.log("default: ", "<%= defaultAddress.addressType %>");
-        console.log("addressType: ", address.addressType); // Should print "Home", "Office", etc.
+        console.log("addressType: ", address.addressType);
         console.log(
           "Element value before setting: ",
           document.getElementById("editAddressType").value
         );
 
-        // Populate the modal fields with the current address
         document.getElementById("editName").value = address.name;
         document.getElementById("editAddressType").value = address.addressType;
         document.getElementById("editCity").value = address.city;
@@ -1051,12 +1029,10 @@
 
         console.log('alt phone: ',address.altPhone )
 
-        // Set the state (update the dropdown)
         document.getElementById("editState").value = address.state;
         document.getElementById("editStateDropdown").textContent =
           address.state;
 
-        // Loop through dropdown items to pre-select the state
         const dropdownItems = document.querySelectorAll(".dropdown-item");
         dropdownItems.forEach((item) => {
           if (item.getAttribute("data-value") === address.state) {
@@ -1065,24 +1041,21 @@
           }
         });
 
-        // Show the Edit Address modal
         const editAddressModal = new bootstrap.Modal(
           document.getElementById("editAddressModal")
         );
         editAddressModal.show();
       });
 
-    // Handle dropdown for selecting state in Edit Address
     const dropdownItems = document.querySelectorAll(".dropdown-item");
     const stateDropdownBtn = document.getElementById("editStateDropdown");
-    const stateInput = document.getElementById("editState"); // The hidden state input field
+    const stateInput = document.getElementById("editState"); 
 
-    // // Update state dropdown when a state is clicked
     dropdownItems.forEach(function (item) {
       item.addEventListener("click", function () {
         const selectedState = item.getAttribute("data-value");
-        stateDropdownBtn.textContent = selectedState; // Update dropdown button text
-        stateInput.value = selectedState; // Set the hidden input value
+        stateDropdownBtn.textContent = selectedState; 
+        stateInput.value = selectedState; 
       });
     });
 
@@ -1102,7 +1075,6 @@
           dataObject[key] = value;
         });
 
-        // Send the updated address to the server
         fetch("/profile/address/editAddress", {
           method: "POST",
           headers: {
@@ -1114,7 +1086,6 @@
           .then((data) => {
             console.log("Server response data:", data);
             if (data.success) {
-              // Update the address on the page without reloading
               document.querySelector(".address-details").innerHTML = `
         <strong>${data.updatedAddress.name}</strong><br>
         ${data.updatedAddress.addressType}<br>
@@ -1126,13 +1097,11 @@
                 document.getElementById("editAddressModal")
               );
 
-              // Close the modal
               editAddressModal.hide();
 
-              // Reload the page after the modal is hidden (with a delay)
               setTimeout(() => {
                 location.reload();
-              }, 500); // 500 ms delay to ensure modal has time to hide before reload
+              }, 500); 
             } else {
               alert("Error updating address");
             }
@@ -1141,16 +1110,15 @@
       });
 
       document.getElementById('usePaymentMethodBtn').addEventListener('click', function () {
-    // Collect order details
-    const orderedItems = <%- JSON.stringify(cartItemsData) %>; // Cart items from EJS
-    const totalPrice = '<%= totalPrice %>'; // Total price calculated in EJS
-    const address = "<%= defaultAddress._id %>"; // User address ID (assuming it's passed from the server)
-    const discount = 0; // Set the discount (you can modify this as per your logic)
-    const status = "Pending"; // Set the order status
-    const finalAmount = totalPrice - discount; // Final amount after discount (if any)
-    const couponApplied = false; // Set if coupon is applied (modify as needed)
+   
+    const orderedItems = <%- JSON.stringify(cartItemsData) %>;
+    const totalPrice = '<%= totalPrice %>'; 
+    const address = "<%= defaultAddress._id %>";
+    const discount = 0;
+    const status = "Pending"; 
+    const finalAmount = totalPrice - discount; 
+    const couponApplied = false;
 
-    // Prepare the order data
     const orderData = {
       ordereditems: orderedItems,
       totalprice: totalPrice,
@@ -1161,7 +1129,6 @@
       couponApplied: couponApplied
     };
 
-    // Send the order data to the server via a POST request
     fetch('/checkout/place-order', {
       method: 'POST',
       headers: {
@@ -1179,7 +1146,6 @@
       .then(data => {
         console.log('Response Data:', data);
 
-        // On successful order creation, redirect to the order success page
         if (data.success) {
           console.log('Order placed successfully:', data);
           Swal.fire({
@@ -1188,7 +1154,7 @@
           icon: 'success',
           confirmButtonText: 'OK'
         }).then(() => {
-          window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`; // Redirect to the success page
+          window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`; 
         });
         } else {
           Swal.fire({

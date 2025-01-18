@@ -170,10 +170,8 @@
       </form>
     </div>
 
-    <!-- SweetAlert2 JavaScript (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.3/dist/sweetalert2.min.js"></script>
 
-    <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
@@ -201,9 +199,8 @@
     
       // Resend OTP functionality
       function resendOtp() {
-        // Disable the resend link and reset the timer
         document.getElementById("resend-otp").style.pointerEvents = "none";
-        document.getElementById("resend-otp").style.color = "#B0BEC5"; // Gray out the link
+        document.getElementById("resend-otp").style.color = "#B0BEC5"; 
         countdown = 60;
         document.getElementById("timer").classList.remove("expired");
         startTimer();
@@ -317,8 +314,8 @@
     
       window.onload = function () {
         startTimer();
-        document.getElementById("resend-otp").style.pointerEvents = "none"; // Initially disable the resend link
-        document.getElementById("resend-otp").style.color = "#B0BEC5"; // Make the link appear disabled
+        document.getElementById("resend-otp").style.pointerEvents = "none";
+        document.getElementById("resend-otp").style.color = "#B0BEC5";
       };
     </script>
     
