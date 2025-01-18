@@ -8,9 +8,9 @@ const orderSchema = new Schema({
     default: () => uuidv4(),
     unique: true,
   },
-  userId: {  
+  userId: {
     type: Schema.Types.ObjectId,
-    ref: "User",  
+    ref: "User",
     required: true,
   },
   ordereditems: [
@@ -28,14 +28,14 @@ const orderSchema = new Schema({
         type: Number,
         default: 0,
       },
-      status: { 
-        type: String, 
-        default: 'Pending' 
-      },  // Product-level status
-      returnStatus: { 
-        type: String, 
-        default: 'Not Requested' 
-      }
+      status: {
+        type: String,
+        default: "Pending",
+      }, // Product-level status
+      returnStatus: {
+        type: String,
+        default: "Not Requested",
+      },
     },
   ],
   totalprice: {
@@ -52,7 +52,7 @@ const orderSchema = new Schema({
   },
   address: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Address",
     required: true,
   },
   invoiceDate: {
@@ -84,7 +84,7 @@ const orderSchema = new Schema({
     type: Date,
     required: false,
   },
-  firstDeliveredAt: {   
+  firstDeliveredAt: {
     type: Date,
     required: false,
   },

@@ -1,0 +1,189 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container mt-4">
+    <h1 class="my-4 text-center">Order Details - <%= orderDetails.orderId %></h1>
+
+    <!-- Order Information -->
+    <div class="order-info mb-4 p-4 border rounded shadow-sm">
+      <h4 class="mb-3">Order Information</h4>
+      <p><strong>Order ID:</strong> <%= orderDetails.orderId %></p>
+      <p><strong>User Name:</strong> <%= Id.name %></p>
+      <p><strong>Total Price:</strong> &#8377;<%= orderDetails.totalPrice %></p>
+      <p><strong>Discount:</strong> &#8377;<%= orderDetails.discount %></p>
+      <p><strong>Final Amount:</strong> &#8377;<%= orderDetails.finalAmount %></p>
+      <p><strong>Status:</strong> <%= orderDetails.status %></p>
+      <p><strong>Coupon Applied:</strong> <%= orderDetails.couponApplied ? 'Yes' : 'No' %></p>
+      <p><strong>Order Date:</strong> <%= new Date(orderDetails.createdOn).toLocaleString() %></p>
+    </div>
+
+    <!-- Address Information -->
+    <div class="address-info mb-4 p-4 border rounded shadow-sm">
+      <h4 class="mb-3">Address</h4>
+      <p><strong>Name:</strong> <%= orderDetails.address.name %></p>
+      <p><strong>City:</strong> <%= orderDetails.address.city %></p>
+      <p><strong>Landmark:</strong> <%= orderDetails.address.landMark || 'N/A' %></p>
+      <p><strong>State:</strong> <%= orderDetails.address.state %></p>
+      <p><strong>Pincode:</strong> <%= orderDetails.address.pincode %></p>
+    </div>
+
+    <!-- Ordered Items -->
+    <div class="ordered-items mb-4">
+      <h4 class="mb-3">Ordered Items</h4>
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Product Image</th>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% orderDetails.orderedItems.forEach(item => { %>
+            <tr>
+              <td><img src="<%= item.product.productImage %>" alt="<%= item.product.productName %>" width="100" class="img-fluid rounded"></td>
+              <td><%= item.product.productName %></td>
+              <td>&#8377;<%= item.price %></td>
+              <td><%= item.quantity %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons text-center mt-4">
+      <% if (orderDetails.status === 'Pending') { %>
+        <button class="btn btn-info status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Processing" style="width: 120px">Process</button>
+      <% } else if (orderDetails.status === 'Processing') { %>
+        <button class="btn btn-secondary status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Shipped" style="width: 120px">Ship</button>
+      <% } else if (orderDetails.status === 'Shipped') { %>
+        <button class="btn btn-success status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Delivered" style="width: 120px">Deliver</button>
+      <% } else if (orderDetails.status === 'Delivered') { %>
+        <button class="btn btn-warning status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Return Request" style="width: 120px">Return Request</button>
+      <% } else if (orderDetails.status === 'Return Request') { %>
+        <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Returned" style="width: 120px">Returned</button>
+      <% } %>
+      <% if (orderDetails.status !== 'Cancelled' && orderDetails.status !== 'Returned') { %>
+        <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Cancelled" style="width: 120px">Cancel</button>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script> 
+  $(document).on("click", ".status-btn", function () {
+    var orderId = $(this).data("id");
+    var status = $(this).data("status");
+ 
+    Swal.fire({
+      title: `Are you sure you want to mark this order as ${status}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: `Yes, ${status}!`,
+      cancelButtonText: "No, Cancel",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) { 
+        $.ajax({
+          type: "POST",
+          url: "/admin/updateOrderStatus",
+          data: { orderId: orderId, status: status },
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: response.message,
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                location.reload(); 
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurred while updating the order status. Please try again.",
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Request Failed",
+              text: "There was an issue connecting to the server. Please try again.",
+            });
+          },
+        });
+      } else { 
+        Swal.fire("Cancelled", `Order status change was cancelled.`, "info");
+      }
+    });
+  });
+</script>
+
+<!-- Styles -->
+<style>
+  /* .wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  } */
+
+  .order-info, .address-info {
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table th, .table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+
+  .table th {
+    background-color: #f8f9fa;
+  }
+
+  .action-buttons .btn {
+    margin: 5px;
+    width: auto;
+  }
+
+  .btn-info, .btn-secondary, .btn-success, .btn-warning, .btn-danger {
+    font-size: 14px;
+    border-radius: 5px;
+  }
+
+  .status-btn {
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .status-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .img-fluid {
+    border-radius: 8px;
+  }
+</style>

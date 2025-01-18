@@ -162,6 +162,7 @@ router.post("/edit-coupon/:id", adminAuth.isLogin, couponController.editCoupon);
 
 // Order Management
 router.get('/orders', adminAuth.isLogin, orderController.loadOrder);
+router.get('/orders/details/:orderId', adminAuth.isLogin, orderController.viewOrderDetails);
 router.post('/updateOrderStatus', adminAuth.isLogin, orderController.updateOrderStatus);
 
 module.exports = router;

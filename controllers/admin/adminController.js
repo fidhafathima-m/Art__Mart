@@ -1,7 +1,7 @@
 const User = require("../../models/userSchema");
-const Product = require('../../models/productSchema');
-const Category = require('../../models/categorySchema');
-const Order = require('../../models/orderSchema');
+const Product = require("../../models/productSchema");
+const Category = require("../../models/categorySchema");
+const Order = require("../../models/orderSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
@@ -50,8 +50,10 @@ const loadDashboard = async (req, res) => {
       // Get total counts for products, categories, users, and orders
       const totalProducts = await Product.countDocuments();
       const totalCategories = await Category.countDocuments();
-      const totalUsers = await User.find({isAdmin: false}).countDocuments();
-      const totalPendingOrders = await Order.countDocuments({ status: 'Processing' });
+      const totalUsers = await User.find({ isAdmin: false }).countDocuments();
+      const totalPendingOrders = await Order.countDocuments({
+        status: "Processing",
+      });
 
       // Get today's order stats
       const today = new Date();
@@ -59,15 +61,17 @@ const loadDashboard = async (req, res) => {
       const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
       const ordersPlacedToday = await Order.countDocuments({
-        createdOn: { $gte: startOfDay, $lte: endOfDay }
+        createdOn: { $gte: startOfDay, $lte: endOfDay },
       });
 
       const ordersDeliveredToday = await Order.countDocuments({
-        firstDeliveredAt: { $gte: startOfDay, $lte: endOfDay }
+        firstDeliveredAt: { $gte: startOfDay, $lte: endOfDay },
       });
 
       // Get low stock products
-      const lowStockProducts = await Product.countDocuments({ quantity: { $lt: 5 } });
+      const lowStockProducts = await Product.countDocuments({
+        quantity: { $lt: 5 },
+      });
 
       // Get total sales data for the current year
       const currentYear = new Date().getFullYear();
@@ -76,35 +80,49 @@ const loadDashboard = async (req, res) => {
           $match: {
             createdOn: {
               $gte: new Date(currentYear, 0, 1), // Start of the year
-              $lte: new Date(currentYear, 11, 31) // End of the year
-            }
-          }
+              $lte: new Date(currentYear, 11, 31), // End of the year
+            },
+          },
         },
         {
-          $unwind: "$ordereditems" 
+          $unwind: "$ordereditems",
         },
         {
           $group: {
-            _id: { $month: "$createdOn" }, 
-            totalSales: { $sum: "$ordereditems.quantity" } 
-          }
+            _id: { $month: "$createdOn" },
+            totalSales: { $sum: "$ordereditems.quantity" },
+          },
         },
         {
-          $sort: { _id: 1 } 
-        }
+          $sort: { _id: 1 },
+        },
       ]);
 
       // Data for graph
       const months = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
       ];
-      const salesDataPerMonth = Array(12).fill(0); 
-      salesPerMonthData.forEach(item => {
-        salesDataPerMonth[item._id - 1] = item.totalSales; 
+      const salesDataPerMonth = Array(12).fill(0);
+      salesPerMonthData.forEach((item) => {
+        salesDataPerMonth[item._id - 1] = item.totalSales;
       });
 
       // progress bar for most sold categories
-      const categories = await Category.find({ isListed: true, isDeleted: false });
+      const categories = await Category.find({
+        isListed: true,
+        isDeleted: false,
+      });
       const categoryLabels = [];
       const categorySalesData = [];
 
@@ -112,36 +130,36 @@ const loadDashboard = async (req, res) => {
 
       for (const category of categories) {
         const salesData = await Order.aggregate([
-          { 
-            $unwind: "$ordereditems"  
+          {
+            $unwind: "$ordereditems",
           },
-          { 
+          {
             $lookup: {
-              from: "products",   
-              localField: "ordereditems.product",  
-              foreignField: "_id",  
-              as: "product"   
-            }
+              from: "products",
+              localField: "ordereditems.product",
+              foreignField: "_id",
+              as: "product",
+            },
           },
-          { 
-            $unwind: "$product"  
+          {
+            $unwind: "$product",
           },
-          { 
+          {
             $match: {
-              "product.category": category._id, 
-              $or: [ 
+              "product.category": category._id,
+              $or: [
                 { status: "Delivered" },
                 { status: "Return Request" },
                 { status: "Returned" },
-              ] 
-            }
+              ],
+            },
           },
-          { 
+          {
             $group: {
-              _id: "$product.category",  
-              totalSales: { $sum: "$ordereditems.quantity" }  
-            }
-          }
+              _id: "$product.category",
+              totalSales: { $sum: "$ordereditems.quantity" },
+            },
+          },
         ]);
 
         const totalSales = salesData.length > 0 ? salesData[0].totalSales : 0;
@@ -149,30 +167,37 @@ const loadDashboard = async (req, res) => {
       }
 
       const sortedCategories = Object.keys(categorySalesMap)
-        .map(categoryId => ({
+        .map((categoryId) => ({
           categoryId,
-          totalSales: categorySalesMap[categoryId]
+          totalSales: categorySalesMap[categoryId],
         }))
-        .sort((a, b) => b.totalSales - a.totalSales) 
-        .slice(0, 4); 
+        .sort((a, b) => b.totalSales - a.totalSales)
+        .slice(0, 4);
 
-      const categoryDetails = await Promise.all(sortedCategories.map(async (category) => {
-        const categoryDoc = await Category.findById(category.categoryId);
-        return {
-          name: categoryDoc.name,
-          sales: category.totalSales
-        };
-      }));
+      const categoryDetails = await Promise.all(
+        sortedCategories.map(async (category) => {
+          const categoryDoc = await Category.findById(category.categoryId);
+          return {
+            name: categoryDoc.name,
+            sales: category.totalSales,
+          };
+        })
+      );
 
-      categoryDetails.forEach(category => {
+      categoryDetails.forEach((category) => {
         categoryLabels.push(category.name);
         categorySalesData.push(category.sales);
       });
 
-      const totalSalesOverall = categorySalesData.reduce((acc, val) => acc + val, 0);
-      const categoryPercentages = categorySalesData.map(sales => (sales / totalSalesOverall) * 100);
+      const totalSalesOverall = categorySalesData.reduce(
+        (acc, val) => acc + val,
+        0
+      );
+      const categoryPercentages = categorySalesData.map(
+        (sales) => (sales / totalSalesOverall) * 100
+      );
 
-      res.render('dashboard', {
+      res.render("dashboard", {
         totalProducts,
         totalCategories,
         totalUsers,
@@ -182,16 +207,15 @@ const loadDashboard = async (req, res) => {
         lowStockProducts,
         categoryLabels,
         categorySalesData: categoryPercentages,
-        salesDataPerMonth, 
-        months,    
+        salesDataPerMonth,
+        months,
       });
     } catch (error) {
       console.error(error);
-      res.status(500).send('Server Error');
+      res.status(500).send("Server Error");
     }
   }
 };
-
 
 const logout = async (req, res) => {
   try {

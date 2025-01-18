@@ -47,20 +47,7 @@
           
             <td><%= data[i].status %></td>
             <td>
-                <% if (data[i].status === 'Pending') { %>
-              <button class="btn btn-info status-btn mt-2" data-id="<%= data[i].orderId %>" data-status="Processing" style="width: 100px">Process</button>
-              <% } else if (data[i].status === 'Processing') { %>
-              <button class="btn btn-secondary status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Shipped" style="width: 100px">Ship</button>
-                <% } else if (data[i].status === 'Shipped') { %>
-              <button class="btn btn-success status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Delivered" style="width: 100px">Deliver</button>
-              <% } else if (data[i].status === 'Delivered') { %>
-              <button class="btn btn-warning status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Return Request" style="width: 100px">Return Request</button>
-              <% } else if (data[i].status === 'Return Request') { %>
-              <button class="btn btn-danger status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Returned" style="width: 100px">Returned</button>
-                <% } %>
-              <% if (data[i].status !== 'Cancelled' && data[i].status !== 'Returned') { %>
-              <button class="btn btn-danger status-btn  mt-2" data-id="<%= data[i].orderId %>" data-status="Cancelled" style="width: 100px">Cancel</button>
-              <% } %>
+              <a href="/admin/orders/details/<%= data[i].orderId %>" class="btn btn-primary mt-2" style="width: 100px">Details</a>
             </td>
           </tr>
           <% } %>
@@ -84,57 +71,3 @@
 </div>
 
 <%- include('../../views/partials/admin/footer') %>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script> 
-  $(document).on("click", ".status-btn", function () {
-    var orderId = $(this).data("id");
-    var status = $(this).data("status");
- 
-    Swal.fire({
-      title: `Are you sure you want to mark this order as ${status}?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: `Yes, ${status}!`,
-      cancelButtonText: "No, Cancel",
-      reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) { 
-        $.ajax({
-          type: "POST",
-          url: "/admin/updateOrderStatus",
-          data: { orderId: orderId, status: status },
-          success: function (response) {
-            if (response.success) {
-              Swal.fire({
-                icon: "success",
-                title: response.message,
-                showConfirmButton: false,
-                timer: 1500,
-              }).then(() => {
-                location.reload(); 
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "An error occurred while updating the order status. Please try again.",
-              });
-            }
-          },
-          error: function () {
-            Swal.fire({
-              icon: "error",
-              title: "Request Failed",
-              text: "There was an issue connecting to the server. Please try again.",
-            });
-          },
-        });
-      } else { 
-        Swal.fire("Cancelled", `Order status change was cancelled.`, "info");
-      }
-    });
-  });
-</script>

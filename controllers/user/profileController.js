@@ -613,7 +613,7 @@ const addAddress = async (req, res) => {
       await userAddress.save();
     }
  
-    res.status(200).json({ success: true, message: 'Address added successfully' });
+    res.status(200).json({ success: true, message: 'Address added successfully',  newAddress: newAddress,  });
 
   } catch (error) {
     console.error('Error in adding address:', error);
@@ -828,10 +828,10 @@ const viewOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;  
     const userId = req.session.user;
- 
+
     // Fetch order and populate ordered items along with review information
     const order = await Order.findById(orderId)
-      .populate('ordereditems.product', 'productName productImage salePrice reviews')  // Populate reviews as well
+      .populate('ordereditems.product', 'productName productImage salePrice reviews')
       .exec();
 
     if (!order || order.userId.toString() !== userId) {
@@ -844,16 +844,23 @@ const viewOrderDetails = async (req, res) => {
     const reviews = [];
     for (let item of order.ordereditems) {
       const existingReview = await Review.findOne({ 
-        product_id: item.product._id,  // Access product ID from the ordered item
+        product_id: item.product._id,
         user_id: userId
       });
 
-      // Add the review status (existing or not) for each product
       reviews.push({
         productId: item.product._id,
         existingReview: existingReview ? true : false
       });
     }
+
+    // Fetch the user's addresses
+    const userAddresses = await Address.findOne({ userId: userId });
+
+    // Find the default address
+    const address = userAddresses ? userAddresses.address.find(addr => addr.isDefault) : null;
+
+    console.log('Address: ', address);  // Check the populated address
 
     res.render('orderDetail', {
       order,
@@ -861,6 +868,7 @@ const viewOrderDetails = async (req, res) => {
       activePage: 'profile',
       cartItems: cartItems,
       reviews,
+      address, // Pass the address to the template
     });
   } catch (error) {
     console.error('Error loading order details:', error);

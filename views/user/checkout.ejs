@@ -1,3 +1,30 @@
+<head>
+  <style>
+    #loadingOverlay {
+  position: fixed; /* Cover the whole screen */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Dull the background with a semi-transparent black */
+  display: flex; /* Use flexbox to center the spinner */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Ensure it's on top of other content */
+}
+
+#loadingSpinner {
+  color: white;
+}
+
+.d-none {
+  display: none; /* Hide the overlay by default */
+}
+
+  </style>
+</head>
+
+
 <%- include("../../views/partials/user/header") %>
 <div class="mt-4 ps-4">
   <!-- Breadcrumbs -->
@@ -102,7 +129,7 @@
                     class="form-control"
                     id="editName"
                     name="name"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -112,7 +139,7 @@
                     class="form-control"
                     id="editCity"
                     name="city"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -322,7 +349,7 @@
                     class="form-control"
                     id="editPincode"
                     name="pincode"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -332,7 +359,7 @@
                     class="form-control"
                     id="editPhone"
                     name="phone"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -463,7 +490,7 @@
                     class="form-control"
                     id="newAddressType"
                     name="addressType"
-                    required
+                    
                   >
                     <option value="home">home</option>
                     <option value="office">office</option>
@@ -479,7 +506,7 @@
                     class="form-control"
                     id="newName"
                     name="name"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -489,7 +516,7 @@
                     class="form-control"
                     id="newCity"
                     name="city"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -699,7 +726,7 @@
                     class="form-control"
                     id="newPincode"
                     name="pincode"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -709,7 +736,7 @@
                     class="form-control"
                     id="newPhone"
                     name="phone"
-                    required
+                    
                   />
                 </div>
                 <div class="mb-3">
@@ -822,6 +849,18 @@
         <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">
           Place Order
         </button>
+
+       <!-- Fullscreen Overlay with Loading Spinner (hidden by default) -->
+        <div id="loadingOverlay" class="d-none">
+          <div id="loadingSpinner" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-white">Placing your order, please wait...</p>
+          </div>
+        </div>
+
+
       </div>
     </div>
   </div>
@@ -894,72 +933,129 @@
         });
       });
 
-      document
-        .getElementById("addNewAddressBtn")
-        .addEventListener("click", function () {
-          document.getElementById("stateDropdown").textContent = "Select State";
-          document.getElementById("state").value = "";
+      document.getElementById("addNewAddressBtn").addEventListener("click", function () {
+  document.getElementById("stateDropdown").textContent = "Select State";
+  document.getElementById("state").value = "";
 
-          const addNewAddressModal = new bootstrap.Modal(
-            document.getElementById("addNewAddressModal")
-          );
-          addNewAddressModal.show();
-        });
+  const addNewAddressModal = new bootstrap.Modal(document.getElementById("addNewAddressModal"));
+  addNewAddressModal.show();
+});
 
-      document
-        .getElementById("addAddressForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
+document.getElementById("addAddressForm").addEventListener("submit", function (event) {
+  event.preventDefault();
 
-          const formData = new FormData(
-            document.getElementById("addAddressForm")
-          );
-          const dataObject = {};
-          formData.forEach((value, key) => {
-            dataObject[key] = value;
-          });
+  const formData = new FormData(document.getElementById("addAddressForm"));
+  const dataObject = {};
+  formData.forEach((value, key) => {
+    dataObject[key] = value;
+  });
 
-          fetch("/profile/address/addAddress", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataObject),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                const addNewAddressModal = bootstrap.Modal.getInstance(
-                  document.getElementById("addNewAddressModal")
-                );
-                addNewAddressModal.hide();
+  // Form Validation
+  const requiredFields = [
+    'addressType', 'name', 'city', 'state', 'pincode', 'phone'
+  ];
 
-                location.reload();
+  for (let field of requiredFields) {
+    if (!dataObject[field]) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: `Please fill in the ${field.charAt(0).toUpperCase() + field.slice(1)} field.`,
+        confirmButtonText: 'Okay',
+      });
+      return;
+    }
+  }
 
-                const newAddress = data.newAddress;
-                const addressListContainer =
-                  document.getElementById("addressForm"); 
-                const newAddressElement = document.createElement("div");
-                newAddressElement.classList.add("form-check");
-                newAddressElement.innerHTML = `
+ // Additional Validation for Name (Allow spaces but not empty or spaces-only names)
+if (!/^[A-Za-z\s\-']+$/.test(dataObject.name) || !/\S/.test(dataObject.name)) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Invalid Name',
+    text: 'Please enter a valid name (only letters, spaces, hyphens, and apostrophes are allowed). Name cannot be empty or consist of only spaces.',
+    confirmButtonText: 'Okay',
+  });
+  return;
+}
+  // Additional Validation for Phone and Pincode
+  if (!/^\d{10}$/.test(dataObject.phone)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Phone Number',
+      text: 'Please enter a valid 10-digit phone number.',
+      confirmButtonText: 'Okay',
+    });
+    return;
+  }
+
+  if (!/^\d{6}$/.test(dataObject.pincode)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Pincode',
+      text: 'Please enter a valid 6-digit pincode.',
+      confirmButtonText: 'Okay',
+    });
+    return;
+  }
+
+  // Submit the form data via fetch if validation is successful
+  fetch("/profile/address/addAddress", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dataObject),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        const addNewAddressModal = bootstrap.Modal.getInstance(document.getElementById("addNewAddressModal"));
+        addNewAddressModal.hide();
+
+        const newAddress = data.newAddress;
+        const addressListContainer = document.getElementById("addressForm");
+        const newAddressElement = document.createElement("div");
+        newAddressElement.classList.add("form-check");
+        newAddressElement.innerHTML = `
           <input class="form-check-input" type="radio" name="address" id="address${newAddress._id}" value="${newAddress._id}" checked />
           <label class="form-check-label" for="address${newAddress._id}">
             ${newAddress.name}, ${newAddress.addressType}, ${newAddress.city}, ${newAddress.state} - ${newAddress.pincode}
           </label>
         `;
-                addressListContainer.appendChild(newAddressElement);
-                const changeAddressModal = bootstrap.Modal.getInstance(
-                  document.getElementById("changeAddressModal")
-                );
-                changeAddressModal.show();
-              } else {
-                alert("Error adding address: " + data.message);
-              }
-            })
-            .catch((error) => {
-              console.error("Error adding address:", error);
-            });
+        addressListContainer.appendChild(newAddressElement);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Address Added Successfully',
+          text: 'Your new address has been added.',
+          confirmButtonText: 'Okay',
+        }).then(() => {
+          location.reload();
+
         });
+
+        const changeAddressModal = bootstrap.Modal.getInstance(document.getElementById("changeAddressModal"));
+        changeAddressModal.show();
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error Adding Address',
+          text: data.message || 'There was an error adding your address.',
+          confirmButtonText: 'Okay',
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error adding address:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Something Went Wrong',
+        text: 'There was an issue with the server, please try again later.',
+        confirmButtonText: 'Okay',
+      });
+    });
+});
+
 
       document
         .getElementById("useThisAddressBtn")
@@ -998,182 +1094,236 @@
         });
     });
 
-    document
-      .getElementById("editAddressBtn")
-      .addEventListener("click", function () {
-        const address = {
-          name: "<%= defaultAddress.name %>",
-          addressType: "<%= defaultAddress.addressType %>",
-          city: "<%= defaultAddress.city %>",
-          landMark: "<%= defaultAddress.landMark %>",
-          state: "<%= defaultAddress.state %>",
-          pincode: "<%= defaultAddress.pincode %>",
-          phone: "<%= defaultAddress.phone %>",
-          altPhone: "<%= defaultAddress.altPhone %>",
-        };
+    document.getElementById("editAddressBtn").addEventListener("click", function () {
+  const address = {
+    name: "<%= defaultAddress.name %>",
+    addressType: "<%= defaultAddress.addressType %>",
+    city: "<%= defaultAddress.city %>",
+    landMark: "<%= defaultAddress.landMark %>",
+    state: "<%= defaultAddress.state %>",
+    pincode: "<%= defaultAddress.pincode %>",
+    phone: "<%= defaultAddress.phone %>",
+    altPhone: "<%= defaultAddress.altPhone %>",
+  };
 
-        console.log("default: ", "<%= defaultAddress.addressType %>");
-        console.log("addressType: ", address.addressType);
-        console.log(
-          "Element value before setting: ",
-          document.getElementById("editAddressType").value
-        );
+  document.getElementById("editName").value = address.name;
+  document.getElementById("editAddressType").value = address.addressType;
+  document.getElementById("editCity").value = address.city;
+  document.getElementById("editLandMark").value = address.landMark || "";
+  document.getElementById("editPincode").value = address.pincode;
+  document.getElementById("editPhone").value = address.phone;
+  document.getElementById("editAltPhone").value = address.altPhone || "";
 
-        document.getElementById("editName").value = address.name;
-        document.getElementById("editAddressType").value = address.addressType;
-        document.getElementById("editCity").value = address.city;
-        document.getElementById("editLandMark").value = address.landMark || "";
-        document.getElementById("editPincode").value = address.pincode;
-        document.getElementById("editPhone").value = address.phone;
-        document.getElementById("editAltPhone").value = address.altPhone || "";
+  document.getElementById("editState").value = address.state;
+  document.getElementById("editStateDropdown").textContent = address.state;
 
-        console.log('alt phone: ',address.altPhone )
+  const dropdownItems = document.querySelectorAll(".dropdown-item");
+  dropdownItems.forEach((item) => {
+    if (item.getAttribute("data-value") === address.state) {
+      document.getElementById("editStateDropdown").textContent = item.textContent;
+    }
+  });
 
-        document.getElementById("editState").value = address.state;
-        document.getElementById("editStateDropdown").textContent =
-          address.state;
+  const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
+  editAddressModal.show();
+});
 
-        const dropdownItems = document.querySelectorAll(".dropdown-item");
-        dropdownItems.forEach((item) => {
-          if (item.getAttribute("data-value") === address.state) {
-            document.getElementById("editStateDropdown").textContent =
-              item.textContent;
-          }
-        });
+const dropdownItems = document.querySelectorAll(".dropdown-item");
+const stateDropdownBtn = document.getElementById("editStateDropdown");
+const stateInput = document.getElementById("editState");
 
-        const editAddressModal = new bootstrap.Modal(
-          document.getElementById("editAddressModal")
-        );
-        editAddressModal.show();
+dropdownItems.forEach(function (item) {
+  item.addEventListener("click", function () {
+    const selectedState = item.getAttribute("data-value");
+    stateDropdownBtn.textContent = selectedState;
+    stateInput.value = selectedState;
+  });
+});
+
+document.getElementById("editAddressForm").addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  const formData = new FormData(document.getElementById("editAddressForm"));
+  const dataObject = {};
+  formData.forEach((value, key) => {
+    dataObject[key] = value;
+  });
+
+  // Form Validation
+  const requiredFields = [
+    'addressType', 'name', 'city', 'state', 'pincode', 'phone'
+  ];
+
+  for (let field of requiredFields) {
+    if (!dataObject[field]) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: `Please fill in the ${field.charAt(0).toUpperCase() + field.slice(1)} field.`,
+        confirmButtonText: 'Okay',
       });
+      return;
+    }
+  }
 
-    const dropdownItems = document.querySelectorAll(".dropdown-item");
-    const stateDropdownBtn = document.getElementById("editStateDropdown");
-    const stateInput = document.getElementById("editState"); 
+  // Additional Validation for Name (Allow spaces but not empty or spaces-only names)
+  if (!/^[A-Za-z\s\-']+$/.test(dataObject.name) || !/\S/.test(dataObject.name)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Name',
+      text: 'Please enter a valid name (only letters, spaces, hyphens, and apostrophes are allowed). Name cannot be empty or consist of only spaces.',
+      confirmButtonText: 'Okay',
+    });
+    return;
+  }
 
-    dropdownItems.forEach(function (item) {
-      item.addEventListener("click", function () {
-        const selectedState = item.getAttribute("data-value");
-        stateDropdownBtn.textContent = selectedState; 
-        stateInput.value = selectedState; 
+  // Additional Validation for Phone and Pincode
+  if (!/^\d{10}$/.test(dataObject.phone)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Phone Number',
+      text: 'Please enter a valid 10-digit phone number.',
+      confirmButtonText: 'Okay',
+    });
+    return;
+  }
+
+  if (!/^\d{6}$/.test(dataObject.pincode)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Pincode',
+      text: 'Please enter a valid 6-digit pincode.',
+      confirmButtonText: 'Okay',
+    });
+    return;
+  }
+
+  // Submit the form data via fetch if validation is successful
+  fetch("/profile/address/editAddress", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dataObject),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        document.querySelector(".address-details").innerHTML = `
+          <strong>${data.updatedAddress.name}</strong><br>
+          ${data.updatedAddress.addressType}<br>
+          ${data.updatedAddress.city}, ${data.updatedAddress.state} - ${data.updatedAddress.pincode}<br>
+          Phone: ${data.updatedAddress.phone}
+        `;
+
+        const editAddressModal = bootstrap.Modal.getInstance(document.getElementById("editAddressModal"));
+        editAddressModal.hide();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Address Updated Successfully',
+          text: 'Your address has been updated.',
+          confirmButtonText: 'Okay',
+        }).then(() => {
+          location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error Updating Address',
+          text: data.message || 'There was an error updating your address.',
+          confirmButtonText: 'Okay',
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error updating address:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Something Went Wrong',
+        text: 'There was an issue with the server, please try again later.',
+        confirmButtonText: 'Okay',
       });
     });
+});
 
-    document
-      .getElementById("editAddressForm")
-      .addEventListener("submit", function (event) {
-        event.preventDefault();
+document.getElementById('usePaymentMethodBtn').addEventListener('click', function () {
+  // Show the loading overlay
+  document.getElementById('loadingOverlay').classList.remove('d-none');
+  document.getElementById('usePaymentMethodBtn').disabled = true; // Disable the button to prevent multiple clicks
 
-        const addressId = document.getElementById("addressId").value;
-        console.log("Address ID:", addressId);
+  const orderedItems = <%- JSON.stringify(cartItemsData) %>;
+  const totalPrice = '<%= totalPrice %>';
+  const address = "<%= defaultAddress._id %>";
+  const discount = 0;
+  const status = "Pending";
+  const finalAmount = totalPrice - discount;
+  const couponApplied = false;
 
-        const formData = new FormData(
-          document.getElementById("editAddressForm")
-        );
-        const dataObject = {};
-        formData.forEach((value, key) => {
-          dataObject[key] = value;
-        });
+  const orderData = {
+    ordereditems: orderedItems,
+    totalprice: totalPrice,
+    finalAmount: finalAmount,
+    address: address,
+    discount: discount,
+    status: status,
+    couponApplied: couponApplied
+  };
 
-        fetch("/profile/address/editAddress", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataObject),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Server response data:", data);
-            if (data.success) {
-              document.querySelector(".address-details").innerHTML = `
-        <strong>${data.updatedAddress.name}</strong><br>
-        ${data.updatedAddress.addressType}<br>
-        ${data.updatedAddress.city}, ${data.updatedAddress.state} - ${data.updatedAddress.pincode}<br>
-        Phone: ${data.updatedAddress.phone}
-      `;
-
-              const editAddressModal = new bootstrap.Modal(
-                document.getElementById("editAddressModal")
-              );
-
-              editAddressModal.hide();
-
-              setTimeout(() => {
-                location.reload();
-              }, 500); 
-            } else {
-              alert("Error updating address");
-            }
-          })
-          .catch((error) => console.error("Error updating address:", error));
-      });
-
-      document.getElementById('usePaymentMethodBtn').addEventListener('click', function () {
-   
-    const orderedItems = <%- JSON.stringify(cartItemsData) %>;
-    const totalPrice = '<%= totalPrice %>'; 
-    const address = "<%= defaultAddress._id %>";
-    const discount = 0;
-    const status = "Pending"; 
-    const finalAmount = totalPrice - discount; 
-    const couponApplied = false;
-
-    const orderData = {
-      ordereditems: orderedItems,
-      totalprice: totalPrice,
-      finalAmount: finalAmount,
-      address: address,
-      discount: discount,
-      status: status,
-      couponApplied: couponApplied
-    };
-
-    fetch('/checkout/place-order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(orderData),
+  fetch('/checkout/place-order', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orderData),
+  })
+    .then(response => {
+      if (response.redirected) {
+        window.location.href = response.url;
+      } else {
+        return response.json();
+      }
     })
-      .then(response => {
-        if(response.redirected) {
-          window.location.href = response.url;
-        } else {
-          return response.json();
-        }
-      })
-      .then(data => {
-        console.log('Response Data:', data);
+    .then(data => {
+      console.log('Response Data:', data);
 
-        if (data.success) {
-          console.log('Order placed successfully:', data);
-          Swal.fire({
+      // Hide the loading overlay after the response is received
+      document.getElementById('loadingOverlay').classList.add('d-none');
+      document.getElementById('usePaymentMethodBtn').disabled = false; // Enable the button again
+
+      if (data.success) {
+        console.log('Order placed successfully:', data);
+        Swal.fire({
           title: 'Order Placed!',
           text: 'Your order has been placed successfully.',
           icon: 'success',
           confirmButtonText: 'OK'
         }).then(() => {
-          window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`; 
+          window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
         });
-        } else {
-          Swal.fire({
+      } else {
+        Swal.fire({
           title: 'Error!',
           text: 'There was an error placing your order. Please try again later.',
           icon: 'error',
           confirmButtonText: 'OK'
         });
-        }
-      })
-      .catch(error => {
-        Swal.fire({
+      }
+    })
+    .catch(error => {
+      // Hide the loading overlay and enable the button in case of an error
+      document.getElementById('loadingOverlay').classList.add('d-none');
+      document.getElementById('usePaymentMethodBtn').disabled = false; 
+
+      Swal.fire({
         title: 'Error!',
         text: 'An unexpected error occurred. Please try again later.',
         icon: 'error',
         confirmButtonText: 'OK'
       });
-  });
+    });
 });
+
 </script>
 
 <%- include("../../views/partials/user/footer") %>

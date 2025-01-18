@@ -1,5 +1,5 @@
 const Order = require('../../models/orderSchema');
-
+const Address = require('../../models/addressSchema');
 const User = require('../../models/userSchema'); 
 
 const loadOrder = async (req, res) => {
@@ -49,6 +49,49 @@ const loadOrder = async (req, res) => {
   }
 };
 
+const viewOrderDetails = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+
+    // Fetch the order details
+    const order = await Order.findOne({ orderId })
+      .populate('ordereditems.product') // Populate product details
+      .exec();
+
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    // Fetch the user's addresses
+    const userAddresses = await Address.findOne({ userId: order.userId });
+
+    console.log('user: ', order.userId);
+
+    // Find the default address or any specific address you want to use
+    const address = userAddresses ? userAddresses.address.find(addr => addr.isDefault) : null;
+
+    // Retrieve the order details
+    const orderDetails = {
+      orderId: order.orderId,
+      Id: order.userId,  // Assuming userId contains user info
+      totalPrice: order.totalprice,
+      discount: order.discount,
+      finalAmount: order.finalAmount,
+      status: order.status,
+      couponApplied: order.couponApplied,
+      createdOn: order.createdOn,
+      address: address,  // Contains the address
+      orderedItems: order.ordereditems  // Product details
+    };
+
+    res.render('orderDetails', { orderDetails });
+
+  } catch (error) {
+    console.error('Error loading order details:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
@@ -86,5 +129,6 @@ const updateOrderStatus = async (req, res) => {
 
 module.exports = {
     loadOrder,
+    viewOrderDetails,
     updateOrderStatus,
 }
