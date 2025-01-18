@@ -146,7 +146,7 @@ const signUp = async (req, res) => {
     req.session.userData = { name, phone, email, password };
 
     res.render("verify-otp");
-    console.log("OTP sent", otp);
+    // console.log("OTP sent", otp);
   } catch (error) {
     console.error("Error during signup", error);
     res.status(500).send("Internal Server Error: Failed to complete signup.");
@@ -156,8 +156,8 @@ const signUp = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
-    console.log("Received OTP:", otp);
-    console.log("Stored OTP in session:", req.session.userOtp);
+    // console.log("Received OTP:", otp);
+    // console.log("Stored OTP in session:", req.session.userOtp);
 
     if (otp === req.session.userOtp) {
       const user = req.session.userData;
@@ -205,7 +205,7 @@ const resendOtp = async (req, res) => {
     const emailSent = await sendVeificationMail(email, otp);
 
     if (emailSent) {
-      console.log("Resent OTP:", otp);
+      // console.log("Resent OTP:", otp);
       res
         .status(200)
         .json({ success: true, message: "OTP resent successfully" });

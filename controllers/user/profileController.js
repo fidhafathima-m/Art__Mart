@@ -332,10 +332,10 @@ const verifyEmailOtp = async (req, res) => {
     const otp = req.body.otp ? req.body.otp.trim() : undefined;
     const sessionOtp = req.session.userOtp ? req.session.userOtp.trim() : undefined;
 
-    console.log('Received OTP:', otp);
-    console.log('Session OTP:', sessionOtp);
+    // console.log('Received OTP:', otp);
+    // console.log('Session OTP:', sessionOtp);
 
-    console.log('Is OTP equal?', otp === sessionOtp);  
+    // console.log('Is OTP equal?', otp === sessionOtp);  
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
 
@@ -352,7 +352,7 @@ const verifyEmailOtp = async (req, res) => {
     }
  
     if (otp === sessionOtp) {
-      console.log('OTP match successful!');
+      // console.log('OTP match successful!');
       req.session.userData = req.body.userData;
       res.json({
         success: true,  
