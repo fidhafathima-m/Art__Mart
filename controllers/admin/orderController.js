@@ -53,8 +53,9 @@ const viewOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;
 
-    // Fetch the order details
+    // Fetch the order details, populate 'userId' for user details
     const order = await Order.findOne({ orderId })
+      .populate('userId') // Populate userId to get user details
       .populate('ordereditems.product') // Populate product details
       .exec();
 
@@ -65,7 +66,6 @@ const viewOrderDetails = async (req, res) => {
     // Fetch the user's addresses
     const userAddresses = await Address.findOne({ userId: order.userId });
 
-    console.log('user: ', order.userId);
 
     // Find the default address or any specific address you want to use
     const address = userAddresses ? userAddresses.address.find(addr => addr.isDefault) : null;
@@ -73,7 +73,7 @@ const viewOrderDetails = async (req, res) => {
     // Retrieve the order details
     const orderDetails = {
       orderId: order.orderId,
-      Id: order.userId,  // Assuming userId contains user info
+      Id: order.userId,  // This now has user details populated
       totalPrice: order.totalprice,
       discount: order.discount,
       finalAmount: order.finalAmount,
@@ -92,6 +92,7 @@ const viewOrderDetails = async (req, res) => {
   }
 };
 
+
 const updateOrderStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
@@ -107,16 +108,26 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).send('Order not found');
     }
 
+    // If the status is "Delivered", set the 'firstDeliveredAt' and 'deliveredAt' timestamps
     if (status === 'Delivered' && !order.firstDeliveredAt) { 
       order.firstDeliveredAt = Date.now();
     }
  
+    // Update the overall order status
     order.status = status;
      
+    // If the status is "Delivered", set the delivery timestamp
     if (status === "Delivered") {
       order.deliveredAt = Date.now();  
     }
- 
+
+    // If the order status is "Returned", update the returnStatus of individual items
+    if (status === "Returned") {
+      order.ordereditems.forEach(item => {
+        item.returnStatus = 'Returned'; // Update the returnStatus for each item
+      });
+    }
+
     await order.save();
 
     res.json({ success: true, message: `Order status updated to ${status}` });
@@ -125,6 +136,7 @@ const updateOrderStatus = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
 
 
 module.exports = {

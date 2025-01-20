@@ -6,11 +6,35 @@
   <div class="container mt-4">
     <h1 class="my-4 text-center">Order Details - <%= orderDetails.orderId %></h1>
 
+    <!-- Action Buttons -->
+    <div class="action-buttons text-center mt-4">
+      <% if (orderDetails.status === 'Pending') { %>
+        <button class="btn btn-info status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Processing" style="width: 120px">Process</button>
+      <% } else if (orderDetails.status === 'Processing') { %>
+        <button class="btn btn-secondary status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Shipped" style="width: 120px">Ship</button>
+      <% } else if (orderDetails.status === 'Shipped') { %>
+        <button class="btn btn-success status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Delivered" style="width: 120px">Deliver</button>
+      <% } else if (orderDetails.status === 'Delivered') { %>
+        <button class="btn btn-warning status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Return Request" style="width: 120px">Return Request</button>
+      <% } else if (orderDetails.status === 'Return Request') { %>
+        <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Returned" style="width: 120px">Returned</button>
+      <% } %>
+      <% if (orderDetails.status !== 'Cancelled' && orderDetails.status !== 'Returned') { %>
+        <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Cancelled" style="width: 120px">Cancel</button>
+      <% } %>
+    </div>
+
+    <% if (orderDetails.status === 'Cancelled') { %>
+      <div class="text-center">
+        <p class="text-danger">This order is Cancelled!</p>
+      </div>
+      <% } %>
+
     <!-- Order Information -->
     <div class="order-info mb-4 p-4 border rounded shadow-sm">
       <h4 class="mb-3">Order Information</h4>
       <p><strong>Order ID:</strong> <%= orderDetails.orderId %></p>
-      <p><strong>User Name:</strong> <%= Id.name %></p>
+      <p><strong>User Name:</strong> <%= orderDetails.Id.name %></p>
       <p><strong>Total Price:</strong> &#8377;<%= orderDetails.totalPrice %></p>
       <p><strong>Discount:</strong> &#8377;<%= orderDetails.discount %></p>
       <p><strong>Final Amount:</strong> &#8377;<%= orderDetails.finalAmount %></p>
@@ -44,7 +68,7 @@
         <tbody>
           <% orderDetails.orderedItems.forEach(item => { %>
             <tr>
-              <td><img src="<%= item.product.productImage %>" alt="<%= item.product.productName %>" width="100" class="img-fluid rounded"></td>
+              <td><img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" width="100" class="img-fluid rounded"></td>
               <td><%= item.product.productName %></td>
               <td>&#8377;<%= item.price %></td>
               <td><%= item.quantity %></td>
@@ -54,22 +78,8 @@
       </table>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons text-center mt-4">
-      <% if (orderDetails.status === 'Pending') { %>
-        <button class="btn btn-info status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Processing" style="width: 120px">Process</button>
-      <% } else if (orderDetails.status === 'Processing') { %>
-        <button class="btn btn-secondary status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Shipped" style="width: 120px">Ship</button>
-      <% } else if (orderDetails.status === 'Shipped') { %>
-        <button class="btn btn-success status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Delivered" style="width: 120px">Deliver</button>
-      <% } else if (orderDetails.status === 'Delivered') { %>
-        <button class="btn btn-warning status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Return Request" style="width: 120px">Return Request</button>
-      <% } else if (orderDetails.status === 'Return Request') { %>
-        <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Returned" style="width: 120px">Returned</button>
-      <% } %>
-      <% if (orderDetails.status !== 'Cancelled' && orderDetails.status !== 'Returned') { %>
-        <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Cancelled" style="width: 120px">Cancel</button>
-      <% } %>
+    <div class="text-center mb-3">
+      <a href="/admin/orders" class="btn btn-outline-dark">Go back</a>
     </div>
   </div>
 </div>

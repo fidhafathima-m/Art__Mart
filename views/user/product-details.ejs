@@ -264,9 +264,14 @@
           >
             Add to cart
           </a>
-          <button class="btn btn-outline-danger" id="add-to-wishlist">
+          <a 
+          href="javascript:void(0);" 
+          data-product-id="<%= products._id %>" 
+          class="btn btn-outline-danger add-wishlist" 
+          id="add-to-wishlist">
             <i class="bi bi-heart"></i> Add to Wishlist
-          </button>
+          </a>
+
         </div>
 
         <!-- Tags and Availability -->
@@ -346,7 +351,9 @@
               </a>
               <ul class="product__hover">
                 <li>
-                  <a href="#"><img src="img/icon/heart.png" alt="" /></a>
+                  <a href="javascript:void(0);" data-product-id="<%= products[i]._id %>" class="add-wishlist">
+                    <img src="img/icon/heart.png" alt="Add to Wishlist" />
+                  </a>
                 </li>
               </ul>
             </div>
@@ -571,5 +578,85 @@
         }
       });
     });
+
+    const addToWishlistButtons = document.querySelectorAll('.add-wishlist');
+addToWishlistButtons.forEach(button => {
+  button.addEventListener('click', async (event) => {
+    event.preventDefault(); // Prevent default anchor behavior (no page jump)
+
+    const productId = event.target.closest('a').getAttribute('data-product-id'); // Get the product ID from the data attribute
+
+    // Check if productId exists
+    if (!productId) {
+      console.error('No product ID found!');
+      return;
+    }
+
+    try {
+      // Send a POST request to add the item to the wishlist
+      const response = await fetch('/addToWishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: productId,
+        }),
+        credentials: 'same-origin', // Ensure session cookies are sent
+      });
+
+      const data = await response.json(); // Parse the response as JSON
+
+      if (data.success) {
+        // Item added successfully, show success alert
+        Swal.fire({
+          title: 'Success!',
+          text: 'Item added to wishlist',
+          icon: 'success',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Go to Wishlist',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "/userProfile?section=wishlist";
+          }
+        });
+      } else {
+        // Customize the alert based on the error message
+        let confirmButtonText = 'OK'; // Default button text
+        let redirectUrl = null; // Default redirect URL
+
+        // Customize based on the error message
+        if (data.message === 'Please log in to add items to the wishlist.') {
+          confirmButtonText = 'Login';
+          redirectUrl = '/login'; // Redirect to login page
+        } else if (data.message === 'This product is already in your wishlist.') {
+          confirmButtonText = 'Go to wishlist'; // Different button text for this case
+          redirectUrl = '/userProfile?section=wishlist'; // Redirect to login page
+        }
+
+        // Show the SweetAlert dialog
+        Swal.fire({
+          title: 'Error',
+          text: data.message,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: confirmButtonText,
+          cancelButtonText: 'Cancel',
+        }).then((result) => {
+          if (result.isConfirmed && redirectUrl) {
+            window.location.href = redirectUrl; // Redirect if there's a URL
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('There was an error adding the item to the wishlist.');
+    }
+  });
+});
+
   });
 </script>

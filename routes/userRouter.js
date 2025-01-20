@@ -77,6 +77,8 @@ router.post('/profile/change-password', profileController.changePassValid);
 router.post('/profile/verify-pass-otp', profileController.verifyChangePassOtp);
 router.get('/profile/order/:orderId', profileController.viewOrderDetails);
 router.post('/order/cancel/:orderId', profileController.cancelOrder);
+router.post('/order/return/:orderId', profileController.returnOrder);
+router.post('/order/cancel-return/:orderId', profileController.cancelReturn);
 router.get('/profile/edit', profileController.loadEditProfile);
 router.post('/profile/edit', profileController.editProfile);
 
@@ -97,6 +99,11 @@ router.post('/addToCart', productController.addToCart);
 router.post('/cart/update-quantity/:productId', productController.updateCartQuantity);
 router.delete('/cart/delete-item/:productId', productController.deletFromCart);
 
+// Wishlist Management
+router.post('/addToWishlist', productController.addToWishlist);
+router.delete('/deleteFromWishlist', productController.deleteFromWishlist);
+
+
 //checkout
 router.get('/checkout', productController.loadCheckout);
 router.post('/update-default-address', productController.updateDefaultAddress);
@@ -106,5 +113,10 @@ router.get('/checkout/orderSuccess', productController.codOrderSuccess);
 //review
 router.get('/profile/order/:orderId/review', productController.loadReview);
 router.post('/profile/order/:orderId/review', productController.postReview);
+
+// coupon
+router.get('/api/coupons', productController.coupons);
+router.post('/api/apply-coupon', productController.applyCoupon);
+router.post('/api/remove-coupon', productController.removeCoupon);
 
 module.exports = router;

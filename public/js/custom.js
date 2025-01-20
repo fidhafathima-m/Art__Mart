@@ -49,68 +49,7 @@ $(document).ready(function () {
     Add Coupon
 --------------------*/
 
-$("#addCouponForm").submit(function (e) {
-  var formData = {
-    name: $("#name").val(),
-    expireOn: $("#expireOn").val(),
-    offerPrice: $("#offerPrice").val(),
-    minPurchaseAmount: $("#minPurchaseAmount").val(),
-  };
 
-  if (
-    !formData.name ||
-    !formData.expireOn ||
-    !formData.offerPrice ||
-    !formData.minPurchaseAmount
-  ) {
-    Swal.fire({
-      icon: "error",
-      title: "All fields are required!",
-      text: "Please fill in all the fields.",
-    });
-    return;
-  }
-
-  var expireDate = new Date(formData.expireOn);
-  if (isNaN(expireDate)) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid expiration date",
-      text: "Please enter a valid expiration date.",
-    });
-    return;
-  }
-
-  $.ajax({
-    type: "POST",
-    url: "/admin/add-coupon",
-    data: formData,
-    success: function (response) {
-      if (response.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Coupon Added",
-          text: response.message || "The coupon has been added successfully.",
-        }).then(() => {
-          window.location.href = "/admin/coupons";
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: response.message || "There was an issue adding the coupon.",
-        });
-      }
-    },
-    error: function () {
-      Swal.fire({
-        icon: "error",
-        title: "Server Error",
-        text: "There was an issue connecting to the server.",
-      });
-    },
-  });
-});
 
 /*------------------
     Add Product

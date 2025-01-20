@@ -28,6 +28,14 @@ const couponSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

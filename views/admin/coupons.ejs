@@ -102,22 +102,22 @@
               </button>
             </td>
             <td>
-              <% if (!coupons[i].isDeleted) { %>
-              <button
-                class="btn btn-danger"
-                style="width: 80px"
-                onclick="deleteCoupon('<%= coupons[i]._id %>')"
-              >
-                Delete
-              </button>
-              <% } else { %>
-              <button
-                class="btn btn-success"
-                style="width: 80px"
-                onclick="restoreCoupon('<%= coupons[i]._id %>')"
-              >
-                Restore
-              </button>
+              <% if (coupons[i].isDeleted) { %> <!-- If coupon is deleted -->
+                <button
+                  class="btn btn-success"
+                  style="width: 80px"
+                  onclick="restoreCoupon('<%= coupons[i]._id %>')"
+                >
+                  Restore
+                </button>
+              <% } else { %> <!-- If coupon is not deleted -->
+                <button
+                  class="btn btn-danger"
+                  style="width: 80px"
+                  onclick="deleteCoupon('<%= coupons[i]._id %>')"
+                >
+                  Delete
+                </button>
               <% } %>
             </td>
           </tr>
@@ -202,7 +202,7 @@ function deleteCoupon(couponId) {
               showConfirmButton: false,
               timer: 1500,
             }).then(() => {
-              location.reload();
+              location.reload(); // Reload the page to reflect the change
             });
           }
         },
@@ -242,7 +242,7 @@ function restoreCoupon(couponId) {
               showConfirmButton: false,
               timer: 1500,
             }).then(() => {
-              location.reload();
+              location.reload(); // Reload the page to reflect the change
             });
           }
         },
@@ -257,5 +257,6 @@ function restoreCoupon(couponId) {
     }
   });
 }
+
 
 </script>

@@ -3,6 +3,8 @@ const Address = require("../../models/addressSchema");
 const Cart = require('../../models/cartSchema');
 const Order = require('../../models/orderSchema');
 const Review = require('../../models/reviewSchema');
+const Wishlist = require("../../models/wishlistSchema");
+const Product = require("../../models/productSchema");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
@@ -225,6 +227,32 @@ const loadUserProfile = async(req, res) => {
         .exec();
 
       content = { orders };
+    } else if (section === 'wishlist') {
+
+      // Fetch Wishlist Logic
+      const wishlist = await Wishlist.findOne({ userId }).populate({
+        path: "products.productId",
+        model: Product,
+      });
+
+      if (!wishlist) {
+        content = { wishlistItems: [] };
+      } else {
+
+        const sortedWishlistItems = wishlist.products.sort((a, b) => b.addedOn - a.addedOn);
+
+        const wishlistItems = sortedWishlistItems.map(item => ({
+          id: item.productId._id,
+          productName: item.productId.productName,
+          productImage: item.productId.productImage,
+          salePrice: item.productId.salePrice,
+          productOffer: item.productId.productOffer,
+          regularPrice: item.productId.regularPrice,
+          productId: item.productId._id,  
+        }));
+        content = { wishlistItems };
+      }
+    
     } else { 
       content = { userProfile: true };
     }
@@ -905,6 +933,76 @@ const cancelOrder = async (req, res) => {
   }
 };
 
+// Route for returning an order
+const returnOrder = async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    const { returnReason } = req.body; // Get the reason from the request body
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    // Ensure the order is eligible for return (you can customize this check)
+    if (order.status !== 'Delivered') {
+      return res.status(400).json({ success: false, message: 'This order cannot be returned' });
+    }
+
+    // Update the order's return reason and status
+    order.status = 'Return Request'; // You can set this to whatever status you want for the return process
+    order.ordereditems.forEach(item => {
+      item.returnStatus = 'Requested'; // Set the return status for individual items
+      item.returnReason = returnReason; // Set the return reason for individual items
+    });
+
+    await order.save();
+
+    res.json({ success: true, message: 'Return request successfully submitted' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Error processing the return request' });
+  }
+};
+
+// In your profileController.js
+const cancelReturn = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId); // Use findById for better matching by ID
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    // Check if any ordered item has an active return request
+    const returnRequestedItem = order.ordereditems.find(item => item.returnStatus === 'Requested');
+
+    if (!returnRequestedItem) {
+      return res.status(400).json({ success: false, message: 'No active return request to cancel' });
+    }
+
+    // Update the returnStatus for each ordered item with an active return request
+    order.ordereditems.forEach(item => {
+      if (item.returnStatus === 'Requested') {
+        item.returnStatus = 'Not Requested'; // or any default value you'd like
+      }
+    });
+
+    // Optionally, update the order's overall status if needed
+    order.status = 'Delivered'; // Or any other status you want to set
+
+    await order.save();
+
+    return res.json({ success: true, message: 'Return request cancelled successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+
 
 
 const loadEditProfile = async(req, res) => {
@@ -978,6 +1076,8 @@ module.exports = {
   editAddressInCheckout,
   viewOrderDetails,
   cancelOrder,
+  returnOrder,
+  cancelReturn,
   loadEditProfile,
   editProfile
 };

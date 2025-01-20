@@ -32,10 +32,19 @@ const orderSchema = new Schema({
         type: String,
         default: "Pending",
       }, // Product-level status
-      returnStatus: {
-        type: String,
-        default: "Not Requested",
+      returnStatus: { 
+        type: String, 
+        enum: [
+          'Not Requested', 
+          'Requested', 
+          'Returned'
+        ], 
+        default: 'Not Requested' 
       },
+      returnReason: {
+        type: String,
+        required: false,
+      }, // Reason for return
     },
   ],
   totalprice: {
@@ -86,6 +95,10 @@ const orderSchema = new Schema({
   },
   firstDeliveredAt: {
     type: Date,
+    required: false,
+  },
+  cancellationReason: {
+    type: Number,
     required: false,
   },
 });

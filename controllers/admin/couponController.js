@@ -49,9 +49,23 @@ const LoadAddCoupon = async (req, res) => {
 const addCoupon = async (req, res) => {
   const { name, expireOn, offerPrice, minPurchaseAmount } = req.body;
 
+  // Check if the name is provided and is not empty
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    return res.json({ success: false, message: "Coupon name is required." });
+  }
+
+  // Check if the expiration date is in the future
+  const expirationDate = new Date(expireOn);
+  const currentDate = new Date();
+
+  if (expirationDate <= currentDate) {
+    return res.json({ success: false, message: "Expiration date must be in the future." });
+  }
+
   const lowerCaseName = name.trim().replace(/\s+/g, " ").toLowerCase();
 
   try {
+    // Check if coupon with the same name already exists
     const existingCoupon = await Coupon.findOne({
       name: { $regex: new RegExp("^" + lowerCaseName + "$", "i") },
     });
@@ -60,21 +74,24 @@ const addCoupon = async (req, res) => {
       return res.json({ success: false, message: "Coupon already exists." });
     }
 
+    // Create new coupon and save to the database
     const newCoupon = new Coupon({
       name,
-      expireOn: new Date(expireOn),
+      expireOn: expirationDate,
       minPurchaseAmount,
+      offerPrice,
+      isList: true,
+      isDeleted: false
     });
     await newCoupon.save();
 
     return res.json({ success: true, message: "Coupon added successfully." });
   } catch (error) {
     console.error("Error adding coupon:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error" });
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
 
 const listCoupon = async (req, res) => {
   try {
@@ -147,6 +164,53 @@ const editCoupon = async (req, res) => {
   }
 };
 
+// Soft delete coupon (set isDeleted to true)
+const deleteCoupon = async (req, res) => {
+  try {
+    const { couponId } = req.params;
+
+    // Find the coupon by ID and mark it as deleted (soft delete)
+    const coupon = await Coupon.findByIdAndUpdate(
+      couponId,
+      { isDeleted: true, deletedAt: new Date(), isList: false },
+      { new: true }
+    );
+
+    if (!coupon) {
+      return res.status(404).json({ success: false, message: 'Coupon not found.' });
+    }
+
+    return res.json({ success: true, message: 'Coupon soft deleted successfully' });
+  } catch (error) {
+    console.error('Error soft deleting coupon:', error);
+    return res.status(500).json({ success: false, message: 'Server error while deleting coupon.' });
+  }
+};
+
+// Restore coupon (set isDeleted to false)
+const restoreCoupon = async (req, res) => {
+  try {
+    const { couponId } = req.params;
+
+    // Find the coupon by ID and restore it (set isDeleted to false)
+    const coupon = await Coupon.findByIdAndUpdate(
+      couponId,
+      { isDeleted: false, deletedAt: null, isList: true },
+      { new: true }
+    );
+
+    if (!coupon) {
+      return res.status(404).json({ success: false, message: 'Coupon not found.' });
+    }
+
+    return res.json({ success: true, message: 'Coupon restored successfully' });
+  } catch (error) {
+    console.error('Error restoring coupon:', error);
+    return res.status(500).json({ success: false, message: 'Server error while restoring coupon.' });
+  }
+};
+
+
 module.exports = {
   loadCoupon,
   LoadAddCoupon,
@@ -155,4 +219,6 @@ module.exports = {
   unlistCoupon,
   loadEditCoupon,
   editCoupon,
+  deleteCoupon,
+  restoreCoupon
 };

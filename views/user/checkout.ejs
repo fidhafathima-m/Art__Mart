@@ -113,7 +113,7 @@
                     class="form-control"
                     id="editAddressType"
                     name="addressType"
-                    required
+                    
                   >
                     <option value="home">home</option>
                     <option value="office">office</option>
@@ -766,6 +766,22 @@
         </div>
       </div>
 
+      <!-- Coupons -->
+      <div class="coupons mt-4 bg-white p-4 rounded">
+        <hr />
+        <div class="row">
+            <div class="col-md-8">
+                <label for="couponInput">Enter Coupon Code:</label>
+                <input type="text" id="couponInput" class="form-control" placeholder="Enter coupon code" />
+                <div id="couponList" class="dropdown-menu" style="display: none;"></div>
+            </div>
+            <div class="col-md-4">
+                <button id="applyCouponBtn" class="btn btn-info mt-4">Apply Coupon</button>
+            </div>
+        </div>
+        <div id="discountMessage" class="mt-2"></div>
+    </div>
+
       <!-- Payment Method -->
       <div class="payment-method mt-4 bg-white p-4 rounded">
         <hr />
@@ -803,54 +819,45 @@
     </div>
 
     <!--  (Order Summary) -->
-    <div
-      class="order-summary bg-white p-4 rounded"
-      style="width: 30%; height: 50%; margin-left: 20px"
-    >
+    <div class="order-summary bg-white p-4 rounded" style="width: 30%; height: 50%; margin-left: 20px">
       <h3>Order Summary</h3>
       <hr />
       <div id="orderItems">
-        <% let totalPrice = 0; %> <% let cartItemsData = []; %>
-        <% cartItems.forEach(function(item) { %> <% let itemTotal = item.price *
-        item.quantity; %>
-        <div class="row mb-2">
-          <div class="col-8">
-            <p style="font-size: 14px; font-weight: 600">
-              <%= item.productId.productName %><span class="text-muted"
-                >(<%= item.quantity %>)</span
-              >
-            </p>
+          <% let totalPrice = 0; %> <% let cartItemsData = []; let discount = 0; %>
+          <% cartItems.forEach(function(item) { %> <% let itemTotal = item.price * item.quantity; %>
+          <div class="row mb-2">
+              <div class="col-8">
+                  <p style="font-size: 14px; font-weight: 600">
+                      <%= item.productId.productName %><span class="text-muted">(<%= item.quantity %>)</span>
+                  </p>
+              </div>
+              <div class="col-4 text-end">
+                  <p class="text-muted">&#8377; <%= itemTotal %></p>
+              </div>
           </div>
-          <div class="col-4 text-end">
-            <p class="text-muted">&#8377; <%= itemTotal %></p>
+          <% totalPrice += itemTotal; %>
+          <% cartItemsData.push({ product: item.productId._id, quantity: item.quantity, price: item.price });%> <% }) %>
+          <div class="row mb-2">
+              <div class="col-8">
+                  <p>Discount:</p>
+              </div>
+              <div class="col-4 text-end">
+                  <p id="discountAmount">₹<%= discount %></p> <!-- Initially 0, will be updated -->
+              </div>
           </div>
-        </div>
-        <% totalPrice += itemTotal; %>
+          <hr />
+          <div class="row">
+              <div class="col-8">
+                  <p style="font-size: 20px"><strong>Total:</strong></p>
+              </div>
+              <div class="col-4 text-end">
+                  <p style="font-size: 20px"><strong id="totalAmount">₹<%= totalPrice %></strong></p> <!-- Initially totalPrice, will be updated -->
+              </div>
+          </div>
+          <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">Place Order</button>
 
-        <!-- Add item to cartItemsData for later use -->
-        <% cartItemsData.push({ product: item.productId._id, quantity: item.quantity, price: item.price });%> <% }) %>
-        <div class="row mb-2">
-          <div class="col-8">
-            <p>Discount:</p>
-          </div>
-          <div class="col-4 text-end">
-            <p>0</p>
-          </div>
-        </div>
-        <hr />
-        <div class="row">
-          <div class="col-8">
-            <p style="font-size: 20px"><strong>Total:</strong></p>
-          </div>
-          <div class="col-4 text-end">
-            <p style="font-size: 20px"><strong>&#8377; <%= totalPrice %></strong></p>
-          </div>
-        </div>
-        <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">
-          Place Order
-        </button>
 
-       <!-- Fullscreen Overlay with Loading Spinner (hidden by default) -->
+          <!-- Fullscreen Overlay with Loading Spinner (hidden by default) -->
         <div id="loadingOverlay" class="d-none">
           <div id="loadingSpinner" class="text-center">
             <div class="spinner-border" role="status">
@@ -860,9 +867,8 @@
           </div>
         </div>
 
-
       </div>
-    </div>
+  </div>
   </div>
 </div>
 
@@ -1247,27 +1253,178 @@ document.getElementById("editAddressForm").addEventListener("submit", function (
     });
 });
 
+const couponInput = document.getElementById('couponInput');
+    const couponList = document.getElementById('couponList');
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+
+    const removeCouponBtn = document.createElement('button');
+    removeCouponBtn.className = 'btn btn-danger mt-4'; // Styling for the "Remove Coupon" button
+    removeCouponBtn.textContent = 'Remove Coupon';
+    removeCouponBtn.style.display = 'none'; // Initially hidden
+
+
+    const discountAmountElement = document.getElementById('discountAmount');
+    const discountMessage = document.getElementById('discountMessage');
+    const totalAmountElement = document.getElementById('totalAmount');
+    let totalPrice = <%= totalPrice %>; 
+    let discount = 0;
+
+    couponInput.addEventListener('focus', async () => {
+        const response = await fetch('/api/coupons');
+        const coupons = await response.json();
+        couponList.innerHTML = '';
+        coupons.forEach(coupon => {
+            if (totalPrice >= coupon.minPurchaseAmount) {
+                const couponItem = document.createElement('div');
+                couponItem.className = 'dropdown-item';
+                couponItem.textContent = coupon.name;
+                couponItem.onclick = () => {
+                    couponInput.value = coupon.name;
+                    couponList.style.display = 'none';
+                };
+                couponList.appendChild(couponItem);
+            }
+        });
+        couponList.style.display = couponList.innerHTML ? 'block' : 'none';
+    });
+
+    applyCouponBtn.addEventListener('click', () => {
+    const couponCode = couponInput.value;
+
+    if (couponCode) {
+        fetch('/api/apply-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: couponCode, totalPrice })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                discount = data.offerPrice; // Update discount with the coupon offer price
+                totalPrice = data.newTotalPrice; // Update total price with the new total
+
+                // Update the UI with the new discount and total
+                discountAmountElement.textContent = `₹${discount}`;
+                totalAmountElement.textContent = `₹${totalPrice}`;
+
+                // Hide Apply Coupon button and show Remove Coupon button
+                applyCouponBtn.style.display = 'none';
+                removeCouponBtn.style.display = 'block';
+
+                // Add Remove Coupon button to the DOM (if it's not already added)
+                if (!document.contains(removeCouponBtn)) {
+                    applyCouponBtn.parentElement.appendChild(removeCouponBtn);
+                }
+
+                Swal.fire({
+                    title: 'Coupon Applied!',
+                    text: `You saved ₹${discount}. Your new total is ₹${totalPrice}`,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'Try Again'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error!',
+                text: 'An unexpected error occurred. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    } else {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please enter a valid coupon code.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+});
+
+// Handle removing coupon when Remove Coupon button is clicked
+removeCouponBtn.addEventListener('click', () => {
+    const couponCode = couponInput.value;
+
+    if (couponCode) {
+        fetch('/api/remove-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: couponCode, totalPrice })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Revert the total price and discount
+                totalPrice += discount; // Add back the discount to total
+                discount = 0;
+
+                // Update the UI with the reverted values
+                discountAmountElement.textContent = '₹0';
+                totalAmountElement.textContent = `₹${totalPrice}`;
+
+                // Show Apply Coupon button and hide Remove Coupon button
+                applyCouponBtn.style.display = 'block';
+                removeCouponBtn.style.display = 'none';
+
+                // Optionally reset the coupon input field
+                couponInput.value = '';
+
+                Swal.fire({
+                    title: 'Coupon Removed!',
+                    text: `The coupon has been removed. Your total is now ₹${totalPrice}.`,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'Try Again'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error!',
+                text: 'An unexpected error occurred. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
+});
+
+
 document.getElementById('usePaymentMethodBtn').addEventListener('click', function () {
   // Show the loading overlay
   document.getElementById('loadingOverlay').classList.remove('d-none');
   document.getElementById('usePaymentMethodBtn').disabled = true; // Disable the button to prevent multiple clicks
 
   const orderedItems = <%- JSON.stringify(cartItemsData) %>;
-  const totalPrice = '<%= totalPrice %>';
+  let totalPrice = <%= totalPrice %>; // Get total price from server
+  const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '')) || 0; // Get the discount amount
+  const finalAmount = totalPrice - discount; // Adjust final amount after coupon discount
   const address = "<%= defaultAddress._id %>";
-  const discount = 0;
   const status = "Pending";
-  const finalAmount = totalPrice - discount;
-  const couponApplied = false;
+  const couponApplied = discount > 0; // Determine if a coupon was applied based on the discount
 
   const orderData = {
     ordereditems: orderedItems,
     totalprice: totalPrice,
-    finalAmount: finalAmount,
+    finalAmount: finalAmount,  // Final amount after coupon discount
     address: address,
-    discount: discount,
+    discount: discount,  // Amount saved from coupon
     status: status,
-    couponApplied: couponApplied
+    couponApplied: couponApplied  // If coupon was applied
   };
 
   fetch('/checkout/place-order', {
@@ -1313,7 +1470,7 @@ document.getElementById('usePaymentMethodBtn').addEventListener('click', functio
     .catch(error => {
       // Hide the loading overlay and enable the button in case of an error
       document.getElementById('loadingOverlay').classList.add('d-none');
-      document.getElementById('usePaymentMethodBtn').disabled = false; 
+      document.getElementById('usePaymentMethodBtn').disabled = false;
 
       Swal.fire({
         title: 'Error!',
@@ -1323,6 +1480,7 @@ document.getElementById('usePaymentMethodBtn').addEventListener('click', functio
       });
     });
 });
+
 
 </script>
 

@@ -25,6 +25,18 @@
     <% if (order.status === 'Processing' || order.status === 'Pending') { %>
       <button class="btn btn-danger my-2 cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
     <% } %>
+    <% if (order.status === 'Delivered') { %>
+      <button class="btn btn-danger my-2 return-order-btn" data-order-id="<%= order._id %>">Return Order</button>
+    <% } %>
+    <% if (order.status === 'Return Request') { %>
+      <div class="return-reason">
+        <p class="text-muted">Return Reason: <span class="text-black"><%= order.ordereditems[0].returnReason %></span></p> 
+        <button class="btn btn-danger my-2 cancel-return-order-btn" data-order-id="<%= order._id %>">Cancel Return Request</button>
+      </div>
+    <% } %>
+    <% if (order.status === 'Returned') { %>
+      <p>Your Order is returned for the reason: <%= order.ordereditems[0].returnReason %></p>
+    <% } %>
   </div>
 
   <div class="text-center">
@@ -50,7 +62,10 @@
               <a href="/product-details?id=<%= item.product._id %>">
                 <p><%= item.product.productName %></p>
               </a>
-              <p>Price: ₹<%= item.price %></p>
+              <span>Price: ₹<%= order.finalAmount %></span>
+              <% if (order.discount > 0) { %>
+                <span class="text-success small pl-3">You saved ₹<%= order.discount %></span>
+                <% } %>
             </div>
             <div class="col-3 text-end">
               <div class="text-end justify-content-center">
@@ -123,4 +138,98 @@
       }
     });
   });
+
+
+  $('.return-order-btn').on('click', function () {
+  const orderId = $(this).data('order-id');
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to return this order?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, return it!',
+    cancelButtonText: 'No, keep it',
+    input: 'textarea', // This creates a textarea for the return reason
+    inputPlaceholder: 'Please provide a reason for returning this order...',
+    inputAttributes: {
+      'aria-label': 'Reason for returning',
+      'maxlength': 300
+    },
+    showLoaderOnConfirm: true,
+    preConfirm: (returnReason) => {
+      if (!returnReason) {
+        Swal.showValidationMessage('You must provide a reason for the return');
+        return false;
+      }
+
+      // Show confirmation that the return request has been submitted
+      Swal.fire({
+        title: 'Return Request Submitted',
+        text: 'Your return request has been submitted. Once the process is complete, you will be notified.',
+        icon: 'info',
+        confirmButtonText: 'Got it',
+      });
+
+      // Send the return request to the server
+      return fetch(`/order/return/${orderId}`, {
+        method: 'POST',
+        body: JSON.stringify({ returnReason }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .catch(error => {
+        Swal.showValidationMessage('Request failed: ' + error);
+      });
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // Once the backend completes the return, notify the user
+      Swal.fire('Return Requested', 'Your return request is under review. We will notify you once it is processed.', 'success').then(() => {
+        location.reload(); // Reload page after returning
+      });
+    }
+  });
+});
+
+document.querySelectorAll('.cancel-return-order-btn').forEach(button => {
+  button.addEventListener('click', function () {
+    const orderId = this.dataset.orderId;
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to cancel this return request?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/order/cancel-return/${orderId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire('Cancelled!', 'Your return request has been cancelled.', 'success').then(() => {
+              location.reload(); 
+            });
+          } else {
+            Swal.fire('Error!', data.message, 'error');
+          }
+        })
+        .catch(error => {
+          Swal.fire('Error!', 'An error occurred while cancelling the return request. Please try again.', 'error');
+        });
+      }
+    });
+  });
+});
+
+
 </script>
