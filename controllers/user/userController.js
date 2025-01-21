@@ -3,6 +3,8 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Cart = require('../../models/cartSchema');
 const Review = require('../../models/reviewSchema');
+const Wallet = require('../../models/walletSchema');
+const Transaction = require('../../models/transactionSchema');
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
@@ -964,6 +966,113 @@ const logout = async (req, res) => {
   }
 };
 
+const addMoney = async (req, res) => {
+  const { amount } = req.body; 
+  const userId = req.session.user; 
+
+  if (!amount || amount <= 0) {
+    return res.status(400).json({ message: "Please enter a valid amount greater than 0." });
+  }
+
+  try {
+    let wallet = await Wallet.findOne({ userId });
+
+    // If the wallet doesn't exist, create a new one with a balance of 0
+    if (!wallet) {
+      wallet = new Wallet({
+        userId,
+        balance: 0, // Initially set to 0
+      });
+    }
+
+    // Add the money to the user's balance
+    wallet.balance += amount;
+
+    // Save the wallet with the updated balance
+    await wallet.save();
+
+    // Optionally, create a transaction record
+    const transaction = new Transaction({
+      userId,
+      type: 'deposit', // Transaction type (e.g., deposit)
+      amount,
+      balance: wallet.balance, // The balance after the transaction
+      date: new Date(),
+    });
+    await transaction.save();
+
+    // Send a response with the updated wallet balance
+    res.status(200).json({
+      message: "Money added to wallet successfully!",
+      wallet,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred while adding money." });
+  }
+}
+
+// Controller for withdrawing money from the wallet
+const withdrawMoney = async (req, res) => {
+  const { amount } = req.body;  // Get amount from the request body
+  const userId = req.session.user;  // Assuming userId is in the session
+
+  // Validate amount
+  if (isNaN(amount) || amount <= 0) {
+    return res.status(400).json({
+      success: false, 
+      message: "Please enter a valid amount greater than 0."
+    });
+  }
+
+  try {
+    // Fetch the user's wallet
+    const wallet = await Wallet.findOne({ userId });
+
+    if (!wallet) {
+      return res.status(404).json({
+        success: false,
+        message: "Wallet not found."
+      });
+    }
+
+    // Check if the wallet has enough balance
+    if (wallet.balance < amount) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient balance."
+      });
+    }
+
+    // Deduct the amount from wallet balance
+    wallet.balance -= amount;
+    await wallet.save();
+
+    // Record the transaction
+    const transaction = new Transaction({
+      userId,
+      type: 'withdrawal',
+      amount,
+      balance: wallet.balance,
+      date: new Date(),
+    });
+    await transaction.save();
+
+    // Respond with the updated wallet and success message
+    res.status(200).json({
+      success: true,
+      message: "Money withdrawn successfully!",
+      wallet,  // Return the updated wallet
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while withdrawing money."
+    });
+  }
+};
 
 
 module.exports = {
@@ -983,4 +1092,6 @@ module.exports = {
   sortByPrice,
   searchProducts,
   logout,
+  addMoney,
+  withdrawMoney
 };

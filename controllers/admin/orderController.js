@@ -1,6 +1,8 @@
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
 const User = require('../../models/userSchema'); 
+const Wallet = require('../../models/walletSchema');
+const Transaction = require('../../models/transactionSchema');
 
 const loadOrder = async (req, res) => {
   try {
@@ -70,6 +72,8 @@ const viewOrderDetails = async (req, res) => {
     // Find the default address or any specific address you want to use
     const address = userAddresses ? userAddresses.address.find(addr => addr.isDefault) : null;
 
+    // console.log()
+
     // Retrieve the order details
     const orderDetails = {
       orderId: order.orderId,
@@ -77,6 +81,8 @@ const viewOrderDetails = async (req, res) => {
       totalPrice: order.totalprice,
       discount: order.discount,
       finalAmount: order.finalAmount,
+      paymentMethod: order.paymentMethod,
+      moneySent: order.moneySent,
       status: order.status,
       couponApplied: order.couponApplied,
       createdOn: order.createdOn,
@@ -137,10 +143,62 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const sendMoneyToWallet = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    // Find the order by orderId
+    const order = await Order.findOne({ orderId }).populate('userId');
+
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    // Check if the order is cancelled and payment method is prepaid, and money has not been sent yet
+    if (order.status === 'Cancelled' && order.paymentMethod === 'prepaid' && !order.moneySent) {
+      // Update the order's moneySent status
+      order.moneySent = true;
+      await order.save();
+
+      // Find the user's wallet
+      let wallet = await Wallet.findOne({ userId: order.userId._id });
+
+      if (!wallet) {
+        // If no wallet exists, create a new one
+        wallet = new Wallet({
+          userId: order.userId._id,
+          balance: order.finalAmount,
+        });
+        await wallet.save();
+      } else {
+        // Add the order's finalAmount to the wallet balance
+        wallet.balance += order.finalAmount;
+        await wallet.save();
+      }
+
+      const transaction = new Transaction({
+        userId: order.userId._id,
+        type: 'credit', 
+        amount: order.finalAmount,
+        balance: wallet.balance,  
+      });
+
+      await transaction.save();
+
+      res.json({ success: true, message: 'Money has been sent to the user\'s wallet.' });
+    } else {
+      return res.status(400).json({ success: false, message: 'Order is not eligible for money transfer.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server Error');
+  }
+};
 
 
 module.exports = {
     loadOrder,
     viewOrderDetails,
     updateOrderStatus,
+    sendMoneyToWallet,
 }

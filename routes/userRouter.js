@@ -119,4 +119,8 @@ router.get('/api/coupons', productController.coupons);
 router.post('/api/apply-coupon', productController.applyCoupon);
 router.post('/api/remove-coupon', productController.removeCoupon);
 
+// Wallet
+router.post('/wallet/add-money', userController.addMoney);
+router.post('/wallet/withdraw-money', userController.withdrawMoney);
+
 module.exports = router;

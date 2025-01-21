@@ -167,5 +167,6 @@ router.patch('/restore-coupon/:couponId', couponController.restoreCoupon);
 router.get('/orders', adminAuth.isLogin, orderController.loadOrder);
 router.get('/orders/details/:orderId', adminAuth.isLogin, orderController.viewOrderDetails);
 router.post('/updateOrderStatus', adminAuth.isLogin, orderController.updateOrderStatus);
+router.post('/sendMoneyToWallet',adminAuth.isLogin, orderController.sendMoneyToWallet);
 
 module.exports = router;

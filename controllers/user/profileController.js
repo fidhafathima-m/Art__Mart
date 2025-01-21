@@ -5,6 +5,8 @@ const Order = require('../../models/orderSchema');
 const Review = require('../../models/reviewSchema');
 const Wishlist = require("../../models/wishlistSchema");
 const Product = require("../../models/productSchema");
+const Wallet = require("../../models/walletSchema");
+const Transaction = require('../../models/transactionSchema');
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
@@ -252,6 +254,23 @@ const loadUserProfile = async(req, res) => {
         }));
         content = { wishlistItems };
       }
+    
+    } else if (section === 'wallet') { 
+
+      const page = parseInt(req.query.page) || 1;
+      const limit = 6;
+      const skip = (page - 1) * limit;
+
+      const wallet = await Wallet.findOne({userId: userId});
+      const totalTransactions = await Transaction.countDocuments({ userId: userId });
+      const transactions = await Transaction.find({userId: userId})
+      .sort({date: -1})
+      .skip(skip)
+      .limit(limit);
+
+      const totalPages = Math.ceil(totalTransactions / limit);
+
+      content = { wallet, transactions, totalPages, totalTransactions, currentPage: page };
     
     } else { 
       content = { userProfile: true };
@@ -924,6 +943,13 @@ const cancelOrder = async (req, res) => {
     // Update the order status to 'Cancelled'
     order.status = 'Cancelled';
     await order.save();
+
+    if (order.paymentMethod === 'prepaid') {
+      return res.json({
+        success: true,
+        message: `Your order has been cancelled. The prepaid amount of ₹${order.finalAmount} will be credited to your wallet within 24 hours.`,
+      });
+    }
 
     // Return success response
     res.json({ success: true, message: 'Order has been cancelled.' });

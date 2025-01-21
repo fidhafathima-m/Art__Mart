@@ -19,16 +19,22 @@
       <% } else if (orderDetails.status === 'Return Request') { %>
         <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Returned" style="width: 120px">Returned</button>
       <% } %>
+      
+      <% if (orderDetails.status === 'Cancelled') { %>
+        <% if (orderDetails.paymentMethod === 'prepaid' && !orderDetails.moneySent) { %>
+          <button class="btn btn-primary send-money-btn mt-2" data-id="<%= orderDetails.orderId %>" style="width: 120px">Send Money</button>
+        <% } else if (orderDetails.paymentMethod === 'prepaid' && orderDetails.moneySent) { %>
+          <p class="text-success mt-2">Money has already been sent to the wallet.</p>
+        <% } else if (orderDetails.paymentMethod === 'COD') { %>
+          <p class="text-danger mt-2">Order is cancelled. No payment is required for COD.</p>
+        <% } %>
+      <% } %>
+
       <% if (orderDetails.status !== 'Cancelled' && orderDetails.status !== 'Returned') { %>
         <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Cancelled" style="width: 120px">Cancel</button>
       <% } %>
     </div>
 
-    <% if (orderDetails.status === 'Cancelled') { %>
-      <div class="text-center">
-        <p class="text-danger">This order is Cancelled!</p>
-      </div>
-      <% } %>
 
     <!-- Order Information -->
     <div class="order-info mb-4 p-4 border rounded shadow-sm">
@@ -90,7 +96,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script> 
-  $(document).on("click", ".status-btn", function () {
+
+$(document).on("click", ".status-btn", function () {
     var orderId = $(this).data("id");
     var status = $(this).data("status");
  
@@ -138,20 +145,57 @@
       }
     });
   });
+
+  $(document).on("click", ".send-money-btn", function () {
+    var orderId = $(this).data("id");
+ 
+    Swal.fire({
+      title: "Are you sure you want to send money to the user's wallet?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, send money!",
+      cancelButtonText: "No, Cancel",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          type: "POST",
+          url: "/admin/sendMoneyToWallet",
+          data: { orderId: orderId },
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: response.message,
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                location.reload(); 
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurred while sending money. Please try again.",
+              });
+            }
+          },
+          error: function () {
+            Swal.fire({
+              icon: "error",
+              title: "Request Failed",
+              text: "There was an issue connecting to the server. Please try again.",
+            });
+          },
+        });
+      } else {
+        Swal.fire("Cancelled", "Money sending was cancelled.", "info");
+      }
+    });
+  });
 </script>
 
-<!-- Styles -->
 <style>
-  /* .wrapper {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-  } */
-
   .order-info, .address-info {
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

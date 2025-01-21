@@ -28,10 +28,6 @@ const orderSchema = new Schema({
         type: Number,
         default: 0,
       },
-      status: {
-        type: String,
-        default: "Pending",
-      }, // Product-level status
       returnStatus: { 
         type: String, 
         enum: [
@@ -88,6 +84,15 @@ const orderSchema = new Schema({
   couponApplied: {
     type: Boolean,
     default: false,
+  },
+  paymentMethod: { 
+    type: String,
+    enum: ['prepaid', 'COD'],  
+    required: true,
+  },
+  moneySent: {
+    type: Boolean,
+    default: false 
   },
   deliveredAt: {
     type: Date,

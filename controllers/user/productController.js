@@ -448,6 +448,7 @@ const codPlaceOrder = async (req, res) => {
       invoiceDate: new Date(),
       couponApplied,  // Store if the coupon was applied
       discount,       // Store the discount value
+      paymentMethod: 'prepaid'
     });
 
     const savedOrder = await newOrder.save(); 

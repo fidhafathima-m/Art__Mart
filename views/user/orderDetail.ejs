@@ -37,6 +37,11 @@
     <% if (order.status === 'Returned') { %>
       <p>Your Order is returned for the reason: <%= order.ordereditems[0].returnReason %></p>
     <% } %>
+
+      <% if(order.moneySent) { %>
+        <p>The prepaid money is creadited to your wallet</p>
+      <% } %>
+
   </div>
 
   <div class="text-center">
@@ -124,7 +129,8 @@
           method: 'POST',
           success: function (response) {
             if (response.success) {
-              Swal.fire('Cancelled!', 'Your order has been cancelled.', 'success').then(() => {
+              let message = response.message || 'Your order has been cancelled.';
+              Swal.fire('Cancelled!', message, 'success').then(() => {
                 location.reload(); 
               });
             } else {
