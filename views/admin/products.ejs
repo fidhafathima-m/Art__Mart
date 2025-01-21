@@ -167,7 +167,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script src="/js/custom.js"></script>
 
 <script>
   // Block Product with Confirmation
@@ -275,4 +274,156 @@
       }
     });
   });
+
+  async function addOffer(productId) {
+  const { value: amount } = await Swal.fire({
+    title: "Offer in percentage",
+    input: "number",
+    inputLabel: "Enter Offer Percentage",
+    inputPlaceholder: "%",
+  });
+  $.ajax({
+    url: "/admin/addProductOffer",
+    method: "POST",
+    data: {
+      percentage: amount,
+      productId: productId,
+    },
+    success: (response) => {
+      if (response.status === true) {
+        Swal.fire("Offer Added", "The offer has been added", "success").then(
+          () => {
+            location.reload();
+          }
+        );
+      } else {
+        alert("failed");
+      }
+    },
+  });
+}
+
+function removeOffer(productId) {
+  try {
+    Swal.fire({
+      title: "Remove offer",
+      text: "Are you sure to remove this offer?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
+      timer: 5000,
+      timerProgressBar: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "/admin/removeProductOffer",
+          method: "POST",
+          data: {
+            productId: productId,
+          },
+          success: (response) => {
+            if (response.status === true) {
+              Swal.fire(
+                "Offer Removed",
+                "The offer has been removed",
+                "success"
+              ).then(() => {
+                location.reload();
+              });
+            } else if (response.success === false) {
+              Swal.fire("failed");
+            } else {
+              alert("failed");
+            }
+          },
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function deleteProduct(productId) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This product will be soft deleted.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "PATCH",
+        url: `/admin/delete-product/${productId}`,
+        success: function (response) {
+          if (response.message === "Product soft deleted successfully") {
+            Swal.fire({
+              icon: "success",
+              title: "Product deleted!",
+              text: "The product has been soft deleted.",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              location.reload();
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error deleting the product.",
+          });
+        },
+      });
+    }
+  });
+}
+
+function restoreProduct(productId) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This product will be restored.",
+    icon: "info",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, restore it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "PATCH",
+        url: `/admin/restore-product/${productId}`,
+        success: function (response) {
+          if (response.message === "Product restored successfully") {
+            Swal.fire({
+              icon: "success",
+              title: "Product Restored!",
+              text: "The product has been successfully restored.",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              location.reload();
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error restoring the product.",
+          });
+        },
+      });
+    }
+  });
+}
+
 </script>

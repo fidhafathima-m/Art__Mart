@@ -9,6 +9,11 @@ const Order = require('../../models/orderSchema');
 const Wishlist = require("../../models/wishlistSchema");
 const mongoose = require("mongoose");
 const nodemailer = require('nodemailer');
+const Razorpay = require('razorpay');
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_ID_KEY,  
+  key_secret: process.env.RAZORPAY_SECRET_KEY,  
+});
 
 
 const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
@@ -448,7 +453,7 @@ const codPlaceOrder = async (req, res) => {
       invoiceDate: new Date(),
       couponApplied,  // Store if the coupon was applied
       discount,       // Store the discount value
-      paymentMethod: 'prepaid'
+      paymentMethod: 'COD'
     });
 
     const savedOrder = await newOrder.save(); 
@@ -503,7 +508,7 @@ const codOrderSuccess = async (req, res) => {
 
     const cartItems = cart ? cart.items : [];
 
-    const order = await Order.findById(orderId); 
+    const order = await Order.findOne({ orderId: orderId });
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -523,6 +528,92 @@ const codOrderSuccess = async (req, res) => {
     return res.status(500).json({ message: "An error occurred while fetching the order details." });
   }
 };
+
+
+
+const razorpayPlaceOrder = async (req, res) => {
+  try {
+    const { ordereditems, totalprice, finalAmount, address, discount, status, couponApplied } = req.body;
+    const userId = req.session.user;  
+
+    const userAddresses = await Address.find({ userId: userId });
+    if (!userAddresses || userAddresses.length === 0) {
+      return res.status(400).json({ success: false, message: "No addresses found for the user" });
+    }
+
+    const defaultAddress = userAddresses
+      .flatMap(addr => addr.address)  
+      .find(addr => addr.isDefault === true);
+
+    if (!defaultAddress) {
+      return res.status(400).json({ success: false, message: "No default address found" });
+    }
+
+    const newOrder = new Order({
+      userId: userId, 
+      ordereditems,
+      totalprice,
+      finalAmount,
+      address: defaultAddress._id,  
+      status: status || "Pending",  
+      createdOn: new Date(),
+      invoiceDate: new Date(),
+      couponApplied, 
+      discount,      
+      paymentMethod: 'prepaid' 
+    });
+
+    const savedOrder = await newOrder.save(); 
+
+    // Handle inventory update and cart removal
+    for (const item of ordereditems) {
+      const productId = item.product;
+      const orderedQuantity = item.quantity;
+ 
+      const product = await Product.findById(productId);
+      if (product) { 
+        if (product.quantity < orderedQuantity) {
+          return res.status(400).json({ success: false, message: `Not enough stock for product ${product.productName}` });
+        } 
+        product.quantity -= orderedQuantity;
+        await product.save();
+      }
+    }
+
+    // Remove items from cart
+    await Cart.findOneAndUpdate(
+      { userId: userId },
+      { $pull: { items: { productId: { $in: ordereditems.map(item => item.product) } } } }
+    );
+
+    // Create Razorpay order
+    const options = {
+      amount: finalAmount * 100, 
+      currency: 'INR',
+      receipt: `receipt_${new Date().getTime()}`,
+      payment_capture: 1,  
+    };
+
+    const razorpayOrder = await razorpay.orders.create(options);
+
+    savedOrder.orderId = razorpayOrder.id;  // Store Razorpay order ID in the order document
+    await savedOrder.save();
+
+    // Return Razorpay order details to frontend
+    res.json({
+      success: true,
+      orderId: razorpayOrder.id,
+      amount: finalAmount,
+      currency: 'INR',
+      razorpayKey: process.env.RAZORPAY_ID_KEY
+    });
+
+  } catch (error) {
+    console.error("Error placing Razorpay order:", error);
+    res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
+  }
+};
+
 
 const loadReview = async(req, res) => {
   try {
@@ -821,6 +912,7 @@ module.exports = {
   loadCheckout,
   updateDefaultAddress,
   codPlaceOrder,
+  razorpayPlaceOrder,
   codOrderSuccess,
   loadReview,
   postReview,

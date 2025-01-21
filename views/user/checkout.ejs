@@ -873,6 +873,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 
 <script>
     document
@@ -1405,73 +1407,67 @@ removeCouponBtn.addEventListener('click', () => {
 
 
 document.getElementById('usePaymentMethodBtn').addEventListener('click', function () {
-  // Show the loading overlay
-  document.getElementById('loadingOverlay').classList.remove('d-none');
-  document.getElementById('usePaymentMethodBtn').disabled = true; // Disable the button to prevent multiple clicks
-
   const orderedItems = <%- JSON.stringify(cartItemsData) %>;
-  let totalPrice = <%= totalPrice %>; // Get total price from server
-  const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '')) || 0; // Get the discount amount
+  const totalPrice = <%= totalPrice %>; // Get total price from server
+  const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '')) || 0;
   const finalAmount = totalPrice - discount; // Adjust final amount after coupon discount
   const address = "<%= defaultAddress._id %>";
   const status = "Pending";
-  const couponApplied = discount > 0; // Determine if a coupon was applied based on the discount
+  const couponApplied = discount > 0;
 
   const orderData = {
     ordereditems: orderedItems,
     totalprice: totalPrice,
-    finalAmount: finalAmount,  // Final amount after coupon discount
+    finalAmount: finalAmount,
     address: address,
-    discount: discount,  // Amount saved from coupon
+    discount: discount,
     status: status,
-    couponApplied: couponApplied  // If coupon was applied
+    couponApplied: couponApplied
   };
 
-  fetch('/checkout/place-order', {
+  const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+  // Select appropriate route based on payment method
+  const url = paymentMethod === 'razorpay' ? '/checkout/razorpay-place-order' : '/checkout/place-order';
+
+  fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(orderData),
   })
-    .then(response => {
-      if (response.redirected) {
-        window.location.href = response.url;
-      } else {
-        return response.json();
-      }
-    })
+    .then(response => response.json())
     .then(data => {
-      console.log('Response Data:', data);
-
-      // Hide the loading overlay after the response is received
-      document.getElementById('loadingOverlay').classList.add('d-none');
-      document.getElementById('usePaymentMethodBtn').disabled = false; // Enable the button again
-
       if (data.success) {
-        console.log('Order placed successfully:', data);
-        Swal.fire({
-          title: 'Order Placed!',
-          text: 'Your order has been placed successfully.',
-          icon: 'success',
-          confirmButtonText: 'OK'
-        }).then(() => {
+        if (paymentMethod === 'razorpay') {
+          var options = {
+            key: data.razorpayKey,
+            amount: data.amount * 100, 
+            currency: data.currency,
+            order_id: data.orderId,
+            handler: function (response) {
+              console.log('Payment Successful:', response);
+              Swal.fire({
+                title: 'Payment Successful',
+                text: 'Your payment has been successfully completed.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+              }).then(() => {
+                window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
+              });
+            }
+          };
+          var rzp1 = new Razorpay(options);
+          rzp1.open();
+        } else {
+          // For COD, redirect directly after order creation
           window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
-        });
-      } else {
-        Swal.fire({
-          title: 'Error!',
-          text: 'There was an error placing your order. Please try again later.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
+        }
       }
     })
     .catch(error => {
-      // Hide the loading overlay and enable the button in case of an error
-      document.getElementById('loadingOverlay').classList.add('d-none');
-      document.getElementById('usePaymentMethodBtn').disabled = false;
-
+      console.error('Error:', error);
       Swal.fire({
         title: 'Error!',
         text: 'An unexpected error occurred. Please try again later.',

@@ -1,4 +1,5 @@
 const Category = require("../../models/categorySchema");
+const Product = require('../../models/productSchema');
 
 const categoryInfo = async (req, res) => {
   try {
@@ -154,6 +155,72 @@ const editCategory = async (req, res) => {
   }
 };
 
+const addCategoryOffer = async (req, res) => {
+  try {
+    const percentage = parseInt(req.body.percentage);
+    const categoryId = req.body.category;
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ success: false, message: 'Category not found' });
+    }
+
+    // Check if any product in the category already has a higher offer
+    const products = await Product.find({ category: category._id });
+    const hasProductOffer = products.some((product) => product.productOffer > percentage);
+    if (hasProductOffer) {
+      return res.status(400).json({ success: false, message: 'Category already has a product offer' });  // Change to 400
+    }
+
+    // Update category offer
+    category.categoryOffer = percentage;
+    await category.save();
+
+    // Update products with the new offer
+    for (const product of products) {
+      product.productOffer = percentage;
+      product.salePrice = product.regularPrice * (1 - percentage / 100);  // Apply discount
+      await product.save();
+    }
+
+    res.json({ success: true });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+const removeProductOffer = async (req, res) => {
+  try {
+    const categoryId = req.body.category;
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ success: false, message: 'Category not found' });
+    }
+
+    // Reset category offer
+    const percentage = category.categoryOffer;
+    category.categoryOffer = 0;
+    await category.save();
+
+    // Update products to remove the offer
+    const products = await Product.find({ category: category._id });
+    for (const product of products) {
+      product.salePrice = product.regularPrice;  // Reset to original price
+      product.productOffer = 0;
+      await product.save();
+    }
+
+    res.json({ success: true });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Failed to remove product offer" });
+  }
+};
+
+
 const deleteCategory = async (req, res) => {
   const { id } = req.params;
 
@@ -202,6 +269,8 @@ module.exports = {
   addCategory,
   loadEditCategory,
   editCategory,
+  addCategoryOffer,
+  removeProductOffer,
   deleteCategory,
   restoreCategory,
 };

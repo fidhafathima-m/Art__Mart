@@ -38,6 +38,8 @@
             <th>Description</th>
             <th>Added On</th>
             <th>Status</th>
+            <th>Offer %</th>
+            <th>Add/Remove Offer</th>
             <th>List / Unlist</th>
             <th>Action</th>
           </tr>
@@ -64,6 +66,32 @@
               </span>
               <% } %>
             </td>
+
+            <td>
+              <% if (category[i].categoryOffer) { %> <%= category[i].categoryOffer
+              %> <% } else { %> 0% <% } %>
+            </td>
+            <td>
+              <% if (category[i].categoryOffer === 0) { %>
+              <button
+                class="btn btn-info"
+                onclick="addOffer('<%= category[i]._id %>')"
+                style="width: 100px"
+              >
+                Add
+              </button>
+              <% } else { %>
+              <button
+                class="btn btn-danger"
+                onclick="removeOffer('<%= category[i]._id %>')"
+                style="width: 100px"
+              >
+                Remove
+              </button>
+
+              <% } %>
+            </td>
+
             <td>
               <% if (category[i].isListed) { %>
               <button
@@ -142,4 +170,192 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<script src="/js/custom.js"></script>
+
+
+<script>
+
+function toggleListing(id, isListed) {
+  const url = isListed ? "/admin/unlistCategory" : "/admin/listCategory";
+
+  $.ajax({
+    type: "GET",
+    url: url,
+    data: { id: id },
+    success: function (response) {
+      if (response.success) {
+        Swal.fire({
+          icon: "success",
+          title: isListed ? "Category Listed" : "Category Unlisted",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          location.reload();
+        });
+      }
+    },
+    error: function () {
+      Swal.fire({
+        icon: "error",
+        title: "Request Failed",
+        text: "There was an issue connecting to the server. Please try again.",
+      });
+    },
+  });
+}
+
+function deleteCategory(categoryId) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This category will be soft deleted.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "PATCH",
+        url: `/admin/delete-category/${categoryId}`,
+        success: function (response) {
+          if (response.message === "Category soft deleted successfully") {
+            Swal.fire({
+              icon: "success",
+              title: "Category deleted!",
+              text: "The Category has been soft deleted.",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              location.reload();
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error deleting the category.",
+          });
+        },
+      });
+    }
+  });
+}
+
+function restoreCategory(categoryId) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This category will be restored.",
+    icon: "info",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, restore it!",
+    cancelButtonText: "Cancel",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        type: "PATCH",
+        url: `/admin/restore-category/${categoryId}`,
+        success: function (response) {
+          if (response.message === "Category restored successfully") {
+            Swal.fire({
+              icon: "success",
+              title: "Category Restored!",
+              text: "The category has been successfully restored.",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              location.reload();
+            });
+          }
+        },
+        error: function () {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an error restoring the cartegory.",
+          });
+        },
+      });
+    }
+  });
+}
+
+
+async function addOffer(categoryId) {
+  const { value: amount } = await Swal.fire({
+    title: "Offer in percentage",
+    input: "number",
+    inputLabel: "Enter Offer Percentage",
+    inputPlaceholder: "%",
+  });
+
+  if (amount) {
+    $.ajax({
+      url: "/admin/addCategoryOffer",
+      method: "POST",
+      data: {
+        percentage: amount,
+        category: categoryId,  // Ensure categoryId is passed correctly
+      },
+      success: (response) => {
+        if (response.success) {
+          Swal.fire("Offer Added", "The offer has been added", "success").then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire("Failed", response.message || "An error occurred", "error");
+        }
+      },
+      error: (xhr, status, error) => {
+        // Handle error response
+        const errorMessage = xhr.responseJSON?.message || "An error occurred";
+        Swal.fire("Failed", errorMessage, "error");
+      }
+    });
+  }
+}
+
+
+
+function removeOffer(categoryId) {
+  try {
+    Swal.fire({
+      title: "Remove offer",
+      text: "Are you sure to remove this offer?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, remove it!",
+      timer: 5000,
+      timerProgressBar: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "/admin/removeCategoryOffer",
+          method: "POST",
+          data: {
+            category: categoryId,  // Ensure categoryId is passed correctly
+          },
+          success: (response) => {
+            if (response.success) {
+              Swal.fire("Offer Removed", "The offer has been removed", "success").then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire("Failed", response.message || "An error occurred", "error");
+            }
+          },
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    Swal.fire("Error", "Something went wrong", "error");
+  }
+}
+
+</script>

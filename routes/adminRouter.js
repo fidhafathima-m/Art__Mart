@@ -81,6 +81,17 @@ router.post("/edit-category/:id", categoryController.editCategory);
 router.patch("/delete-category/:id", categoryController.deleteCategory);
 router.patch("/restore-category/:id", categoryController.restoreCategory);
 
+router.post(
+  "/addCategoryOffer",
+  adminAuth.isLogin,
+  categoryController.addCategoryOffer
+);
+router.post(
+  "/removeCategoryOffer",
+  adminAuth.isLogin,
+  categoryController.removeProductOffer
+);
+
 //Product Management
 // Set storage options
 const storage = multer.diskStorage({

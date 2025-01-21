@@ -108,6 +108,7 @@ router.delete('/deleteFromWishlist', productController.deleteFromWishlist);
 router.get('/checkout', productController.loadCheckout);
 router.post('/update-default-address', productController.updateDefaultAddress);
 router.post('/checkout/place-order', productController.codPlaceOrder);
+router.post('/checkout/razorpay-place-order', productController.razorpayPlaceOrder);
 router.get('/checkout/orderSuccess', productController.codOrderSuccess);
 
 //review
