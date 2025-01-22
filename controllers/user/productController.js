@@ -489,7 +489,7 @@ const codPlaceOrder = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Order placed successfully!",
-      orderId: savedOrder._id,
+      orderId: savedOrder.orderId,
     });
 
   } catch (error) {
@@ -502,6 +502,8 @@ const codPlaceOrder = async (req, res) => {
 const codOrderSuccess = async (req, res) => {
   try { 
     const { orderId } = req.query;
+
+    console.log('orderId', orderId);
 
     const user = req.session.user;
     const cart = await Cart.findOne({ userId: user });

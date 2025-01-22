@@ -1,25 +1,25 @@
 <head>
   <style>
     #loadingOverlay {
-  position: fixed; /* Cover the whole screen */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Dull the background with a semi-transparent black */
-  display: flex; /* Use flexbox to center the spinner */
-  justify-content: center;
-  align-items: center;
-  z-index: 9999; /* Ensure it's on top of other content */
-}
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999; /* Make sure it's on top of everything */
+    }
 
-#loadingSpinner {
-  color: white;
-}
+    #loadingSpinner {
+      color: white;
+    }
 
-.d-none {
-  display: none; /* Hide the overlay by default */
-}
+    .d-none {
+      display: none;
+    }
 
   </style>
 </head>
@@ -857,15 +857,15 @@
           <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">Place Order</button>
 
 
-          <!-- Fullscreen Overlay with Loading Spinner (hidden by default) -->
-        <div id="loadingOverlay" class="d-none">
-          <div id="loadingSpinner" class="text-center">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">Loading...</span>
+           <!-- Loading Overlay -->
+          <div id="loadingOverlay" class="d-none">
+            <div id="loadingSpinner" class="text-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="text-white">Processing your request...</p>
             </div>
-            <p class="text-white">Placing your order, please wait...</p>
           </div>
-        </div>
 
       </div>
   </div>
@@ -1407,6 +1407,10 @@ removeCouponBtn.addEventListener('click', () => {
 
 
 document.getElementById('usePaymentMethodBtn').addEventListener('click', function () {
+
+  document.getElementById('loadingOverlay').classList.remove('d-none');
+    this.disabled = true; // Disable the button to prevent multiple clicks
+
   const orderedItems = <%- JSON.stringify(cartItemsData) %>;
   const totalPrice = <%= totalPrice %>; // Get total price from server
   const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '')) || 0;
@@ -1439,6 +1443,9 @@ document.getElementById('usePaymentMethodBtn').addEventListener('click', functio
   })
     .then(response => response.json())
     .then(data => {
+      document.getElementById('loadingOverlay').classList.add('d-none');
+        this.disabled = false; // Re-enable the button
+
       if (data.success) {
         if (paymentMethod === 'razorpay') {
           var options = {
@@ -1468,6 +1475,8 @@ document.getElementById('usePaymentMethodBtn').addEventListener('click', functio
     })
     .catch(error => {
       console.error('Error:', error);
+      document.getElementById('loadingOverlay').classList.add('d-none');
+        this.disabled = false; // Re-enable the button
       Swal.fire({
         title: 'Error!',
         text: 'An unexpected error occurred. Please try again later.',

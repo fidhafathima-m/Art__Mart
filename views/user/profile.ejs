@@ -134,6 +134,9 @@
                   >
                   <% }) %>
                 </p>
+                <% if(order.status === 'Cancelled') { %>
+                  <p class="text-danger">This order was cancelled!</p>
+                  <% } %>
               </div>
  
               <div class="col-12 text-end">

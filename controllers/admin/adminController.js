@@ -4,6 +4,8 @@ const Category = require("../../models/categorySchema");
 const Order = require("../../models/orderSchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const { generatePDFReport, generateExcelReport } = require('../../helpers/generateReports');
+
 
 const pageError = (req, res) => {
   res.render("admin-error");
@@ -233,10 +235,97 @@ const logout = async (req, res) => {
   }
 };
 
+
+
+// Route to get report data (top and least purchased products)
+const salesReport = async (req, res) => {
+    try {
+        // Fetch top purchased products
+        const topProducts = await Order.aggregate([
+            { $unwind: "$ordereditems" },
+            { $group: { _id: "$ordereditems.product", totalQuantity: { $sum: "$ordereditems.quantity" } } },
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 3 },
+            { $lookup: { from: "products", localField: "_id", foreignField: "_id", as: "productDetails" } }
+        ]);
+
+        // Fetch least purchased products
+        const leastProducts = await Order.aggregate([
+            { $unwind: "$ordereditems" },
+            { $group: { _id: "$ordereditems.product", totalQuantity: { $sum: "$ordereditems.quantity" } } },
+            { $sort: { totalQuantity: 1 } },
+            { $limit: 3 },
+            { $lookup: { from: "products", localField: "_id", foreignField: "_id", as: "productDetails" } }
+        ]);
+
+        // Send the data to the frontend
+        res.render('reports', { topProducts, leastProducts });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+        console.log('error', error)
+    }
+};
+
+const salesStatistics = async (req, res) => {
+  const { filterType, specificDate, startDate, endDate } = req.body;
+
+  let matchCriteria = {};
+  if (filterType === 'custom') {
+      matchCriteria.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
+  } else if (filterType === 'daily') {
+    matchCriteria.createdOn = { $gte: new Date(new Date().setHours(0, 0, 0, 0)), $lte: new Date() };
+  } else if (filterType === 'weekly') {
+      matchCriteria.createdOn = { $gte: new Date(new Date().setDate(new Date().getDate() - 7)), $lte: new Date() };
+  } else if (filterType === 'monthly') {
+      matchCriteria.createdOn = { $gte: new Date(new Date().setDate(new Date().getDate() - 30)), $lte: new Date() };
+  }
+
+  try {
+      const salesData = await Order.find(matchCriteria);
+      const overallSalesCount = salesData.length;
+      const overallOrderAmount = salesData.reduce((acc, order) => acc + order.finalAmount, 0);
+      const overallDiscount = salesData.reduce((acc, order) => acc + order.discount, 0);
+
+      res.json({ overallSalesCount, overallOrderAmount, overallDiscount });
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+      console.log('error', error);
+  }
+};
+
+
+const exportSalesReport = async (req, res) => {
+  const { format, filterType, startDate, endDate, specificDate } = req.query;
+
+  // Assume discounts and coupons are always included by default
+  const showDiscounts = true;
+
+  // Logic to generate the report based on the format
+  if (format === 'pdf') {
+      const pdfBuffer = await generatePDFReport(filterType, specificDate, startDate, endDate, showDiscounts);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
+      res.send(pdfBuffer);
+  } else if (format === 'excel') {
+      const excelBuffer = await generateExcelReport(filterType, specificDate, startDate, endDate, showDiscounts);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=sales_report.xlsx');
+      res.send(excelBuffer);
+  } else {
+      res.status(400).json({ message: 'Invalid format' });
+  }
+};
+
+
+
+
 module.exports = {
   loadLogin,
   login,
   loadDashboard,
+  salesReport,
+  salesStatistics,
+  exportSalesReport,
   pageError,
   logout,
 };

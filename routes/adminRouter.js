@@ -180,4 +180,9 @@ router.get('/orders/details/:orderId', adminAuth.isLogin, orderController.viewOr
 router.post('/updateOrderStatus', adminAuth.isLogin, orderController.updateOrderStatus);
 router.post('/sendMoneyToWallet',adminAuth.isLogin, orderController.sendMoneyToWallet);
 
+// sales reports
+router.get('/reports', adminAuth.isLogin, adminController.salesReport);
+router.post('/reports/sales', adminAuth.isLogin, adminController.salesStatistics);
+router.get('/reports/export', adminAuth.isLogin, adminController.exportSalesReport);
+
 module.exports = router;
