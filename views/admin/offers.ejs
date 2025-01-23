@@ -1,0 +1,366 @@
+<%- include('../../views/partials/admin/header') %>
+
+<!-- Include SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container mt-4">
+    <h1 class="mb-4">Offer Management</h1>
+
+    <div class="row g-4">
+      <!-- Product Offer Card -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="h5">Product Offer</h2>
+          </div>
+          <div class="card-body">
+            <!-- Add Product Offer Form -->
+                <form id="productOfferForm" class="form-group">
+                    <div class="mb-3">
+                        <label for="productIdAdd" class="form-label">Product:</label>
+                        <input type="text" id="productIdAdd" name="productId" class="form-control" placeholder="Search for a Product" required>
+                        <input type="hidden" id="productIdHidden" name="productId" value=""> <!-- Hidden input for product ID -->
+                        <div id="productDropdown" class="dropdown-list" style="display: none;">
+                            <% products.forEach(function(product) { %>
+                                <div class="dropdown-item" data-id="<%= product._id %>"><%= product.productName %></div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="percentageAdd" class="form-label">Discount Percentage:</label>
+                        <input type="number" id="percentageAdd" name="percentage" class="form-control" required min="1" max="100">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Product Offer</button>
+                </form>
+
+                <!-- Remove Product Offer Form -->
+                <form id="removeProductOfferForm" class="form-group mt-3">
+                    <div class="mb-3">
+                        <label for="productIdRemove" class="form-label">Product:</label>
+                        <input type="text" id="productIdRemove" name="productId" class="form-control" placeholder="Search for a Product" required>
+                        <input type="hidden" id="productIdHidden" name="productId" value=""> <!-- Hidden input for product ID -->
+                        <div id="productDropdownRemove" class="dropdown-list" style="display: none;">
+                            <% products.forEach(function(product) { %>
+                                <div class="dropdown-item" data-id="<%= product._id %>"><%= product.productName %></div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Remove Product Offer</button>
+                </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Offer Card -->
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="h5">Category Offer</h2>
+          </div>
+          <div class="card-body">
+            <!-- Add Category Offer Form -->
+            <form id="categoryOfferForm" class="form-group">
+                <div class="mb-3">
+                    <label for="categoryIdAdd" class="form-label">Category:</label>
+                    <input type="text" id="categoryIdAdd" name="categoryId" class="form-control" placeholder="Search for a Category" required>
+                    <input type="hidden" id="categoryIdHidden" name="categoryId" value=""> <!-- Hidden input for product ID -->
+                    <div id="categoryDropdownAdd" class="dropdown-list" style="display: none;">
+                      <% categories.forEach(function(category) { %>
+                        <div class="dropdown-item" data-id="<%= category._id %>"><%= category.name %></div>
+                      <% }) %>
+                    </div>
+                  </div>
+              <div class="mb-3">
+                <label for="percentage" class="form-label">Discount Percentage:</label>
+                <input type="number" id="percentage" name="percentage" class="form-control" required min="1" max="100">
+              </div>
+              <button type="submit" class="btn btn-primary">Add Category Offer</button>
+            </form>
+
+            <!-- Remove Category Offer Form -->
+            <form id="removeCategoryOfferForm" class="form-group mt-3">
+                <div class="mb-3">
+                    <label for="categoryIdRemove" class="form-label">Category:</label>
+                    <input type="text" id="categoryIdRemove" name="categoryId" class="form-control" placeholder="Search for a Category" required>
+                    <input type="hidden" id="categoryIdHidden" name="categoryId" value=""> <!-- Hidden input for product ID -->
+                    <div id="categoryDropdownRemove" class="dropdown-list" style="display: none;">
+                      <% categories.forEach(function(category) { %>
+                        <div class="dropdown-item" data-id="<%= category._id %>"><%= category.name %></div>
+                      <% }) %>
+                    </div>
+                  </div>
+              <button type="submit" class="btn btn-danger">Remove Category Offer</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productIdAdd = document.getElementById('productIdAdd');
+    const productDropdownAdd = document.getElementById('productDropdown');
+
+    const productIdRemove = document.getElementById('productIdRemove');
+    const productDropdownRemove = document.getElementById('productDropdownRemove');
+
+    const categoryIdAdd = document.getElementById('categoryIdAdd');
+    const categoryDropdownAdd = document.getElementById('categoryDropdownAdd');
+
+    const categoryIdRemove = document.getElementById('categoryIdRemove');
+    const categoryDropdownRemove = document.getElementById('categoryDropdownRemove');
+
+    // Show dropdown on input focus
+    productIdAdd.addEventListener('focus', function() {
+        productDropdownAdd.style.display = 'block';
+    });
+
+    productIdRemove.addEventListener('focus', function() {
+        productDropdownRemove.style.display = 'block';
+    });
+
+    categoryIdAdd.addEventListener('focus', function() {
+        categoryDropdownAdd.style.display = 'block';
+    });
+
+    categoryIdRemove.addEventListener('focus', function() {
+        categoryDropdownRemove.style.display = 'block';
+    });
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!productIdAdd.contains(event.target) && !productDropdownAdd.contains(event.target)) {
+            productDropdownAdd.style.display = 'none';
+        }
+        if (!productIdRemove.contains(event.target) && !productDropdownRemove.contains(event.target)) {
+            productDropdownRemove.style.display = 'none';
+        }
+        if (!categoryIdAdd.contains(event.target) && !categoryDropdownAdd.contains(event.target)) {
+            categoryDropdownAdd.style.display = 'none';
+        }
+        if (!categoryIdRemove.contains(event.target) && !categoryDropdownRemove.contains(event.target)) {
+            categoryDropdownRemove.style.display = 'none';
+        }
+    });
+
+        // Select product from dropdown for Add
+    // Select product from dropdown for Add
+productDropdownAdd.addEventListener('click', function(event) {
+    if (event.target.classList.contains('dropdown-item')) {
+        productIdAdd.value = event.target.textContent; // Set the product name
+        const productId = event.target.getAttribute('data-id'); // Get the product ID
+        document.getElementById('productIdHidden').value = productId; // Set the hidden input value with productId
+        productDropdownAdd.style.display = 'none';
+    }
+});
+
+    // Select product from dropdown for Remove
+    productDropdownRemove.addEventListener('click', function(event) {
+        if (event.target.classList.contains('dropdown-item')) {
+            productIdRemove.value = event.target.textContent;
+            const productId = event.target.getAttribute('data-id'); // Get the product ID
+            document.getElementById('productIdHidden').value = productId;
+            productDropdownRemove.style.display = 'none';
+        }
+    });
+
+    // Select category from dropdown
+    categoryDropdownAdd.addEventListener('click', function(event) {
+        if (event.target.classList.contains('dropdown-item')) {
+            categoryIdAdd.value = event.target.textContent;
+            const categoryId= event.target.getAttribute('data-id'); // Get the product ID
+            document.getElementById('categoryIdHidden').value = categoryId;
+            categoryDropdownAdd.style.display = 'none';
+        }
+    });
+    categoryDropdownRemove.addEventListener('click', function(event) {
+        if (event.target.classList.contains('dropdown-item')) {
+            categoryIdRemove.value = event.target.textContent;
+            const categoryId= event.target.getAttribute('data-id'); // Get the product ID
+            document.getElementById('categoryIdHidden').value = categoryId;
+            categoryDropdownRemove.style.display = 'none';
+        }
+    });
+});
+
+document.getElementById('productOfferForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const productId = document.getElementById('productIdHidden').value; 
+    const percentage = document.getElementById('percentageAdd').value;
+
+    const jsonData = {
+        productId: productId,
+        percentage: percentage
+    };
+
+    fetch('/admin/offers/addProductOffer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        Swal.fire({
+            title: data.message,
+            icon: data.success ? 'success' : 'error',
+            confirmButtonText: "Ok"
+        }).then(() => {
+            location.reload();
+        });
+    })
+    .catch(error => {
+        console.log(error);
+        Swal.fire({
+            title: 'An error occurred',
+            icon: 'error',
+            confirmButtonText: "Ok"
+        });
+    });
+});
+
+
+// Handle Remove Product Offer form submission with AJAX
+document.getElementById('removeProductOfferForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const productId = document.getElementById('productIdHidden').value; 
+
+    console.log('productId: ', productId);
+
+    const jsonData = {
+        productId: productId,
+    };
+
+    fetch('/admin/offers/removeProductOffer', {
+      method: 'POST',
+      headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      Swal.fire({
+        title: data.message,
+        icon: data.success ? 'success' : 'error',
+        confirmButtonText: "Ok"
+      });
+    })
+    .catch(error => {
+      console.log(error);
+      Swal.fire({
+        title: 'An error occurred',
+        icon: 'error',
+        confirmButtonText: "Ok"
+      });
+    });
+});
+
+// Handle Category Offer form submission with AJAX
+document.getElementById('categoryOfferForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const categoryId= document.getElementById('categoryIdHidden').value; 
+    const percentage = document.getElementById('percentage').value;
+
+    console.log('categoryid: ', categoryId);
+
+    const jsonData = {
+        categoryId: categoryId,
+        percentage: percentage
+    };
+
+    fetch('/admin/offers/addCategoryOffer', {
+      method: 'POST',
+      headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      Swal.fire({
+        title: data.message,
+        icon: data.success ? 'success' : 'error',
+        confirmButtonText: "Ok"
+      }).then(() => {
+            location.reload();
+        });
+    })
+    .catch(error => {
+      console.log(error);
+      Swal.fire({
+        title: 'An error occurred',
+        icon: 'error',
+        confirmButtonText: "Ok"
+      });
+    });
+});
+
+// Handle Remove Category Offer form submission with AJAX
+document.getElementById('removeCategoryOfferForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const categoryId= document.getElementById('categoryIdHidden').value; 
+
+    const jsonData = {
+        categoryId: categoryId,
+    };
+
+    fetch('/admin/offers/removeCategoryOffer', {
+      method: 'POST',
+      headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(jsonData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      Swal.fire({
+        title: data.message,
+        icon: data.success ? 'success' : 'error',
+        confirmButtonText: "Ok"
+      });
+    })
+    .catch(error => {
+      console.log(error);
+      Swal.fire({
+        title: 'An error occurred',
+        icon: 'error',
+        confirmButtonText: "Ok"
+      });
+    });
+});
+
+</script>
+
+<style>
+    .dropdown-list {
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  background-color: white;
+  z-index: 1000;
+  width: 100%;
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+</style>

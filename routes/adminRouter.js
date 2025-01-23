@@ -10,6 +10,7 @@ const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
 const couponController = require("../controllers/admin/couponController");
 const orderController = require('../controllers/admin/orderController');
+const offerController = require('../controllers/admin/offerController');
 
 router.get("/pageError", adminController.pageError);
 router.get("/login", adminAuth.isLogout, adminController.loadLogin);
@@ -89,7 +90,7 @@ router.post(
 router.post(
   "/removeCategoryOffer",
   adminAuth.isLogin,
-  categoryController.removeProductOffer
+  categoryController.removeCategoryOffer
 );
 
 //Product Management
@@ -184,5 +185,13 @@ router.post('/sendMoneyToWallet',adminAuth.isLogin, orderController.sendMoneyToW
 router.get('/reports', adminAuth.isLogin, adminController.salesReport);
 router.post('/reports/sales', adminAuth.isLogin, adminController.salesStatistics);
 router.get('/reports/export', adminAuth.isLogin, adminController.exportSalesReport);
+
+// offer management
+router.get('/offers', adminAuth.isLogin, offerController.loadOffer);
+router.post("/offers/addProductOffer",offerController.addProductsOffer);
+router.post("/offers/removeProductOffer",offerController.removeProductsOffer);
+router.post("/offers/addCategoryOffer",offerController.addCategoryOffer);
+router.post("/offers/removeCategoryOffer",offerController.removeCategoryOffer);
+
 
 module.exports = router;

@@ -58,7 +58,7 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
         content: [
             {
                 image: 'public/img/logo.png',
-                width: 80
+                width: 100
             },
             {
                 text: 'Sales Report',

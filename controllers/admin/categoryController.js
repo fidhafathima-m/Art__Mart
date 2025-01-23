@@ -191,7 +191,7 @@ const addCategoryOffer = async (req, res) => {
 };
 
 
-const removeProductOffer = async (req, res) => {
+const removeCategoryOffer = async (req, res) => {
   try {
     const categoryId = req.body.category;
     const category = await Category.findById(categoryId);
@@ -270,7 +270,7 @@ module.exports = {
   loadEditCategory,
   editCategory,
   addCategoryOffer,
-  removeProductOffer,
+  removeCategoryOffer,
   deleteCategory,
   restoreCategory,
 };
