@@ -189,8 +189,10 @@ router.get('/reports/export', adminAuth.isLogin, adminController.exportSalesRepo
 // offer management
 router.get('/offers', adminAuth.isLogin, offerController.loadOffer);
 router.post("/offers/addProductOffer",offerController.addProductsOffer);
+router.get('/offers/getProductOffer/:productId', offerController.getProductOffer);
 router.post("/offers/removeProductOffer",offerController.removeProductsOffer);
 router.post("/offers/addCategoryOffer",offerController.addCategoryOffer);
+router.get('/offers/getCategoryOffer/:categoryId', offerController.getCategoryOffer);
 router.post("/offers/removeCategoryOffer",offerController.removeCategoryOffer);
 
 

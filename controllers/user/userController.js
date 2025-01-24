@@ -126,17 +126,20 @@ const loadSignUp = async (req, res) => {
 
 const signUp = async (req, res) => {
   try {
-    const { name, phone, email, password, confirm_password } = req.body;
+    const { name, phone, email, password, confirm_password, referralCode } = req.body;
 
+    // Check if passwords match
     if (password !== confirm_password) {
       return res.render("signup", { message: "Passwords do not match" });
     }
 
-    const findUser = await User.findOne({ email });
-    if (findUser) {
-      return res.render("signup", { message: "User with this email exists" });
+    // Check if the user already exists
+    const existingUser  = await User.findOne({ email });
+    if (existingUser ) {
+      return res.render("signup", { message: "User  with this email already exists." });
     }
 
+    // Generate OTP
     const otp = generateOtp();
     const sendOtp = sendVeificationMail(email, otp);
 
@@ -144,11 +147,18 @@ const signUp = async (req, res) => {
       return res.json("email-error");
     }
 
+    // Store user data and OTP in session
+    req.session.userData = {
+      name,
+      phone,
+      email,
+      password, // Store the plain password temporarily (hash it later)
+      referralCode: referralCode ? referralCode : null, // Store the referral code if provided
+    };
     req.session.userOtp = otp;
-    req.session.userData = { name, phone, email, password };
 
+    // Render OTP verification page
     res.render("verify-otp");
-    // console.log("OTP sent", otp);
   } catch (error) {
     console.error("Error during signup", error);
     res.status(500).send("Internal Server Error: Failed to complete signup.");
@@ -158,36 +168,112 @@ const signUp = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
-    // console.log("Received OTP:", otp);
-    // console.log("Stored OTP in session:", req.session.userOtp);
 
     if (otp === req.session.userOtp) {
       const user = req.session.userData;
       const passwordHashed = await securePassword(user.password);
 
-      const saveUser = new User({
+      // Create a new user
+      const saveUser  = new User({
         name: user.name,
         email: user.email,
         phone: user.phone,
         password: passwordHashed,
+        referralCode: generateRandomReferralCode(user.name), // Generate a random referral code
       });
 
-      await saveUser.save();
-      req.session.user = saveUser._id;
+      await saveUser .save(); // Save the user to the database
+
+      // Create a new wallet for the user
+      const newWallet = new Wallet({ userId: saveUser ._id, balance: 0 });
+      await newWallet.save();
+
+      // Assign the wallet to the user
+      saveUser .wallet = newWallet._id;
+      await saveUser .save();
+
+      // Check if the referral code exists
+      if (user.referralCode) {
+        const referrer = await User.findOne({ referralCode: user.referralCode });
+        if (referrer) {
+          // Credit the new user with ₹100
+          newWallet.balance += 100;
+          await newWallet.save();
+
+          // Create a transaction for the new user
+          const newTransaction = new Transaction({
+            userId: saveUser ._id,
+            type: 'Referral code - Credit',
+            amount: 100,
+            balance: newWallet.balance,
+          });
+          await newTransaction.save();
+
+          // Credit the referrer with ₹200
+          const referrerWallet = await Wallet.findOne({ userId: referrer._id });
+          if (referrerWallet) {
+            referrerWallet.balance += 200;
+            await referrerWallet.save();
+
+            // Create a transaction for the referrer
+            const referrerTransaction = new Transaction({
+              userId: referrer._id,
+              type: 'Refferal Reward - Credit',
+              amount: 200,
+              balance: referrerWallet.balance,
+            });
+            await referrerTransaction.save();
+          }
+        }
+      }
+
+      req.session.user = saveUser ._id; // Store user ID in session
       res.json({ success: true, redirectUrl: "/" });
     } else {
-      res
-        .status(400)
-        .json({ success: false, message: "Invalid OTP, Please try again." });
+      res.status(400).json({ success: false, message: "Invalid OTP, Please try again." });
     }
   } catch (error) {
     console.error("Error verifying OTP", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error: Unable to verify OTP.",
-      });
+    res.status(500).json({ success: false, message: "Internal Server Error: Unable to verify OTP." });
+  }
+};
+
+function generateRandomReferralCode(name) {
+  // Remove spaces and convert to uppercase
+  const namePart = name.replace(/\s+/g, '').toUpperCase().substring(0, 3); // Take the first 3 letters of the name
+  const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase(); // Generate a random 6-character alphanumeric string
+  return `${namePart}-${randomPart}`; // Combine name part and random part
+}
+
+const veryreferralCode = async (req, res) => {
+  const { referralCode } = req.body;
+  console.log('body: ', referralCode);
+
+  try {
+    const user = await User.findOne({ referralCode });
+    console.log('user: ', user);
+    
+    // Initialize userData if it doesn't exist
+    if (!req.session.userData) {
+      req.session.userData = {};
+    }
+
+    if (user) {
+      // Check if the referral code has already been used
+      if (req.session.userData.redeemed) {
+        return res.json({ success: false, message: "Referral code has already been used." });
+      }
+
+      // Mark the referral code as used
+      req.session.userData.redeemed = true;
+
+      return res.json({ success: true });
+    } else {
+      return res.json({ success: false, message: "Referral code does not exist." });
+    }
+  } catch (error) {
+    console.error("Error verifying referral code:", error);
+    return res.status(500).json({ success: false, message: "Internal Server Error." });
   }
 };
 
@@ -1080,6 +1166,7 @@ module.exports = {
   pageNotFound,
   loadSignUp,
   signUp,
+  veryreferralCode,
   verifyOtp,
   resendOtp,
   loadLogin,

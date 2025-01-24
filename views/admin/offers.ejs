@@ -28,6 +28,9 @@
                                 <div class="dropdown-item" data-id="<%= product._id %>"><%= product.productName %></div>
                             <% }) %>
                         </div>
+                        <div id="existingOffer" class="mt-2 text-muted" style="display: none;">
+                          Existing Offer: <span id="existingOfferValue">0%</span>
+                      </div>
                     </div>
                     <div class="mb-3">
                         <label for="percentageAdd" class="form-label">Discount Percentage:</label>
@@ -47,6 +50,9 @@
                                 <div class="dropdown-item" data-id="<%= product._id %>"><%= product.productName %></div>
                             <% }) %>
                         </div>
+                        <div id="existingOfferRemove" class="mt-2 text-muted" style="display: none;">
+                          Existing Offer: <span id="existingOfferValueRemove">0%</span>
+                      </div>
                     </div>
                     <button type="submit" class="btn btn-danger">Remove Product Offer</button>
                 </form>
@@ -72,6 +78,9 @@
                         <div class="dropdown-item" data-id="<%= category._id %>"><%= category.name %></div>
                       <% }) %>
                     </div>
+                    <div id="existingCategoryOffer" class="mt-2 text-muted" style="display: none;">
+                      Existing Offer: <span id="existingCategoryOfferValue">0%</span>
+                  </div>
                   </div>
               <div class="mb-3">
                 <label for="percentage" class="form-label">Discount Percentage:</label>
@@ -91,6 +100,9 @@
                         <div class="dropdown-item" data-id="<%= category._id %>"><%= category.name %></div>
                       <% }) %>
                     </div>
+                    <div id="existingCategoryOfferRemove" class="mt-2 text-muted" style="display: none;">
+                      Existing Offer: <span id="existingCategoryOfferValueRemove">0%</span>
+                  </div>
                   </div>
               <button type="submit" class="btn btn-danger">Remove Category Offer</button>
             </form>
@@ -150,13 +162,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-        // Select product from dropdown for Add
-    // Select product from dropdown for Add
 productDropdownAdd.addEventListener('click', function(event) {
     if (event.target.classList.contains('dropdown-item')) {
         productIdAdd.value = event.target.textContent; // Set the product name
         const productId = event.target.getAttribute('data-id'); // Get the product ID
         document.getElementById('productIdHidden').value = productId; // Set the hidden input value with productId
+        
+        // Fetch existing offer for the selected product
+        fetch(`/admin/offers/getProductOffer/${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('existingOfferValue').textContent = data.offer + '%';
+                    document.getElementById('existingOffer').style.display = 'block'; // Show existing offer
+                } else {
+                    document.getElementById('existingOfferValue').textContent = '0%';
+                    document.getElementById('existingOffer').style.display = 'none'; // Hide existing offer
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                document.getElementById('existingOfferValue').textContent = '0%';
+                document.getElementById('existingOffer').style.display = 'none'; // Hide existing offer
+            });
+
         productDropdownAdd.style.display = 'none';
     }
 });
@@ -167,6 +196,24 @@ productDropdownAdd.addEventListener('click', function(event) {
             productIdRemove.value = event.target.textContent;
             const productId = event.target.getAttribute('data-id'); // Get the product ID
             document.getElementById('productIdHidden').value = productId;
+
+            fetch(`/admin/offers/getProductOffer/${productId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('existingOfferValueRemove').textContent = data.offer + '%';
+                    document.getElementById('existingOfferRemove').style.display = 'block'; // Show existing offer
+                } else {
+                    document.getElementById('existingOfferValueRemove').textContent = '0%';
+                    document.getElementById('existingOfferRemove').style.display = 'none'; // Hide existing offer
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                document.getElementById('existingOfferValueRemove').textContent = '0%';
+                document.getElementById('existingOfferRemove').style.display = 'none'; // Hide existing offer
+            });
+
             productDropdownRemove.style.display = 'none';
         }
     });
@@ -177,6 +224,24 @@ productDropdownAdd.addEventListener('click', function(event) {
             categoryIdAdd.value = event.target.textContent;
             const categoryId= event.target.getAttribute('data-id'); // Get the product ID
             document.getElementById('categoryIdHidden').value = categoryId;
+
+            fetch(`/admin/offers/getCategoryOffer/${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('existingCategoryOfferValue').textContent = data.offer + '%';
+                    document.getElementById('existingCategoryOffer').style.display = 'block'; // Show existing offer
+                } else {
+                    document.getElementById('existingCategoryOfferValue').textContent = '0%';
+                    document.getElementById('existingCategoryOffer').style.display = 'none'; // Hide existing offer
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                document.getElementById('existingCategoryOfferValue').textContent = '0%';
+                document.getElementById('existingCategoryOffer').style.display = 'none'; // Hide existing offer
+            });
+
             categoryDropdownAdd.style.display = 'none';
         }
     });
@@ -185,6 +250,24 @@ productDropdownAdd.addEventListener('click', function(event) {
             categoryIdRemove.value = event.target.textContent;
             const categoryId= event.target.getAttribute('data-id'); // Get the product ID
             document.getElementById('categoryIdHidden').value = categoryId;
+
+            fetch(`/admin/offers/getCategoryOffer/${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('existingCategoryOfferValueRemove').textContent = data.offer + '%';
+                    document.getElementById('existingCategoryOfferRemove').style.display = 'block'; // Show existing offer
+                } else {
+                    document.getElementById('existingCategoryOfferValueRemove').textContent = '0%';
+                    document.getElementById('existingCategoryOfferRemove').style.display = 'none'; // Hide existing offer
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                document.getElementById('existingCategoryOfferValueRemove').textContent = '0%';
+                document.getElementById('existingCategoryOfferRemove').style.display = 'none'; // Hide existing offer
+            });
+
             categoryDropdownRemove.style.display = 'none';
         }
     });
@@ -254,7 +337,9 @@ document.getElementById('removeProductOfferForm').addEventListener('submit', fun
         title: data.message,
         icon: data.success ? 'success' : 'error',
         confirmButtonText: "Ok"
-      });
+      }).then(() => {
+            location.reload();
+        });
     })
     .catch(error => {
       console.log(error);
@@ -330,7 +415,9 @@ document.getElementById('removeCategoryOfferForm').addEventListener('submit', fu
         title: data.message,
         icon: data.success ? 'success' : 'error',
         confirmButtonText: "Ok"
-      });
+      }).then(() => {
+            location.reload();
+        });
     })
     .catch(error => {
       console.log(error);

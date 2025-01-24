@@ -58,11 +58,17 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  referalCode: {
+  wallet: {
+    type: Schema.Types.ObjectId,
+    ref: "Wallet",
+  },
+  referralCode: {
     type: String,
+    unique: true,
   },
   redeemed: {
     type: Boolean,
+    default: false,
   },
   redeemedUsers: {
     type: Schema.Types.ObjectId,

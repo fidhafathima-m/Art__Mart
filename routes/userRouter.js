@@ -12,6 +12,7 @@ router.get("/", userController.loadHomePage);
 //signup
 router.get("/signup", userAuth.isLogout, userController.loadSignUp);
 router.post("/signup", userController.signUp);
+router.post('/verify-referral-code', userController.veryreferralCode);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 // google signup routes

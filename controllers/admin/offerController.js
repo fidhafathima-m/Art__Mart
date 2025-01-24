@@ -73,6 +73,31 @@ const addCategoryOffer = async (req, res) => {
     }
 };
 
+const getCategoryOffer = async (req, res) => {
+    try {
+        const { categoryId } = req.params;
+        const category = await Category.findById(categoryId);
+        if (!category) {
+            return res.json({
+                success: false,
+                message: 'Category not found'
+            });
+        }
+
+        return res.json({
+            success: true,
+            offer: category.categoryOffer || 0 // Return the existing offer or 0 if none
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            success: false,
+            message: 'Failed to fetch category offer'
+        });
+    }
+};
+
+
 const removeCategoryOffer = async (req, res) => {
     try {
         const { categoryId } = req.body;
@@ -84,6 +109,13 @@ const removeCategoryOffer = async (req, res) => {
             });
         }
 
+        if(categoryDoc.categoryOffer === 0) {
+            return res.json({
+                success: false,
+                message: 'Category offer is already 0'
+            })
+        }
+
         // Reset category offer
         categoryDoc.categoryOffer = 0;
         await categoryDoc.save();
@@ -92,7 +124,7 @@ const removeCategoryOffer = async (req, res) => {
         const products = await Product.find({ category: categoryId });
         for (const product of products) {
             product.productOffer = 0;
-            product.salePrice = product.regularPrice;  // Reset sale price
+            product.salePrice = product.regularPrice;  
             await product.save();
         }
 
@@ -145,17 +177,46 @@ const addProductsOffer = async (req, res) => {
     }
 };
 
+const getProductOffer = async (req, res) => {
+    try {
+        const { productId } = req.params;
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+
+        return res.json({
+            success: true,
+            offer: product.productOffer || 0 // Return the existing offer or 0 if none
+        });
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            success: false,
+            message: 'Failed to fetch product offer'
+        });
+    }
+};
 
 
 const removeProductsOffer = async (req, res) => {
     try {
-        console.log('body: ', req.body);
         const { productId } = req.body;
         const findProduct = await Product.findOne({ _id: productId });
         if (!findProduct) {
             return res.json({
                 success: false,
                 message: 'Product not found'
+            });
+        }
+
+        if(findProduct.productOffer === 0) {
+            return res.json({
+                success: false,
+                message: 'Product offer is already 0'
             });
         }
 
@@ -183,7 +244,9 @@ const removeProductsOffer = async (req, res) => {
 module.exports = {
     loadOffer,
     addCategoryOffer,
+    getCategoryOffer,
     removeCategoryOffer,
     addProductsOffer,
+    getProductOffer,
     removeProductsOffer
 }
