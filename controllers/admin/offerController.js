@@ -1,5 +1,6 @@
 const Product = require('../../models/productSchema');
 const Category = require('../../models/categorySchema');
+const User = require('../../models/userSchema');
 
 
 const loadOffer = async(req, res) => {
@@ -238,7 +239,16 @@ const removeProductsOffer = async (req, res) => {
     }
 };
 
-
+const getReferredUsers = async (req, res) => {
+    try {
+        // Find all users who have been referred by others
+        const users = await User.find({ redeemed: true }).populate('redeemedUsers', 'name email'); // Populate the redeemedUsers field with user names
+        res.json({ success: true, users });
+    } catch (error) {
+        console.error("Error fetching referral users:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
 
 
 module.exports = {
@@ -248,5 +258,6 @@ module.exports = {
     removeCategoryOffer,
     addProductsOffer,
     getProductOffer,
-    removeProductsOffer
+    removeProductsOffer,
+    getReferredUsers
 }

@@ -36,6 +36,87 @@
     .alert {
       margin-top: 20px;
     }
+
+    /* Container styling */
+.referral-users {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+}
+
+/* Heading styling */
+.referral-users h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Card styling */
+#referralUsersList {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+/* User list container */
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Individual user item styling */
+.user-item {
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fafafa;
+}
+
+/* User name styling */
+.user-name {
+    font-weight: bold;
+    color: #333;
+}
+
+/* User email styling */
+.user-email {
+    color: #777;
+    font-size: 14px;
+}
+
+/* Empty state text */
+#referralUsersList p {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .referral-users {
+        padding: 15px;
+        margin: 10px;
+    }
+
+    .user-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-name, .user-email {
+        margin-bottom: 5px;
+    }
+}
+
   </style>
 </head>
 <%- include('../../views/partials/user/header') %>
@@ -50,7 +131,7 @@
     <div class="ml-5 col-md-8">
       <h2 class="mt-4 text-center mb-4">
         <%= section === 'addresses' ? 'Your Addresses' : section === 'orders' ?
-        'Your Orders' :  section === 'wishlist' ? '': 'Your Profile' %>
+        'Your Orders' :  section === 'wishlist' ? '': section === 'referrals' ? '' : 'Your Profile' %>
       </h2>
  
       <% if (section === 'addresses') { %> 
@@ -152,6 +233,22 @@
         <% }) %> <% } else { %>
         <p>No orders placed yet.</p>
         <% } %>
+      </div>
+
+       <!-- Pagination -->
+       <div class="container mt-3 mb-3">
+        <nav aria-label="Page navigation">
+          <ul
+            class="pagination justify-content-center mb-20"
+            style="margin-right: 200px"
+          >
+            <% for(let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+              <a class="page-link" href="/userProfile?section=orders&page=<%= i %>"><%= i %></a>
+            </li>
+            <% } %>
+          </ul>
+        </nav>
       </div>
 
       <% } else if (section === 'wishlist') { %>
@@ -354,6 +451,30 @@
 </div>
 
 
+  <% } else if (section === 'referrals') { %>
+    <div class="referral-users">
+      <h2>Users Who Used Your Referral Code</h2>
+      <div id="referralUsersList" class="card">
+        <% if (usersWhoUsedReferral && usersWhoUsedReferral.length > 0) { %>
+          <div class="user-list">
+            <% usersWhoUsedReferral.forEach(user => { %>
+              <% user.redeemedUsers.forEach(redeemedUser => { %> <!-- Loop through redeemed users -->
+                <div class="user-item">
+                  <span class="user-name"><%= redeemedUser.name %></span>
+                  <span class="user-email"><%= redeemedUser.email %></span>
+                </div>
+              <% }) %>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <p>No users have used your referral code.</p>
+        <% } %>
+      </div>
+    </div>
+    
+      </div>
+  </div>
+  
       <% } else { %>
       <!-- Dashboard content -->
       <div class="card">

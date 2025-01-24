@@ -221,14 +221,25 @@ const loadUserProfile = async(req, res) => {
       }
   
     } else if (section === 'orders') {
-
-      
+      const page = parseInt(req.query.page) || 1; // Get the current page from the query parameters
+      const limit = 3; // Set the number of orders to display per page
+      const skip = (page - 1) * limit; // Calculate the number of orders to skip
+    
+      // Fetch the total number of orders for the user
+      const totalOrders = await Order.countDocuments({ userId });
+    
+      // Fetch the orders for the user with pagination
       const orders = await Order.find({ userId })
-        .populate('ordereditems.product', 'productName productImage')  
-        .sort({createdOn: -1})
+        .populate('ordereditems.product', 'productName productImage') // Populate product details
+        .sort({ createdOn: -1 }) // Sort orders by creation date in descending order
+        .skip(skip) // Skip the calculated number of orders
+        .limit(limit) // Limit the number of orders returned
         .exec();
-
-      content = { orders };
+    
+      const totalPages = Math.ceil(totalOrders / limit); // Calculate total pages
+    
+      // Prepare the content to be sent to the client
+      content = { orders, totalPages, totalOrders, currentPage: page };
     } else if (section === 'wishlist') {
 
       // Fetch Wishlist Logic
@@ -272,6 +283,12 @@ const loadUserProfile = async(req, res) => {
 
       content = { wallet, transactions, totalPages, totalTransactions, currentPage: page };
     
+    } else if (section === 'referrals') { 
+    
+      const usersWhoUsedReferral = await User.find({ redeemed: true })
+      .populate('redeemedUsers', 'name email');
+      content = { usersWhoUsedReferral };
+
     } else { 
       content = { userProfile: true };
     }

@@ -429,6 +429,7 @@ const codPlaceOrder = async (req, res) => {
     const { ordereditems, totalprice, finalAmount, address, discount, status, couponApplied } = req.body;
     const userId = req.session.user;  
 
+
     const userAddresses = await Address.find({ userId: userId });
     if (!userAddresses || userAddresses.length === 0) {
       return res.status(400).json({ success: false, message: "No addresses found for the user" });
@@ -455,6 +456,7 @@ const codPlaceOrder = async (req, res) => {
       discount,       // Store the discount value
       paymentMethod: 'COD'
     });
+    
 
     const savedOrder = await newOrder.save(); 
 
@@ -526,7 +528,7 @@ const codOrderSuccess = async (req, res) => {
       cartItems: cartItems,
     });
   } catch (error) {
-    console.error("Error retrieving order:", error);
+    console.log("Error retrieving order:", error);
     return res.status(500).json({ message: "An error occurred while fetching the order details." });
   }
 };
@@ -611,7 +613,7 @@ const razorpayPlaceOrder = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error placing Razorpay order:", error);
+    console.log("Error placing Razorpay order:", error);
     res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
   }
 };

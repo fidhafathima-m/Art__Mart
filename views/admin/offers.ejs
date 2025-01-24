@@ -110,6 +110,20 @@
         </div>
       </div>
     </div>
+
+    <!-- Referral Offer Management Card -->
+<div class="col-md-6 mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="h5">Referral Offer</h2>
+        </div>
+        <div class="card-body">
+            <button id="fetchReferralUsers" class="btn btn-primary">List Users Who Used Referral Codes</button>
+            <div id="referralUsersList" class="mt-3"></div>
+        </div>
+    </div>
+</div>
+
   </div>
 </div>
 
@@ -429,6 +443,37 @@ document.getElementById('removeCategoryOfferForm').addEventListener('submit', fu
     });
 });
 
+document.getElementById('fetchReferralUsers').addEventListener('click', function() {
+    fetch('/admin/offers/referralUsers')
+        .then(response => response.json())
+        .then(data => {
+            const referralUsersList = document.getElementById('referralUsersList');
+            referralUsersList.innerHTML = ''; // Clear previous results
+
+            if (data.success) {
+                if (data.users.length > 0) {
+                    const userList = document.createElement('ul');
+                    data.users.forEach(user => {
+                        const listItem = document.createElement('li');
+                        const redeemedUsersNames = user.redeemedUsers.map(redeemedUser => redeemedUser.name).join(', ');
+                        const redeemedUsersEmail = user.redeemedUsers.map(redeemedUser => redeemedUser.email).join(', ');
+                        listItem.textContent = `${redeemedUsersNames} (${redeemedUsersEmail}) - Referred by: ${user.name || 'N/A'}`; // Display user name, email, and referrer
+                        userList.appendChild(listItem);
+                    });
+                    referralUsersList.appendChild(userList);
+                } else {
+                    referralUsersList.textContent = 'No users found who have used referral codes.';
+                }
+            } else {
+                referralUsersList.textContent = 'Error fetching users.';
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById('referralUsersList').textContent = 'An error occurred while fetching users.';
+        });
+});
+
 </script>
 
 <style>
@@ -449,5 +494,15 @@ document.getElementById('removeCategoryOfferForm').addEventListener('submit', fu
 
 .dropdown-item:hover {
   background-color: #f0f0f0;
+}
+
+#referralUsersList ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#referralUsersList li {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
 }
 </style>

@@ -224,6 +224,12 @@ const verifyOtp = async (req, res) => {
             });
             await referrerTransaction.save();
           }
+
+          // Update the referrer's redeemed status and add the new user to redeemedUsers
+          referrer.redeemed = true; // Set the referrer as redeemed
+          referrer.redeemedUsers.push(saveUser ._id); // Add the new user to the redeemedUsers array
+          await referrer.save(); // Save the referrer
+
         }
       }
 

@@ -194,6 +194,7 @@ router.post("/offers/removeProductOffer",offerController.removeProductsOffer);
 router.post("/offers/addCategoryOffer",offerController.addCategoryOffer);
 router.get('/offers/getCategoryOffer/:categoryId', offerController.getCategoryOffer);
 router.post("/offers/removeCategoryOffer",offerController.removeCategoryOffer);
+router.get('/offers/referralUsers', offerController.getReferredUsers);
 
 
 module.exports = router;

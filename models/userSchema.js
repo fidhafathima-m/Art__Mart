@@ -70,10 +70,10 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  redeemedUsers: {
+  redeemedUsers: [{
     type: Schema.Types.ObjectId,
     ref: "User",
-  },
+  }],
   searchHistory: [
     {
       category: {
