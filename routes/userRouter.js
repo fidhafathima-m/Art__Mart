@@ -1,9 +1,15 @@
+// eslint-disable-next-line no-undef
 const express = require("express");
 const router = express.Router();
+// eslint-disable-next-line no-undef
 const userController = require("../controllers/user/userController");
+// eslint-disable-next-line no-undef
 const profileController = require("../controllers/user/profileController");
+// eslint-disable-next-line no-undef
 const productController = require("../controllers/user/productController");
+// eslint-disable-next-line no-undef
 const userAuth = require("../middlewares/auth");
+// eslint-disable-next-line no-undef
 const passport = require("passport");
 
 router.get("/pageNotFound", userController.pageNotFound);
@@ -125,4 +131,5 @@ router.post('/api/remove-coupon', productController.removeCoupon);
 router.post('/wallet/add-money', userController.addMoney);
 router.post('/wallet/withdraw-money', userController.withdrawMoney);
 
+// eslint-disable-next-line no-undef
 module.exports = router;

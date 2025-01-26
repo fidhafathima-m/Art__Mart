@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
 
 const customerInfo = async (req, res) => {
@@ -47,6 +48,7 @@ const customerBlocked = async (req, res) => {
     await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
     res.json({ success: true });
   } catch (error) {
+    console.log("Error: ", error);
     res.json({ success: false, message: "Error blocking user" });
   }
 };
@@ -57,10 +59,12 @@ const customerUnblocked = async (req, res) => {
     await User.updateOne({ _id: id }, { $set: { isBlocked: false } });
     res.json({ success: true });
   } catch (error) {
+    console.log("Error: ", error);
     res.json({ success: false, message: "Error unblocking user" });
   }
 };
 
+// eslint-disable-next-line no-undef
 module.exports = {
   customerInfo,
   customerBlocked,

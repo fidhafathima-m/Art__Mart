@@ -20,6 +20,7 @@ const isLogout = async (req, res, next) => {
   }
 };
 
+// eslint-disable-next-line no-undef
 module.exports = {
   isLogin,
   isLogout,

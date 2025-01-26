@@ -1,7 +1,10 @@
+// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
-const mongoose = require("mongoose");
+// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
+// eslint-disable-next-line no-undef, no-unused-vars
 const env = require("dotenv").config();
+// eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
 
 // generate OTP
@@ -18,12 +21,15 @@ const sendVeificationMail = async (email, otp) => {
       secure: false,
       requireTLS: true,
       auth: {
+        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
+        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const mailOptions = {
+      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Password Reset Request",
@@ -46,7 +52,7 @@ const securePassword = async (password) => {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (error) {
-    console.error("Error in hashing");
+    console.log("Error in hashing", error);
   }
 };
 
@@ -55,6 +61,7 @@ const getForgetPass = async (req, res) => {
     res.render("admin-forgot-password");
   } catch (error) {
     res.redirect("/pageError");
+    console.log('Error', error);
   }
 };
 
@@ -141,6 +148,7 @@ const resetPasswordLoad = async (req, res) => {
     res.render("admin-reset-password");
   } catch (error) {
     res.redirect("/pageError");
+    console.log("Error: ", error);
   }
 };
 
@@ -159,9 +167,11 @@ const resetPassword = async (req, res) => {
     }
   } catch (error) {
     res.redirect("/pageError");
+    console.log("Error: ", error);
   }
 };
 
+// eslint-disable-next-line no-undef
 module.exports = {
   getForgetPass,
   forgetPassOtpPage,

@@ -1,15 +1,27 @@
+// eslint-disable-next-line no-undef
 const express = require("express");
+// eslint-disable-next-line no-undef
 const multer = require("multer");
+// eslint-disable-next-line no-undef
 const path = require("path");
 const router = express.Router();
+// eslint-disable-next-line no-undef
 const adminController = require("../controllers/admin/adminController");
+// eslint-disable-next-line no-undef
 const adminProfileController = require("../controllers/admin/adminProfileController");
+// eslint-disable-next-line no-undef
 const adminAuth = require("../middlewares/adminAuth");
+// eslint-disable-next-line no-undef
 const customerController = require("../controllers/admin/customerController");
+// eslint-disable-next-line no-undef
 const categoryController = require("../controllers/admin/categoryController");
+// eslint-disable-next-line no-undef
 const productController = require("../controllers/admin/productController");
+// eslint-disable-next-line no-undef
 const couponController = require("../controllers/admin/couponController");
+// eslint-disable-next-line no-undef
 const orderController = require('../controllers/admin/orderController');
+// eslint-disable-next-line no-undef
 const offerController = require('../controllers/admin/offerController');
 
 router.get("/pageError", adminController.pageError);
@@ -196,5 +208,5 @@ router.get('/offers/getCategoryOffer/:categoryId', offerController.getCategoryOf
 router.post("/offers/removeCategoryOffer",offerController.removeCategoryOffer);
 router.get('/offers/referralUsers', offerController.getReferredUsers);
 
-
+// eslint-disable-next-line no-undef
 module.exports = router;

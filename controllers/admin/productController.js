@@ -1,10 +1,16 @@
+// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
+// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
-const User = require("../../models/userSchema");
+// eslint-disable-next-line no-undef
 const sharp = require("sharp");
+// eslint-disable-next-line no-undef
 const fs = require("fs");
+// eslint-disable-next-line no-undef
 const path = require("path");
+// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
+// eslint-disable-next-line no-undef
 const multer = require("multer");
 
 const productInfo = async (req, res) => {
@@ -69,6 +75,7 @@ const addProduct = async (req, res) => {
         const base64Data = products[`croppedImage${i}`];
 
         if (base64Data) {
+          // eslint-disable-next-line no-undef
           const buffer = Buffer.from(base64Data.split(",")[1], "base64");
           const croppedImagePath = path.join(
             "public",
@@ -244,6 +251,7 @@ const editProduct = async (req, res) => {
       const base64Data = products[`croppedImage${i}`];
 
       if (base64Data) {
+        // eslint-disable-next-line no-undef
         const buffer = Buffer.from(base64Data.split(",")[1], "base64");
 
         const croppedImagePath = path.join(
@@ -343,6 +351,7 @@ const deleteSingleImage = async (req, res) => {
     product.productImage.splice(imageIndex, 1);
 
     const imagePath = path.join(
+      // eslint-disable-next-line no-undef
       __dirname,
       "..",
       "..",
@@ -425,6 +434,7 @@ const blockProduct = async (req, res) => {
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } });
     res.json({ success: true });
   } catch (error) {
+    console.log(error);
     res.json({ success: false, message: "Error blocking product" });
   }
 };
@@ -436,10 +446,12 @@ const unblockProduct = async (req, res) => {
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } });
     res.json({ success: true });
   } catch (error) {
+    console.log("Error: ", error);
     res.json({ success: false, message: "Error unblocking product" });
   }
 };
 
+// eslint-disable-next-line no-undef
 module.exports = {
   productInfo,
   loadAddProduct,

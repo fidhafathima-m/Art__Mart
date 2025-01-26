@@ -1,5 +1,8 @@
+// eslint-disable-next-line no-undef
 const Product = require('../../models/productSchema');
+// eslint-disable-next-line no-undef
 const Category = require('../../models/categorySchema');
+// eslint-disable-next-line no-undef
 const User = require('../../models/userSchema');
 
 
@@ -250,7 +253,7 @@ const getReferredUsers = async (req, res) => {
     }
 };
 
-
+// eslint-disable-next-line no-undef
 module.exports = {
     loadOffer,
     addCategoryOffer,

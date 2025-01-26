@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
@@ -25,4 +26,5 @@ const transactionSchema = new mongoose.Schema({
 });
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
+// eslint-disable-next-line no-undef
 module.exports = Transaction;

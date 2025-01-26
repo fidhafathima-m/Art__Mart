@@ -1,5 +1,8 @@
+// eslint-disable-next-line no-undef
 const ExcelJS = require('exceljs');
+// eslint-disable-next-line no-undef
 const PdfPrinter = require('pdfmake');
+// eslint-disable-next-line no-undef
 const Order = require('../models/orderSchema'); // Assuming you have the Order model
 
 // Define fonts for pdfmake
@@ -45,6 +48,7 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
     const salesData = await Order.find(matchCriteria);
 
     if (filterType === 'custom' && salesData.length === 0) {
+        // eslint-disable-next-line no-undef
         return Buffer.from('No orders found for the selected date range.');
     }
 
@@ -114,32 +118,47 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
                     ],
                     layout: {
                         // Custom layout with no borders
+                        
+                        // eslint-disable-next-line no-unused-vars
                         hLineWidth: function (i, node) {
                             return 0; // no horizontal line
                         },
+                        // eslint-disable-next-line no-unused-vars
                         vLineWidth: function (i, node) {
                             return 0; // no vertical line
                         },
+                        // eslint-disable-next-line no-unused-vars
                         hLineColor: function (i, node) {
                             return '#fff'; // no horizontal line color
                         },
+                        // eslint-disable-next-line no-unused-vars
                         vLineColor: function (i, node) {
                             return '#fff'; // no vertical line color
                         },
+                        // eslint-disable-next-line no-unused-vars
                         paddingLeft: function (i) {
                             return 5; // padding inside cells
                         },
+                        // eslint-disable-next-line no-unused-vars
                         paddingRight: function (i) {
                             return 5; // padding inside cells
                         },
+                        // eslint-disable-next-line no-unused-vars
                         paddingTop: function (i) {
                             return 5; // padding inside cells
                         },
+                        // eslint-disable-next-line no-unused-vars
                         paddingBottom: function (i) {
                             return 5; // padding inside cells
                         }
                     }
                 }
+            },
+            {
+                text: `Report generated on: ${new Date().toLocaleString()}`,
+                style: 'footer',
+                alignment: 'right',
+                margin: [0, 20, 0, 0] // Add some margin for spacing
             }
         ],
         styles: {
@@ -157,6 +176,11 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
                 bold: true,
                 fontSize: 10,
                 color: 'black'
+            },
+            footer: {
+                fontSize: 10,
+                italics: true,
+                color: 'gray'
             }
         }
     };
@@ -166,6 +190,7 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
     let buffers = [];
     pdfDoc.on('data', buffers.push.bind(buffers));
     pdfDoc.on('end', () => {
+        // eslint-disable-next-line no-undef
         const pdfData = Buffer.concat(buffers);
         return pdfData;
     });
@@ -173,6 +198,7 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
 
     return new Promise((resolve) => {
         pdfDoc.on('end', () => {
+            // eslint-disable-next-line no-undef
             const pdfData = Buffer.concat(buffers);
             resolve(pdfData);
         });
@@ -239,6 +265,7 @@ async function generateExcelReport(filterType, specificDate, startDate, endDate,
     return buffer;
 }
 
+// eslint-disable-next-line no-undef
 module.exports = {
     generatePDFReport,
     generateExcelReport,

@@ -1,9 +1,14 @@
+// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
+// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
+// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
+// eslint-disable-next-line no-undef
 const Order = require("../../models/orderSchema");
-const mongoose = require("mongoose");
+// eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
+// eslint-disable-next-line no-undef
 const { generatePDFReport, generateExcelReport } = require('../../helpers/generateReports');
 
 
@@ -267,7 +272,7 @@ const salesReport = async (req, res) => {
 };
 
 const salesStatistics = async (req, res) => {
-  const { filterType, specificDate, startDate, endDate } = req.body;
+  const { filterType, startDate, endDate } = req.body;
 
   let matchCriteria = {};
   if (filterType === 'custom') {
@@ -318,7 +323,7 @@ const exportSalesReport = async (req, res) => {
 
 
 
-
+// eslint-disable-next-line no-undef
 module.exports = {
   loadLogin,
   login,

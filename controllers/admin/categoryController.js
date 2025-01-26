@@ -1,5 +1,10 @@
+// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
+// eslint-disable-next-line no-undef
 const Product = require('../../models/productSchema');
+// eslint-disable-next-line no-undef
+const mongoose = require("mongoose");
+
 
 const categoryInfo = async (req, res) => {
   try {
@@ -84,13 +89,13 @@ const addCategory = async (req, res) => {
 
     return res.json({ success: true, message: "Category added successfully." });
   } catch (error) {
+    console.log("Error: ", error.message);
     return res
       .status(500)
       .json({ success: false, message: "Internal Server Error" });
   }
 };
 
-const mongoose = require("mongoose");
 
 const loadEditCategory = async (req, res) => {
   try {
@@ -200,6 +205,7 @@ const removeCategoryOffer = async (req, res) => {
     }
 
     // Reset category offer
+    // eslint-disable-next-line no-unused-vars
     const percentage = category.categoryOffer;
     category.categoryOffer = 0;
     await category.save();
@@ -261,6 +267,7 @@ const restoreCategory = async (req, res) => {
   }
 };
 
+// eslint-disable-next-line no-undef
 module.exports = {
   categoryInfo,
   getListCategory,

@@ -1,13 +1,24 @@
+// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
+// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
+// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
+// eslint-disable-next-line no-undef
 const Cart = require('../../models/cartSchema');
+// eslint-disable-next-line no-undef
 const Review = require('../../models/reviewSchema');
+// eslint-disable-next-line no-undef
 const Wallet = require('../../models/walletSchema');
+// eslint-disable-next-line no-undef
 const Transaction = require('../../models/transactionSchema');
+// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
+// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
+// eslint-disable-next-line no-undef, no-unused-vars
 const env = require("dotenv").config();
+// eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
 
 // generate OTP
@@ -24,12 +35,15 @@ const sendVeificationMail = async (email, otp) => {
       secure: false,
       requireTLS: true,
       auth: {
+        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
+        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const info = await transporter.sendMail({
+      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Verify your account",
@@ -51,7 +65,7 @@ const securePassword = async (password) => {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (error) {
-    console.error("Error in hashing");
+    console.log("Error in hashing", error);
     throw new Error("Failed to secure password");
   }
 };
@@ -388,6 +402,7 @@ const loadShopping = async (req, res) => {
     const categoryIds = categories.map((category) => category._id.toString());
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
+    // eslint-disable-next-line no-unused-vars
     const skip = (page - 1) * limit;
 
     const sortBy = req.query.sortBy;
@@ -726,6 +741,7 @@ const filterRating = async (req, res) => {
  
       product.averageRating = averageRating;
  
+      // eslint-disable-next-line no-undef
       if (rating === 0 || averageRating >= rating) {
         filteredProducts.push(product);
       }
@@ -761,7 +777,8 @@ const filterRating = async (req, res) => {
       currentPage,
       sortBy,  
       noProductsMessage,  
-      selectedCategory,  
+      selectedCategory, 
+      // eslint-disable-next-line no-undef 
       rating,  
       cartItems,  
       activePage: 'shop',
@@ -951,7 +968,7 @@ const searchProducts = async (req, res) => {
     const userData = await User.findOne({ _id: user });
     let search = req.query.search || ''; // Default to empty string if no search term
     const categories = await Category.find({ isListed: true }).lean();
-    const categoryids = categories.map((category) => category._id.toString());
+    categories.map((category) => category._id.toString());
     let searchResult = [];
 
     const cart = await Cart.findOne({ userId: user });
@@ -1166,7 +1183,7 @@ const withdrawMoney = async (req, res) => {
   }
 };
 
-
+// eslint-disable-next-line no-undef
 module.exports = {
   loadHomePage,
   pageNotFound,

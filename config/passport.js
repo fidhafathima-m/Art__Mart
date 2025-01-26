@@ -1,13 +1,19 @@
+// eslint-disable-next-line no-undef
 const env = require("dotenv");
 env.config();
+// eslint-disable-next-line no-undef
 const passport = require("passport");
+// eslint-disable-next-line no-undef
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
+// eslint-disable-next-line no-undef
 const User = require("../models/userSchema");
 
 passport.use(
   new GoogleStrategy(
     {
+      // eslint-disable-next-line no-undef
       clientID: process.env.GOOGLE_CLIENT_ID,
+      // eslint-disable-next-line no-undef
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "http://localhost:3000/auth/google/callback",
     },
@@ -46,4 +52,5 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+// eslint-disable-next-line no-undef
 module.exports = passport;

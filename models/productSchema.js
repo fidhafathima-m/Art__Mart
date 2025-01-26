@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -83,4 +84,5 @@ const productSchema = new Schema(
 );
 
 const Product = mongoose.model("Product", productSchema);
+// eslint-disable-next-line no-undef
 module.exports = Product;

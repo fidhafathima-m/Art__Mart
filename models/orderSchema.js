@@ -1,5 +1,7 @@
+// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+// eslint-disable-next-line no-undef
 const { v4: uuidv4 } = require("uuid");
 
 const orderSchema = new Schema({
@@ -109,4 +111,5 @@ const orderSchema = new Schema({
 });
 
 const Order = mongoose.model("Order", orderSchema);
+// eslint-disable-next-line no-undef
 module.exports = Order;

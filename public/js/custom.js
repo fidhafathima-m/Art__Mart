@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*------------------
      ADMIN SCRIPTS
 --------------------*/
@@ -6,18 +7,22 @@
      Add Category
     --------------------*/
 
+// eslint-disable-next-line no-undef
 $(document).ready(function () {
+  // eslint-disable-next-line no-undef
   $("#categoryForm").submit(function (event) {
     event.preventDefault();
 
     const formData = $(this).serialize();
 
+    // eslint-disable-next-line no-undef
     $.ajax({
       type: "POST",
       url: "/admin/add-category",
       data: formData,
       success: function (response) {
         if (response.success) {
+          // eslint-disable-next-line no-undef
           Swal.fire({
             icon: "success",
             title: response.message,
@@ -27,6 +32,7 @@ $(document).ready(function () {
             window.location.href = "/admin/categories";
           });
         } else {
+          // eslint-disable-next-line no-undef
           Swal.fire({
             icon: "error",
             title: "Error",
@@ -35,6 +41,7 @@ $(document).ready(function () {
         }
       },
       error: function () {
+        // eslint-disable-next-line no-undef
         Swal.fire({
           icon: "error",
           title: "Request Failed",
@@ -154,6 +161,7 @@ document.getElementById("add-highlight").addEventListener("click", function () {
 });
 
 // Form Validation
+// eslint-disable-next-line no-unused-vars
 function validateForm() {
   let isValid = true;
 
@@ -229,6 +237,7 @@ function handleImageUpload(
         previewContainer.style.display = "block";
 
         // Initialize cropper without fixed aspect ratio for free cropping
+        // eslint-disable-next-line no-undef
         const cropper = new Cropper(imageElement, {
           viewMode: 1,
           responsive: true,

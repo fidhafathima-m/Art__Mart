@@ -1,15 +1,28 @@
+// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
+// eslint-disable-next-line no-undef
 const Address = require("../../models/addressSchema");
+// eslint-disable-next-line no-undef
 const Cart = require('../../models/cartSchema');
+// eslint-disable-next-line no-undef
 const Order = require('../../models/orderSchema');
+// eslint-disable-next-line no-undef
 const Review = require('../../models/reviewSchema');
+// eslint-disable-next-line no-undef
 const Wishlist = require("../../models/wishlistSchema");
+// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
+// eslint-disable-next-line no-undef
 const Wallet = require("../../models/walletSchema");
+// eslint-disable-next-line no-undef
 const Transaction = require('../../models/transactionSchema');
+// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
+// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
+// eslint-disable-next-line no-undef, no-unused-vars
 const env = require("dotenv").config();
+// eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
 
 // generate OTP
@@ -26,12 +39,15 @@ const sendVeificationMail = async (email, otp) => {
       secure: false,
       requireTLS: true,
       auth: {
+        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
+        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const mailOptions = {
+      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Password Reset Request",
@@ -54,6 +70,7 @@ const securePassword = async (password) => {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (error) {
+    console.log("Error: ", error.message);
     console.error("Error in hashing");
   }
 };
@@ -62,6 +79,7 @@ const getForgetPass = async (req, res) => {
   try {
     res.render("forgot-password");
   } catch (error) {
+    console.log("Error: ", error.message);
     res.redirect("/pageNotFound");
   }
 };
@@ -148,6 +166,7 @@ const resetPasswordLoad = async (req, res) => {
   try {
     res.render("reset-password");
   } catch (error) {
+    console.log('error: ', error);
     res.redirect("/pageNotFound");
   }
 };
@@ -162,7 +181,7 @@ const resetPassword = async (req, res) => {
     if (password === confirmPassword) {
       const passwordHash = await securePassword(password);
 
-      const updated = await User.updateOne({ email: email }, { password: passwordHash });
+      await User.updateOne({ email: email }, { password: passwordHash });
 
 
       // Send JSON response indicating success
@@ -199,7 +218,7 @@ const loadUserProfile = async(req, res) => {
       // console.log("Fetched Addresses:", addresses); 
       if (addresses && addresses.length > 0) {
           addresses.forEach(address => {
-              // console.log("Address Object:", address);  
+              console.log("Address Object:", address);  
           });
       } else {
           console.log("No addresses found for this user.");
@@ -333,8 +352,7 @@ const loadChangeEmail = async(req, res) => {
 const changeEmail = async (req, res) => {
   try {
     const user = req.session.user;
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
+    await Cart.findOne({ userId: user });
 
     const { currentEmail } = req.body;
     const userData = await User.findById(user);
@@ -529,8 +547,7 @@ const loadEmailPageforPassChange = async(req, res) => {
 const changePassValid = async (req, res) => {
   try {
     const user = req.session.user;
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
+    await Cart.findOne({ userId: user });
 
     const { newEmail } = req.body;   
     const userData = await User.findById(user);   
@@ -1090,7 +1107,7 @@ const editProfile = async (req, res) => {
   }
 };
 
-
+// eslint-disable-next-line no-undef
 module.exports = {
   getForgetPass,
   forgotPassOtpLoad,

@@ -1,14 +1,24 @@
+// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
-const Category = require("../../models/categorySchema");
+// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
+// eslint-disable-next-line no-undef
 const Coupon = require("../../models/couponSchema");
+// eslint-disable-next-line no-undef
 const Review = require("../../models/reviewSchema");
+// eslint-disable-next-line no-undef
 const Address = require('../../models/addressSchema');
+// eslint-disable-next-line no-undef
 const Cart = require("../../models/cartSchema");
+// eslint-disable-next-line no-undef
 const Order = require('../../models/orderSchema');
+// eslint-disable-next-line no-undef
 const Wishlist = require("../../models/wishlistSchema");
+// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
+// eslint-disable-next-line no-undef
 const nodemailer = require('nodemailer');
+// eslint-disable-next-line no-undef
 const Razorpay = require('razorpay');
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,  
@@ -426,7 +436,7 @@ const updateDefaultAddress = async (req, res) => {
 
 const codPlaceOrder = async (req, res) => {
   try {
-    const { ordereditems, totalprice, finalAmount, address, discount, status, couponApplied } = req.body;
+    const { ordereditems, totalprice, finalAmount, discount, status, couponApplied } = req.body;
     const userId = req.session.user;  
 
 

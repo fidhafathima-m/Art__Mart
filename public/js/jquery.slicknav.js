@@ -1,3 +1,7 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-redeclare */
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-unused-vars */
 ;(function ($, document, window) {
     var
     // default settings object.

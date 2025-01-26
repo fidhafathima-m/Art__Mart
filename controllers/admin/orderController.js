@@ -1,7 +1,12 @@
+// eslint-disable-next-line no-undef
 const Order = require('../../models/orderSchema');
+// eslint-disable-next-line no-undef
 const Address = require('../../models/addressSchema');
+// eslint-disable-next-line no-undef
 const User = require('../../models/userSchema'); 
+// eslint-disable-next-line no-undef
 const Wallet = require('../../models/walletSchema');
+// eslint-disable-next-line no-undef
 const Transaction = require('../../models/transactionSchema');
 
 const loadOrder = async (req, res) => {
@@ -195,7 +200,7 @@ const sendMoneyToWallet = async (req, res) => {
   }
 };
 
-
+// eslint-disable-next-line no-undef
 module.exports = {
     loadOrder,
     viewOrderDetails,

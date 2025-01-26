@@ -15,6 +15,7 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
+    "lint": "npx eslint .",
     "start": "nodemon app"
   },
   "dependencies": {
@@ -40,5 +41,10 @@
     "razorpay": "^2.9.5",
     "sharp": "^0.33.5",
     "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0"
   }
 }

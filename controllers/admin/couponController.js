@@ -1,5 +1,6 @@
-const Category = require("../../models/categorySchema");
+// eslint-disable-next-line no-undef
 const Coupon = require("../../models/couponSchema");
+// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
 
 const loadCoupon = async (req, res) => {
@@ -210,7 +211,7 @@ const restoreCoupon = async (req, res) => {
   }
 };
 
-
+// eslint-disable-next-line no-undef
 module.exports = {
   loadCoupon,
   LoadAddCoupon,
