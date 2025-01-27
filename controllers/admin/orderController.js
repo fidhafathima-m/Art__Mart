@@ -60,29 +60,24 @@ const viewOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;
 
-    // Fetch the order details, populate 'userId' for user details
     const order = await Order.findOne({ orderId })
-      .populate('userId') // Populate userId to get user details
-      .populate('ordereditems.product') // Populate product details
+      .populate('userId') 
+      .populate('ordereditems.product') 
       .exec();
 
     if (!order) {
       return res.status(404).send('Order not found');
     }
 
-    // Fetch the user's addresses
     const userAddresses = await Address.findOne({ userId: order.userId });
 
 
-    // Find the default address or any specific address you want to use
     const address = userAddresses ? userAddresses.address.find(addr => addr.isDefault) : null;
 
-    // console.log()
 
-    // Retrieve the order details
     const orderDetails = {
       orderId: order.orderId,
-      Id: order.userId,  // This now has user details populated
+      Id: order.userId,  
       totalPrice: order.totalprice,
       discount: order.discount,
       finalAmount: order.finalAmount,
@@ -91,8 +86,8 @@ const viewOrderDetails = async (req, res) => {
       status: order.status,
       couponApplied: order.couponApplied,
       createdOn: order.createdOn,
-      address: address,  // Contains the address
-      orderedItems: order.ordereditems  // Product details
+      address: address,  
+      orderedItems: order.ordereditems  
     };
 
     res.render('orderDetails', { orderDetails });
@@ -119,12 +114,10 @@ const updateOrderStatus = async (req, res) => {
       return res.status(404).send('Order not found');
     }
 
-    // If the status is "Delivered", set the 'firstDeliveredAt' and 'deliveredAt' timestamps
     if (status === 'Delivered' && !order.firstDeliveredAt) { 
       order.firstDeliveredAt = Date.now();
     }
  
-    // Update the overall order status
     order.status = status;
      
     // If the status is "Delivered", set the delivery timestamp
@@ -132,7 +125,6 @@ const updateOrderStatus = async (req, res) => {
       order.deliveredAt = Date.now();  
     }
 
-    // If the order status is "Returned", update the returnStatus of individual items
     if (status === "Returned") {
       order.ordereditems.forEach(item => {
         item.returnStatus = 'Returned'; // Update the returnStatus for each item
@@ -152,14 +144,12 @@ const sendMoneyToWallet = async (req, res) => {
   try {
     const { orderId } = req.body;
 
-    // Find the order by orderId
     const order = await Order.findOne({ orderId }).populate('userId');
 
     if (!order) {
       return res.status(404).send('Order not found');
     }
 
-    // Check if the order is cancelled and payment method is prepaid, and money has not been sent yet
     if (order.status === 'Cancelled' && order.paymentMethod === 'prepaid' && !order.moneySent) {
       // Update the order's moneySent status
       order.moneySent = true;

@@ -3,7 +3,7 @@ const ExcelJS = require('exceljs');
 // eslint-disable-next-line no-undef
 const PdfPrinter = require('pdfmake');
 // eslint-disable-next-line no-undef
-const Order = require('../models/orderSchema'); // Assuming you have the Order model
+const Order = require('../models/orderSchema'); 
 
 // Define fonts for pdfmake
 const fonts = {
@@ -23,7 +23,7 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
     if (filterType === 'custom') {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);  // Set the end date to 23:59:59.999
+        end.setHours(23, 59, 59, 999);  
         
         matchCriteria.createdOn = { $gte: start, $lte: end };
     } else if (filterType === 'daily') {
@@ -117,7 +117,6 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
                         ])
                     ],
                     layout: {
-                        // Custom layout with no borders
                         
                         // eslint-disable-next-line no-unused-vars
                         hLineWidth: function (i, node) {
@@ -158,7 +157,7 @@ async function generatePDFReport(filterType, specificDate, startDate, endDate, i
                 text: `Report generated on: ${new Date().toLocaleString()}`,
                 style: 'footer',
                 alignment: 'right',
-                margin: [0, 20, 0, 0] // Add some margin for spacing
+                margin: [0, 20, 0, 0] 
             }
         ],
         styles: {
@@ -213,7 +212,7 @@ async function generateExcelReport(filterType, specificDate, startDate, endDate,
     if (filterType === 'custom') {
         const start = new Date(startDate);
         const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);  // Set the end date to 23:59:59.999
+        end.setHours(23, 59, 59, 999);  
         
         matchCriteria.createdOn = { $gte: start, $lte: end };
     } else if (filterType === 'daily') {
@@ -242,7 +241,7 @@ async function generateExcelReport(filterType, specificDate, startDate, endDate,
         return buffer;
     }
 
-    // Add column headers
+    // column headers
     worksheet.columns = [
         { header: 'Order ID', key: 'orderId', width: 30 },
         { header: 'Total Amount', key: 'totalAmount', width: 15 },
@@ -250,7 +249,7 @@ async function generateExcelReport(filterType, specificDate, startDate, endDate,
         { header: 'Date', key: 'date', width: 20 },
     ];
 
-    // Add sales data to the worksheet
+    //sales data to the worksheet
     salesData.forEach(order => {
         worksheet.addRow({
             orderId: order.orderId,

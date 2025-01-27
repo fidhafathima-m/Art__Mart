@@ -304,7 +304,7 @@ const loadUserProfile = async(req, res) => {
     
     } else if (section === 'referrals') { 
     
-      const usersWhoUsedReferral = await User.find({ redeemed: true })
+      const usersWhoUsedReferral = await User.find({ _id: userId, redeemed: true })
       .populate('redeemedUsers', 'name email');
       content = { usersWhoUsedReferral };
 
@@ -910,7 +910,6 @@ const viewOrderDetails = async (req, res) => {
     const orderId = req.params.orderId;  
     const userId = req.session.user;
 
-    // Fetch order and populate ordered items along with review information
     const order = await Order.findById(orderId)
       .populate('ordereditems.product', 'productName productImage salePrice reviews')
       .exec();
@@ -935,13 +934,11 @@ const viewOrderDetails = async (req, res) => {
       });
     }
 
-    // Fetch the user's addresses
     const userAddresses = await Address.findOne({ userId: userId });
 
-    // Find the default address
     const address = userAddresses ? userAddresses.address.find(addr => addr.isDefault) : null;
 
-    console.log('Address: ', address);  // Check the populated address
+    console.log('Address: ', address);  
 
     res.render('orderDetail', {
       order,
@@ -949,7 +946,7 @@ const viewOrderDetails = async (req, res) => {
       activePage: 'profile',
       cartItems: cartItems,
       reviews,
-      address, // Pass the address to the template
+      address, 
     });
   } catch (error) {
     console.error('Error loading order details:', error);
@@ -962,19 +959,16 @@ const cancelOrder = async (req, res) => {
     const orderId = req.params.orderId;
     const userId = req.session.user;
 
-    // Find the order by ID and check if it belongs to the user
     const order = await Order.findById(orderId);
     
     if (!order || order.userId.toString() !== userId) {
       return res.status(404).json({ success: false, message: 'Order not found or you are not authorized to cancel this order.' });
     }
 
-    // Check if the order can be canceled (e.g., status is Pending or Processing)
     if (order.status !== 'Pending' && order.status !== 'Processing') {
       return res.status(400).json({ success: false, message: 'Order cannot be canceled at this stage.' });
     }
 
-    // Update the order status to 'Cancelled'
     order.status = 'Cancelled';
     await order.save();
 
@@ -985,7 +979,6 @@ const cancelOrder = async (req, res) => {
       });
     }
 
-    // Return success response
     res.json({ success: true, message: 'Order has been cancelled.' });
   } catch (error) {
     console.error('Error cancelling order:', error);
@@ -993,27 +986,24 @@ const cancelOrder = async (req, res) => {
   }
 };
 
-// Route for returning an order
 const returnOrder = async (req, res) => {
   try {
     const orderId = req.params.orderId;
-    const { returnReason } = req.body; // Get the reason from the request body
+    const { returnReason } = req.body; 
     const order = await Order.findById(orderId);
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // Ensure the order is eligible for return (you can customize this check)
     if (order.status !== 'Delivered') {
       return res.status(400).json({ success: false, message: 'This order cannot be returned' });
     }
 
-    // Update the order's return reason and status
-    order.status = 'Return Request'; // You can set this to whatever status you want for the return process
+    order.status = 'Return Request'; 
     order.ordereditems.forEach(item => {
-      item.returnStatus = 'Requested'; // Set the return status for individual items
-      item.returnReason = returnReason; // Set the return reason for individual items
+      item.returnStatus = 'Requested'; 
+      item.returnReason = returnReason; 
     });
 
     await order.save();
@@ -1025,33 +1015,29 @@ const returnOrder = async (req, res) => {
   }
 };
 
-// In your profileController.js
 const cancelReturn = async (req, res) => {
   const { orderId } = req.params;
 
   try {
-    const order = await Order.findById(orderId); // Use findById for better matching by ID
+    const order = await Order.findById(orderId); 
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // Check if any ordered item has an active return request
     const returnRequestedItem = order.ordereditems.find(item => item.returnStatus === 'Requested');
 
     if (!returnRequestedItem) {
       return res.status(400).json({ success: false, message: 'No active return request to cancel' });
     }
 
-    // Update the returnStatus for each ordered item with an active return request
     order.ordereditems.forEach(item => {
       if (item.returnStatus === 'Requested') {
-        item.returnStatus = 'Not Requested'; // or any default value you'd like
+        item.returnStatus = 'Not Requested'; 
       }
     });
 
-    // Optionally, update the order's overall status if needed
-    order.status = 'Delivered'; // Or any other status you want to set
+    order.status = 'Delivered'; 
 
     await order.save();
 

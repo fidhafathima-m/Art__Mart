@@ -8,20 +8,17 @@ const User = require('../../models/userSchema');
 
 const loadOffer = async(req, res) => {
     try {
-        // Fetch active products
         const products = await Product.find({
           isBlocked: false,
           isDeleted: false,
           isListed: true,
         });
     
-        // Fetch active categories
         const categories = await Category.find({
           isDeleted: false,
           isListed: true,
         });
     
-        // Render the offers page with products and categories
         res.render('offers', {
           products: products,
           categories: categories,
@@ -53,14 +50,12 @@ const addCategoryOffer = async (req, res) => {
             });
         }
 
-        // Update category offer
         category.categoryOffer = percentage;
         await category.save();
 
-        // Update products with the new offer
         for (const product of products) {
             product.productOffer = percentage;
-            product.salePrice = product.regularPrice * (1 - percentage / 100);  // Apply discount
+            product.salePrice = product.regularPrice * (1 - percentage / 100);  
             await product.save();
         }
 
@@ -120,11 +115,9 @@ const removeCategoryOffer = async (req, res) => {
             })
         }
 
-        // Reset category offer
         categoryDoc.categoryOffer = 0;
         await categoryDoc.save();
 
-        // Reset offer on all products in the category
         const products = await Product.find({ category: categoryId });
         for (const product of products) {
             product.productOffer = 0;
@@ -156,7 +149,6 @@ const addProductsOffer = async (req, res) => {
             });
         }
 
-        // Apply the discount logic and save the product
         findProduct.salePrice = findProduct.regularPrice * (1 - percentage / 100);
         findProduct.productOffer = parseInt(percentage);
 
@@ -194,7 +186,7 @@ const getProductOffer = async (req, res) => {
 
         return res.json({
             success: true,
-            offer: product.productOffer || 0 // Return the existing offer or 0 if none
+            offer: product.productOffer || 0 
         });
     } catch (error) {
         console.log(error);
@@ -245,7 +237,7 @@ const removeProductsOffer = async (req, res) => {
 const getReferredUsers = async (req, res) => {
     try {
         // Find all users who have been referred by others
-        const users = await User.find({ redeemed: true }).populate('redeemedUsers', 'name email'); // Populate the redeemedUsers field with user names
+        const users = await User.find({ redeemed: true }).populate('redeemedUsers', 'name email'); 
         res.json({ success: true, users });
     } catch (error) {
         console.error("Error fetching referral users:", error);

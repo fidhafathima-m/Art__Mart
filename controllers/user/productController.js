@@ -21,7 +21,9 @@ const nodemailer = require('nodemailer');
 // eslint-disable-next-line no-undef
 const Razorpay = require('razorpay');
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_ID_KEY,  
+  // eslint-disable-next-line no-undef
+  key_id: process.env.RAZORPAY_ID_KEY,
+  // eslint-disable-next-line no-undef  
   key_secret: process.env.RAZORPAY_SECRET_KEY,  
 });
 
@@ -72,12 +74,15 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
       secure: false,
       requireTLS: true,
       auth: {
+        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
+        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const info = await transporter.sendMail({
+      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Order Confirmation - Thank you for your purchase!",
@@ -547,7 +552,7 @@ const codOrderSuccess = async (req, res) => {
 
 const razorpayPlaceOrder = async (req, res) => {
   try {
-    const { ordereditems, totalprice, finalAmount, address, discount, status, couponApplied } = req.body;
+    const { ordereditems, totalprice, finalAmount, discount, status, couponApplied } = req.body;
     const userId = req.session.user;  
 
     const userAddresses = await Address.find({ userId: userId });
@@ -619,6 +624,7 @@ const razorpayPlaceOrder = async (req, res) => {
       orderId: razorpayOrder.id,
       amount: finalAmount,
       currency: 'INR',
+      // eslint-disable-next-line no-undef
       razorpayKey: process.env.RAZORPAY_ID_KEY
     });
 
@@ -657,11 +663,12 @@ const loadReview = async(req, res) => {
       activePage: 'profile',
       user: user,
       cartItems: cartItems,
-      existingReview, existingReview,
+      existingReview, 
     });
 
   } catch (error) {
-    
+    console.log("Error: ", error);
+    res.status(500).json({ success: false, message: 'Failed to load review'});
   }
 }
 
@@ -730,20 +737,17 @@ const addToWishlist = async(req, res) => {
 
     const productId = req.body.productId;  
     
-    // Find the product
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).send('Product not found');
     }
 
-    // Find the wishlist for the user
     let wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) { 
-      // Create a new wishlist if none exists
       wishlist = new Wishlist({
         userId,
-        items: [  // Make sure this matches the schema field (items instead of products)
+        items: [  
           {
             productId: product._id,
             addedOn: Date.now()
@@ -790,7 +794,6 @@ const deleteFromWishlist = async (req, res) => {
       });
     }
 
-    // Find the wishlist for the user
     const wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
@@ -800,7 +803,6 @@ const deleteFromWishlist = async (req, res) => {
       });
     }
 
-    // Check if the product exists in the wishlist
     const productIndex = wishlist.products.findIndex(item => item.productId.toString() === productId);
 
     if (productIndex === -1) {
@@ -810,10 +812,8 @@ const deleteFromWishlist = async (req, res) => {
       });
     }
 
-    // Remove the product from the wishlist
     wishlist.products.splice(productIndex, 1);
 
-    // Save the updated wishlist
     await wishlist.save();
 
     return res.json({
@@ -836,23 +836,22 @@ const coupons = async(req, res) => {
     console.log('coupons: ', coupons);
     res.json(coupons);
 } catch (error) {
+  console.log("Error: ", error);
     res.status(500).json({ message: 'Error fetching coupons' });
 }
 }
 
 const applyCoupon = async (req, res) => {
   const { code, totalPrice } = req.body;
-  const userId = req.session.user; // Assuming `req.user` contains the logged-in user's info
+  const userId = req.session.user; 
 
   try {
-    // Find the coupon by code
     const coupon = await Coupon.findOne({ name: code, isDeleted: false });
 
     if (!coupon) {
       return res.status(400).json({ message: 'Coupon not found' });
     }
 
-    // Check if the coupon is expired or the purchase amount is not enough
     if (coupon.expireOn < new Date()) {
       return res.status(400).json({ message: 'Coupon has expired' });
     }
@@ -861,62 +860,51 @@ const applyCoupon = async (req, res) => {
       return res.status(400).json({ message: `Minimum purchase amount of ₹${coupon.minPurchaseAmount} not met` });
     }
 
-    // Check if the coupon has already been used by this user
     if (coupon.userId && coupon.userId.toString() === userId.toString()) {
       return res.status(400).json({ message: 'Coupon has already been used by you' });
     }
 
-    // Apply the coupon offer price to the total
     coupon.userId = userId; 
 
     await coupon.save();
 
-    const newTotalPrice = totalPrice - coupon.offerPrice; // Calculate new total price
+    const newTotalPrice = totalPrice - coupon.offerPrice; 
 
-
-
-    // Send the updated total price back to the front-end
     res.json({ success: true, offerPrice: coupon.offerPrice, newTotalPrice });
   } catch (error) {
+    console.log("Error: ", error);
     res.status(500).json({ message: 'Error applying coupon' });
   }
 };
 
 const removeCoupon = async (req, res) => {
   const { code, totalPrice } = req.body;
-  const userId = req.session.user; // Assuming `req.user` contains the logged-in user's info
+  const userId = req.session.user; 
 
   try {
-    // Find the coupon by code
     const coupon = await Coupon.findOne({ name: code, isDeleted: false });
 
     if (!coupon) {
       return res.status(400).json({ message: 'Coupon not found' });
     }
 
-    // Check if the coupon was applied by the user
     if (coupon.userId && coupon.userId.toString() === userId.toString()) {
-      // Remove the user's association with the coupon
       coupon.userId = null;
       await coupon.save();
 
-      const newTotalPrice = totalPrice + coupon.offerPrice; // Revert the total price by adding back the offerPrice
+      const newTotalPrice = totalPrice + coupon.offerPrice; 
 
-      // Send the updated total price back to the front-end
       res.json({ success: true, newTotalPrice });
     } else {
       res.status(400).json({ message: 'Coupon was not applied by you' });
     }
   } catch (error) {
+    console.log("Error: ", error);
     res.status(500).json({ message: 'Error removing coupon' });
   }
 };
 
-
-
-
-
-
+// eslint-disable-next-line no-undef
 module.exports = {
   loadProductDetails,
   loadCart,

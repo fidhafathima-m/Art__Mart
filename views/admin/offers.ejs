@@ -22,7 +22,7 @@
                     <div class="mb-3">
                         <label for="productIdAdd" class="form-label">Product:</label>
                         <input type="text" id="productIdAdd" name="productId" class="form-control" placeholder="Search for a Product" required>
-                        <input type="hidden" id="productIdHidden" name="productId" value=""> <!-- Hidden input for product ID -->
+                        <input type="hidden" id="productIdHidden" name="productId" value=""> 
                         <div id="productDropdown" class="dropdown-list" style="display: none;">
                             <% products.forEach(function(product) { %>
                                 <div class="dropdown-item" data-id="<%= product._id %>"><%= product.productName %></div>
@@ -178,9 +178,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 productDropdownAdd.addEventListener('click', function(event) {
     if (event.target.classList.contains('dropdown-item')) {
-        productIdAdd.value = event.target.textContent; // Set the product name
-        const productId = event.target.getAttribute('data-id'); // Get the product ID
-        document.getElementById('productIdHidden').value = productId; // Set the hidden input value with productId
+        productIdAdd.value = event.target.textContent;
+        const productId = event.target.getAttribute('data-id'); 
+        document.getElementById('productIdHidden').value = productId; 
         
         // Fetch existing offer for the selected product
         fetch(`/admin/offers/getProductOffer/${productId}`)
@@ -188,16 +188,16 @@ productDropdownAdd.addEventListener('click', function(event) {
             .then(data => {
                 if (data.success) {
                     document.getElementById('existingOfferValue').textContent = data.offer + '%';
-                    document.getElementById('existingOffer').style.display = 'block'; // Show existing offer
+                    document.getElementById('existingOffer').style.display = 'block'; 
                 } else {
                     document.getElementById('existingOfferValue').textContent = '0%';
-                    document.getElementById('existingOffer').style.display = 'none'; // Hide existing offer
+                    document.getElementById('existingOffer').style.display = 'none'; 
                 }
             })
             .catch(error => {
                 console.log(error);
                 document.getElementById('existingOfferValue').textContent = '0%';
-                document.getElementById('existingOffer').style.display = 'none'; // Hide existing offer
+                document.getElementById('existingOffer').style.display = 'none'; 
             });
 
         productDropdownAdd.style.display = 'none';
@@ -208,7 +208,7 @@ productDropdownAdd.addEventListener('click', function(event) {
     productDropdownRemove.addEventListener('click', function(event) {
         if (event.target.classList.contains('dropdown-item')) {
             productIdRemove.value = event.target.textContent;
-            const productId = event.target.getAttribute('data-id'); // Get the product ID
+            const productId = event.target.getAttribute('data-id'); 
             document.getElementById('productIdHidden').value = productId;
 
             fetch(`/admin/offers/getProductOffer/${productId}`)
@@ -216,7 +216,7 @@ productDropdownAdd.addEventListener('click', function(event) {
             .then(data => {
                 if (data.success) {
                     document.getElementById('existingOfferValueRemove').textContent = data.offer + '%';
-                    document.getElementById('existingOfferRemove').style.display = 'block'; // Show existing offer
+                    document.getElementById('existingOfferRemove').style.display = 'block';
                 } else {
                     document.getElementById('existingOfferValueRemove').textContent = '0%';
                     document.getElementById('existingOfferRemove').style.display = 'none'; // Hide existing offer

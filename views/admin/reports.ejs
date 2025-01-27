@@ -4,15 +4,12 @@
 <div class="wrapper">
   <%- include('../../views/partials/admin/sidebar') %>
 
-  <!-- Main content -->
   <div class="main-content">
-    <!-- Button to trigger the modal -->
 <div class="d-flex justify-content-between align-items-center my-4">
     <span class="h1">Sales Reports</span>
     <button class="btn btn-primary" data-toggle="modal" data-target="#reportModal">Generate Sales Report</button>
 </div>
 
-<!-- Modal for selecting filters -->
 <!-- Modal for selecting filters -->
 <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -78,7 +75,6 @@
     </div>
 </div>
 
-    <!-- Container to hold the cards in a row -->
 <div class="row">
     <!-- Top Purchased Products Card -->
     <div class="col-md-6 col-12 mb-4">
@@ -233,7 +229,6 @@ document.getElementById('reportForm').addEventListener('submit', function (event
     const startDate = document.getElementById('modalStartDate').value;
     const endDate = document.getElementById('modalEndDate').value;
 
-    // Check if the filter is 'custom' and validate the dates
     if (filterType === 'custom') {
         // Check if both dates are filled
         if (!startDate || !endDate) {
@@ -242,18 +237,17 @@ document.getElementById('reportForm').addEventListener('submit', function (event
                 title: 'Oops...',
                 text: 'Please select both start and end dates!',
             });
-            return; // Stop further processing
+            return; 
         }
 
-        // Check if the start and end dates are in the future
-        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0]; 
         if (startDate > today || endDate > today) {
             Swal.fire({
                 icon: 'error',
                 title: 'Invalid Date',
                 text: 'The selected dates cannot be in the future!',
             });
-            return; // Stop further processing
+            return; 
         }
         if (new Date(startDate) > new Date(endDate)) {
             Swal.fire({
@@ -261,7 +255,7 @@ document.getElementById('reportForm').addEventListener('submit', function (event
                 title: 'Invalid Date Range',
                 text: 'End date cannot be before the start date!',
             });
-            return; // Stop further processing
+            return; 
         }
     } else if (filterType === 'daily') {
         // Validate specific date for daily report
@@ -278,19 +272,16 @@ document.getElementById('reportForm').addEventListener('submit', function (event
     // Get selected report format (PDF or Excel)
     const reportFormat = document.querySelector('input[name="reportFormat"]:checked').value;
 
-    // Construct the URL with query parameters
     let url = `/admin/reports/export?format=${reportFormat}&filterType=${filterType}`;
 
     if (filterType === 'custom') {
         url += `&startDate=${startDate}&endDate=${endDate}`;
     } else if (filterType === 'daily') {
-        url += `&specificDate=${specificDate}`; // Add specific date for daily report
+        url += `&specificDate=${specificDate}`; 
     }
 
-    // Since the inclusion of discounts is always true, no need to check it.
     url += '&includeDiscounts=true';
 
-    // Trigger the report generation by navigating to the URL
     window.location.href = url;
 });
 
@@ -298,11 +289,10 @@ document.getElementById('reportForm').addEventListener('submit', function (event
 </script>
 
 <style>
-    /* Additional Styling for Top Purchased and Least Purchased Products Cards */
 
 .card {
-    border-radius: 10px; /* Round corners */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
+    border-radius: 10px; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
 }
 
 
@@ -322,12 +312,12 @@ document.getElementById('reportForm').addEventListener('submit', function (event
     padding: 8px 15px;
     background-color: #f9f9f9;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow for list items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
     transition: background-color 0.3s ease;
 }
 
 .list-item:hover {
-    background-color: #e9ecef; /* Hover effect for list items */
+    background-color: #e9ecef; 
 }
 
 .badge {
@@ -338,10 +328,9 @@ document.getElementById('reportForm').addEventListener('submit', function (event
 }
 
 .bi {
-    margin-right: 8px; /* Space between icon and product name */
+    margin-right: 8px; 
 }
 
-/* Specific icon styles */
 .bi-cart-fill {
     font-size: 1.2rem;
 }
@@ -369,7 +358,7 @@ document.getElementById('reportForm').addEventListener('submit', function (event
 /* Responsive adjustments for small screens */
 @media (max-width: 767px) {
     .list-item {
-        font-size: 0.9rem; /* Adjust font size on smaller screens */
+        font-size: 0.9rem; 
     }
 }
 

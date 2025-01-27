@@ -1086,31 +1086,26 @@ const addMoney = async (req, res) => {
   try {
     let wallet = await Wallet.findOne({ userId });
 
-    // If the wallet doesn't exist, create a new one with a balance of 0
     if (!wallet) {
       wallet = new Wallet({
         userId,
-        balance: 0, // Initially set to 0
+        balance: 0, 
       });
     }
 
-    // Add the money to the user's balance
     wallet.balance += amount;
 
-    // Save the wallet with the updated balance
     await wallet.save();
 
-    // Optionally, create a transaction record
     const transaction = new Transaction({
       userId,
-      type: 'deposit', // Transaction type (e.g., deposit)
+      type: 'deposit', 
       amount,
-      balance: wallet.balance, // The balance after the transaction
+      balance: wallet.balance, 
       date: new Date(),
     });
     await transaction.save();
 
-    // Send a response with the updated wallet balance
     res.status(200).json({
       message: "Money added to wallet successfully!",
       wallet,
@@ -1122,12 +1117,10 @@ const addMoney = async (req, res) => {
   }
 }
 
-// Controller for withdrawing money from the wallet
 const withdrawMoney = async (req, res) => {
-  const { amount } = req.body;  // Get amount from the request body
-  const userId = req.session.user;  // Assuming userId is in the session
+  const { amount } = req.body;  
+  const userId = req.session.user;  
 
-  // Validate amount
   if (isNaN(amount) || amount <= 0) {
     return res.status(400).json({
       success: false, 
@@ -1136,7 +1129,6 @@ const withdrawMoney = async (req, res) => {
   }
 
   try {
-    // Fetch the user's wallet
     const wallet = await Wallet.findOne({ userId });
 
     if (!wallet) {
@@ -1146,7 +1138,6 @@ const withdrawMoney = async (req, res) => {
       });
     }
 
-    // Check if the wallet has enough balance
     if (wallet.balance < amount) {
       return res.status(400).json({
         success: false,
@@ -1154,11 +1145,9 @@ const withdrawMoney = async (req, res) => {
       });
     }
 
-    // Deduct the amount from wallet balance
     wallet.balance -= amount;
     await wallet.save();
 
-    // Record the transaction
     const transaction = new Transaction({
       userId,
       type: 'withdrawal',
@@ -1168,11 +1157,10 @@ const withdrawMoney = async (req, res) => {
     });
     await transaction.save();
 
-    // Respond with the updated wallet and success message
     res.status(200).json({
       success: true,
       message: "Money withdrawn successfully!",
-      wallet,  // Return the updated wallet
+      wallet, 
     });
   } catch (error) {
     console.error(error);
