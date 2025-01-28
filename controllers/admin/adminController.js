@@ -125,85 +125,40 @@ const loadDashboard = async (req, res) => {
         salesDataPerMonth[item._id - 1] = item.totalSales;
       });
 
-      // progress bar for most sold categories
-      const categories = await Category.find({
-        isListed: true,
-        isDeleted: false,
-      });
-      const categoryLabels = [];
-      const categorySalesData = [];
+      const topProducts = await Order.aggregate([
+        { $unwind: "$ordereditems" },
+        { $lookup: { from: "products", localField: "ordereditems.product", foreignField: "_id", as: "product" } },
+        { $unwind: "$product" },
+        { $group: { _id: "$product._id", totalSales: { $sum: "$ordereditems.quantity" }, productName: { $first: "$product.productName" }, productImage: { $first: { $arrayElemAt: ["$product.productImage", 0] } } } },
+        { $sort: { totalSales: -1 } },
+        { $limit: 10 }
+      ]);
 
-      const categorySalesMap = {};
+      // Get top 10 best-selling categories
+      const topCategories = await Order.aggregate([
+        { $unwind: "$ordereditems" },
+        { $lookup: { from: "products", localField: "ordereditems.product", foreignField: "_id", as: "product" } },
+        { $unwind: "$product" },
+        { $lookup: { from: "categories", localField: "product.category", foreignField: "_id", as: "category" } },
+        { $unwind: "$category" },
+        { $group: { _id: "$category._id", totalSales: { $sum: "$ordereditems.quantity" }, categoryName: { $first: "$category.name" } } },
+        { $sort: { totalSales: -1 } },
+        { $limit: 10 }
+      ]);
 
-      for (const category of categories) {
-        const salesData = await Order.aggregate([
-          {
-            $unwind: "$ordereditems",
-          },
-          {
-            $lookup: {
-              from: "products",
-              localField: "ordereditems.product",
-              foreignField: "_id",
-              as: "product",
-            },
-          },
-          {
-            $unwind: "$product",
-          },
-          {
-            $match: {
-              "product.category": category._id,
-              $or: [
-                { status: "Delivered" },
-                { status: "Return Request" },
-                { status: "Returned" },
-              ],
-            },
-          },
-          {
-            $group: {
-              _id: "$product.category",
-              totalSales: { $sum: "$ordereditems.quantity" },
-            },
-          },
-        ]);
+      // Get top 10 best-selling brands
+      const topBrands = await Order.aggregate([
+        { $unwind: "$ordereditems" },
+        { $lookup: { from: "products", localField: "ordereditems.product", foreignField: "_id", as: "product" } },
+        { $unwind: "$product" },
+        { $lookup: { from: "brands", localField: "product.brand", foreignField: "_id", as: "brand" } },
+        { $unwind: "$brand" },
+        { $group: { _id: "$brand._id", totalSales: { $sum: "$ordereditems.quantity" }, brandName: { $first: "$brand.brandName" } } },
+        { $sort: { totalSales: -1 } },
+        { $limit: 10 }
+      ]);
 
-        const totalSales = salesData.length > 0 ? salesData[0].totalSales : 0;
-        categorySalesMap[category._id] = totalSales;
-      }
-
-      const sortedCategories = Object.keys(categorySalesMap)
-        .map((categoryId) => ({
-          categoryId,
-          totalSales: categorySalesMap[categoryId],
-        }))
-        .sort((a, b) => b.totalSales - a.totalSales)
-        .slice(0, 4);
-
-      const categoryDetails = await Promise.all(
-        sortedCategories.map(async (category) => {
-          const categoryDoc = await Category.findById(category.categoryId);
-          return {
-            name: categoryDoc.name,
-            sales: category.totalSales,
-          };
-        })
-      );
-
-      categoryDetails.forEach((category) => {
-        categoryLabels.push(category.name);
-        categorySalesData.push(category.sales);
-      });
-
-      const totalSalesOverall = categorySalesData.reduce(
-        (acc, val) => acc + val,
-        0
-      );
-      const categoryPercentages = categorySalesData.map(
-        (sales) => (sales / totalSalesOverall) * 100
-      );
-
+      
       res.render("dashboard", {
         totalProducts,
         totalCategories,
@@ -212,8 +167,9 @@ const loadDashboard = async (req, res) => {
         ordersPlacedToday,
         ordersDeliveredToday,
         lowStockProducts,
-        categoryLabels,
-        categorySalesData: categoryPercentages,
+        topProducts,
+        topCategories,
+        topBrands,
         salesDataPerMonth,
         months,
       });
@@ -222,6 +178,127 @@ const loadDashboard = async (req, res) => {
       res.status(500).send("Server Error");
     }
   }
+};
+
+const getSalesData = async (req, res) => {
+  const { timeFrame } = req.query; 
+  const currentYear = new Date().getFullYear();
+  let salesPerTimeFrameData;
+  let labels = [];
+  let salesDataPerTimeFrame = [];
+
+  if (timeFrame === 'yearly') {
+    const years = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
+    labels = years;
+
+    salesPerTimeFrameData = await Order.aggregate([
+      {
+        $match: {
+          createdOn: {
+            $gte: new Date(currentYear - 5, 0, 1),
+            $lte: new Date(currentYear, 11, 31),
+          },
+        },
+      },
+      {
+        $unwind: "$ordereditems",
+      },
+      {
+        $group: {
+          _id: { $year: "$createdOn" },
+          totalSales: { $sum: "$ordereditems.quantity" },
+        },
+      },
+      {
+        $match: {
+          _id: { $in: years },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+    
+    years.forEach(year => {
+      const data = salesPerTimeFrameData.find(item => item._id === year);
+      salesDataPerTimeFrame.push(data ? data.totalSales : 0);
+    });
+  } else if (timeFrame === 'monthly') {
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    labels = months;
+
+    salesPerTimeFrameData = await Order.aggregate([
+      {
+        $match: {
+          createdOn: {
+            $gte: new Date(currentYear, 0, 1),
+            $lte: new Date(currentYear, 11, 31),
+          },
+        },
+      },
+      {
+        $unwind: "$ordereditems",
+      },
+      {
+        $group: {
+          _id: { $month: "$createdOn" },
+          totalSales: { $sum: "$ordereditems.quantity" },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+    
+    salesDataPerTimeFrame = Array(12).fill(0);
+    salesPerTimeFrameData.forEach(item => {
+      salesDataPerTimeFrame[item._id - 1] = item.totalSales;
+    });
+  } else if (timeFrame === 'weekly') {
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+    
+    labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    salesPerTimeFrameData = await Order.aggregate([
+      {
+        $match: {
+          createdOn: {
+            $gte: last7Days,
+            $lte: new Date(),
+          },
+        },
+      },
+      {
+        $unwind: "$ordereditems",
+      },
+      {
+        $project: {
+          dayOfWeek: { $dayOfWeek: "$createdOn" }, 
+          ordereditems: 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$dayOfWeek",
+          totalSales: { $sum: "$ordereditems.quantity" },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    salesDataPerTimeFrame = Array(7).fill(0);
+    salesPerTimeFrameData.forEach(item => {
+      salesDataPerTimeFrame[item._id - 1] = item.totalSales;
+    });
+  }
+
+  res.json({ labels, salesDataPerTimeFrame });
 };
 
 const logout = async (req, res) => {
@@ -328,6 +405,7 @@ module.exports = {
   loadLogin,
   login,
   loadDashboard,
+  getSalesData,
   salesReport,
   salesStatistics,
   exportSalesReport,

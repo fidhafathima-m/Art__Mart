@@ -8,39 +8,8 @@
   <div class="main-content">
     <h1 class="my-4">Welcome, Admin</h1>
 
-    <!-- Cards for Daily Stats (Today's Sales, Delivered, Low Stock) -->
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card border-info mb-3">
-          <div class="card-header">Orders Placed Today</div>
-          <div class="card-body">
-            <h5 class="card-title"><%= ordersPlacedToday %></h5>
-            <p class="card-text">Number of orders placed today</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-success mb-3">
-          <div class="card-header">Orders Delivered Today</div>
-          <div class="card-body">
-            <h5 class="card-title"><%= ordersDeliveredToday %></h5>
-            <p class="card-text">Number of orders delivered today</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card border-warning mb-3">
-          <div class="card-header">Low Stock Products</div>
-          <div class="card-body">
-            <h5 class="card-title"><%= lowStockProducts %></h5>
-            <p class="card-text">Number of products with low stock</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cards for Overview (Total Products, Categories, Users, Orders) -->
-    <div class="row">
+     <!-- Cards for Overview (Total Products, Categories, Users, Orders) -->
+     <div class="row">
       <div class="col-md-3">
         <a href="/admin/products">
         <div class="card text-white bg-primary mb-3">
@@ -87,13 +56,116 @@
       </div>
     </div>
 
-    
 
-    <!-- Total Sales per Month Graph -->
-<div class="row">
+    <!-- Cards for Daily Stats (Today's Sales, Delivered, Low Stock) -->
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card border-info mb-3">
+          <div class="card-header">Orders Placed Today</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= ordersPlacedToday %></h5>
+            <p class="card-text">Number of orders placed today</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-success mb-3">
+          <div class="card-header">Orders Delivered Today</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= ordersDeliveredToday %></h5>
+            <p class="card-text">Number of orders delivered today</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card border-warning mb-3">
+          <div class="card-header">Low Stock Products</div>
+          <div class="card-body">
+            <h5 class="card-title"><%= lowStockProducts %></h5>
+            <p class="card-text">Number of products with low stock</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <!-- Top 10 Best-Selling Products Card -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Top 10 Best-Selling Products</h5>
+          </div>
+          <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+            <% topProducts.forEach((product, index) => { %>
+              <div class="mb-3">
+                <!-- Each item takes full width inside the card -->
+                <div class="d-flex align-items-center">
+                  <img src="<%= product.productImage %>" alt="<%= product.productName %>" class="img-fluid rounded" style="width: 50px; height: 50px; object-fit: cover;"/>
+                  <span class="ml-2"><%= product.productName %></span>
+                </div>
+                <span class="badge badge-info badge-pill"><%= product.totalSales %> sold</span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Top 10 Best-Selling Categories Card -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Top 10 Best-Selling Categories</h5>
+          </div>
+          <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+            <% topCategories.forEach((category, index) => { %>
+              <div class="mb-3">
+                <!-- Each item takes full width inside the card -->
+                <span><%= category.categoryName %></span>
+                <span class="badge badge-primary badge-pill"><%= category.totalSales %> sold</span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Top 10 Best-Selling Brands Card -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Top 10 Best-Selling Brands</h5>
+          </div>
+          <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+            <% topBrands.forEach((brand, index) => { %>
+              <div class="mb-3">
+                <!-- Each item takes full width inside the card -->
+                <span><%= brand.brandName %></span>
+                <span class="badge badge-secondary badge-pill"><%= brand.totalSales %> sold</span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+   <!-- Filter for Time Frame -->
+<div class="row mt-4">
+  <div class="col-md-12">
+    <div class="form-group">
+      <label for="timeFrame" style="margin-left: -150px; margin-top: 20px;">Select Time Frame:</label>
+      <select id="timeFrame" class="form-control mt-5" onchange="updateChart()">
+        <option value="yearly">Yearly (2-5 Years)</option>
+        <option value="monthly">Monthly</option>
+        <option value="weekly">Weekly (Days of Week)</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Dynamic Sales Chart -->
+<div class="row mt-4">
   <div class="col-md-12">
     <div class="card">
-      <div class="card-header">Total Sales This Year</div>
+      <div class="card-header">Sales Data</div>
       <div class="card-body">
         <canvas id="salesChart"></canvas>
       </div>
@@ -101,55 +173,55 @@
   </div>
 </div>
 
-    <!-- Most Sold Categories (Progress Bars) -->
-<div class="row mt-3">
-  <div class="col-md-12">
-    <div class="card">
-      <div class="card-header">Most Sold Categories</div>
-      <div class="card-body"> 
-        <% for(let i = 0; i < categoryLabels.length; i++) { %>
-        <div class="mb-3">
-          <label for="category<%= i %>" class="form-label"><%= categoryLabels[i] %></label>
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: <%= categorySalesData[i] %>%" aria-valuenow="<%= categorySalesData[i] %>" aria-valuemin="0" aria-valuemax="100"></div>
-            
-          </div>
-          <p style="text-align: right;"><%= categorySalesData[i].toFixed(2) %>%</p>
-        </div>
-        <% } %>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-</div>
 
-<!-- footer -->
+</div>
+</div>
 <%- include('../../views/partials/admin/footer') %>
+
 
 <!-- Chart.js Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-  var ctx = document.getElementById('salesChart').getContext('2d');
-  var salesChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: <%- JSON.stringify(months) %>,  
-      datasets: [{
-        label: 'Total Sales (Units Sold)',
-        data: <%= JSON.stringify(salesDataPerMonth) %>,  
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        y: {
-          beginAtZero: true
+  var salesChart;
+
+  function updateChart() {
+    const timeFrame = document.getElementById('timeFrame').value;
+
+    fetch(`/admin/api/sales-data?timeFrame=${timeFrame}`)
+      .then(response => response.json())
+      .then(data => {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+
+        if (salesChart) {
+          salesChart.destroy(); // Destroy the previous chart instance
         }
-      }
-    }
-  });
+
+        salesChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels,  // dynamic labels for days of the week
+            datasets: [{
+              label: 'Total Sales (Units Sold)',
+              data: data.salesDataPerTimeFrame,
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      })
+      .catch(error => console.error('Error fetching sales data:', error));
+  }
+
+  // Initial chart load
+  document.addEventListener('DOMContentLoaded', updateChart);
 </script>

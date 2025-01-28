@@ -743,7 +743,8 @@ const razorpayPlaceOrder = async (req, res) => {
       amount: finalAmount,
       currency: 'INR',
       // eslint-disable-next-line no-undef
-      razorpayKey: process.env.RAZORPAY_ID_KEY
+      razorpayKey: process.env.RAZORPAY_ID_KEY,
+      paymentMethod: 'razorpay'
     });
 
   } catch (error) {

@@ -50,6 +50,7 @@ router.get(
 router.post("/reset-password", adminProfileController.resetPassword);
 
 router.get("/", adminController.loadDashboard);
+router.get('/api/sales-data', adminController.getSalesData);
 router.get("/logout", adminController.logout);
 
 // Customer management

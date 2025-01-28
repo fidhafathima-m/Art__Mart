@@ -1440,6 +1440,20 @@ document.getElementById('usePaymentMethodBtn').addEventListener('click', functio
 
   const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
+  if (paymentMethod === 'cod' && finalAmount > 1000) {
+    this.disabled = false; // Re-enable the button
+    document.getElementById('loadingOverlay').classList.add('d-none');
+    Swal.fire({
+          title: 'Exceeded Limit',
+          text: 'Sorry, COD is not available for orders above ₹1000',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          document.getElementById('loadingOverlay').classList.add('d-none');
+        });
+        return; 
+  }
+
   // Select appropriate route based on payment method
   const url = paymentMethod === 'razorpay' ? '/checkout/razorpay-place-order' : 
               paymentMethod === 'wallet' ? '/checkout/wallet-place-order' : 
@@ -1487,6 +1501,7 @@ document.getElementById('usePaymentMethodBtn').addEventListener('click', functio
 
 // Function to place the order
 function placeOrder(url, orderData) {
+  console.log('inside place order')
   fetch(url, {
     method: 'POST',
     headers: {
@@ -1496,11 +1511,16 @@ function placeOrder(url, orderData) {
   })
   .then(response => response.json())
   .then(data => {
+    console.log('Payment method:', data.paymentMethod);
+    console.log('Razorpay API Key:', data.razorpayKey);
+
     document.getElementById('loadingOverlay').classList.add('d-none');
-    document.getElementById('usePaymentMethodBtn').disabled = false; // Re-enable the button
+    document.getElementById('usePaymentMethodBtn').disabled = false; 
 
     if (data.success) {
+      
       if (data.paymentMethod === 'razorpay') {
+        console.log('Opening Razorpay payment window...');
         var options = {
           key: data.razorpayKey,
           amount: data.amount * 100, 
@@ -1519,11 +1539,18 @@ function placeOrder(url, orderData) {
           }
         };
         var rzp1 = new Razorpay(options);
-        rzp1.open();
+        try {
+          rzp1.open();
+        } catch (error) {
+          console.log('Error opening Razorpay window:', error);
+        }
+
       } else {
         // For COD or wallet, redirect directly after order creation
         window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
       }
+    } else {
+      console.log('Error')
     }
   })
   .catch(error => {
