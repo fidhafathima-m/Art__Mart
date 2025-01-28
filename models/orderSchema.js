@@ -89,7 +89,7 @@ const orderSchema = new Schema({
   },
   paymentMethod: { 
     type: String,
-    enum: ['prepaid', 'COD'],  
+    enum: ['prepaid', 'COD', 'wallet'],  
     required: true,
   },
   moneySent: {

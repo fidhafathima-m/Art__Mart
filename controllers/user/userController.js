@@ -20,6 +20,8 @@ const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
 // eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
+// eslint-disable-next-line no-undef
+const Brand = require("../../models/brandSchema");
 
 // generate OTP
 const generateOtp = () => {
@@ -400,6 +402,8 @@ const loadShopping = async (req, res) => {
     const userData = await User.findOne({ _id: user });
     const categories = await Category.find({ isListed: true, isDeleted: false });
     const categoryIds = categories.map((category) => category._id.toString());
+    const brands = await Brand.find({isDeleted: false });
+    const brandIds = brands.map((brand) => brand._id.toString());
     const page = parseInt(req.query.page) || 1;
     const limit = 6;
     // eslint-disable-next-line no-unused-vars
@@ -411,6 +415,11 @@ const loadShopping = async (req, res) => {
       isBlocked: false,
       isDeleted: false,
       category: { $in: categoryIds },
+      $or: [
+        { brand: { $in: brandIds } },  
+        { brand: { $exists: false } }, 
+        { brand: null }               
+      ]
     });
 
     if (sortBy === 'lowToHigh') {
@@ -421,7 +430,9 @@ const loadShopping = async (req, res) => {
       productsQuery = productsQuery.sort({ createdAt: -1 }); 
     }
 
-    const allProducts = await productsQuery.lean();
+    const allProducts = await productsQuery
+    .populate('brand', 'brandName')
+    .lean();
 
     const rating = parseInt(req.query.rating) || 0;
 
@@ -457,10 +468,15 @@ const loadShopping = async (req, res) => {
       _id: category._id,
       name: category.name,
     }));
+    const brandWithIds = brands.map((brand) => ({
+      _id: brand._id,
+      name: brand.brandName,
+      }));
 
     res.render('shop', {
       user: userData,
       categories: categoryWithIds,
+      brands: brandWithIds,
       products: currentProducts,
       totalProducts: totalProducts,
       currentPage: page,
@@ -1079,7 +1095,10 @@ const addMoney = async (req, res) => {
   const { amount } = req.body; 
   const userId = req.session.user; 
 
-  if (!amount || amount <= 0) {
+  // Ensure amount is a number
+  const parsedAmount = parseFloat(amount);
+
+  if (!parsedAmount || parsedAmount <= 0) {
     return res.status(400).json({ message: "Please enter a valid amount greater than 0." });
   }
 
@@ -1093,14 +1112,14 @@ const addMoney = async (req, res) => {
       });
     }
 
-    wallet.balance += amount;
+    wallet.balance += parsedAmount; // Use parsedAmount
 
     await wallet.save();
 
     const transaction = new Transaction({
       userId,
       type: 'deposit', 
-      amount,
+      amount: parsedAmount, // Use parsedAmount
       balance: wallet.balance, 
       date: new Date(),
     });

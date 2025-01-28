@@ -150,7 +150,7 @@ const sendMoneyToWallet = async (req, res) => {
       return res.status(404).send('Order not found');
     }
 
-    if (order.status === 'Cancelled' && order.paymentMethod === 'prepaid' && !order.moneySent) {
+    if ((order.status === 'Cancelled' && order.paymentMethod === 'prepaid' || order.paymentMethod === 'wallet') && !order.moneySent) {
       // Update the order's moneySent status
       order.moneySent = true;
       await order.save();

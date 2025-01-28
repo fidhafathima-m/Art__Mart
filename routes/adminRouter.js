@@ -1,9 +1,5 @@
 // eslint-disable-next-line no-undef
 const express = require("express");
-// eslint-disable-next-line no-undef
-const multer = require("multer");
-// eslint-disable-next-line no-undef
-const path = require("path");
 const router = express.Router();
 // eslint-disable-next-line no-undef
 const adminController = require("../controllers/admin/adminController");
@@ -23,6 +19,10 @@ const couponController = require("../controllers/admin/couponController");
 const orderController = require('../controllers/admin/orderController');
 // eslint-disable-next-line no-undef
 const offerController = require('../controllers/admin/offerController');
+// eslint-disable-next-line no-undef
+const brandController = require('../controllers/admin/brandController');
+// eslint-disable-next-line no-undef
+const upload = require('../helpers/multerUploads');
 
 router.get("/pageError", adminController.pageError);
 router.get("/login", adminAuth.isLogout, adminController.loadLogin);
@@ -106,26 +106,6 @@ router.post(
 );
 
 //Product Management
-// Set storage options
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads/product-images/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 20 * 1024 * 1024, fieldSize: 50 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
-      cb(null, true);
-    } else {
-      cb(new Error("Only image files are allowed"), false);
-    }
-  },
-});
 
 router.get("/products", adminAuth.isLogin, productController.productInfo);
 router.get("/add-product", adminAuth.isLogin, productController.loadAddProduct);
@@ -207,6 +187,17 @@ router.post("/offers/addCategoryOffer",offerController.addCategoryOffer);
 router.get('/offers/getCategoryOffer/:categoryId', offerController.getCategoryOffer);
 router.post("/offers/removeCategoryOffer",offerController.removeCategoryOffer);
 router.get('/offers/referralUsers', offerController.getReferredUsers);
+
+// brand management
+router.get('/brands', adminAuth.isLogin, brandController.getBrand);
+router.get('/brands/add-brand', adminAuth.isLogin, brandController.loadAddBrand);
+router.post('/brands/add-brand', adminAuth.isLogin, upload.single('brandImage'), brandController.addBrand);
+// router.get('/brands/edit-brand', adminAuth.isLogin, brandController.loadEditBrand);
+// router.delete('brands/delete-image/:imageId',adminAuth.isLogin, brandController.deleteLogo);
+router.post('/brands/block-brand', adminAuth.isLogin, brandController.brandBlocked);
+router.post('/brands/unblock-brand', adminAuth.isLogin, brandController.brandUnblocked);
+router.patch("/delete-brand/:id", brandController.deleteBrand);
+router.patch("/restore-brand/:id", brandController.restoreBrand);
 
 // eslint-disable-next-line no-undef
 module.exports = router;

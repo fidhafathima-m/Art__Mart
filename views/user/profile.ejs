@@ -215,9 +215,14 @@
                   >
                   <% }) %>
                 </p>
+                
+                <p><strong>Payment method: </strong><%= order.paymentMethod %></p>
+
+                
                 <% if(order.status === 'Cancelled') { %>
                   <p class="text-danger">This order was cancelled!</p>
                   <% } %>
+
               </div>
  
               <div class="col-12 text-end">
@@ -282,6 +287,14 @@
                   <% } %>
                 </p>
                 </a>
+                <input type="number" class="quantity-input" min="1" max="5" value="1" style="width: 60px; margin-right: 10px;">
+                  <a
+                    href="#"
+                    data-product-id="<%= item.productId %>"
+                    class="add-cart btn btn-primary mr-2"
+                  >
+                    Add to cart
+                  </a>
               </div>
 
               <!-- Delete Icon (Third Column) -->
@@ -332,9 +345,9 @@
 
         <!-- Right Column: Add Money Button -->
         <div class="ml-auto">
-          <!-- <button class="btn btn-success" data-toggle="modal" data-target="#addMoneyModal">
+          <button class="btn btn-success" data-toggle="modal" data-target="#addMoneyModal">
             Add Money
-          </button> -->
+          </button>
           <button class="btn btn-danger ml-2" data-toggle="modal" data-target="#withdrawMoneyModal">
             Withdraw Money
           </button>
@@ -522,6 +535,141 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const addToCartButtons = document.querySelectorAll(".add-cart");
+
+  addToCartButtons.forEach((button) => {
+    button.addEventListener("click", async (event) => {
+
+      event.preventDefault();
+
+      const quantityInput = button.previousElementSibling; // Get the quantity input
+      let quantity = parseInt(quantityInput.value);
+
+      console.log("Button clicked:", button);
+      console.log("Quantity:", quantity);
+
+      if (quantity > 5) {
+        Swal.fire({
+          title: "Limit Exceeded!",
+          text: "You cannot add more than 5 of this product.",
+          icon: "warning",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      const productId = button.getAttribute("data-product-id");
+      console.log("Product id: ", productId)
+
+      if (!productId) {
+        console.error("No product ID found!");
+        return;
+      }
+
+      try {
+        const response = await fetch("/cart/update-quantity/" + productId, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productId: productId,
+            quantity: quantity,
+          }),
+          credentials: "same-origin",
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          Swal.fire({
+            title: "Success!",
+            text: "Item added to cart",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Go to cart",
+            cancelButtonText: "Cancel",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/cart";
+            }
+          });
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: data.message,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Login",
+            cancelButtonText: "Cancel",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/login";
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("There was an error adding the item to the cart.");
+      }
+    });
+  });
+
+  const deleteButtons = document.querySelectorAll('.delete-wishlist-item');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', async (event) => {
+                event.preventDefault();
+                const productId = event.target.closest('a').getAttribute('data-product-id'); // Get the product ID
+
+                try {
+                    // Send a DELETE request to remove the item from the wishlist
+                    const response = await fetch(`/deleteFromWishlist`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            productId: productId
+                        }),
+                        credentials: 'same-origin',
+                    });
+
+                    const data = await response.json(); // Parse the response as JSON
+
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Item removed from wishlist',
+                            icon: 'success',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            location.reload(); // Reload the page to reflect the changes
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonColor: '#d33',
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("There was an error removing the item from the wishlist.");
+                }
+            });
+        });
+});
   // When clicking on the delete button
   document.querySelectorAll("#deleteAddressLink").forEach((link) => {
     link.addEventListener("click", function (event) {
@@ -577,61 +725,12 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-        const deleteButtons = document.querySelectorAll('.delete-wishlist-item');
-        
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', async (event) => {
-                event.preventDefault();
-                const productId = event.target.closest('a').getAttribute('data-product-id'); // Get the product ID
-
-                try {
-                    // Send a DELETE request to remove the item from the wishlist
-                    const response = await fetch(`/deleteFromWishlist`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            productId: productId
-                        }),
-                        credentials: 'same-origin',
-                    });
-
-                    const data = await response.json(); // Parse the response as JSON
-
-                    if (data.success) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Item removed from wishlist',
-                            icon: 'success',
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'OK',
-                        }).then(() => {
-                            location.reload(); // Reload the page to reflect the changes
-                        });
-                    } else {
-                        Swal.fire({
-                            title: 'Error',
-                            text: data.message,
-                            icon: 'error',
-                            confirmButtonColor: '#d33',
-                        });
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("There was an error removing the item from the wishlist.");
-                }
-            });
-        });
-    });
-
        // Handle Add Money form submission
-  document.getElementById('addMoneyForm').addEventListener('submit', function (e) {
+       document.getElementById('addMoneyForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    const amount = document.getElementById('amount').value;
+    const amount = parseFloat(document.getElementById('amount').value); // Convert to number
 
-    if (parseFloat(amount) <= 0) {
+    if (isNaN(amount) || amount <= 0) {
       // Display an error alert if the amount is invalid
       Swal.fire({
         title: 'Error',
@@ -655,12 +754,12 @@
         // Display success alert with the wallet balance
         Swal.fire({
           title: 'Success!',
-          text: data.message + '\nNew Balance: $' + data.wallet.balance.toFixed(2),
+          text: data.message + '\nNew Balance: ₹' + data.wallet.balance.toFixed(2), // Change to rupees
           icon: 'success',
           confirmButtonText: 'OK'
         }).then(() => {
           // Optionally, update the wallet balance on the page without reloading
-          document.querySelector('.card-body .h5').textContent = `$${data.wallet.balance.toFixed(2)}`;
+          document.querySelector('.card-body .h5').textContent = `₹${data.wallet.balance.toFixed(2)}`; // Change to rupees
           $('#addMoneyModal').modal('hide'); // Hide the modal after success
         });
       }
@@ -674,7 +773,7 @@
         confirmButtonText: 'OK'
       });
     });
-  });
+});
 
 
   // Handle Withdraw Money form submission using jQuery AJAX
@@ -749,5 +848,7 @@ $('#withdrawMoneyForm').submit(function (e) {
     }
   });
 });
+
+
 
 </script>

@@ -12,12 +12,21 @@ const brandSchema = new Schema({
     required: true,
   },
   isBlocked: {
-    type: String,
+    type: Boolean,
+    default: false,
     required: true,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+  deletedAt: {
+    type: Date,
+    default: Date.now,
+  },
   createdAt: {
-    type: String,
-    required: true,
+    type: Date,
+    default: Date.now,
   },
 });
 

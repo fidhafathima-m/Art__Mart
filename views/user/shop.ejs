@@ -240,6 +240,11 @@
                 </ul>
               </div>
               <div class="product__item__text">
+                <% if (products[i].brand && products[i].brand.brandName) { %>
+                  <h6 class="text-muted text-start mt-2"><%= products[i].brand.brandName %></h6>
+                <% } else { %>
+                  <h6 class="text-muted text-start mt-2">No Brand</h6>
+                <% } %>
                 <h6><%= products[i].productName %></h6>
                 <% if (products[i].quantity > 0) { %>
                 <a href="#" data-product-id="<%= products[i]._id %>" class="add-cart"> Add to cart </a>

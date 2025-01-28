@@ -35,6 +35,7 @@
         <thead>
           <tr>
             <th>Product Name</th>
+            <th>Brand</th>
             <th>Category</th>
             <th>Stock</th>
             <th>Regular Price</th>
@@ -50,6 +51,15 @@
           <% for(let i = 0; i < product.length; i++) { %>
           <tr id="<%= product[i]._id %>">
             <td><%= product[i].productName %></td>
+            <td>
+              <% if (product[i].brand && product[i].brand.brandName) { %>
+                <%= product[i].brand.brandName %>
+              <% } else { %>
+                No Brand
+              <% } %>
+            </td>
+            
+
             <td><%= product[i].category.name %></td>
             <% if (product[i].quantity < 5) { %>
               <td><span class="badge badge-danger"><%= product[i].quantity %></span></td>

@@ -15,6 +15,10 @@ const Order = require('../../models/orderSchema');
 // eslint-disable-next-line no-undef
 const Wishlist = require("../../models/wishlistSchema");
 // eslint-disable-next-line no-undef
+const Wallet = require('../../models/walletSchema');
+// eslint-disable-next-line no-undef
+const Transaction = require('../../models/transactionSchema');
+// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
 // eslint-disable-next-line no-undef
 const nodemailer = require('nodemailer');
@@ -103,8 +107,9 @@ const loadProductDetails = async (req, res) => {
     const userId = req.session.user;
     const userData = await User.findById(userId);
     const productId = req.query.id;
-    const product = await Product.findById(productId).populate("category");
+    const product = await Product.findById(productId).populate("category brand");
     const category = product.category;
+    const brand = product.brand;
     const couponData = await Coupon.find({ isList: true });
 
     const priceLowerBound = product.salePrice - product.salePrice * 0.2;
@@ -156,6 +161,7 @@ const loadProductDetails = async (req, res) => {
       user: userData,
       products: product,
       category: category,
+      brand: brand,
       quantity: product.quantity,
       coupons: couponData,
       relatedProducts: relatedProducts,
@@ -548,6 +554,118 @@ const codOrderSuccess = async (req, res) => {
   }
 };
 
+const walletBalanceCheck = async(req, res) => {
+  const { amount } = req.body;
+  const userId = req.session.user;
+
+  try {
+    const wallet = await Wallet.findOne({ userId: userId });
+    if (!wallet || wallet.balance < amount) {
+      return res.status(400).json({ success: false, message: "Insufficient balance" });
+    }
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Error checking wallet balance:", error);
+    return res.status(500).json({ success: false, message: "An error occurred while checking the wallet balance." });
+  }
+}
+
+const walletPlaceOrder = async(req, res) => {
+  try {
+    const { ordereditems, totalprice, finalAmount, discount, status, couponApplied } = req.body;
+    const userId = req.session.user;
+
+    // Check if the user has a default address
+    const userAddresses = await Address.find({ userId: userId });
+    if (!userAddresses || userAddresses.length === 0) {
+      return res.status(400).json({ success: false, message: "No addresses found for the user" });
+    }
+
+    const defaultAddress = userAddresses
+      .flatMap(addr => addr.address)
+      .find(addr => addr.isDefault === true);
+
+    if (!defaultAddress) {
+      return res.status(400).json({ success: false, message: "No default address found" });
+    }
+
+    // Check wallet balance
+    const wallet = await Wallet.findOne({ userId: userId });
+    if (!wallet || wallet.balance < finalAmount) {
+      return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
+    }
+
+    // Deduct the amount from the wallet
+    wallet.balance -= finalAmount;
+    await wallet.save();
+
+    // Create a transaction record
+    const transaction = new Transaction({
+      userId: userId,
+      type: 'Purchased using wallet - Debit',
+      amount: finalAmount,
+      balance: wallet.balance,
+    });
+    await transaction.save();
+
+    // Create the order
+    const newOrder = new Order({
+      userId: userId,
+      ordereditems,
+      totalprice,
+      finalAmount,
+      address: defaultAddress._id,
+      status: status || "Pending",
+      createdOn: new Date(),
+      invoiceDate: new Date(),
+      couponApplied,
+      discount,
+      paymentMethod: 'wallet' // Set payment method to Wallet
+    });
+
+    const savedOrder = await newOrder.save();
+
+    // Update product quantities
+    for (const item of ordereditems) {
+      const productId = item.product;
+      const orderedQuantity = item.quantity;
+
+      const product = await Product.findById(productId);
+      if (product) {
+        if (product.quantity < orderedQuantity) {
+          return res.status(400).json({ success: false, message: `Not enough stock for product ${product.productName}` });
+        }
+        product.quantity -= orderedQuantity;
+        await product.save();
+      }
+    }
+
+    // Remove items from cart after order is placed
+    await Cart.findOneAndUpdate(
+      { userId: userId },
+      { $pull: { items: { productId: { $in: ordereditems.map(item => item.product) } } } }
+    );
+
+    const userData = await User.findOne({ _id: userId });
+    const userEmail = userData.email;
+    const emailSent = await sendOrderConfirmationEmail(userEmail, savedOrder, defaultAddress);
+
+    if (!emailSent) {
+      return res.status(500).json({ success: false, message: "Failed to send order confirmation email." });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Order placed successfully!",
+      orderId: savedOrder.orderId,
+    });
+
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ message: "An error occurred while placing the order. Please try again." });
+  }
+}
+
 
 
 const razorpayPlaceOrder = async (req, res) => {
@@ -915,6 +1033,8 @@ module.exports = {
   updateDefaultAddress,
   codPlaceOrder,
   razorpayPlaceOrder,
+  walletBalanceCheck,
+  walletPlaceOrder,
   codOrderSuccess,
   loadReview,
   postReview,

@@ -979,6 +979,13 @@ const cancelOrder = async (req, res) => {
       });
     }
 
+    if (order.paymentMethod === 'wallet') {
+      return res.json({
+        success: true,
+        message: `Your order has been cancelled. The prepaid amount of ₹${order.finalAmount} will be credited to your wallet within 24 hours.`,
+      });
+    }
+
     res.json({ success: true, message: 'Order has been cancelled.' });
   } catch (error) {
     console.error('Error cancelling order:', error);

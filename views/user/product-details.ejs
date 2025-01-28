@@ -196,7 +196,9 @@
             ><%= avgRating.toFixed(1) %> / 5.0</span
           >
         </div>
-
+        <% if(products.brand) { %>
+          <h5 class="text-muted text-start mt-2"><%= products.brand.brandName %></h5>
+          <% } %>
         <h2><%= products.productName %></h2>
 
         <!-- Display average rating -->

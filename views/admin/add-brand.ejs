@@ -1,0 +1,99 @@
+<%- include('../../views/partials/admin/header') %>
+
+<div class="wrapper">
+  <%- include('../../views/partials/admin/sidebar') %>
+
+  <div class="container">
+    <h1 class="my-4">Add Brand</h1>
+
+    <!-- Brand Form -->
+    <form
+      id="addBrandForm"
+      action="/admin/brands/add-brand"
+      method="POST"
+      enctype="multipart/form-data"
+      class="form-horizontal"
+    >
+      <div class="form-group">
+        <label for="brandName" class="form-label">Brand Name</label>
+        <input
+          type="text"
+          id="brandName"
+          name="name"
+          class="form-control"
+          required
+          placeholder="Enter brand name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="brandImage" class="form-label">Brand logo</label>
+        <input
+          type="file"
+          id="brandImage"
+          name="brandImage"
+          class="form-control"
+          accept="image/*"
+        />
+        </div>
+
+      <button type="submit" class="btn btn-primary">Add Brand</button>
+      <a href="/admin/brands" class="btn btn-danger">Cancel</a>
+    </form>
+  </div>
+</div>
+
+<%- include('../../views/partials/admin/footer') %>
+
+<!-- Add jQuery and SweetAlert -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('addBrandForm');
+    
+      form.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
+    
+        const formData = new FormData(form); // Collect the form data
+    
+        // Use fetch to send the form data to the server
+        fetch('/admin/brands/add-brand', {
+          method: 'POST',
+          body: formData,  // Pass the FormData as the body of the request
+        })
+        .then(response => response.json()) // Parse the response as JSON
+        .then(data => {
+          if (data.success) {
+            // Show success alert and redirect to brands page
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: data.message,
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              window.location.href = '/admin/brands'; // Redirect to brands page
+            });
+          } else {
+            // Show error alert if something went wrong
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops!',
+              text: data.message,
+            });
+          }
+        })
+        .catch(error => {
+          // Handle any errors in the request
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!',
+            text: 'Something went wrong, please try again!',
+          });
+        });
+      });
+    });
+    </script>

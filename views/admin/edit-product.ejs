@@ -23,20 +23,37 @@
       onsubmit="return validateForm();"
     >
       <!-- Product Name -->
-      <div class="form-group">
-        <label for="productName" class="form-label">Product Name</label>
-        <input
+      <div class="form-group row">
+        <label for="productName" class="col-sm-2 col-form-label">
+          Product Name
+        </label>
+        <div class="col-sm-4">
+          <input
           type="text"
           id="productName"
           name="productName"
           class="form-control"
-          value="<%= product.productName %>"
           placeholder="Enter Product name"
-        />
-        <div class="invalid-feedback" id="productNameError">
-          Please enter the product name.
+          value="<%= product.productName %>"
+          />
+          <div class="invalid-feedback" id="productNameError">
+            Please enter the product name.
+          </div>
         </div>
-      </div>
+        <label for="brand" class="col-sm-2 col-form-label">Brand</label>
+        <div class="col-sm-4">
+          <select id="brand" name="brand" class="form-control">
+            <option value="" <% if (!product.brand) { %> selected <% } %> >No Brand</option>
+            <% brands.forEach(function(brand) { %>
+              <option value="<%= brand._id %>" 
+                <% if (product.brand && brand._id.toString() === product.brand.toString()) { %> selected <% } %>>
+                <%= brand.brandName %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+        
+        </div>
 
       <!-- Product Description -->
       <div class="form-group">
@@ -139,10 +156,10 @@
         <label for="category" class="col-sm-2 col-form-label">Category</label>
         <div class="col-sm-4">
           <select id="category" name="category" class="form-control">
-            <% categories.forEach(function(category) { %> <option value="<%=
-            category._id %>" <% if (category._id.toString() ===
-            product.category.toString()) { %> selected <% } %>> <%=
-            category.name %> <% }); %>
+            <% categories.forEach(function(category) { %> 
+            <option value="<%= category._id %>" 
+            <% if (category._id.toString() === product.category.toString()) { %> selected <% } %>> 
+            <%= category.name %> <% }); %>
           </select>
         </div>
       </div>

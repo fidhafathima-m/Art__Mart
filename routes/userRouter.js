@@ -116,6 +116,8 @@ router.get('/checkout', productController.loadCheckout);
 router.post('/update-default-address', productController.updateDefaultAddress);
 router.post('/checkout/place-order', productController.codPlaceOrder);
 router.post('/checkout/razorpay-place-order', productController.razorpayPlaceOrder);
+router.post('/wallet/check-balance', productController.walletBalanceCheck);
+router.post('/checkout/wallet-place-order', productController.walletPlaceOrder);
 router.get('/checkout/orderSuccess', productController.codOrderSuccess);
 
 //review

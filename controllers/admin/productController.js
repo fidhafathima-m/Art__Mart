@@ -3,6 +3,8 @@ const Product = require("../../models/productSchema");
 // eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
 // eslint-disable-next-line no-undef
+const Brand = require('../../models/brandSchema');
+// eslint-disable-next-line no-undef
 const sharp = require("sharp");
 // eslint-disable-next-line no-undef
 const fs = require("fs");
@@ -30,7 +32,8 @@ const productInfo = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("category", "name");
+      .populate("category", "name") // Populate the category field with only the 'name' field
+      .populate("brand", "brandName"); 
 
     const totalProducts = await Product.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalProducts / limit);
@@ -51,7 +54,8 @@ const productInfo = async (req, res) => {
 const loadAddProduct = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true, isDeleted: false });
-    res.render("add-product", { categories: category });
+    const brand = await Brand.find({ isDeleted: false });
+    res.render("add-product", { categories: category, brands: brand });
   } catch (error) {
     console.log(error.message);
     res.redirect("/pageError");
@@ -105,6 +109,17 @@ const addProduct = async (req, res) => {
           .json({ success: false, message: "Invalid category ID" });
       }
 
+      const brandId = await Brand.findOne({
+        _id: new mongoose.Types.ObjectId(products.brand.trim()),
+        isDeleted: false,
+      });
+
+      if (!brandId) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid brand ID" });
+      }
+
       // Calculate the offer price
       const percentage = products.productOffer || 0;
       const salePrice =
@@ -130,6 +145,7 @@ const addProduct = async (req, res) => {
         description: products.description,
         highlights: highlights,
         category: categoryId._id,
+        brand: brandId._id,
         regularPrice: products.regularPrice,
         productOffer: percentage,
         salePrice: salePrice,
@@ -184,7 +200,8 @@ const loadEditProduct = async (req, res) => {
     }
 
     const category = await Category.find({ isListed: true, isDeleted: false });
-    res.render("edit-product", { product: product, categories: category });
+    const brand = await Brand.find({ isDeleted: false });
+    res.render("edit-product", { product: product, categories: category, brands: brand });
   } catch (error) {
     console.log(error.message);
     res.redirect("/admin/pageError");
@@ -281,6 +298,17 @@ const editProduct = async (req, res) => {
         .json({ success: false, message: "Invalid category ID" });
     }
 
+    const brandId = await Brand.findOne({
+      _id: new mongoose.Types.ObjectId(products.brand.trim()),
+      isDeleted: false,
+    });
+
+    if (!brandId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid brand ID" });
+    }
+
     const percentage = products.productOffer || 0;
     const salePrice =
       products.regularPrice -
@@ -303,6 +331,7 @@ const editProduct = async (req, res) => {
       description: products.description,
       highlights: highlights,
       category: categoryId._id,
+      brand: brandId._id,
       regularPrice: products.regularPrice,
       productOffer: percentage,
       salePrice: salePrice,
