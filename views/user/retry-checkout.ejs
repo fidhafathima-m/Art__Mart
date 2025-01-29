@@ -12,6 +12,12 @@
         <p><strong>Order ID:</strong> <%= order.orderId %></p>
         <p><strong>Amount:</strong> &#8377; <%= order.finalAmount %></p>
         <p><strong>Status:</strong> <%= order.status %></p>
+        <div>
+            <p><span class="fw-bold">Selected Address:</span> <br>
+            <%= address.name %><br>
+            <%= address.city %>, <% if (address.landMark) {%> <%= address.landMark %>, <% } %><br>
+            <%= address.state %>, <%= address.pincode %></p>
+          </div>
 
         <form id="retryPaymentForm" action="/retry-payment" method="POST" class="mt-4">
           <input type="hidden" name="orderId" value="<%= order.orderId %>">

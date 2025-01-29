@@ -595,7 +595,11 @@ const loadRetryPayment = async (req, res) => {
     if (!order) {
       return res.status(404).send('Order not found');
     }
-    const user = req.session.user
+    const user = req.session.user;
+
+    const userAddresses = await Address.findOne({ userId: user });
+
+    const address = userAddresses ? userAddresses.address.find(addr => addr.isDefault) : null;
 
     const cart = await Cart.findOne({ userId: user });
 
@@ -605,7 +609,8 @@ const loadRetryPayment = async (req, res) => {
       order: order,
       activePage: 'shop',
       user: user,
-      cartItems
+      cartItems,
+      address: address
     });
   } catch (error) {
     console.error('Error loading retry payment page:', error);
@@ -617,9 +622,7 @@ const retryPayment = async (req, res) => {
   const { orderId, paymentMethod } = req.body;
 
   try {
-    console.log('order id in retry payment:', orderId);
     const order = await Order.findOne({orderId: orderId});
-    console.log('order id in database :', order.orderId);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
@@ -662,8 +665,8 @@ const retryPayment = async (req, res) => {
       });
 
     } else if (paymentMethod === 'cod') {
-      console.log('control is here');
       order.status = 'Pending'; // Update the order status
+      order.paymentMethod = 'COD'
       await order.save();
 
       // Return a JSON response with the redirect URL
@@ -695,6 +698,7 @@ const retryPayment = async (req, res) => {
 
       // Update order status to "Paid"
       order.status = "Pending"; // Update the order status
+      order.paymentMethod = 'wallet'
       await order.save();
 
       // Return a JSON response with the redirect URL

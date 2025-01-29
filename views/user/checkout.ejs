@@ -1566,7 +1566,7 @@ function placeOrder(url, orderData) {
             icon: 'error',
             confirmButtonText: 'OK'
           }).then(() => {
-            window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; // Redirect to "order failed" page
+            window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; 
           });
         });
 
