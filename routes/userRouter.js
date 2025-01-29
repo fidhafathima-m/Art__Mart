@@ -119,6 +119,9 @@ router.post('/checkout/razorpay-place-order', productController.razorpayPlaceOrd
 router.post('/wallet/check-balance', productController.walletBalanceCheck);
 router.post('/checkout/wallet-place-order', productController.walletPlaceOrder);
 router.get('/checkout/orderSuccess', productController.codOrderSuccess);
+router.get('/checkout/orderFailed', productController.razorpayOrderFailed);
+router.get('/retry-payment', productController.loadRetryPayment);
+router.post('/retry-payment', productController.retryPayment);
 
 //review
 router.get('/profile/order/:orderId/review', productController.loadReview);

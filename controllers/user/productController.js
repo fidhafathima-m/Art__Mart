@@ -554,6 +554,165 @@ const codOrderSuccess = async (req, res) => {
   }
 };
 
+const razorpayOrderFailed = async(req, res) => {
+  try {
+
+    const { orderId } = req.query;
+
+    const user = req.session.user;
+    const cart = await Cart.findOne({ userId: user });
+
+    const cartItems = cart ? cart.items : [];
+
+    const order = await Order.findOne({orderId: orderId});
+
+    if(!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Update order status to "Payment Pending"
+    order.status = "Payment Pending";
+    await order.save();
+      
+    res.render('order-failed', { 
+      order: order,
+      activePage: 'shop',
+      user: user,
+      cartItems: cartItems,
+     });
+    
+  } catch (error) {
+    console.log("Error retrieving order:", error);
+    return res.status(500).json({ message: "An error occurred while fetching the order details." });
+  }
+}
+
+const loadRetryPayment = async (req, res) => {
+  const { orderId } = req.query;
+
+  try {
+    const order = await Order.findOne({orderId: orderId});
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+    const user = req.session.user
+
+    const cart = await Cart.findOne({ userId: user });
+
+    const cartItems = cart ? cart.items : [];
+
+    res.render('retry-checkout', {
+      order: order,
+      activePage: 'shop',
+      user: user,
+      cartItems
+    });
+  } catch (error) {
+    console.error('Error loading retry payment page:', error);
+    res.redirect('/pageNotFound');
+  }
+};
+
+const retryPayment = async (req, res) => {
+  const { orderId, paymentMethod } = req.body;
+
+  try {
+    console.log('order id in retry payment:', orderId);
+    const order = await Order.findOne({orderId: orderId});
+    console.log('order id in database :', order.orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    // Prepare order data for payment processing
+    const orderData = {
+      ordereditems: order.ordereditems,
+      totalprice: order.totalprice,
+      finalAmount: order.finalAmount,
+      address: order.address,
+      discount: order.discount,
+      couponApplied: order.couponApplied,
+      userId: order.userId // Include userId for further processing
+    };
+
+    // Logic to process the payment based on the selected payment method
+    if (paymentMethod === 'razorpay') {
+      // Create a Razorpay order
+      const options = {
+        amount: orderData.finalAmount * 100, // Convert to paise
+        currency: 'INR',
+        receipt: `receipt_${orderId}`,
+        payment_capture: 1,
+      };
+
+      const razorpayOrder = await razorpay.orders.create(options);
+      order.orderId = razorpayOrder.id; // Store Razorpay order ID in the order document
+      order.status = 'Pending';
+      await order.save();
+
+      // Return Razorpay order details to frontend
+      return res.json({
+        success: true,
+        orderId: razorpayOrder.id,
+        amount: orderData.finalAmount,
+        currency: 'INR',
+        // eslint-disable-next-line no-undef
+        razorpayKey: process.env.RAZORPAY_ID_KEY,
+        paymentMethod: 'razorpay'
+      });
+
+    } else if (paymentMethod === 'cod') {
+      console.log('control is here');
+      order.status = 'Pending'; // Update the order status
+      await order.save();
+
+      // Return a JSON response with the redirect URL
+      return res.json({
+        success: true,
+        paymentMethod: 'cod',
+        redirectUrl: `/checkout/orderSuccess?orderId=${orderId}`,
+      });
+
+    } else if (paymentMethod === 'wallet') {
+      // Check wallet balance
+      const wallet = await Wallet.findOne({ userId: orderData.userId });
+      if (!wallet || wallet.balance < orderData.finalAmount) {
+        return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
+      }
+
+      // Deduct the amount from the wallet
+      wallet.balance -= orderData.finalAmount;
+      await wallet.save();
+
+      // Create a transaction record
+      const transaction = new Transaction({
+        userId: orderData.userId,
+        type: 'Purchased using wallet - Debit',
+        amount: orderData.finalAmount,
+        balance: wallet.balance,
+      });
+      await transaction.save();
+
+      // Update order status to "Paid"
+      order.status = "Pending"; // Update the order status
+      await order.save();
+
+      // Return a JSON response with the redirect URL
+      return res.json({
+        success: true,
+        paymentMethod: 'wallet',
+        redirectUrl: `/checkout/orderSuccess?orderId=${orderId}`,
+      });
+    }
+
+     // If none of the conditions match, return an error
+     return res.status(400).json({ success: false, message: 'Invalid payment method' });
+  } catch (error) {
+    console.error('Error processing retry payment:', error);
+    res.redirect('/checkout/orderFailed?orderId=' + orderId);
+  }
+};
+
 const walletBalanceCheck = async(req, res) => {
   const { amount } = req.body;
   const userId = req.session.user;
@@ -1037,6 +1196,9 @@ module.exports = {
   walletBalanceCheck,
   walletPlaceOrder,
   codOrderSuccess,
+  razorpayOrderFailed,
+  loadRetryPayment,
+  retryPayment,
   loadReview,
   postReview,
   addToWishlist,

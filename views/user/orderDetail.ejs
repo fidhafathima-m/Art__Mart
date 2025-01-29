@@ -16,14 +16,19 @@
 
 <div class="container mt-4 mb-5">
   <h3 class="text-center">Order Details</h3>
-  <h5 class="text-black-50 my-2">Id: <%= order._id %></h5>
+  <h5 class="text-black-50 my-2">Id: <%= order.orderId %></h5>
   <p class="text-center">
     <strong>Placed on:</strong> <%= new Date(order.createdOn).toLocaleDateString() %> - <%= order.paymentMethod %>
   </p>
 
   <div class="d-flex justify-content-center">
-    <% if (order.status === 'Processing' || order.status === 'Pending') { %>
+    <% if ((order.status === 'Processing' || order.status === 'Pending') && !order.status === 'Payment Pending') { %>
       <button class="btn btn-danger my-2 cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+    <% } %>
+    <% if (order.status === 'Payment Pending') { %>
+      <div class="text-center">
+        <a href="/retry-payment?orderId=<%= order.orderId %>" class="btn btn-primary mb-4">Retry Payment</a>
+      </div>
     <% } %>
     <% if (order.status === 'Delivered') { %>
       <button class="btn btn-danger my-2 return-order-btn" data-order-id="<%= order._id %>">Return Order</button>

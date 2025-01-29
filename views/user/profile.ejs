@@ -215,8 +215,11 @@
                   >
                   <% }) %>
                 </p>
-                
+                <% if(order.status === 'Payment Pending') { %>
+                  <p class="text-danger">Your order is pending payment.</p>
+                  <% } else { %>
                 <p><strong>Payment method: </strong><%= order.paymentMethod %></p>
+                <% } %>
 
                 
                 <% if(order.status === 'Cancelled') { %>
@@ -227,7 +230,7 @@
  
               <div class="col-12 text-end">
                 <a
-                  href="/profile/order/<%= order._id %>"
+                  href="/profile/order/<%= order.orderId %>"
                   class="btn btn-primary"
                   >View Order Details</a
                 >

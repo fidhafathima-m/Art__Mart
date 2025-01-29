@@ -1501,7 +1501,6 @@ document.getElementById('usePaymentMethodBtn').addEventListener('click', functio
 
 // Function to place the order
 function placeOrder(url, orderData) {
-  console.log('inside place order')
   fetch(url, {
     method: 'POST',
     headers: {
@@ -1511,8 +1510,6 @@ function placeOrder(url, orderData) {
   })
   .then(response => response.json())
   .then(data => {
-    console.log('Payment method:', data.paymentMethod);
-    console.log('Razorpay API Key:', data.razorpayKey);
 
     document.getElementById('loadingOverlay').classList.add('d-none');
     document.getElementById('usePaymentMethodBtn').disabled = false; 
@@ -1520,7 +1517,6 @@ function placeOrder(url, orderData) {
     if (data.success) {
       
       if (data.paymentMethod === 'razorpay') {
-        console.log('Opening Razorpay payment window...');
         var options = {
           key: data.razorpayKey,
           amount: data.amount * 100, 
@@ -1536,21 +1532,50 @@ function placeOrder(url, orderData) {
             }).then(() => {
               window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
             });
+          },
+          // Adding a failure handler to the Razorpay options
+          "prefill": {
+            // You can prefill customer details if available (optional)
+            name: orderData.customerName,
+            email: orderData.customerEmail
+          },
+          "theme": {
+            "color": "#F37254"
+          },
+          "modal": {
+            "ondismiss": function() {
+              console.log('Payment window was closed before completing.');
+            }
           }
         };
+        
         var rzp1 = new Razorpay(options);
         try {
           rzp1.open();
         } catch (error) {
           console.log('Error opening Razorpay window:', error);
+          window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; // Redirect to "order failed" page
         }
+
+        // Handle Razorpay payment failure
+        rzp1.on('payment.failed', function(response) {
+          console.log('Payment Failed:', response);
+          Swal.fire({
+            title: 'Payment Failed',
+            text: 'There was an issue with the payment. Please try again later.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; // Redirect to "order failed" page
+          });
+        });
 
       } else {
         // For COD or wallet, redirect directly after order creation
         window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
       }
     } else {
-      console.log('Error')
+      console.log('Error');
     }
   })
   .catch(error => {

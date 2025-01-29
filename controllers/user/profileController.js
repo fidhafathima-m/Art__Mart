@@ -910,7 +910,7 @@ const viewOrderDetails = async (req, res) => {
     const orderId = req.params.orderId;  
     const userId = req.session.user;
 
-    const order = await Order.findById(orderId)
+    const order = await Order.findOne({orderId: orderId})
       .populate('ordereditems.product', 'productName productImage salePrice reviews')
       .exec();
 

@@ -76,6 +76,7 @@ const orderSchema = new Schema({
       "Cancelled",
       "Return Request",
       "Returned",
+      "Payment Pending"
     ],
   },
   createdOn: {
