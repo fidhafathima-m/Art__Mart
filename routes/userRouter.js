@@ -99,6 +99,7 @@ router.post('/profile/address/editAddress', profileController.editAddressInCheck
 
 // Product Managemrnt
 router.get("/product-details", productController.loadProductDetails);
+router.get('/checkout/generate-invoice/:orderId', productController.generateInvoice);
 
 // Cart management
 router.get("/cart", productController.loadCart);

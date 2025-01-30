@@ -30,6 +30,8 @@ const razorpay = new Razorpay({
   // eslint-disable-next-line no-undef  
   key_secret: process.env.RAZORPAY_SECRET_KEY,  
 });
+  // eslint-disable-next-line no-undef  
+const { generateInvoicePDF } = require('../../helpers/generateInvoicePDF');  
 
 
 const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
@@ -886,9 +888,11 @@ const razorpayPlaceOrder = async (req, res) => {
       { $pull: { items: { productId: { $in: ordereditems.map(item => item.product) } } } }
     );
 
+    const amountInPaise = Math.round(finalAmount * 100);
+
     // Create Razorpay order
     const options = {
-      amount: finalAmount * 100, 
+      amount: amountInPaise, 
       currency: 'INR',
       receipt: `receipt_${new Date().getTime()}`,
       payment_capture: 1,  
@@ -1186,6 +1190,24 @@ const removeCoupon = async (req, res) => {
   }
 };
 
+
+
+const generateInvoice = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const pdfBuffer = await generateInvoicePDF(orderId);  // Call the helper function to generate the PDF
+
+    // Send the PDF as a response
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=invoice-${orderId}.pdf`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error generating invoice' });
+  }
+}
+
 // eslint-disable-next-line no-undef
 module.exports = {
   loadProductDetails,
@@ -1210,4 +1232,5 @@ module.exports = {
   coupons,
   applyCoupon,
   removeCoupon,
+  generateInvoice
 }

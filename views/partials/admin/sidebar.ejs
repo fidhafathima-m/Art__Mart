@@ -32,9 +32,22 @@
     <li>
       <a href="/admin/brands"><i class="fas fa-archive icon py-3"></i> Brand</a>
     </li>
-    <li>
-      <a href="/admin/banners"><i class="fas fa-image icon py-3"></i> Banners</a>
-    </li>
     
   </ul>
 </div>
+
+<script>
+  // Get the current path
+  const currentPath = window.location.pathname;
+
+  // Select all list items
+  const menuItems = document.querySelectorAll('.sidebar ul li');
+
+  // Loop through the items and add the 'active' class if the path matches
+  menuItems.forEach(item => {
+    const link = item.querySelector('a');
+    if (link.href.includes(currentPath)) {
+      item.classList.add('active');
+    }
+  });
+</script>

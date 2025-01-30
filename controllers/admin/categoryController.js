@@ -33,6 +33,7 @@ const categoryInfo = async (req, res) => {
       totalCategory: totalCategory,
       totalPages: totalPages,
       search: search,
+      currentRoute: req.originalUrl
     });
   } catch (error) {
     console.error(error);
@@ -64,7 +65,7 @@ const getUnlistCategory = async (req, res) => {
 
 const loadAddCategory = async (req, res) => {
   try {
-    res.render("add-category");
+    res.render("add-category" ,{currentRoute: req.originalUrl});
   } catch (error) {
     console.log(error.message);
   }
@@ -118,7 +119,7 @@ const loadEditCategory = async (req, res) => {
       return res.redirect("/admin/pageError");
     }
 
-    res.render("edit-category", { category: category });
+    res.render("edit-category", { category: category, currentRoute: req.originalUrl });
   } catch (error) {
     console.log(error.message);
     res.redirect("/admin/pageError");

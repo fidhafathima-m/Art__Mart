@@ -129,7 +129,7 @@
       <% subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal +=
       item.salePrice * item.cartQuantity; %> <% }) %>
       <p style="font-size: 20px">
-        <strong>Total: &#8377; <%= subtotal %>.00</strong>
+        <strong>Total: &#8377; <%= subtotal %></strong>
       </p>
     </div>
     <% if (cartItems.length === 0) { %>

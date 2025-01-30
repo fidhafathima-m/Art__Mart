@@ -761,7 +761,7 @@ document.addEventListener('DOMContentLoaded', () => {
           icon: 'success',
           confirmButtonText: 'OK'
         }).then(() => {
-          // Optionally, update the wallet balance on the page without reloading
+          location.reload();
           document.querySelector('.card-body .h5').textContent = `₹${data.wallet.balance.toFixed(2)}`; // Change to rupees
           $('#addMoneyModal').modal('hide'); // Hide the modal after success
         });

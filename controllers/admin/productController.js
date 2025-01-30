@@ -44,6 +44,7 @@ const productInfo = async (req, res) => {
       totalProducts: totalProducts,
       totalPages: totalPages,
       search: search,
+      currentRoute: req.originalUrl
     });
   } catch (error) {
     console.error(error);
@@ -55,7 +56,7 @@ const loadAddProduct = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true, isDeleted: false });
     const brand = await Brand.find({ isDeleted: false });
-    res.render("add-product", { categories: category, brands: brand });
+    res.render("add-product", { categories: category, brands: brand, });
   } catch (error) {
     console.log(error.message);
     res.redirect("/pageError");

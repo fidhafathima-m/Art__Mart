@@ -172,6 +172,7 @@ const loadDashboard = async (req, res) => {
         topBrands,
         salesDataPerMonth,
         months,
+        currentRoute: req.originalUrl
       });
     } catch (error) {
       console.error(error);
