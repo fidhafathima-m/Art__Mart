@@ -1,10 +1,9 @@
 // eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
 // eslint-disable-next-line no-undef
-const Product = require('../../models/productSchema');
+const Product = require("../../models/productSchema");
 // eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
-
 
 const categoryInfo = async (req, res) => {
   try {
@@ -33,7 +32,7 @@ const categoryInfo = async (req, res) => {
       totalCategory: totalCategory,
       totalPages: totalPages,
       search: search,
-      currentRoute: req.originalUrl
+      currentRoute: req.originalUrl,
     });
   } catch (error) {
     console.error(error);
@@ -65,7 +64,7 @@ const getUnlistCategory = async (req, res) => {
 
 const loadAddCategory = async (req, res) => {
   try {
-    res.render("add-category" ,{currentRoute: req.originalUrl});
+    res.render("add-category", { currentRoute: req.originalUrl });
   } catch (error) {
     console.log(error.message);
   }
@@ -97,7 +96,6 @@ const addCategory = async (req, res) => {
   }
 };
 
-
 const loadEditCategory = async (req, res) => {
   try {
     const id = req.query.id;
@@ -119,7 +117,10 @@ const loadEditCategory = async (req, res) => {
       return res.redirect("/admin/pageError");
     }
 
-    res.render("edit-category", { category: category, currentRoute: req.originalUrl });
+    res.render("edit-category", {
+      category: category,
+      currentRoute: req.originalUrl,
+    });
   } catch (error) {
     console.log(error.message);
     res.redirect("/admin/pageError");
@@ -167,14 +168,23 @@ const addCategoryOffer = async (req, res) => {
     const categoryId = req.body.category;
     const category = await Category.findById(categoryId);
     if (!category) {
-      return res.status(404).json({ success: false, message: 'Category not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
     }
 
     // Check if any product in the category already has a higher offer
     const products = await Product.find({ category: category._id });
-    const hasProductOffer = products.some((product) => product.productOffer > percentage);
+    const hasProductOffer = products.some(
+      (product) => product.productOffer > percentage
+    );
     if (hasProductOffer) {
-      return res.status(400).json({ success: false, message: 'Category already has a product offer' });  // Change to 400
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Category already has a product offer",
+        }); // Change to 400
     }
 
     // Update category offer
@@ -184,25 +194,25 @@ const addCategoryOffer = async (req, res) => {
     // Update products with the new offer
     for (const product of products) {
       product.productOffer = percentage;
-      product.salePrice = product.regularPrice * (1 - percentage / 100);  // Apply discount
+      product.salePrice = product.regularPrice * (1 - percentage / 100); // Apply discount
       await product.save();
     }
 
     res.json({ success: true });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
-
 const removeCategoryOffer = async (req, res) => {
   try {
     const categoryId = req.body.category;
     const category = await Category.findById(categoryId);
     if (!category) {
-      return res.status(404).json({ success: false, message: 'Category not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
     }
 
     // Reset category offer
@@ -214,19 +224,19 @@ const removeCategoryOffer = async (req, res) => {
     // Update products to remove the offer
     const products = await Product.find({ category: category._id });
     for (const product of products) {
-      product.salePrice = product.regularPrice;  // Reset to original price
+      product.salePrice = product.regularPrice; // Reset to original price
       product.productOffer = 0;
       await product.save();
     }
 
     res.json({ success: true });
-
   } catch (error) {
     console.log(error);
-    res.status(500).json({ success: false, message: "Failed to remove product offer" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to remove product offer" });
   }
 };
-
 
 const deleteCategory = async (req, res) => {
   const { id } = req.params;

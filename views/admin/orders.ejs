@@ -9,14 +9,7 @@
     <!-- Search Bar -->
     <form method="GET">
       <div class="input-group mb-3">
-        <input
-          type="text"
-          class="form-control col-6"
-          name="search"
-          placeholder="Search by order ID, user name, or status"
-          aria-label="Search"
-          aria-describedby="basic-addon2"
-        />
+        <input type="text" class="form-control col-6" name="search" placeholder="Search by order ID, user name, or status" aria-label="Search" aria-describedby="basic-addon2" />
         <button class="btn btn-primary" type="submit">Search</button>
       </div>
     </form>
@@ -38,13 +31,13 @@
           <% for(let i = 0; i < data.length; i++) { %>
           <tr>
             <td><%= data[i].orderId %></td>
-            <td><%= data[i].userId ? data[i].userId.name : 'N/A' %></td>  
+            <td><%= data[i].userId ? data[i].userId.name : 'N/A' %></td>
             <td><%= data[i].totalprice %></td>
             <td><%= new Date(data[i].createdOn).toLocaleString('en-US', { 
               weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
               hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
           }) %></td>
-          
+
             <td><%= data[i].status %></td>
             <td>
               <a href="/admin/orders/details/<%= data[i].orderId %>" class="btn btn-primary mt-2" style="width: 100px">Details</a>

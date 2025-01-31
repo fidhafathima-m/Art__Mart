@@ -1,184 +1,182 @@
 <%- include("../../views/partials/user/header") %>
 <div class="container mt-4">
 
-    <!-- Breadcrumbs -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">Home</a></li>
-          <li class="breadcrumb-item"><a href="/userProfile?section=addresses">Address</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Edit Address</li>
-        </ol>
-      </nav>
+  <!-- Breadcrumbs -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/userProfile?section=addresses">Address</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Edit Address</li>
+    </ol>
+  </nav>
 
-   <h3 class="mt-3" style="color: #046963; margin-bottom:70px">Edit User Address</h3>
-   <form id="addressForm" method="POST" action="/profile/address/edit?id=<%= address._id.toLocaleString() %>" class="border-0 p-3">
-       <!-- Form Fields -->
-       <div class="row mb-50">
-        <div class="form-group col-md-4">
-            <label for="addressType">Address Type:</label>
-            <select class="form-control border-3" id="addressType" name="addressType" required>
-                <option value="Home" <% if (address.addressType === 'Home') { %> selected <% } %>>Home</option>
-                <option value="Office" <% if (address.addressType === 'Office') { %> selected <% } %>>Office</option>
-                <option value="Other" <% if (address.addressType === 'Other') { %> selected <% } %>>Other</option>
-            </select>
-        </div>
-        
-           <div class="form-group col-md-4">
-               <label for="name">Name:</label>
-               <input type="text" class="form-control border-3" value="<%= address.name %>" id="name" name="name" required>
-           </div>
-           <div class="form-group col-md-4">
-               <label for="city">City:</label>
-               <input type="text" class="form-control border-3" id="city" value="<%= address.city %>" name="city" required>
-           </div>
-       </div>
-       <div class="row mb-3">
-           <div class="form-group col-md-4">
-               <label for="landMark">Landmark:</label>
-               <input type="text" class="form-control border-3" value="<%= address.landMark%>" id="landMark" name="landMark">
-           </div>
-           <div class="form-group col-md-4">
-            <label for="state">State:</label>
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle form-control border-3" type="button" id="stateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <%= address.state || 'Select State' %>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="stateDropdown" style="max-height: 200px; overflow-y: auto;">
-                    <li><a class="dropdown-item" href="#" data-value="Andhra Pradesh">Andhra Pradesh</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Arunachal Pradesh">Arunachal Pradesh</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Assam">Assam</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Bihar">Bihar</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Chhattisgarh">Chhattisgarh</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Goa">Goa</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Gujarat">Gujarat</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Haryana">Haryana</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Himachal Pradesh">Himachal Pradesh</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Jharkhand">Jharkhand</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Karnataka">Karnataka</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Kerala">Kerala</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Madhya Pradesh">Madhya Pradesh</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Maharashtra">Maharashtra</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Manipur">Manipur</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Meghalaya">Meghalaya</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Mizoram">Mizoram</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Nagaland">Nagaland</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Odisha">Odisha</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Punjab">Punjab</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Rajasthan">Rajasthan</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Sikkim">Sikkim</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Tamil Nadu">Tamil Nadu</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Telangana">Telangana</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Tripura">Tripura</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Uttar Pradesh">Uttar Pradesh</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="Uttarakhand">Uttarakhand</a></li>
-                    <li><a class="dropdown-item" href="#" data-value="West Bengal">West Bengal</a></li>
-                </ul>
-            </div>
-            <input type="hidden" id="state" name="state" value="<%= address.state %>" />
-        </div>
-        
-           <div class="form-group col-md-4">
-               <label for="pincode">Pincode:</label>
-               <input type="number" class="form-control border-3" value="<%= address.pincode %>" id="pincode" name="pincode" required>
-           </div>
-       </div>
-       <div class="row mb-3">
-           <div class="form-group col-md-4">
-               <label for="phone">Phone:</label>
-               <input type="number" class="form-control border-3" id="phone" value="<%= address.phone %>" name="phone" required>
-           </div>
-           <div class="form-group col-md-4">
-               <label for="altPhone">Alternate Phone:</label>
-               <input type="number" class="form-control border-3" id="altPhone" value="<%= address.altPhone %>" name="altPhone">
-           </div>
-       </div>
+  <h3 class="mt-3" style="color: #046963; margin-bottom:70px">Edit User Address</h3>
+  <form id="addressForm" method="POST" action="/profile/address/edit?id=<%= address._id.toLocaleString() %>" class="border-0 p-3">
+    <!-- Form Fields -->
+    <div class="row mb-50">
+      <div class="form-group col-md-4">
+        <label for="addressType">Address Type:</label>
+        <select class="form-control border-3" id="addressType" name="addressType" required>
+          <option value="Home" <% if (address.addressType === 'Home') { %> selected <% } %>>Home</option>
+          <option value="Office" <% if (address.addressType === 'Office') { %> selected <% } %>>Office</option>
+          <option value="Other" <% if (address.addressType === 'Other') { %> selected <% } %>>Other</option>
+        </select>
+      </div>
 
-       <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="isDefault" name="isDefault" 
-               <% if (address.isDefault) { %> checked <% } %> >
-        <label class="form-check-label pb-4" for="isDefault">
-            Set this as the default address
-        </label>
+      <div class="form-group col-md-4">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control border-3" value="<%= address.name %>" id="name" name="name" required>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="city">City:</label>
+        <input type="text" class="form-control border-3" id="city" value="<%= address.city %>" name="city" required>
+      </div>
     </div>
-    
-       <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
-       <a href="/userProfile?section=addresses" class="btn btn-danger">Cancel</a>
-   </form>
+    <div class="row mb-3">
+      <div class="form-group col-md-4">
+        <label for="landMark">Landmark:</label>
+        <input type="text" class="form-control border-3" value="<%= address.landMark%>" id="landMark" name="landMark">
+      </div>
+      <div class="form-group col-md-4">
+        <label for="state">State:</label>
+        <div class="dropdown">
+          <button class="btn btn-light dropdown-toggle form-control border-3" type="button" id="stateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <%= address.state || 'Select State' %>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="stateDropdown" style="max-height: 200px; overflow-y: auto;">
+            <li><a class="dropdown-item" href="#" data-value="Andhra Pradesh">Andhra Pradesh</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Arunachal Pradesh">Arunachal Pradesh</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Assam">Assam</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Bihar">Bihar</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Chhattisgarh">Chhattisgarh</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Goa">Goa</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Gujarat">Gujarat</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Haryana">Haryana</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Himachal Pradesh">Himachal Pradesh</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Jharkhand">Jharkhand</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Karnataka">Karnataka</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Kerala">Kerala</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Madhya Pradesh">Madhya Pradesh</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Maharashtra">Maharashtra</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Manipur">Manipur</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Meghalaya">Meghalaya</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Mizoram">Mizoram</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Nagaland">Nagaland</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Odisha">Odisha</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Punjab">Punjab</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Rajasthan">Rajasthan</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Sikkim">Sikkim</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Tamil Nadu">Tamil Nadu</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Telangana">Telangana</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Tripura">Tripura</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Uttar Pradesh">Uttar Pradesh</a></li>
+            <li><a class="dropdown-item" href="#" data-value="Uttarakhand">Uttarakhand</a></li>
+            <li><a class="dropdown-item" href="#" data-value="West Bengal">West Bengal</a></li>
+          </ul>
+        </div>
+        <input type="hidden" id="state" name="state" value="<%= address.state %>" />
+      </div>
+
+      <div class="form-group col-md-4">
+        <label for="pincode">Pincode:</label>
+        <input type="number" class="form-control border-3" value="<%= address.pincode %>" id="pincode" name="pincode" required>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="form-group col-md-4">
+        <label for="phone">Phone:</label>
+        <input type="number" class="form-control border-3" id="phone" value="<%= address.phone %>" name="phone" required>
+      </div>
+      <div class="form-group col-md-4">
+        <label for="altPhone">Alternate Phone:</label>
+        <input type="number" class="form-control border-3" id="altPhone" value="<%= address.altPhone %>" name="altPhone">
+      </div>
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="isDefault" name="isDefault" <% if (address.isDefault) { %> checked <% } %>>
+      <label class="form-check-label pb-4" for="isDefault">
+        Set this as the default address
+      </label>
+    </div>
+
+    <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+    <a href="/userProfile?section=addresses" class="btn btn-danger">Cancel</a>
+  </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-
-document.addEventListener("DOMContentLoaded", function () { 
+  document.addEventListener("DOMContentLoaded", function() {
     const dropdownItems = document.querySelectorAll('.dropdown-item');
     const stateDropdownBtn = document.getElementById('stateDropdown');
-    const stateInput = document.getElementById('state');   
-     
+    const stateInput = document.getElementById('state');
+
     const initialState = stateInput.value;
     if (initialState) {
-        stateDropdownBtn.textContent = initialState;  
+      stateDropdownBtn.textContent = initialState;
     }
- 
-    dropdownItems.forEach(function (item) {
-        item.addEventListener('click', function () {
-            const selectedState = item.getAttribute('data-value');
-            stateDropdownBtn.textContent = selectedState;  
-            stateInput.value = selectedState;  
-        });
+
+    dropdownItems.forEach(function(item) {
+      item.addEventListener('click', function() {
+        const selectedState = item.getAttribute('data-value');
+        stateDropdownBtn.textContent = selectedState;
+        stateInput.value = selectedState;
+      });
     });
 
- 
-   $("#addressForm").submit(function (event) { 
-       event.preventDefault(); 
- 
-       if (validateForm()) { 
-           var formData = $(this).serialize();  
 
-           $.ajax({
-               url: $(this).attr('action'),
-               method: 'POST',
-               data: formData,
-               success: function (response) { 
-                   Swal.fire({
-                       title: 'Address Updated!',
-                       text: 'Your address has been updated successfully.',
-                       icon: 'success',
-                       confirmButtonText: 'Ok'
-                   }).then(function() { 
-                       window.location.href = '/userProfile?section=addresses';
-                   });
-               },
-               error: function (error) { 
-                   Swal.fire({
-                       title: 'Error!',
-                       text: 'Something went wrong. Please try again.',
-                       icon: 'error',
-                       confirmButtonText: 'Ok'
-                   });
-               }
-           });
-       }
-   });
- 
-   function validateForm() {
-       let isValid = true;
-       const requiredFields = ["addressType", "name", "city", "state", "pincode", "phone"];
-       requiredFields.forEach(function (field) {
-           const input = document.getElementById(field);
-           if (input.value.trim() === "") { 
-               Swal.fire({
-                   title: 'Error',
-                   text: 'Please fill all the fields.',
-                   icon: 'error'
-               });
-               isValid = false;
-           }
-       });
-       return isValid;
-   }
-});
+    $("#addressForm").submit(function(event) {
+      event.preventDefault();
+
+      if (validateForm()) {
+        var formData = $(this).serialize();
+
+        $.ajax({
+          url: $(this).attr('action'),
+          method: 'POST',
+          data: formData,
+          success: function(response) {
+            Swal.fire({
+              title: 'Address Updated!',
+              text: 'Your address has been updated successfully.',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(function() {
+              window.location.href = '/userProfile?section=addresses';
+            });
+          },
+          error: function(error) {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Something went wrong. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            });
+          }
+        });
+      }
+    });
+
+    function validateForm() {
+      let isValid = true;
+      const requiredFields = ["addressType", "name", "city", "state", "pincode", "phone"];
+      requiredFields.forEach(function(field) {
+        const input = document.getElementById(field);
+        if (input.value.trim() === "") {
+          Swal.fire({
+            title: 'Error',
+            text: 'Please fill all the fields.',
+            icon: 'error'
+          });
+          isValid = false;
+        }
+      });
+      return isValid;
+    }
+  });
 </script>
 
 <%- include("../../views/partials/user/footer") %>

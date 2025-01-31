@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-  
+
   <style>
     .con {
       display: flex;
@@ -16,19 +17,20 @@
       align-items: center;
       height: 60%;
     }
-  
+
     .form-container {
       width: 100%;
-      max-width: 500px; 
+      max-width: 500px;
       padding: 20px;
     }
-  
+
     .alert {
       display: none;
     }
   </style>
-  
+
 </head>
+
 <body>
 
   <%- include('../../views/partials/user/header') %>
@@ -36,26 +38,26 @@
   <div class="container con mt-5">
     <div class="form-container">
       <h2>Change Email</h2>
-      
+
       <div class="alert alert-danger" id="errorAlert">
         <strong>Error!</strong> The email entered is invalid.
       </div>
 
       <% if (locals.message && message.length > 0) { %>
-        <div class="alert alert-danger mx-3"><%= message %></div>
-        <% } %>
-  
+      <div class="alert alert-danger mx-3"><%= message %></div>
+      <% } %>
+
       <form id="changeEmailForm" method="POST" action="/profile/update-email">
         <div class="mb-3 d-flex flex-column justify-content-center">
           <label for="email" class="form-label">New Email</label>
           <input type="email" class="form-control w-100" id="newEmail" name="newEmail" placeholder="Enter your current email" required>
         </div>
-  
+
         <button type="submit" class="btn btn-primary" id="verifyBtn">Submit</button>
       </form>
     </div>
   </div>
-  
+
 
   <%- include('../../views/partials/user/footer') %>
 
@@ -79,10 +81,11 @@
         errorAlert.textContent = 'Please enter a valid email address.';
         errorAlert.style.display = 'block';
       } else {
-        successAlert.style.display = 'block';  
-        errorAlert.style.display = 'none';     
+        successAlert.style.display = 'block';
+        errorAlert.style.display = 'none';
       }
     });
   </script>
 </body>
+
 </html>

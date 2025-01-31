@@ -7,35 +7,15 @@
     <h1 class="my-4">Add Category</h1>
 
     <!-- Category Form -->
-    <form
-      id="categoryForm"
-      action="/admin/add-category"
-      method="POST"
-      class="form-horizontal"
-    >
+    <form id="categoryForm" action="/admin/add-category" method="POST" class="form-horizontal">
       <div class="form-group">
         <label for="categoryName" class="form-label">Category Name</label>
-        <input
-          type="text"
-          id="categoryName"
-          name="name"
-          class="form-control"
-          required
-          placeholder="Enter category name"
-        />
+        <input type="text" id="categoryName" name="name" class="form-control" required placeholder="Enter category name" />
       </div>
 
       <div class="form-group">
-        <label for="categoryDescription" class="form-label"
-          >Category Description</label
-        >
-        <textarea
-          id="categoryDescription"
-          name="description"
-          class="form-control"
-          required
-          placeholder="Enter category description"
-        ></textarea>
+        <label for="categoryDescription" class="form-label">Category Description</label>
+        <textarea id="categoryDescription" name="description" class="form-control" required placeholder="Enter category description"></textarea>
       </div>
 
       <button type="submit" class="btn btn-primary">Add Category</button>

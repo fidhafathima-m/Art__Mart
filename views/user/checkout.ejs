@@ -6,11 +6,13 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+      background: rgba(0, 0, 0, 0.5);
+      /* Semi-transparent black background */
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999; /* Make sure it's on top of everything */
+      z-index: 9999;
+      /* Make sure it's on top of everything */
     }
 
     #loadingSpinner {
@@ -20,7 +22,6 @@
     .d-none {
       display: none;
     }
-
   </style>
 </head>
 
@@ -36,10 +37,7 @@
     </ol>
   </nav>
 
-  <div
-    class="cart-container"
-    style="display: flex; justify-content: space-between; padding: 20px"
-  >
+  <div class="cart-container" style="display: flex; justify-content: space-between; padding: 20px">
     <!--  (checkout details) -->
     <div class="checkout-details bg-white p-4 rounded" style="width: 70%">
       <h2>Checkout</h2>
@@ -58,8 +56,8 @@
             <%= defaultAddress.city %>, <%= defaultAddress.state %> - <%=
             defaultAddress.pincode %><br />Phone: <%= defaultAddress.phone %>
             <%if (defaultAddress.altPhone) {%>
-              Alternative Phone: <%= defaultAddress.altPhone %>
-              <% } %>
+            Alternative Phone: <%= defaultAddress.altPhone %>
+            <% } %>
           </p>
         </div>
 
@@ -83,260 +81,127 @@
       </div>
 
       <!-- Edit Address Modal -->
-      <div
-        id="editAddressModal"
-        class="modal fade"
-        tabindex="-1"
-        aria-labelledby="editAddressModalLabel"
-        aria-hidden="true"
-      >
+      <div id="editAddressModal" class="modal fade" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="editAddressModalLabel">
                 Edit Address
               </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form id="editAddressForm">
                 <div class="mb-3">
-                  <label for="editAddressType" class="form-label"
-                    >Address Type</label
-                  >
-                  <select
-                    class="form-control"
-                    id="editAddressType"
-                    name="addressType"
-                    
-                  >
+                  <label for="editAddressType" class="form-label">Address Type</label>
+                  <select class="form-control" id="editAddressType" name="addressType">
                     <option value="home">home</option>
                     <option value="office">office</option>
                     <option value="other">other</option>
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="editName" class="form-label"
-                    ><br /><br />House Name</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="editName"
-                    name="name"
-                    
-                  />
+                  <label for="editName" class="form-label"><br /><br />House Name</label>
+                  <input type="text" class="form-control" id="editName" name="name" />
                 </div>
                 <div class="mb-3">
                   <label for="editCity" class="form-label">City</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="editCity"
-                    name="city"
-                    
-                  />
+                  <input type="text" class="form-control" id="editCity" name="city" />
                 </div>
                 <div class="mb-3">
                   <label for="editLandMark" class="form-label">Landmark</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="editLandMark"
-                    name="landMark"
-                  />
+                  <input type="text" class="form-control" id="editLandMark" name="landMark" />
                 </div>
                 <div class="mb-3">
                   <label for="editState" class="form-label">State</label>
                   <div class="dropdown">
-                    <button
-                      class="btn btn-light dropdown-toggle form-control border-3"
-                      type="button"
-                      id="editStateDropdown"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
+                    <button class="btn btn-light dropdown-toggle form-control border-3" type="button" id="editStateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                       Select State
                     </button>
-                    <ul
-                      class="dropdown-menu"
-                      aria-labelledby="editStateDropdown"
-                      style="max-height: 200px; overflow-y: auto"
-                    >
+                    <ul class="dropdown-menu" aria-labelledby="editStateDropdown" style="max-height: 200px; overflow-y: auto">
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Andhra Pradesh"
-                          >Andhra Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Andhra Pradesh">Andhra Pradesh</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Arunachal Pradesh"
-                          >Arunachal Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Arunachal Pradesh">Arunachal Pradesh</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Assam"
-                          >Assam</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Assam">Assam</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Bihar"
-                          >Bihar</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Bihar">Bihar</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Chhattisgarh"
-                          >Chhattisgarh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Chhattisgarh">Chhattisgarh</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Goa"
-                          >Goa</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Goa">Goa</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Gujarat"
-                          >Gujarat</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Gujarat">Gujarat</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Haryana"
-                          >Haryana</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Haryana">Haryana</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Himachal Pradesh"
-                          >Himachal Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Himachal Pradesh">Himachal Pradesh</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Jharkhand"
-                          >Jharkhand</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Jharkhand">Jharkhand</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Karnataka"
-                          >Karnataka</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Karnataka">Karnataka</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Kerala"
-                          >Kerala</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Kerala">Kerala</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Madhya Pradesh"
-                          >Madhya Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Madhya Pradesh">Madhya Pradesh</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Maharashtra"
-                          >Maharashtra</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Maharashtra">Maharashtra</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Manipur"
-                          >Manipur</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Manipur">Manipur</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Meghalaya"
-                          >Meghalaya</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Meghalaya">Meghalaya</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Mizoram"
-                          >Mizoram</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Mizoram">Mizoram</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Nagaland"
-                          >Nagaland</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Nagaland">Nagaland</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Odisha"
-                          >Odisha</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Odisha">Odisha</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Punjab"
-                          >Punjab</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Punjab">Punjab</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Rajasthan"
-                          >Rajasthan</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Rajasthan">Rajasthan</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Sikkim"
-                          >Sikkim</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Sikkim">Sikkim</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Tamil Nadu"
-                          >Tamil Nadu</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Tamil Nadu">Tamil Nadu</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Telangana"
-                          >Telangana</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Telangana">Telangana</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Tripura"
-                          >Tripura</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Tripura">Tripura</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Uttar Pradesh"
-                          >Uttar Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Uttar Pradesh">Uttar Pradesh</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Uttarakhand"
-                          >Uttarakhand</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Uttarakhand">Uttarakhand</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="West Bengal"
-                          >West Bengal</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="West Bengal">West Bengal</a>
                       </li>
                     </ul>
                   </div>
@@ -344,50 +209,22 @@
                 </div>
                 <div class="mb-3">
                   <label for="editPincode" class="form-label">Pincode</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="editPincode"
-                    name="pincode"
-                    
-                  />
+                  <input type="number" class="form-control" id="editPincode" name="pincode" />
                 </div>
                 <div class="mb-3">
                   <label for="editPhone" class="form-label">Phone</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="editPhone"
-                    name="phone"
-                    
-                  />
+                  <input type="number" class="form-control" id="editPhone" name="phone" />
                 </div>
                 <div class="mb-3">
-                  <label for="editAltPhone" class="form-label"
-                    >Alternate Phone</label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="editAltPhone"
-                    name="altPhone"
-                  />
+                  <label for="editAltPhone" class="form-label">Alternate Phone</label>
+                  <input type="number" class="form-control" id="editAltPhone" name="altPhone" />
                 </div>
 
-                <input
-                  type="hidden"
-                  name="addressId"
-                  id="addressId"
-                  value="<%= defaultAddress._id %>"
-                />
+                <input type="hidden" name="addressId" id="addressId" value="<%= defaultAddress._id %>" />
                 <button type="submit" class="btn btn-primary">
                   Save Changes
                 </button>
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                   Close
                 </button>
               </form>
@@ -397,37 +234,22 @@
       </div>
 
       <!-- Change Address Modal -->
-      <div
-        id="changeAddressModal"
-        class="modal fade"
-        tabindex="-1"
-        aria-labelledby="changeAddressModalLabel"
-        aria-hidden="true"
-      >
+      <div id="changeAddressModal" class="modal fade" tabindex="-1" aria-labelledby="changeAddressModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="changeAddressModalLabel">
                 Select Address
               </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form id="addressForm">
                 <% addresses.forEach(function(address) { %>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="address"
-                  id="address<%= address._id %>" value="<%= address._id %>" <%=
+                  <input class="form-check-input" type="radio" name="address" id="address<%= address._id %>" value="<%= address._id %>" <%=
                   address.isDefault ? 'checked' : '' %> />
-                  <label
-                    class="form-check-label"
-                    for="address<%= address._id %>"
-                  >
+                  <label class="form-check-label" for="address<%= address._id %>">
                     <%= address.name %>, <%= address.addressType %>, <%=
                     address.city %>, <%= address.state %> - <%= address.pincode
                     %>
@@ -435,23 +257,13 @@
                 </div>
                 <% }) %>
               </form>
-              <a href="#" class="btn btn-link" id="addNewAddressBtn"
-                >Add New Address</a
-              >
+              <a href="#" class="btn btn-link" id="addNewAddressBtn">Add New Address</a>
             </div>
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                 Close
               </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                id="useThisAddressBtn"
-              >
+              <button type="button" class="btn btn-primary" id="useThisAddressBtn">
                 Use This Address
               </button>
             </div>
@@ -460,260 +272,127 @@
       </div>
 
       <!-- Add New Address Modal -->
-      <div
-        id="addNewAddressModal"
-        class="modal fade"
-        tabindex="-1"
-        aria-labelledby="addNewAddressModalLabel"
-        aria-hidden="true"
-      >
+      <div id="addNewAddressModal" class="modal fade" tabindex="-1" aria-labelledby="addNewAddressModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title text-black" id="addNewAddressModalLabel">
                 Add New Address
               </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <form id="addAddressForm">
                 <div class="mb-3">
-                  <label for="newAddressType" class="form-label"
-                    >Address Type</label
-                  >
-                  <select
-                    class="form-control"
-                    id="newAddressType"
-                    name="addressType"
-                    
-                  >
+                  <label for="newAddressType" class="form-label">Address Type</label>
+                  <select class="form-control" id="newAddressType" name="addressType">
                     <option value="home">home</option>
                     <option value="office">office</option>
                     <option value="other">other</option>
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="newName" class="form-label"
-                    ><br /><br />House Name</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="newName"
-                    name="name"
-                    
-                  />
+                  <label for="newName" class="form-label"><br /><br />House Name</label>
+                  <input type="text" class="form-control" id="newName" name="name" />
                 </div>
                 <div class="mb-3">
                   <label for="newCity" class="form-label">City</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="newCity"
-                    name="city"
-                    
-                  />
+                  <input type="text" class="form-control" id="newCity" name="city" />
                 </div>
                 <div class="mb-3">
                   <label for="newLandMark" class="form-label">Landmark</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="newLandMark"
-                    name="landMark"
-                  />
+                  <input type="text" class="form-control" id="newLandMark" name="landMark" />
                 </div>
                 <div class="mb-3">
                   <label for="newState" class="form-label">State</label>
                   <div class="dropdown">
-                    <button
-                      class="btn btn-light dropdown-toggle form-control border-3"
-                      type="button"
-                      id="stateDropdown"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
+                    <button class="btn btn-light dropdown-toggle form-control border-3" type="button" id="stateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                       Select State
                     </button>
-                    <ul
-                      class="dropdown-menu"
-                      aria-labelledby="stateDropdown"
-                      style="max-height: 200px; overflow-y: auto"
-                    >
+                    <ul class="dropdown-menu" aria-labelledby="stateDropdown" style="max-height: 200px; overflow-y: auto">
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Andhra Pradesh"
-                          >Andhra Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Andhra Pradesh">Andhra Pradesh</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Arunachal Pradesh"
-                          >Arunachal Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Arunachal Pradesh">Arunachal Pradesh</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Assam"
-                          >Assam</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Assam">Assam</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Bihar"
-                          >Bihar</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Bihar">Bihar</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Chhattisgarh"
-                          >Chhattisgarh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Chhattisgarh">Chhattisgarh</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Goa"
-                          >Goa</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Goa">Goa</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Gujarat"
-                          >Gujarat</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Gujarat">Gujarat</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Haryana"
-                          >Haryana</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Haryana">Haryana</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Himachal Pradesh"
-                          >Himachal Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Himachal Pradesh">Himachal Pradesh</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Jharkhand"
-                          >Jharkhand</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Jharkhand">Jharkhand</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Karnataka"
-                          >Karnataka</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Karnataka">Karnataka</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Kerala"
-                          >Kerala</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Kerala">Kerala</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Madhya Pradesh"
-                          >Madhya Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Madhya Pradesh">Madhya Pradesh</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Maharashtra"
-                          >Maharashtra</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Maharashtra">Maharashtra</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Manipur"
-                          >Manipur</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Manipur">Manipur</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Meghalaya"
-                          >Meghalaya</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Meghalaya">Meghalaya</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Mizoram"
-                          >Mizoram</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Mizoram">Mizoram</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Nagaland"
-                          >Nagaland</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Nagaland">Nagaland</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Odisha"
-                          >Odisha</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Odisha">Odisha</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Punjab"
-                          >Punjab</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Punjab">Punjab</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Rajasthan"
-                          >Rajasthan</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Rajasthan">Rajasthan</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Sikkim"
-                          >Sikkim</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Sikkim">Sikkim</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Tamil Nadu"
-                          >Tamil Nadu</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Tamil Nadu">Tamil Nadu</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Telangana"
-                          >Telangana</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Telangana">Telangana</a>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="#" data-value="Tripura"
-                          >Tripura</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Tripura">Tripura</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Uttar Pradesh"
-                          >Uttar Pradesh</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Uttar Pradesh">Uttar Pradesh</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="Uttarakhand"
-                          >Uttarakhand</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="Uttarakhand">Uttarakhand</a>
                       </li>
                       <li>
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          data-value="West Bengal"
-                          >West Bengal</a
-                        >
+                        <a class="dropdown-item" href="#" data-value="West Bengal">West Bengal</a>
                       </li>
                     </ul>
                   </div>
@@ -721,43 +400,20 @@
                 </div>
                 <div class="mb-3">
                   <label for="newPincode" class="form-label">Pincode</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="newPincode"
-                    name="pincode"
-                    
-                  />
+                  <input type="number" class="form-control" id="newPincode" name="pincode" />
                 </div>
                 <div class="mb-3">
                   <label for="newPhone" class="form-label">Phone</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="newPhone"
-                    name="phone"
-                    
-                  />
+                  <input type="number" class="form-control" id="newPhone" name="phone" />
                 </div>
                 <div class="mb-3">
-                  <label for="newAltPhone" class="form-label"
-                    >Alternate Phone</label
-                  >
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="newAltPhone"
-                    name="altPhone"
-                  />
+                  <label for="newAltPhone" class="form-label">Alternate Phone</label>
+                  <input type="number" class="form-control" id="newAltPhone" name="altPhone" />
                 </div>
                 <button type="submit" class="btn btn-primary">
                   Add Address
                 </button>
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                   Close
                 </button>
               </form>
@@ -770,17 +426,17 @@
       <div class="coupons mt-4 bg-white p-4 rounded">
         <hr />
         <div class="row">
-            <div class="col-md-8">
-                <label for="couponInput">Enter Coupon Code:</label>
-                <input type="text" id="couponInput" class="form-control" placeholder="Enter coupon code" />
-                <div id="couponList" class="dropdown-menu" style="display: none;"></div>
-            </div>
-            <div class="col-md-4">
-                <button id="applyCouponBtn" class="btn btn-info" style="margin-top: 32px;">Apply</button>
-            </div>
+          <div class="col-md-8">
+            <label for="couponInput">Enter Coupon Code:</label>
+            <input type="text" id="couponInput" class="form-control" placeholder="Enter coupon code" />
+            <div id="couponList" class="dropdown-menu" style="display: none;"></div>
+          </div>
+          <div class="col-md-4">
+            <button id="applyCouponBtn" class="btn btn-info" style="margin-top: 32px;">Apply</button>
+          </div>
         </div>
         <div id="discountMessage" class="mt-2"></div>
-    </div>
+      </div>
 
       <!-- Payment Method -->
       <div class="payment-method mt-4 bg-white p-4 rounded">
@@ -792,35 +448,15 @@
 
           <div class="col-md-6">
             <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="paymentMethod"
-                id="razorpay"
-                value="razorpay"
-                
-              />
+              <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay" />
               <label class="form-check-label" for="razorpay">Razorpay</label>
             </div>
             <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="paymentMethod"
-                id="cod"
-                value="cod"
-                checked
-              />
+              <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="cod" checked />
               <label class="form-check-label" for="cod">Cash on Delivery</label>
             </div>
             <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="paymentMethod"
-                id="wallet"
-                value="wallet"
-              />
+              <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="wallet" />
               <label class="form-check-label" for="cod">Wallet</label>
             </div>
           </div>
@@ -833,52 +469,52 @@
       <h3>Order Summary</h3>
       <hr />
       <div id="orderItems">
-          <% let totalPrice = 0; %> <% let cartItemsData = []; let discount = 0; %>
-          <% cartItems.forEach(function(item) { %> <% let itemTotal = item.price * item.quantity; %>
-          <div class="row mb-2">
-              <div class="col-8">
-                  <p style="font-size: 14px; font-weight: 600">
-                      <%= item.productId.productName %><span class="text-muted">(<%= item.quantity %>)</span>
-                  </p>
-              </div>
-              <div class="col-4 text-end">
-                  <p class="text-muted">&#8377; <%= itemTotal %></p>
-              </div>
+        <% let totalPrice = 0; %> <% let cartItemsData = []; let discount = 0; %>
+        <% cartItems.forEach(function(item) { %> <% let itemTotal = item.price * item.quantity; %>
+        <div class="row mb-2">
+          <div class="col-8">
+            <p style="font-size: 14px; font-weight: 600">
+              <%= item.productId.productName %><span class="text-muted">(<%= item.quantity %>)</span>
+            </p>
           </div>
-          <% totalPrice += itemTotal; %>
-          <% cartItemsData.push({ product: item.productId._id, quantity: item.quantity, price: item.price });%> <% }) %>
-          <div class="row mb-2">
-              <div class="col-8">
-                  <p>Discount:</p>
-              </div>
-              <div class="col-4 text-end">
-                  <p id="discountAmount">₹<%= discount %></p> <!-- Initially 0, will be updated -->
-              </div>
+          <div class="col-4 text-end">
+            <p class="text-muted">&#8377; <%= itemTotal %></p>
           </div>
-          <hr />
-          <div class="row">
-              <div class="col-8">
-                  <p style="font-size: 20px"><strong>Total:</strong></p>
-              </div>
-              <div class="col-4 text-end">
-                  <p style="font-size: 20px"><strong id="totalAmount">₹<%= totalPrice %></strong></p> <!-- Initially totalPrice, will be updated -->
-              </div>
+        </div>
+        <% totalPrice += itemTotal; %>
+        <% cartItemsData.push({ product: item.productId._id, quantity: item.quantity, price: item.price });%> <% }) %>
+        <div class="row mb-2">
+          <div class="col-8">
+            <p>Discount:</p>
           </div>
-          <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">Place Order</button>
+          <div class="col-4 text-end">
+            <p id="discountAmount">₹<%= discount %></p> <!-- Initially 0, will be updated -->
+          </div>
+        </div>
+        <hr />
+        <div class="row">
+          <div class="col-8">
+            <p style="font-size: 20px"><strong>Total:</strong></p>
+          </div>
+          <div class="col-4 text-end">
+            <p style="font-size: 20px"><strong id="totalAmount">₹<%= totalPrice %></strong></p> <!-- Initially totalPrice, will be updated -->
+          </div>
+        </div>
+        <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">Place Order</button>
 
 
-           <!-- Loading Overlay -->
-          <div id="loadingOverlay" class="d-none">
-            <div id="loadingSpinner" class="text-center">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              <p class="text-white">Processing your request...</p>
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="d-none">
+          <div id="loadingSpinner" class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
+            <p class="text-white">Processing your request...</p>
           </div>
+        </div>
 
       </div>
-  </div>
+    </div>
   </div>
 </div>
 
@@ -887,747 +523,765 @@
 
 
 <script>
-    document
-      .getElementById("changeAddressBtn")
-      .addEventListener("click", function () {
-        const changeAddressModal = new bootstrap.Modal(
-          document.getElementById("changeAddressModal")
-        );
-        changeAddressModal.show();
-      });
+  document
+    .getElementById("changeAddressBtn")
+    .addEventListener("click", function() {
+      const changeAddressModal = new bootstrap.Modal(
+        document.getElementById("changeAddressModal")
+      );
+      changeAddressModal.show();
+    });
 
-    document
-      .getElementById("useThisAddressBtn")
-      .addEventListener("click", function () {
-        console.log("Use This Address button clicked");
-        const selectedAddress = document.querySelector(
-          'input[name="address"]:checked'
-        ).value;
+  document
+    .getElementById("useThisAddressBtn")
+    .addEventListener("click", function() {
+      console.log("Use This Address button clicked");
+      const selectedAddress = document.querySelector(
+        'input[name="address"]:checked'
+      ).value;
 
-        // Perform an API call to update the default address for the user.
-        fetch(`/update-default-address`, {
+      // Perform an API call to update the default address for the user.
+      fetch(`/update-default-address`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ addressId: selectedAddress }),
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            addressId: selectedAddress
+          }),
         })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.success) {
-              // Update the shipping address without reloading the page
-              const selectedAddressElement = document.querySelector(
-                `label[for="address${selectedAddress}"]`
-              ).textContent;
-              const addressParts = selectedAddressElement.split(",");
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Update the shipping address without reloading the page
+            const selectedAddressElement = document.querySelector(
+              `label[for="address${selectedAddress}"]`
+            ).textContent;
+            const addressParts = selectedAddressElement.split(",");
 
-              // Dynamically update the shipping address section
-              document.querySelector(".address-details").innerHTML = `
+            // Dynamically update the shipping address section
+            document.querySelector(".address-details").innerHTML = `
         <strong>${addressParts[0]}</strong><br>
         ${addressParts[1]}<br>
         ${addressParts[2]}, ${addressParts[3]} - ${addressParts[4]}<br>
         ${addressParts[5] || "N/A"}`;
-              location.reload();
+            location.reload();
 
-              const changeAddressModal = bootstrap.Modal.getInstance(
-                document.getElementById("changeAddressModal")
-              );
-              changeAddressModal.hide();
-            } else {
-              alert("Error setting default address");
-            }
-          })
-          .catch((error) => console.error("Error:", error));
+            const changeAddressModal = bootstrap.Modal.getInstance(
+              document.getElementById("changeAddressModal")
+            );
+            changeAddressModal.hide();
+          } else {
+            alert("Error setting default address");
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    });
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const dropdownItems = document.querySelectorAll(".dropdown-item");
+    const stateDropdownBtn = document.getElementById("stateDropdown");
+    const stateInput = document.getElementById("state");
+
+    dropdownItems.forEach(function(item) {
+      item.addEventListener("click", function() {
+        const selectedState = item.getAttribute("data-value");
+        stateDropdownBtn.textContent = selectedState;
+        stateInput.value = selectedState;
+      });
+    });
+
+    document.getElementById("addNewAddressBtn").addEventListener("click", function() {
+      document.getElementById("stateDropdown").textContent = "Select State";
+      document.getElementById("state").value = "";
+
+      const addNewAddressModal = new bootstrap.Modal(document.getElementById("addNewAddressModal"));
+      addNewAddressModal.show();
+    });
+
+    document.getElementById("addAddressForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(document.getElementById("addAddressForm"));
+      const dataObject = {};
+      formData.forEach((value, key) => {
+        dataObject[key] = value;
       });
 
-    document.addEventListener("DOMContentLoaded", function () {
-      const dropdownItems = document.querySelectorAll(".dropdown-item");
-      const stateDropdownBtn = document.getElementById("stateDropdown");
-      const stateInput = document.getElementById("state"); 
+      // Form Validation
+      const requiredFields = [
+        'addressType', 'name', 'city', 'state', 'pincode', 'phone'
+      ];
 
-      dropdownItems.forEach(function (item) {
-        item.addEventListener("click", function () {
-          const selectedState = item.getAttribute("data-value");
-          stateDropdownBtn.textContent = selectedState; 
-          stateInput.value = selectedState; 
+      for (let field of requiredFields) {
+        if (!dataObject[field]) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: `Please fill in the ${field.charAt(0).toUpperCase() + field.slice(1)} field.`,
+            confirmButtonText: 'Okay',
+          });
+          return;
+        }
+      }
+
+      // Additional Validation for Name (Allow spaces but not empty or spaces-only names)
+      if (!/^[A-Za-z\s\-']+$/.test(dataObject.name) || !/\S/.test(dataObject.name)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Name',
+          text: 'Please enter a valid name (only letters, spaces, hyphens, and apostrophes are allowed). Name cannot be empty or consist of only spaces.',
+          confirmButtonText: 'Okay',
         });
-      });
+        return;
+      }
+      // Additional Validation for Phone and Pincode
+      if (!/^\d{10}$/.test(dataObject.phone)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Phone Number',
+          text: 'Please enter a valid 10-digit phone number.',
+          confirmButtonText: 'Okay',
+        });
+        return;
+      }
 
-      document.getElementById("addNewAddressBtn").addEventListener("click", function () {
-  document.getElementById("stateDropdown").textContent = "Select State";
-  document.getElementById("state").value = "";
+      if (!/^\d{6}$/.test(dataObject.pincode)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Pincode',
+          text: 'Please enter a valid 6-digit pincode.',
+          confirmButtonText: 'Okay',
+        });
+        return;
+      }
 
-  const addNewAddressModal = new bootstrap.Modal(document.getElementById("addNewAddressModal"));
-  addNewAddressModal.show();
-});
+      // Submit the form data via fetch if validation is successful
+      fetch("/profile/address/addAddress", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataObject),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            const addNewAddressModal = bootstrap.Modal.getInstance(document.getElementById("addNewAddressModal"));
+            addNewAddressModal.hide();
 
-document.getElementById("addAddressForm").addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  const formData = new FormData(document.getElementById("addAddressForm"));
-  const dataObject = {};
-  formData.forEach((value, key) => {
-    dataObject[key] = value;
-  });
-
-  // Form Validation
-  const requiredFields = [
-    'addressType', 'name', 'city', 'state', 'pincode', 'phone'
-  ];
-
-  for (let field of requiredFields) {
-    if (!dataObject[field]) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: `Please fill in the ${field.charAt(0).toUpperCase() + field.slice(1)} field.`,
-        confirmButtonText: 'Okay',
-      });
-      return;
-    }
-  }
-
- // Additional Validation for Name (Allow spaces but not empty or spaces-only names)
-if (!/^[A-Za-z\s\-']+$/.test(dataObject.name) || !/\S/.test(dataObject.name)) {
-  Swal.fire({
-    icon: 'error',
-    title: 'Invalid Name',
-    text: 'Please enter a valid name (only letters, spaces, hyphens, and apostrophes are allowed). Name cannot be empty or consist of only spaces.',
-    confirmButtonText: 'Okay',
-  });
-  return;
-}
-  // Additional Validation for Phone and Pincode
-  if (!/^\d{10}$/.test(dataObject.phone)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Phone Number',
-      text: 'Please enter a valid 10-digit phone number.',
-      confirmButtonText: 'Okay',
-    });
-    return;
-  }
-
-  if (!/^\d{6}$/.test(dataObject.pincode)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Pincode',
-      text: 'Please enter a valid 6-digit pincode.',
-      confirmButtonText: 'Okay',
-    });
-    return;
-  }
-
-  // Submit the form data via fetch if validation is successful
-  fetch("/profile/address/addAddress", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(dataObject),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        const addNewAddressModal = bootstrap.Modal.getInstance(document.getElementById("addNewAddressModal"));
-        addNewAddressModal.hide();
-
-        const newAddress = data.newAddress;
-        const addressListContainer = document.getElementById("addressForm");
-        const newAddressElement = document.createElement("div");
-        newAddressElement.classList.add("form-check");
-        newAddressElement.innerHTML = `
+            const newAddress = data.newAddress;
+            const addressListContainer = document.getElementById("addressForm");
+            const newAddressElement = document.createElement("div");
+            newAddressElement.classList.add("form-check");
+            newAddressElement.innerHTML = `
           <input class="form-check-input" type="radio" name="address" id="address${newAddress._id}" value="${newAddress._id}" checked />
           <label class="form-check-label" for="address${newAddress._id}">
             ${newAddress.name}, ${newAddress.addressType}, ${newAddress.city}, ${newAddress.state} - ${newAddress.pincode}
           </label>
         `;
-        addressListContainer.appendChild(newAddressElement);
+            addressListContainer.appendChild(newAddressElement);
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Address Added Successfully',
-          text: 'Your new address has been added.',
-          confirmButtonText: 'Okay',
-        }).then(() => {
-          location.reload();
+            Swal.fire({
+              icon: 'success',
+              title: 'Address Added Successfully',
+              text: 'Your new address has been added.',
+              confirmButtonText: 'Okay',
+            }).then(() => {
+              location.reload();
 
+            });
+
+            const changeAddressModal = bootstrap.Modal.getInstance(document.getElementById("changeAddressModal"));
+            changeAddressModal.show();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error Adding Address',
+              text: data.message || 'There was an error adding your address.',
+              confirmButtonText: 'Okay',
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding address:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Something Went Wrong',
+            text: 'There was an issue with the server, please try again later.',
+            confirmButtonText: 'Okay',
+          });
         });
-
-        const changeAddressModal = bootstrap.Modal.getInstance(document.getElementById("changeAddressModal"));
-        changeAddressModal.show();
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error Adding Address',
-          text: data.message || 'There was an error adding your address.',
-          confirmButtonText: 'Okay',
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Error adding address:", error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Something Went Wrong',
-        text: 'There was an issue with the server, please try again later.',
-        confirmButtonText: 'Okay',
-      });
     });
-});
 
 
-      document
-        .getElementById("useThisAddressBtn")
-        .addEventListener("click", function () {
-          const selectedAddressId = document.querySelector(
-            'input[name="address"]:checked'
-          ).value;
-          console.log("Selected Address:", selectedAddressId);
+    document
+      .getElementById("useThisAddressBtn")
+      .addEventListener("click", function() {
+        const selectedAddressId = document.querySelector(
+          'input[name="address"]:checked'
+        ).value;
+        console.log("Selected Address:", selectedAddressId);
 
-          fetch(`/update-default-address`, {
+        fetch(`/update-default-address`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ addressId: selectedAddressId }),
+            body: JSON.stringify({
+              addressId: selectedAddressId
+            }),
           })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                const selectedAddress = data.selectedAddress;
-                document.querySelector(".address-details").innerHTML = `
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              const selectedAddress = data.selectedAddress;
+              document.querySelector(".address-details").innerHTML = `
           <strong>${selectedAddress.name}</strong><br>
           ${selectedAddress.addressType}<br>
           ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}<br>
           Phone: ${selectedAddress.phone}
         `;
-                const changeAddressModal = bootstrap.Modal.getInstance(
-                  document.getElementById("changeAddressModal")
-                );
-                changeAddressModal.hide();
-              } else {
-                alert("Error updating address");
-              }
-            })
-            .catch((error) => console.error("Error:", error));
-        });
+              const changeAddressModal = bootstrap.Modal.getInstance(
+                document.getElementById("changeAddressModal")
+              );
+              changeAddressModal.hide();
+            } else {
+              alert("Error updating address");
+            }
+          })
+          .catch((error) => console.error("Error:", error));
+      });
+  });
+
+  document.getElementById("editAddressBtn").addEventListener("click", function() {
+    const address = {
+      name: "<%= defaultAddress.name %>",
+      addressType: "<%= defaultAddress.addressType %>",
+      city: "<%= defaultAddress.city %>",
+      landMark: "<%= defaultAddress.landMark %>",
+      state: "<%= defaultAddress.state %>",
+      pincode: "<%= defaultAddress.pincode %>",
+      phone: "<%= defaultAddress.phone %>",
+      altPhone: "<%= defaultAddress.altPhone %>",
+    };
+
+    document.getElementById("editName").value = address.name;
+    document.getElementById("editAddressType").value = address.addressType;
+    document.getElementById("editCity").value = address.city;
+    document.getElementById("editLandMark").value = address.landMark || "";
+    document.getElementById("editPincode").value = address.pincode;
+    document.getElementById("editPhone").value = address.phone;
+    document.getElementById("editAltPhone").value = address.altPhone || "";
+
+    document.getElementById("editState").value = address.state;
+    document.getElementById("editStateDropdown").textContent = address.state;
+
+    const dropdownItems = document.querySelectorAll(".dropdown-item");
+    dropdownItems.forEach((item) => {
+      if (item.getAttribute("data-value") === address.state) {
+        document.getElementById("editStateDropdown").textContent = item.textContent;
+      }
     });
 
-    document.getElementById("editAddressBtn").addEventListener("click", function () {
-  const address = {
-    name: "<%= defaultAddress.name %>",
-    addressType: "<%= defaultAddress.addressType %>",
-    city: "<%= defaultAddress.city %>",
-    landMark: "<%= defaultAddress.landMark %>",
-    state: "<%= defaultAddress.state %>",
-    pincode: "<%= defaultAddress.pincode %>",
-    phone: "<%= defaultAddress.phone %>",
-    altPhone: "<%= defaultAddress.altPhone %>",
-  };
-
-  document.getElementById("editName").value = address.name;
-  document.getElementById("editAddressType").value = address.addressType;
-  document.getElementById("editCity").value = address.city;
-  document.getElementById("editLandMark").value = address.landMark || "";
-  document.getElementById("editPincode").value = address.pincode;
-  document.getElementById("editPhone").value = address.phone;
-  document.getElementById("editAltPhone").value = address.altPhone || "";
-
-  document.getElementById("editState").value = address.state;
-  document.getElementById("editStateDropdown").textContent = address.state;
+    const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
+    editAddressModal.show();
+  });
 
   const dropdownItems = document.querySelectorAll(".dropdown-item");
-  dropdownItems.forEach((item) => {
-    if (item.getAttribute("data-value") === address.state) {
-      document.getElementById("editStateDropdown").textContent = item.textContent;
+  const stateDropdownBtn = document.getElementById("editStateDropdown");
+  const stateInput = document.getElementById("editState");
+
+  dropdownItems.forEach(function(item) {
+    item.addEventListener("click", function() {
+      const selectedState = item.getAttribute("data-value");
+      stateDropdownBtn.textContent = selectedState;
+      stateInput.value = selectedState;
+    });
+  });
+
+  document.getElementById("editAddressForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const formData = new FormData(document.getElementById("editAddressForm"));
+    const dataObject = {};
+    formData.forEach((value, key) => {
+      dataObject[key] = value;
+    });
+
+    // Form Validation
+    const requiredFields = [
+      'addressType', 'name', 'city', 'state', 'pincode', 'phone'
+    ];
+
+    for (let field of requiredFields) {
+      if (!dataObject[field]) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Validation Error',
+          text: `Please fill in the ${field.charAt(0).toUpperCase() + field.slice(1)} field.`,
+          confirmButtonText: 'Okay',
+        });
+        return;
+      }
     }
-  });
 
-  const editAddressModal = new bootstrap.Modal(document.getElementById("editAddressModal"));
-  editAddressModal.show();
-});
-
-const dropdownItems = document.querySelectorAll(".dropdown-item");
-const stateDropdownBtn = document.getElementById("editStateDropdown");
-const stateInput = document.getElementById("editState");
-
-dropdownItems.forEach(function (item) {
-  item.addEventListener("click", function () {
-    const selectedState = item.getAttribute("data-value");
-    stateDropdownBtn.textContent = selectedState;
-    stateInput.value = selectedState;
-  });
-});
-
-document.getElementById("editAddressForm").addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  const formData = new FormData(document.getElementById("editAddressForm"));
-  const dataObject = {};
-  formData.forEach((value, key) => {
-    dataObject[key] = value;
-  });
-
-  // Form Validation
-  const requiredFields = [
-    'addressType', 'name', 'city', 'state', 'pincode', 'phone'
-  ];
-
-  for (let field of requiredFields) {
-    if (!dataObject[field]) {
+    // Additional Validation for Name (Allow spaces but not empty or spaces-only names)
+    if (!/^[A-Za-z\s\-']+$/.test(dataObject.name) || !/\S/.test(dataObject.name)) {
       Swal.fire({
         icon: 'error',
-        title: 'Validation Error',
-        text: `Please fill in the ${field.charAt(0).toUpperCase() + field.slice(1)} field.`,
+        title: 'Invalid Name',
+        text: 'Please enter a valid name (only letters, spaces, hyphens, and apostrophes are allowed). Name cannot be empty or consist of only spaces.',
         confirmButtonText: 'Okay',
       });
       return;
     }
-  }
 
-  // Additional Validation for Name (Allow spaces but not empty or spaces-only names)
-  if (!/^[A-Za-z\s\-']+$/.test(dataObject.name) || !/\S/.test(dataObject.name)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Name',
-      text: 'Please enter a valid name (only letters, spaces, hyphens, and apostrophes are allowed). Name cannot be empty or consist of only spaces.',
-      confirmButtonText: 'Okay',
-    });
-    return;
-  }
+    // Additional Validation for Phone and Pincode
+    if (!/^\d{10}$/.test(dataObject.phone)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Phone Number',
+        text: 'Please enter a valid 10-digit phone number.',
+        confirmButtonText: 'Okay',
+      });
+      return;
+    }
 
-  // Additional Validation for Phone and Pincode
-  if (!/^\d{10}$/.test(dataObject.phone)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Phone Number',
-      text: 'Please enter a valid 10-digit phone number.',
-      confirmButtonText: 'Okay',
-    });
-    return;
-  }
+    if (!/^\d{6}$/.test(dataObject.pincode)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Pincode',
+        text: 'Please enter a valid 6-digit pincode.',
+        confirmButtonText: 'Okay',
+      });
+      return;
+    }
 
-  if (!/^\d{6}$/.test(dataObject.pincode)) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Invalid Pincode',
-      text: 'Please enter a valid 6-digit pincode.',
-      confirmButtonText: 'Okay',
-    });
-    return;
-  }
-
-  // Submit the form data via fetch if validation is successful
-  fetch("/profile/address/editAddress", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(dataObject),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        document.querySelector(".address-details").innerHTML = `
+    // Submit the form data via fetch if validation is successful
+    fetch("/profile/address/editAddress", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataObject),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          document.querySelector(".address-details").innerHTML = `
           <strong>${data.updatedAddress.name}</strong><br>
           ${data.updatedAddress.addressType}<br>
           ${data.updatedAddress.city}, ${data.updatedAddress.state} - ${data.updatedAddress.pincode}<br>
           Phone: ${data.updatedAddress.phone}
         `;
 
-        const editAddressModal = bootstrap.Modal.getInstance(document.getElementById("editAddressModal"));
-        editAddressModal.hide();
+          const editAddressModal = bootstrap.Modal.getInstance(document.getElementById("editAddressModal"));
+          editAddressModal.hide();
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Address Updated Successfully',
-          text: 'Your address has been updated.',
-          confirmButtonText: 'Okay',
-        }).then(() => {
-          location.reload();
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error Updating Address',
-          text: data.message || 'There was an error updating your address.',
-          confirmButtonText: 'Okay',
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Error updating address:", error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Something Went Wrong',
-        text: 'There was an issue with the server, please try again later.',
-        confirmButtonText: 'Okay',
-      });
-    });
-});
-
-const couponInput = document.getElementById('couponInput');
-    const couponList = document.getElementById('couponList');
-    const applyCouponBtn = document.getElementById('applyCouponBtn');
-
-    const removeCouponBtn = document.createElement('button');
-    removeCouponBtn.className = 'btn btn-danger mt-4'; // Styling for the "Remove Coupon" button
-    removeCouponBtn.textContent = 'Remove Coupon';
-    removeCouponBtn.style.display = 'none'; // Initially hidden
-
-
-    const discountAmountElement = document.getElementById('discountAmount');
-    const discountMessage = document.getElementById('discountMessage');
-    const totalAmountElement = document.getElementById('totalAmount');
-    let totalPrice = <%= totalPrice %>; 
-    let discount = 0;
-
-    couponInput.addEventListener('focus', async () => {
-        const response = await fetch('/api/coupons');
-        const coupons = await response.json();
-        couponList.innerHTML = '';
-        coupons.forEach(coupon => {
-            if (totalPrice >= coupon.minPurchaseAmount) {
-                const couponItem = document.createElement('div');
-                couponItem.className = 'dropdown-item';
-                couponItem.textContent = coupon.name;
-                couponItem.onclick = () => {
-                    couponInput.value = coupon.name;
-                    couponList.style.display = 'none';
-                };
-                couponList.appendChild(couponItem);
-            }
-        });
-        couponList.style.display = couponList.innerHTML ? 'block' : 'none';
-    });
-
-    applyCouponBtn.addEventListener('click', () => {
-    const couponCode = couponInput.value;
-
-    if (couponCode) {
-        fetch('/api/apply-coupon', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: couponCode, totalPrice })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                discount = data.offerPrice; // Update discount with the coupon offer price
-                totalPrice = data.newTotalPrice; // Update total price with the new total
-
-                // Update the UI with the new discount and total
-                discountAmountElement.textContent = `₹${discount}`;
-                totalAmountElement.textContent = `₹${totalPrice}`;
-
-                // Hide Apply Coupon button and show Remove Coupon button
-                applyCouponBtn.style.display = 'none';
-                removeCouponBtn.style.display = 'block';
-
-                // Add Remove Coupon button to the DOM (if it's not already added)
-                if (!document.contains(removeCouponBtn)) {
-                    applyCouponBtn.parentElement.appendChild(removeCouponBtn);
-                }
-
-                Swal.fire({
-                    title: 'Coupon Applied!',
-                    text: `You saved ₹${discount}. Your new total is ₹${totalPrice}`,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-            } else {
-                Swal.fire({
-                    title: 'Error!',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Try Again'
-                });
-            }
-        })
-        .catch(error => {
-            Swal.fire({
-                title: 'Error!',
-                text: 'An unexpected error occurred. Please try again later.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        });
-    } else {
-        Swal.fire({
-            title: 'Error!',
-            text: 'Please enter a valid coupon code.',
+          Swal.fire({
+            icon: 'success',
+            title: 'Address Updated Successfully',
+            text: 'Your address has been updated.',
+            confirmButtonText: 'Okay',
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire({
             icon: 'error',
-            confirmButtonText: 'OK'
+            title: 'Error Updating Address',
+            text: data.message || 'There was an error updating your address.',
+            confirmButtonText: 'Okay',
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating address:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Something Went Wrong',
+          text: 'There was an issue with the server, please try again later.',
+          confirmButtonText: 'Okay',
         });
-    }
-});
+      });
+  });
 
-// Handle removing coupon when Remove Coupon button is clicked
-removeCouponBtn.addEventListener('click', () => {
+  const couponInput = document.getElementById('couponInput');
+  const couponList = document.getElementById('couponList');
+  const applyCouponBtn = document.getElementById('applyCouponBtn');
+
+  const removeCouponBtn = document.createElement('button');
+  removeCouponBtn.className = 'btn btn-danger mt-4'; // Styling for the "Remove Coupon" button
+  removeCouponBtn.textContent = 'Remove Coupon';
+  removeCouponBtn.style.display = 'none'; // Initially hidden
+
+
+  const discountAmountElement = document.getElementById('discountAmount');
+  const discountMessage = document.getElementById('discountMessage');
+  const totalAmountElement = document.getElementById('totalAmount');
+  let totalPrice = <%= totalPrice %>;
+  let discount = 0;
+
+  couponInput.addEventListener('focus', async () => {
+    const response = await fetch('/api/coupons');
+    const coupons = await response.json();
+    couponList.innerHTML = '';
+    coupons.forEach(coupon => {
+      if (totalPrice >= coupon.minPurchaseAmount) {
+        const couponItem = document.createElement('div');
+        couponItem.className = 'dropdown-item';
+        couponItem.textContent = coupon.name;
+        couponItem.onclick = () => {
+          couponInput.value = coupon.name;
+          couponList.style.display = 'none';
+        };
+        couponList.appendChild(couponItem);
+      }
+    });
+    couponList.style.display = couponList.innerHTML ? 'block' : 'none';
+  });
+
+  applyCouponBtn.addEventListener('click', () => {
     const couponCode = couponInput.value;
 
     if (couponCode) {
-        fetch('/api/remove-coupon', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: couponCode, totalPrice })
+      fetch('/api/apply-coupon', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            code: couponCode,
+            totalPrice
+          })
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                // Revert the total price and discount
-                totalPrice += discount; // Add back the discount to total
-                discount = 0;
+          if (data.success) {
+            discount = data.offerPrice; // Update discount with the coupon offer price
+            totalPrice = data.newTotalPrice; // Update total price with the new total
 
-                // Update the UI with the reverted values
-                discountAmountElement.textContent = '₹0';
-                totalAmountElement.textContent = `₹${totalPrice}`;
+            // Update the UI with the new discount and total
+            discountAmountElement.textContent = `₹${discount}`;
+            totalAmountElement.textContent = `₹${totalPrice}`;
 
-                // Show Apply Coupon button and hide Remove Coupon button
-                applyCouponBtn.style.display = 'block';
-                removeCouponBtn.style.display = 'none';
+            // Hide Apply Coupon button and show Remove Coupon button
+            applyCouponBtn.style.display = 'none';
+            removeCouponBtn.style.display = 'block';
 
-                // Optionally reset the coupon input field
-                couponInput.value = '';
-
-                Swal.fire({
-                    title: 'Coupon Removed!',
-                    text: `The coupon has been removed. Your total is now ₹${totalPrice}.`,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-            } else {
-                Swal.fire({
-                    title: 'Error!',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonText: 'Try Again'
-                });
+            // Add Remove Coupon button to the DOM (if it's not already added)
+            if (!document.contains(removeCouponBtn)) {
+              applyCouponBtn.parentElement.appendChild(removeCouponBtn);
             }
-        })
-        .catch(error => {
+
             Swal.fire({
-                title: 'Error!',
-                text: 'An unexpected error occurred. Please try again later.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        });
-    }
-});
-
-
-document.getElementById('usePaymentMethodBtn').addEventListener('click', function () {
-  document.getElementById('loadingOverlay').classList.remove('d-none');
-  this.disabled = true; // Disable the button to prevent multiple clicks
-
-  const orderedItems = <%- JSON.stringify(cartItemsData) %>;
-  const totalPrice = <%= totalPrice %>; // Get total price from server
-  const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '')) || 0;
-  const finalAmount = totalPrice - discount; // Adjust final amount after coupon discount
-  const address = "<%= defaultAddress._id %>";
-  const status = "Pending";
-  const couponApplied = discount > 0;
-
-  const orderData = {
-    ordereditems: orderedItems,
-    totalprice: totalPrice,
-    finalAmount: finalAmount,
-    address: address,
-    discount: discount,
-    status: status,
-    couponApplied: couponApplied
-  };
-
-  const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-
-  if (paymentMethod === 'cod' && finalAmount > 1000) {
-    this.disabled = false; // Re-enable the button
-    document.getElementById('loadingOverlay').classList.add('d-none');
-    Swal.fire({
-          title: 'Exceeded Limit',
-          text: 'Sorry, COD is not available for orders above ₹1000',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        }).then(() => {
-          document.getElementById('loadingOverlay').classList.add('d-none');
-        });
-        return; 
-  }
-
-  // Select appropriate route based on payment method
-  const url = paymentMethod === 'razorpay' ? '/checkout/razorpay-place-order' : 
-              paymentMethod === 'wallet' ? '/checkout/wallet-place-order' : 
-              '/checkout/place-order';
-
-  // If payment method is wallet, check wallet balance
-  if (paymentMethod === 'wallet') {
-    fetch('/wallet/check-balance', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ amount: finalAmount }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Proceed with order placement
-        placeOrder(url, orderData);
-      } else {
-        // Insufficient balance
-        this.disabled = false; // Re-enable the button
-          document.getElementById('loadingOverlay').classList.add('d-none');
-        Swal.fire({
-          title: 'Insufficient Balance',
-          text: 'You do not have enough balance in your wallet to complete this purchase.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        }).then(() => {
-          this.disabled = false; // Re-enable the button
-          document.getElementById('loadingOverlay').classList.add('d-none');
-        });
-      }
-    })
-    .catch(error => {
-      console.error('Error checking wallet balance:', error);
-      this.disabled = false; // Re-enable the button
-      document.getElementById('loadingOverlay').classList.add('d-none');
-    });
-  } else {
-    // Proceed with order placement for other payment methods
-    placeOrder(url, orderData);
-  }
-});
-
-
-// Function to place the order
-function placeOrder(url, orderData) {
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(orderData),
-  })
-  .then(response => response.json())
-  .then(data => {
-
-    document.getElementById('loadingOverlay').classList.add('d-none');
-    document.getElementById('usePaymentMethodBtn').disabled = false; 
-
-    if (data.success) {
-      
-      if (data.paymentMethod === 'razorpay') {
-        var options = {
-          key: data.razorpayKey,
-          amount: data.amount * 100, 
-          currency: data.currency,
-          order_id: data.orderId,
-          handler: function (response) {
-            console.log('Payment Successful:', response);
-            Swal.fire({
-              title: 'Payment Successful',
-              text: 'Your payment has been successfully completed.',
+              title: 'Coupon Applied!',
+              text: `You saved ₹${discount}. Your new total is ₹${totalPrice}`,
               icon: 'success',
               confirmButtonText: 'OK'
-            }).then(() => {
-              downloadInvoice(data.orderId);
             });
-          },
-          // Adding a failure handler to the Razorpay options
-          "prefill": {
-            // You can prefill customer details if available (optional)
-            name: orderData.customerName,
-            email: orderData.customerEmail
-          },
-          "theme": {
-            "color": "#F37254"
-          },
-          "modal": {
-            "ondismiss": function() {
-              console.log('Payment window was closed before completing.');
-            }
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: data.message,
+              icon: 'error',
+              confirmButtonText: 'Try Again'
+            });
           }
-        };
-        
-        var rzp1 = new Razorpay(options);
-        try {
-          rzp1.open();
-        } catch (error) {
-          console.log('Error opening Razorpay window:', error);
-          window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; // Redirect to "order failed" page
-        }
-
-        // Handle Razorpay payment failure
-        rzp1.on('payment.failed', function(response) {
-          console.log('Payment Failed:', response);
+        })
+        .catch(error => {
           Swal.fire({
-            title: 'Payment Failed',
-            text: 'There was an issue with the payment. Please try again later.',
+            title: 'Error!',
+            text: 'An unexpected error occurred. Please try again later.',
             icon: 'error',
             confirmButtonText: 'OK'
-          }).then(() => {
-            window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; 
           });
         });
-
-      } else {
-        downloadInvoice(data.orderId);
-      }
     } else {
-      console.log('Error');
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    document.getElementById('loadingOverlay').classList.add('d-none');
-    document.getElementById('usePaymentMethodBtn').disabled = false; // Re-enable the button
-    Swal.fire({
-      title: 'Error!',
-      text: 'An unexpected error occurred. Please try again later.',
-      icon: 'error',
-      confirmButtonText: 'OK'
-    });
-  });
-}
-
-function downloadInvoice(orderId) {
-  console.log('Starting download for order:', orderId);
-
-  fetch(`/checkout/generate-invoice/${orderId}`)
-    .then(response => {
-      console.log('Response status:', response.status); 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      return response.blob();
-    })
-    .then(blob => {
-      console.log('Blob received:', blob); 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `invoice-${orderId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url); // Clean up the object URL
-
-      setTimeout(() => {
-        window.location.href = `/checkout/orderSuccess?orderId=${orderId}`;
-      }, 1000);
-
-    })
-    .catch(error => {
-      console.error('Error downloading invoice:', error);
       Swal.fire({
         title: 'Error!',
-        text: 'Failed to download the invoice. Please try again later.',
+        text: 'Please enter a valid coupon code.',
         icon: 'error',
         confirmButtonText: 'OK'
       });
-    });
-}
+    }
+  });
+
+  // Handle removing coupon when Remove Coupon button is clicked
+  removeCouponBtn.addEventListener('click', () => {
+    const couponCode = couponInput.value;
+
+    if (couponCode) {
+      fetch('/api/remove-coupon', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            code: couponCode,
+            totalPrice
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Revert the total price and discount
+            totalPrice += discount; // Add back the discount to total
+            discount = 0;
+
+            // Update the UI with the reverted values
+            discountAmountElement.textContent = '₹0';
+            totalAmountElement.textContent = `₹${totalPrice}`;
+
+            // Show Apply Coupon button and hide Remove Coupon button
+            applyCouponBtn.style.display = 'block';
+            removeCouponBtn.style.display = 'none';
+
+            // Optionally reset the coupon input field
+            couponInput.value = '';
+
+            Swal.fire({
+              title: 'Coupon Removed!',
+              text: `The coupon has been removed. Your total is now ₹${totalPrice}.`,
+              icon: 'success',
+              confirmButtonText: 'OK'
+            });
+          } else {
+            Swal.fire({
+              title: 'Error!',
+              text: data.message,
+              icon: 'error',
+              confirmButtonText: 'Try Again'
+            });
+          }
+        })
+        .catch(error => {
+          Swal.fire({
+            title: 'Error!',
+            text: 'An unexpected error occurred. Please try again later.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        });
+    }
+  });
+
+
+  document.getElementById('usePaymentMethodBtn').addEventListener('click', function() {
+    document.getElementById('loadingOverlay').classList.remove('d-none');
+    this.disabled = true; // Disable the button to prevent multiple clicks
+
+    const orderedItems = <%- JSON.stringify(cartItemsData) %>;
+    const totalPrice = <%= totalPrice %>; // Get total price from server
+    const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '')) || 0;
+    const finalAmount = totalPrice - discount; // Adjust final amount after coupon discount
+    const address = "<%= defaultAddress._id %>";
+    const status = "Pending";
+    const couponApplied = discount > 0;
+
+    const orderData = {
+      ordereditems: orderedItems,
+      totalprice: totalPrice,
+      finalAmount: finalAmount,
+      address: address,
+      discount: discount,
+      status: status,
+      couponApplied: couponApplied
+    };
+
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+    if (paymentMethod === 'cod' && finalAmount > 1000) {
+      this.disabled = false; // Re-enable the button
+      document.getElementById('loadingOverlay').classList.add('d-none');
+      Swal.fire({
+        title: 'Exceeded Limit',
+        text: 'Sorry, COD is not available for orders above ₹1000',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        document.getElementById('loadingOverlay').classList.add('d-none');
+      });
+      return;
+    }
+
+    // Select appropriate route based on payment method
+    const url = paymentMethod === 'razorpay' ? '/checkout/razorpay-place-order' :
+      paymentMethod === 'wallet' ? '/checkout/wallet-place-order' :
+      '/checkout/place-order';
+
+    // If payment method is wallet, check wallet balance
+    if (paymentMethod === 'wallet') {
+      fetch('/wallet/check-balance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: finalAmount
+          }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Proceed with order placement
+            placeOrder(url, orderData);
+          } else {
+            // Insufficient balance
+            this.disabled = false; // Re-enable the button
+            document.getElementById('loadingOverlay').classList.add('d-none');
+            Swal.fire({
+              title: 'Insufficient Balance',
+              text: 'You do not have enough balance in your wallet to complete this purchase.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              this.disabled = false; // Re-enable the button
+              document.getElementById('loadingOverlay').classList.add('d-none');
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error checking wallet balance:', error);
+          this.disabled = false; // Re-enable the button
+          document.getElementById('loadingOverlay').classList.add('d-none');
+        });
+    } else {
+      // Proceed with order placement for other payment methods
+      placeOrder(url, orderData);
+    }
+  });
+
+
+  // Function to place the order
+  function placeOrder(url, orderData) {
+    fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      })
+      .then(response => response.json())
+      .then(data => {
+
+        document.getElementById('loadingOverlay').classList.add('d-none');
+        document.getElementById('usePaymentMethodBtn').disabled = false;
+
+        if (data.success) {
+
+          if (data.paymentMethod === 'razorpay') {
+            var options = {
+              key: data.razorpayKey,
+              amount: data.amount * 100,
+              currency: data.currency,
+              order_id: data.orderId,
+              handler: function(response) {
+                console.log('Payment Successful:', response);
+                Swal.fire({
+                  title: 'Payment Successful',
+                  text: 'Your payment has been successfully completed.',
+                  icon: 'success',
+                  confirmButtonText: 'OK'
+                }).then(() => {
+                  downloadInvoice(data.orderId);
+                });
+              },
+              // Adding a failure handler to the Razorpay options
+              "prefill": {
+                // You can prefill customer details if available (optional)
+                name: orderData.customerName,
+                email: orderData.customerEmail
+              },
+              "theme": {
+                "color": "#F37254"
+              },
+              "modal": {
+                "ondismiss": function() {
+                  console.log('Payment window was closed before completing.');
+                }
+              }
+            };
+
+            var rzp1 = new Razorpay(options);
+            try {
+              rzp1.open();
+            } catch (error) {
+              console.log('Error opening Razorpay window:', error);
+              window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; // Redirect to "order failed" page
+            }
+
+            // Handle Razorpay payment failure
+            rzp1.on('payment.failed', function(response) {
+              console.log('Payment Failed:', response);
+              Swal.fire({
+                title: 'Payment Failed',
+                text: 'There was an issue with the payment. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+              }).then(() => {
+                window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`;
+              });
+            });
+
+          } else {
+            downloadInvoice(data.orderId);
+          }
+        } else {
+          console.log('Error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('loadingOverlay').classList.add('d-none');
+        document.getElementById('usePaymentMethodBtn').disabled = false; // Re-enable the button
+        Swal.fire({
+          title: 'Error!',
+          text: 'An unexpected error occurred. Please try again later.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      });
+  }
+
+  function downloadInvoice(orderId) {
+    console.log('Starting download for order:', orderId);
+
+    fetch(`/checkout/generate-invoice/${orderId}`)
+      .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        console.log('Blob received:', blob);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `invoice-${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Clean up the object URL
+
+        setTimeout(() => {
+          window.location.href = `/checkout/orderSuccess?orderId=${orderId}`;
+        }, 1000);
+
+      })
+      .catch(error => {
+        console.error('Error downloading invoice:', error);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to download the invoice. Please try again later.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      });
+  }
 </script>
 
 <%- include("../../views/partials/user/footer") %>

@@ -1,105 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Log In</title>
-    <!-- Bootstrap CSS -->
-    <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
-    <link rel="stylesheet" href="/css/signup_style.css" type="text/css" />
-  </head>
-  <body>
 
-    <div class="p-4">
-      <a href="/"><img src="/img/logo.png" style="width: 13%;" alt="Art Mart" class="img-fluid" /></a>
-    </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link rel="stylesheet" href="/css/signup_style.css" type="text/css" />
+</head>
 
-    <h1 class="text-center pt-5 pb-0 head">Log In & Explore More</h1>
-    <div class="container">
-      <div class="signup-container row">
-        <!-- Left Image -->
-        <div class="col-12 col-md-6 d-flex justify-content-center">
-          <img
-            src="/img/illustrations/admin-login.png"
-            alt="Creative Tools Image"
-          />
-        </div>
+<body>
 
-        <!-- Right Form -->
-        <div class="form-container col-12 col-md-6">
-          <p class="text-center">
-            Login to the Admin Portal: Control your store’s settings and track
-            your sales.!
-          </p>
+  <div class="p-4">
+    <a href="/"><img src="/img/logo.png" style="width: 13%;" alt="Art Mart" class="img-fluid" /></a>
+  </div>
 
-          <!-- Sign-Up Form -->
-          <form id="signup-form" action="/admin/login" method="POST">
-            <!-- Input Fields -->
+  <h1 class="text-center pt-5 pb-0 head">Log In & Explore More</h1>
+  <div class="container">
+    <div class="signup-container row">
+      <!-- Left Image -->
+      <div class="col-12 col-md-6 d-flex justify-content-center">
+        <img src="/img/illustrations/admin-login.png" alt="Creative Tools Image" />
+      </div>
 
-            <% if (locals.message && message.length > 0) {%>
+      <!-- Right Form -->
+      <div class="form-container col-12 col-md-6">
+        <p class="text-center">
+          Login to the Admin Portal: Control your store’s settings and track
+          your sales.!
+        </p>
 
-            <div class="alert alert-danger text-center"><%= message %></div>
+        <!-- Sign-Up Form -->
+        <form id="signup-form" action="/admin/login" method="POST">
+          <!-- Input Fields -->
 
-            <% } %>
+          <% if (locals.message && message.length > 0) {%>
 
-            <div class="form-group">
-              <input
-                type="email"
-                name="email"
-                id="email"
-                class="input-line"
-                placeholder="Email Address"
-                required
-              />
-              <div class="error-message" id="email-error"></div>
-            </div>
+          <div class="alert alert-danger text-center"><%= message %></div>
 
-            <div class="form-group">
-              <input
-                type="password"
-                name="password"
-                id="password"
-                class="input-line"
-                placeholder="Password"
-                required
-              />
-              <div class="error-message" id="password-error"></div>
-            </div>
+          <% } %>
 
-            <div class="form-group d-flex justify-content-end">
-              <a href="/admin/forgot-password" class="f-pass ms-auto"
-                >Forgot password?</a
-              >
-            </div>
+          <div class="form-group">
+            <input type="email" name="email" id="email" class="input-line" placeholder="Email Address" required />
+            <div class="error-message" id="email-error"></div>
+          </div>
 
-            <!-- Login Button -->
-            <button type="submit" class="primary-btn">Log In</button>
+          <div class="form-group">
+            <input type="password" name="password" id="password" class="input-line" placeholder="Password" required />
+            <div class="error-message" id="password-error"></div>
+          </div>
 
-            <a href="/auth/google" class="google-btn">
-              <i class="fab fa-google"></i> Login with Google
-            </a>
+          <div class="form-group d-flex justify-content-end">
+            <a href="/admin/forgot-password" class="f-pass ms-auto">Forgot password?</a>
+          </div>
 
-            <div class="text-center" style="margin-top: 20px">
-              <p>Don't have an account? <a href="/signup">Sign Up</a></p>
-            </div>
-          </form>
-        </div>
+          <!-- Login Button -->
+          <button type="submit" class="primary-btn">Log In</button>
+
+          <a href="/auth/google" class="google-btn">
+            <i class="fab fa-google"></i> Login with Google
+          </a>
+
+          <div class="text-center" style="margin-top: 20px">
+            <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+          </div>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- Bootstrap JS and jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <script src="/js/custom.js"></script>
-  </body>
+  <script src="/js/custom.js"></script>
+</body>
+
 </html>

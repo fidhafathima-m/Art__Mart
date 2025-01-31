@@ -1,43 +1,43 @@
 <head>
-    <style>
-      .sidebar a.active {
-        background-color: #007bff;
-        color: white;
-      }
-  
-      .sidebar a.active i {
-        color: white;  
-      }
-  
-      .sidebar {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 50px;
-        background-color: #f8f9fa;
-        padding-top: 20px;
-        margin-bottom: 30px;
-      }
-  
-      .sidebar a {
-        display: block;
-        padding: 10px 15px;
-        color: #000;
-        text-decoration: none;
-        margin-bottom: 10px;
-      }
-  
-      .sidebar a:hover {
-        background-color: #007bff;
-        color: white;
-      }
-  
-      .alert {
-        margin-top: 20px;
-      }
-    </style>
-  </head>
+  <style>
+    .sidebar a.active {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .sidebar a.active i {
+      color: white;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      background-color: #f8f9fa;
+      padding-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+
+    .sidebar a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .alert {
+      margin-top: 20px;
+    }
+  </style>
+</head>
 
 <%- include('../../views/partials/user/header') %>
 
@@ -54,25 +54,12 @@
           <div class="card-body p-3">
             <div class="form-group">
               <label for="name">Full Name</label>
-              <input
-                type="text"
-                class="form-control"
-                id="name"
-                name="name"
-                value="<%= user.name %>"  
-                required
-              />
+              <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>" required />
             </div>
 
             <div class="form-group mt-3">
               <label for="phone">Phone Number</label>
-              <input
-                type="text"
-                class="form-control"
-                id="phone"
-                name="phone"
-                value="<%= user.phone || '' %>" 
-              />
+              <input type="text" class="form-control" id="phone" name="phone" value="<%= user.phone || '' %>" />
             </div>
 
             <div class="mt-4">
@@ -90,8 +77,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  $('#editProfileForm').on('submit', function (e) {
-    e.preventDefault(); 
+  $('#editProfileForm').on('submit', function(e) {
+    e.preventDefault();
 
     $('.error').remove();
 
@@ -105,7 +92,7 @@
       $('#name').after('<span class="error text-danger">Name is required</span>');
     }
 
-    
+
     const phoneRegex = /^[0-9]{10}$/;
     if (phone.trim() !== "" && !phoneRegex.test(phone)) {
       isValid = false;
@@ -119,10 +106,10 @@
     const formData = $(this).serialize();
 
     $.ajax({
-      url: '/profile/edit', 
+      url: '/profile/edit',
       method: 'POST',
       data: formData,
-      success: function (response) {
+      success: function(response) {
         if (response.success) {
           Swal.fire({
             title: 'Success!',
@@ -143,7 +130,7 @@
           });
         }
       },
-      error: function () {
+      error: function() {
         Swal.fire({
           title: 'Error!',
           text: 'An unexpected error occurred. Please try again later.',

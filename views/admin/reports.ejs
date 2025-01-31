@@ -5,134 +5,134 @@
   <%- include('../../views/partials/admin/sidebar') %>
 
   <div class="main-content">
-<div class="d-flex justify-content-between align-items-center my-4">
-    <span class="h1">Sales Reports</span>
-    <button class="btn btn-primary" data-toggle="modal" data-target="#reportModal">Generate Sales Report</button>
-</div>
+    <div class="d-flex justify-content-between align-items-center my-4">
+      <span class="h1">Sales Reports</span>
+      <button class="btn btn-primary" data-toggle="modal" data-target="#reportModal">Generate Sales Report</button>
+    </div>
 
-<!-- Modal for selecting filters -->
-<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <!-- Modal for selecting filters -->
+    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reportModalLabel">Generate Sales Report</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="reportForm">
-                    <!-- Filter by period (Daily/Weekly/Monthly) -->
-                    <div class="form-group">
-                        <label for="modalFilterType" class="mt-1" style="margin-left: -80px;">Filter by Period</label>
-                        <select class="form-control mt-5" id="modalFilterType" onchange="toggleModalCustomDateFields(this.value)">
-                            <option value="daily">1 Day</option>
-                            <option value="weekly" selected>1 Week</option>
-                            <option value="monthly">1 Month</option>
-                            <option value="custom">Custom Date Range</option>
-                        </select>
-                    </div>
+          <div class="modal-header">
+            <h5 class="modal-title" id="reportModalLabel">Generate Sales Report</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="reportForm">
+              <!-- Filter by period (Daily/Weekly/Monthly) -->
+              <div class="form-group">
+                <label for="modalFilterType" class="mt-1" style="margin-left: -80px;">Filter by Period</label>
+                <select class="form-control mt-5" id="modalFilterType" onchange="toggleModalCustomDateFields(this.value)">
+                  <option value="daily">1 Day</option>
+                  <option value="weekly" selected>1 Week</option>
+                  <option value="monthly">1 Month</option>
+                  <option value="custom">Custom Date Range</option>
+                </select>
+              </div>
 
-                    <div id="modalSpecificDateField" style="display: none; margin-top: 100px;">
-                        <div class="form-group">
-                            <label for="modalSpecificDate">Select Date:</label>
-                            <input type="date" class="form-control" id="modalSpecificDate">
-                        </div>
-                    </div>
+              <div id="modalSpecificDateField" style="display: none; margin-top: 100px;">
+                <div class="form-group">
+                  <label for="modalSpecificDate">Select Date:</label>
+                  <input type="date" class="form-control" id="modalSpecificDate">
+                </div>
+              </div>
 
-                    <!-- Date range selection -->
-                    <div id="modalCustomDateFields" style="display: none; margin-top: 100px;">
-                        <div class="form-group">
-                            <label for="modalStartDate">Start Date:</label>
-                            <input type="date" class="form-control" id="modalStartDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="modalEndDate">End Date:</label>
-                            <input type="date" class="form-control mt-2" id="modalEndDate">
-                        </div>
-                    </div>
+              <!-- Date range selection -->
+              <div id="modalCustomDateFields" style="display: none; margin-top: 100px;">
+                <div class="form-group">
+                  <label for="modalStartDate">Start Date:</label>
+                  <input type="date" class="form-control" id="modalStartDate">
+                </div>
+                <div class="form-group">
+                  <label for="modalEndDate">End Date:</label>
+                  <input type="date" class="form-control mt-2" id="modalEndDate">
+                </div>
+              </div>
 
-                    <!-- Report Format Selection (PDF or Excel) -->
-                    <div class="form-group" style="margin-top: 80px;">
-                        <label for="reportFormat">Select Report Format</label>
-                        <div>
-                            <input type="radio" id="pdfFormat" name="reportFormat" value="pdf" checked>
-                            <label for="pdfFormat">PDF</label>
-                            <br>
-                            <input type="radio" id="excelFormat" name="reportFormat" value="excel">
-                            <label for="excelFormat">Excel</label>
-                        </div>
-                    </div>
+              <!-- Report Format Selection (PDF or Excel) -->
+              <div class="form-group" style="margin-top: 80px;">
+                <label for="reportFormat">Select Report Format</label>
+                <div>
+                  <input type="radio" id="pdfFormat" name="reportFormat" value="pdf" checked>
+                  <label for="pdfFormat">PDF</label>
+                  <br>
+                  <input type="radio" id="excelFormat" name="reportFormat" value="excel">
+                  <label for="excelFormat">Excel</label>
+                </div>
+              </div>
 
-                    <!-- Submit Button -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Generate Report</button>
-                    </div>
-                </form>
-            </div>
+              <!-- Submit Button -->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<div class="row">
-    <!-- Top Purchased Products Card -->
-    <div class="col-md-6 col-12 mb-4">
+    <div class="row">
+      <!-- Top Purchased Products Card -->
+      <div class="col-md-6 col-12 mb-4">
         <div class="card border-info mb-3 shadow-lg">
-            <div class="card-header bg-info text-white">Top Purchased Products</div>
-            <div class="card-body">
-                <ul id="topProductsList" class="list-unstyled">
-                    <% topProducts.forEach(product => { %>
-                    <li class="list-item d-flex justify-content-between align-items-center mb-3">
-                        <span><i class="bi bi-cart-fill text-info"></i> <%= product.productDetails[0].productName %></span>
-                        <span class="badge bg-info text-white rounded-pill"><%= product.totalQuantity %></span>
-                    </li>
-                    <% }) %>
-                </ul>
-            </div>
+          <div class="card-header bg-info text-white">Top Purchased Products</div>
+          <div class="card-body">
+            <ul id="topProductsList" class="list-unstyled">
+              <% topProducts.forEach(product => { %>
+              <li class="list-item d-flex justify-content-between align-items-center mb-3">
+                <span><i class="bi bi-cart-fill text-info"></i> <%= product.productDetails[0].productName %></span>
+                <span class="badge bg-info text-white rounded-pill"><%= product.totalQuantity %></span>
+              </li>
+              <% }) %>
+            </ul>
+          </div>
         </div>
-    </div>
-  
-    <!-- Least Purchased Products Card -->
-    <div class="col-md-6 col-12 mb-4">
+      </div>
+
+      <!-- Least Purchased Products Card -->
+      <div class="col-md-6 col-12 mb-4">
         <div class="card border-warning mb-3 shadow-lg">
-            <div class="card-header bg-warning text-dark">Least Purchased Products</div>
-            <div class="card-body">
-                <ul id="leastProductsList" class="list-unstyled">
-                    <% leastProducts.forEach(product => { %>
-                    <li class="list-item d-flex justify-content-between align-items-center mb-3">
-                        <span><i class="bi bi-cart-dash-fill text-warning"></i> <%= product.productDetails[0].productName %></span>
-                        <span class="badge bg-warning text-dark rounded-pill"><%= product.totalQuantity %></span>
-                    </li>
-                    <% }) %>
-                </ul>
-            </div>
+          <div class="card-header bg-warning text-dark">Least Purchased Products</div>
+          <div class="card-body">
+            <ul id="leastProductsList" class="list-unstyled">
+              <% leastProducts.forEach(product => { %>
+              <li class="list-item d-flex justify-content-between align-items-center mb-3">
+                <span><i class="bi bi-cart-dash-fill text-warning"></i> <%= product.productDetails[0].productName %></span>
+                <span class="badge bg-warning text-dark rounded-pill"><%= product.totalQuantity %></span>
+              </li>
+              <% }) %>
+            </ul>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
     <!-- Filter Options Card -->
     <div class="card border-primary mb-4">
-        <div class="card-header">Filter Reports</div>
-        <div class="card-body">
-            <select id="filterType" class="form-control mb-3" onchange="toggleFilterCustomDateFields(this.value)">
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="custom">Custom Date</option>
-            </select>
-            <div id="filterCustomDateFields" style="display:none;">
-                <div class="form-group">
-                    <label for="filterStartDate">Start Date:</label>
-                    <input type="date" id="filterStartDate" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label for="filterEndDate">End Date:</label>
-                    <input type="date" id="filterEndDate" class="form-control" />
-                </div>
-            </div>
-            <button class="btn btn-primary ml-5" onclick="filterReport()">Filter report</button>
+      <div class="card-header">Filter Reports</div>
+      <div class="card-body">
+        <select id="filterType" class="form-control mb-3" onchange="toggleFilterCustomDateFields(this.value)">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom Date</option>
+        </select>
+        <div id="filterCustomDateFields" style="display:none;">
+          <div class="form-group">
+            <label for="filterStartDate">Start Date:</label>
+            <input type="date" id="filterStartDate" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="filterEndDate">End Date:</label>
+            <input type="date" id="filterEndDate" class="form-control" />
+          </div>
         </div>
+        <button class="btn btn-primary ml-5" onclick="filterReport()">Filter report</button>
+      </div>
     </div>
 
     <!-- Sales Statistics Card -->
@@ -173,34 +173,34 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
- function toggleModalCustomDateFields(filterType) {
+  function toggleModalCustomDateFields(filterType) {
     const modalCustomDateFields = document.getElementById('modalCustomDateFields');
     const modalSpecificDateField = document.getElementById('modalSpecificDateField');
 
     if (filterType === 'custom') {
-        modalSpecificDateField.style.display = 'none';
-        modalCustomDateFields.style.display = 'block';
+      modalSpecificDateField.style.display = 'none';
+      modalCustomDateFields.style.display = 'block';
     } else if (filterType === 'daily') {
-        modalSpecificDateField.style.display = 'block'; // Show date input for 1 Day
-        modalCustomDateFields.style.display = 'none'; // Hide date range fields
+      modalSpecificDateField.style.display = 'block'; // Show date input for 1 Day
+      modalCustomDateFields.style.display = 'none'; // Hide date range fields
     } else {
-        modalSpecificDateField.style.display = 'none';
-        modalCustomDateFields.style.display = 'none';
+      modalSpecificDateField.style.display = 'none';
+      modalCustomDateFields.style.display = 'none';
     }
-}
+  }
 
-function toggleFilterCustomDateFields(filterType) {
+  function toggleFilterCustomDateFields(filterType) {
     const filterCustomDateFields = document.getElementById('filterCustomDateFields');
 
     if (filterType === 'custom') {
-        filterCustomDateFields.style.display = 'block';
+      filterCustomDateFields.style.display = 'block';
     } else {
-        filterCustomDateFields.style.display = 'none';
+      filterCustomDateFields.style.display = 'none';
     }
-}
+  }
 
-  
-function filterReport() {
+
+  function filterReport() {
     const filterType = document.getElementById('filterType').value;
     const startDate = document.getElementById('filterStartDate').value;
     const endDate = document.getElementById('filterEndDate').value;
@@ -208,20 +208,26 @@ function filterReport() {
     // Fetch and update the report based on the filter
     fetch('/admin/reports/sales', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filterType, startDate, endDate })
-    })
-    .then(response => response.json())
-    .then(data => {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          filterType,
+          startDate,
+          endDate
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
         // Update the UI with the filtered data
         document.getElementById('overallSalesCount').textContent = data.overallSalesCount;
         document.getElementById('overallOrderAmount').textContent = data.overallOrderAmount;
         document.getElementById('overallDiscount').textContent = data.overallDiscount;
-    });
-}
+      });
+  }
 
 
-document.getElementById('reportForm').addEventListener('submit', function (event) {
+  document.getElementById('reportForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const filterType = document.getElementById('modalFilterType').value;
@@ -230,43 +236,43 @@ document.getElementById('reportForm').addEventListener('submit', function (event
     const endDate = document.getElementById('modalEndDate').value;
 
     if (filterType === 'custom') {
-        // Check if both dates are filled
-        if (!startDate || !endDate) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Please select both start and end dates!',
-            });
-            return; 
-        }
+      // Check if both dates are filled
+      if (!startDate || !endDate) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Please select both start and end dates!',
+        });
+        return;
+      }
 
-        const today = new Date().toISOString().split('T')[0]; 
-        if (startDate > today || endDate > today) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Date',
-                text: 'The selected dates cannot be in the future!',
-            });
-            return; 
-        }
-        if (new Date(startDate) > new Date(endDate)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Date Range',
-                text: 'End date cannot be before the start date!',
-            });
-            return; 
-        }
+      const today = new Date().toISOString().split('T')[0];
+      if (startDate > today || endDate > today) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Date',
+          text: 'The selected dates cannot be in the future!',
+        });
+        return;
+      }
+      if (new Date(startDate) > new Date(endDate)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid Date Range',
+          text: 'End date cannot be before the start date!',
+        });
+        return;
+      }
     } else if (filterType === 'daily') {
-        // Validate specific date for daily report
-        if (!specificDate) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Please select a date for the daily report!',
-            });
-            return; // Stop further processing
-        }
+      // Validate specific date for daily report
+      if (!specificDate) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Please select a date for the daily report!',
+        });
+        return; // Stop further processing
+      }
     }
 
     // Get selected report format (PDF or Excel)
@@ -275,93 +281,89 @@ document.getElementById('reportForm').addEventListener('submit', function (event
     let url = `/admin/reports/export?format=${reportFormat}&filterType=${filterType}`;
 
     if (filterType === 'custom') {
-        url += `&startDate=${startDate}&endDate=${endDate}`;
+      url += `&startDate=${startDate}&endDate=${endDate}`;
     } else if (filterType === 'daily') {
-        url += `&specificDate=${specificDate}`; 
+      url += `&specificDate=${specificDate}`;
     }
 
     url += '&includeDiscounts=true';
 
     window.location.href = url;
-});
-
-
+  });
 </script>
 
 <style>
+  .card {
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
 
-.card {
-    border-radius: 10px; 
-    transition: transform 0.3s ease, box-shadow 0.3s ease; 
-}
 
-
-.card-header {
+  .card-header {
     font-weight: bold;
     font-size: 1.1rem;
     border-bottom: 2px solid #ddd;
     padding: 12px 16px;
-}
+  }
 
-.card-body {
+  .card-body {
     padding: 20px;
-}
+  }
 
-.list-item {
+  .list-item {
     font-size: 1rem;
     padding: 8px 15px;
     background-color: #f9f9f9;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease;
-}
+  }
 
-.list-item:hover {
-    background-color: #e9ecef; 
-}
+  .list-item:hover {
+    background-color: #e9ecef;
+  }
 
-.badge {
+  .badge {
     font-size: 1rem;
     font-weight: bold;
     padding: 0.4em 0.7em;
     border-radius: 12px;
-}
+  }
 
-.bi {
-    margin-right: 8px; 
-}
+  .bi {
+    margin-right: 8px;
+  }
 
-.bi-cart-fill {
+  .bi-cart-fill {
     font-size: 1.2rem;
-}
+  }
 
-.bi-cart-dash-fill {
+  .bi-cart-dash-fill {
     font-size: 1.2rem;
-}
+  }
 
-.text-info {
+  .text-info {
     color: #17a2b8 !important;
-}
+  }
 
-.text-warning {
+  .text-warning {
     color: #ffc107 !important;
-}
+  }
 
-.bg-info {
+  .bg-info {
     background-color: #17a2b8 !important;
-}
+  }
 
-.bg-warning {
+  .bg-warning {
     background-color: #ffc107 !important;
-}
+  }
 
-/* Responsive adjustments for small screens */
-@media (max-width: 767px) {
+  /* Responsive adjustments for small screens */
+  @media (max-width: 767px) {
     .list-item {
-        font-size: 0.9rem; 
+      font-size: 0.9rem;
     }
-}
-
+  }
 </style>
 
 <%- include('../../views/partials/admin/footer') %>

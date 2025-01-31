@@ -51,7 +51,7 @@ const addCoupon = async (req, res) => {
   const { name, expireOn, offerPrice, minPurchaseAmount } = req.body;
 
   // Check if the name is provided and is not empty
-  if (!name || typeof name !== 'string' || name.trim() === '') {
+  if (!name || typeof name !== "string" || name.trim() === "") {
     return res.json({ success: false, message: "Coupon name is required." });
   }
 
@@ -60,7 +60,10 @@ const addCoupon = async (req, res) => {
   const currentDate = new Date();
 
   if (expirationDate <= currentDate) {
-    return res.json({ success: false, message: "Expiration date must be in the future." });
+    return res.json({
+      success: false,
+      message: "Expiration date must be in the future.",
+    });
   }
 
   const lowerCaseName = name.trim().replace(/\s+/g, " ").toLowerCase();
@@ -82,17 +85,18 @@ const addCoupon = async (req, res) => {
       minPurchaseAmount,
       offerPrice,
       isList: true,
-      isDeleted: false
+      isDeleted: false,
     });
     await newCoupon.save();
 
     return res.json({ success: true, message: "Coupon added successfully." });
   } catch (error) {
     console.error("Error adding coupon:", error);
-    return res.status(500).json({ success: false, message: "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
 };
-
 
 const listCoupon = async (req, res) => {
   try {
@@ -178,13 +182,20 @@ const deleteCoupon = async (req, res) => {
     );
 
     if (!coupon) {
-      return res.status(404).json({ success: false, message: 'Coupon not found.' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Coupon not found." });
     }
 
-    return res.json({ success: true, message: 'Coupon soft deleted successfully' });
+    return res.json({
+      success: true,
+      message: "Coupon soft deleted successfully",
+    });
   } catch (error) {
-    console.error('Error soft deleting coupon:', error);
-    return res.status(500).json({ success: false, message: 'Server error while deleting coupon.' });
+    console.error("Error soft deleting coupon:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error while deleting coupon." });
   }
 };
 
@@ -201,13 +212,20 @@ const restoreCoupon = async (req, res) => {
     );
 
     if (!coupon) {
-      return res.status(404).json({ success: false, message: 'Coupon not found.' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Coupon not found." });
     }
 
-    return res.json({ success: true, message: 'Coupon restored successfully' });
+    return res.json({ success: true, message: "Coupon restored successfully" });
   } catch (error) {
-    console.error('Error restoring coupon:', error);
-    return res.status(500).json({ success: false, message: 'Server error while restoring coupon.' });
+    console.error("Error restoring coupon:", error);
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error while restoring coupon.",
+      });
   }
 };
 
@@ -221,5 +239,5 @@ module.exports = {
   loadEditCoupon,
   editCoupon,
   deleteCoupon,
-  restoreCoupon
+  restoreCoupon,
 };

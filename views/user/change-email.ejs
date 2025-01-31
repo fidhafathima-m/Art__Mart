@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,7 +20,7 @@
 
     .form-container {
       width: 100%;
-      max-width: 500px; 
+      max-width: 500px;
       padding: 20px;
     }
 
@@ -30,11 +31,13 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+      background: rgba(0, 0, 0, 0.5);
+      /* Semi-transparent black background */
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999; /* Make sure it's on top of everything */
+      z-index: 9999;
+      /* Make sure it's on top of everything */
     }
 
     #loadingSpinner {
@@ -46,6 +49,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <%- include('../../views/partials/user/header') %>
@@ -94,7 +98,7 @@
 
   <script>
     document.getElementById('changeEmailForm').addEventListener('submit', function(e) {
-      e.preventDefault(); 
+      e.preventDefault();
 
       var emailInput = document.getElementById('currentEmail').value;
       var emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -109,50 +113,52 @@
         } else {
           // Show the loading overlay
           document.getElementById('loadingOverlay').classList.remove('d-none');
-          
+
           // Disable the form submit button to prevent multiple submissions
           document.getElementById('verifyBtn').disabled = true;
 
           fetch('/profile/change-email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ currentEmail: emailInput })
-          })
-          .then(response => response.json())
-          .then(data => {
-            // Hide the loading overlay once the response is received
-            document.getElementById('loadingOverlay').classList.add('d-none');
-            document.getElementById('verifyBtn').disabled = false; // Re-enable the button
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                currentEmail: emailInput
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Hide the loading overlay once the response is received
+              document.getElementById('loadingOverlay').classList.add('d-none');
+              document.getElementById('verifyBtn').disabled = false; // Re-enable the button
 
-            if (data.success) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: data.message,  
-              }).then(() => {
-                window.location.href = '/profile/otp-verification';  
-              });
-            } else {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success',
+                  text: data.message,
+                }).then(() => {
+                  window.location.href = '/profile/otp-verification';
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: data.message,
+                });
+              }
+            })
+            .catch(error => {
+              // Hide the loading overlay and re-enable the button in case of an error
+              document.getElementById('loadingOverlay').classList.add('d-none');
+              document.getElementById('verifyBtn').disabled = false;
+
               Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: data.message,  
+                text: 'Something went wrong. Please try again later.',
               });
-            }
-          })
-          .catch(error => {
-            // Hide the loading overlay and re-enable the button in case of an error
-            document.getElementById('loadingOverlay').classList.add('d-none');
-            document.getElementById('verifyBtn').disabled = false;
-
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Something went wrong. Please try again later.',
             });
-          });
         }
       } else {
         Swal.fire({
@@ -164,4 +170,5 @@
     });
   </script>
 </body>
+
 </html>

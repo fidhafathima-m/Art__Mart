@@ -3,7 +3,7 @@ const Product = require("../../models/productSchema");
 // eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
 // eslint-disable-next-line no-undef
-const Brand = require('../../models/brandSchema');
+const Brand = require("../../models/brandSchema");
 // eslint-disable-next-line no-undef
 const sharp = require("sharp");
 // eslint-disable-next-line no-undef
@@ -33,7 +33,7 @@ const productInfo = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .populate("category", "name") // Populate the category field with only the 'name' field
-      .populate("brand", "brandName"); 
+      .populate("brand", "brandName");
 
     const totalProducts = await Product.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalProducts / limit);
@@ -44,7 +44,7 @@ const productInfo = async (req, res) => {
       totalProducts: totalProducts,
       totalPages: totalPages,
       search: search,
-      currentRoute: req.originalUrl
+      currentRoute: req.originalUrl,
     });
   } catch (error) {
     console.error(error);
@@ -56,7 +56,7 @@ const loadAddProduct = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true, isDeleted: false });
     const brand = await Brand.find({ isDeleted: false });
-    res.render("add-product", { categories: category, brands: brand, });
+    res.render("add-product", { categories: category, brands: brand });
   } catch (error) {
     console.log(error.message);
     res.redirect("/pageError");
@@ -202,7 +202,11 @@ const loadEditProduct = async (req, res) => {
 
     const category = await Category.find({ isListed: true, isDeleted: false });
     const brand = await Brand.find({ isDeleted: false });
-    res.render("edit-product", { product: product, categories: category, brands: brand });
+    res.render("edit-product", {
+      product: product,
+      categories: category,
+      brands: brand,
+    });
   } catch (error) {
     console.log(error.message);
     res.redirect("/admin/pageError");
@@ -368,7 +372,6 @@ const deleteSingleImage = async (req, res) => {
         .status(404)
         .json({ status: false, message: "Product not found." });
     }
-    
 
     // Find and remove the image from the product's image array
     const imageIndex = product.productImage.indexOf(imageNameToServer);
@@ -406,12 +409,10 @@ const deleteSingleImage = async (req, res) => {
     return res.json({ status: true, message: "Image deleted successfully." });
   } catch (error) {
     console.error("Error deleting image:", error.message || error);
-    return res
-      .status(500)
-      .json({
-        status: false,
-        message: "Error deleting image or updating product.",
-      });
+    return res.status(500).json({
+      status: false,
+      message: "Error deleting image or updating product.",
+    });
   }
 };
 

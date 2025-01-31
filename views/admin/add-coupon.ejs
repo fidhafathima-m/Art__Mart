@@ -9,51 +9,22 @@
     <form id="addCouponForm" method="POST" enctype="multipart/form-data">
       <div class="form-group mb-3">
         <label for="name">Coupon Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="name"
-          name="name"
-          required
-          placeholder="Enter coupon name"
-        />
+        <input type="text" class="form-control" id="name" name="name" required placeholder="Enter coupon name" />
       </div>
 
       <div class="form-group mb-3">
         <label for="expireOn">Expiration Date</label>
-        <input
-          type="datetime-local"
-          class="form-control"
-          id="expireOn"
-          name="expireOn"
-          required
-        />
+        <input type="datetime-local" class="form-control" id="expireOn" name="expireOn" required />
       </div>
 
       <div class="form-group mb-3">
         <label for="offerPrice">Offer Price</label>
-        <input
-          type="number"
-          class="form-control"
-          id="offerPrice"
-          name="offerPrice"
-          required
-          min="0"
-          placeholder="Enter offer price"
-        />
+        <input type="number" class="form-control" id="offerPrice" name="offerPrice" required min="0" placeholder="Enter offer price" />
       </div>
 
       <div class="form-group mb-3">
         <label for="minPurchaseAmount">Minimum Purchase Amount</label>
-        <input
-          type="number"
-          class="form-control"
-          id="minPurchaseAmount"
-          name="minPurchaseAmount"
-          required
-          min="0"
-          placeholder="Enter minimum purchase amount"
-        />
+        <input type="number" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount" required min="0" placeholder="Enter minimum purchase amount" />
       </div>
 
       <button type="submit" class="btn btn-primary">Add Coupon</button>
@@ -68,84 +39,82 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
- $("#addCouponForm").submit(function (e) {
-  e.preventDefault(); // Prevent form submission
+  $("#addCouponForm").submit(function(e) {
+    e.preventDefault(); // Prevent form submission
 
-  var formData = {
-    name: $("#name").val(),
-    expireOn: $("#expireOn").val(),
-    offerPrice: $("#offerPrice").val(),
-    minPurchaseAmount: $("#minPurchaseAmount").val(),
-  };
+    var formData = {
+      name: $("#name").val(),
+      expireOn: $("#expireOn").val(),
+      offerPrice: $("#offerPrice").val(),
+      minPurchaseAmount: $("#minPurchaseAmount").val(),
+    };
 
-  // Check for empty fields
-  if (
-    !formData.name ||
-    !formData.expireOn ||
-    !formData.offerPrice ||
-    !formData.minPurchaseAmount
-  ) {
-    Swal.fire({
-      icon: "error",
-      title: "All fields are required!",
-      text: "Please fill in all the fields.",
-    });
-    return;
-  }
-
-  // Check if expiration date is valid
-  var expireDate = new Date(formData.expireOn);
-  if (isNaN(expireDate)) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid expiration date",
-      text: "Please enter a valid expiration date.",
-    });
-    return;
-  }
-
-  // Check if expiration date is in the future
-  var currentDate = new Date();
-  if (expireDate <= currentDate) {
-    Swal.fire({
-      icon: "error",
-      title: "Expiration Date Must Be in the Future",
-      text: "The expiration date you entered is not valid. Please select a future date.",
-    });
-    return;
-  }
-
-  // Send the form data via AJAX POST
-  $.ajax({
-    type: "POST",
-    url: "/admin/add-coupon",
-    data: formData,
-    success: function (response) {
-      if (response.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Coupon Added",
-          text: response.message || "The coupon has been added successfully.",
-        }).then(() => {
-          window.location.href = "/admin/coupons"; // Redirect to coupons page
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: response.message || "There was an issue adding the coupon.",
-        });
-      }
-    },
-    error: function () {
+    // Check for empty fields
+    if (
+      !formData.name ||
+      !formData.expireOn ||
+      !formData.offerPrice ||
+      !formData.minPurchaseAmount
+    ) {
       Swal.fire({
         icon: "error",
-        title: "Server Error",
-        text: "There was an issue connecting to the server.",
+        title: "All fields are required!",
+        text: "Please fill in all the fields.",
       });
-    },
+      return;
+    }
+
+    // Check if expiration date is valid
+    var expireDate = new Date(formData.expireOn);
+    if (isNaN(expireDate)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid expiration date",
+        text: "Please enter a valid expiration date.",
+      });
+      return;
+    }
+
+    // Check if expiration date is in the future
+    var currentDate = new Date();
+    if (expireDate <= currentDate) {
+      Swal.fire({
+        icon: "error",
+        title: "Expiration Date Must Be in the Future",
+        text: "The expiration date you entered is not valid. Please select a future date.",
+      });
+      return;
+    }
+
+    // Send the form data via AJAX POST
+    $.ajax({
+      type: "POST",
+      url: "/admin/add-coupon",
+      data: formData,
+      success: function(response) {
+        if (response.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Coupon Added",
+            text: response.message || "The coupon has been added successfully.",
+          }).then(() => {
+            window.location.href = "/admin/coupons"; // Redirect to coupons page
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: response.message || "There was an issue adding the coupon.",
+          });
+        }
+      },
+      error: function() {
+        Swal.fire({
+          icon: "error",
+          title: "Server Error",
+          text: "There was an issue connecting to the server.",
+        });
+      },
+    });
   });
-});
-
-
 </script>

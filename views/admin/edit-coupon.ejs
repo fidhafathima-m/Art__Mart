@@ -5,57 +5,25 @@
 
   <div class="container">
     <h1>Edit Coupon</h1>
-    <form
-      action="/admin/edit-coupon/<%= coupon._id %>"
-      method="POST"
-      id="editCategoryForm"
-    >
+    <form action="/admin/edit-coupon/<%= coupon._id %>" method="POST" id="editCategoryForm">
       <div class="form-group">
         <label for="name">Coupon Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="name"
-          name="name"
-          value="<%= coupon.name %>"
-          required
-        />
+        <input type="text" class="form-control" id="name" name="name" value="<%= coupon.name %>" required />
       </div>
 
       <div class="form-group">
         <label for="expireOn">Expiration Date</label>
-        <input
-          type="datetime-local"
-          class="form-control"
-          id="expireOn"
-          name="expireOn"
-          value="<%= coupon.expireOn.toISOString().slice(0, 16) %>"
-          required
-        />
+        <input type="datetime-local" class="form-control" id="expireOn" name="expireOn" value="<%= coupon.expireOn.toISOString().slice(0, 16) %>" required />
       </div>
 
       <div class="form-group">
         <label for="offerPrice">Offer Price</label>
-        <input
-          type="number"
-          class="form-control"
-          id="offerPrice"
-          name="offerPrice"
-          value="<%= coupon.offerPrice %>"
-          required
-        />
+        <input type="number" class="form-control" id="offerPrice" name="offerPrice" value="<%= coupon.offerPrice %>" required />
       </div>
 
       <div class="form-group">
         <label for="minPurchaseAmount">Minimum Purchase Amount</label>
-        <input
-          type="number"
-          class="form-control"
-          id="minPurchaseAmount"
-          name="minPurchaseAmount"
-          value="<%= coupon.minPurchaseAmount %>"
-          required
-        />
+        <input type="number" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount" value="<%= coupon.minPurchaseAmount %>" required />
       </div>
 
       <button type="submit" class="btn btn-primary">Update Coupon</button>
@@ -69,14 +37,14 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-  $("#editCategoryForm").on("submit", function (e) {
+  $("#editCategoryForm").on("submit", function(e) {
     e.preventDefault(); // Prevent normal form submission
 
     $.ajax({
       type: "POST",
       url: $(this).attr("action"),
       data: $(this).serialize(),
-      success: function (response) {
+      success: function(response) {
         if (response.success) {
           Swal.fire({
             icon: "success",
@@ -95,7 +63,7 @@
           });
         }
       },
-      error: function () {
+      error: function() {
         Swal.fire({
           icon: "error",
           title: "Request Failed",

@@ -7,62 +7,27 @@
     <h1 class="my-4">Edit Brand</h1>
 
     <!-- Brand Form -->
-    <form
-      id="editBrandForm"
-      action="/admin/brands/edit-brand"
-      method="POST"
-      enctype="multipart/form-data"
-      class="form-horizontal"
-    >
+    <form id="editBrandForm" action="/admin/brands/edit-brand" method="POST" enctype="multipart/form-data" class="form-horizontal">
       <div class="form-group">
         <label for="brandName" class="form-label">Brand Name</label>
-        <input
-          type="text"
-          id="brandName"
-          name="name"
-          class="form-control"
-          required
-          placeholder="Enter brand name"
-          value="<%= brand.brandName %>"
-        />
+        <input type="text" id="brandName" name="name" class="form-control" required placeholder="Enter brand name" value="<%= brand.brandName %>" />
       </div>
 
       <h6 class="text-black mb-3">Brand logo</h6>
       <div class="col-md-12">
         <div class="mb-4" id="brandImageWrapper">
           <% if (brand.brandImage) { %>
-            <td>
-              <input
-                type="hidden"
-                id="imageDatas"
-                name="brandImageOld"
-                value="<%= brand.brandImage %>"
-              />
-              <img
-                src="/uploads/brand-images/<%= brand.brandImage %>"
-                alt=""
-                class="rounded"
-                style="width: 100px; height: 120px"
-              />
-              <i
-                class="bi bi-x delete-image"
-                data-image-id="<%= brand.brandImage %>"
-                data-product-id="<%= brand._id %>"
-                style="position: absolute; margin-left: 0.5rem; cursor: pointer"
-              ></i>
-            </td>
+          <td>
+            <input type="hidden" id="imageDatas" name="brandImageOld" value="<%= brand.brandImage %>" />
+            <img src="/uploads/brand-images/<%= brand.brandImage %>" alt="" class="rounded" style="width: 100px; height: 120px" />
+            <i class="bi bi-x delete-image" data-image-id="<%= brand.brandImage %>" data-product-id="<%= brand._id %>" style="position: absolute; margin-left: 0.5rem; cursor: pointer"></i>
+          </td>
           <% } %>
         </div>
       </div>
 
       <div class="form-group" id="fileInputWrapper" style="<%= brand.brandImage ? 'display: none;' : 'display: block;' %>">
-        <input
-          type="file"
-          id="brandImage"
-          name="brandImage"
-          class="form-control"
-          accept="image/*"
-        />
+        <input type="file" id="brandImage" name="brandImage" class="form-control" accept="image/*" />
       </div>
 
       <button type="submit" class="btn btn-primary">Update Brand</button>
@@ -78,22 +43,22 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('editBrandForm');
     const fileInputWrapper = document.getElementById('fileInputWrapper');
     const brandImageWrapper = document.getElementById('brandImageWrapper');
     const deleteImageIcon = document.querySelector('.delete-image');
 
     // Handle form submission
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
 
       const formData = new FormData(form);
 
       fetch('/admin/brands/edit-brand', {
-        method: 'POST',
-        body: formData,
-      })
+          method: 'POST',
+          body: formData,
+        })
         .then(response => response.json())
         .then(data => {
           if (data.success) {
@@ -126,7 +91,7 @@
 
     // Handle image deletion
     if (deleteImageIcon) {
-      deleteImageIcon.addEventListener('click', function () {
+      deleteImageIcon.addEventListener('click', function() {
         const imageId = deleteImageIcon.getAttribute('data-image-id');
         const productId = deleteImageIcon.getAttribute('data-product-id');
 
@@ -140,7 +105,9 @@
           confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
           if (result.isConfirmed) {
-            fetch(`/admin/brands/delete-image/${imageId}`, { method: 'DELETE' })
+            fetch(`/admin/brands/delete-image/${imageId}`, {
+                method: 'DELETE'
+              })
               .then(response => response.json())
               .then(data => {
                 if (data.success) {

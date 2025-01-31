@@ -9,8 +9,7 @@ const Order = require("../../models/orderSchema");
 // eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
 // eslint-disable-next-line no-undef
-const { generatePDFReport, generateExcelReport } = require('../../helpers/generateReports');
-
+const { generatePDFReport, generateExcelReport} = require("../../helpers/generateReports");
 
 const pageError = (req, res) => {
   res.render("admin-error");
@@ -127,38 +126,93 @@ const loadDashboard = async (req, res) => {
 
       const topProducts = await Order.aggregate([
         { $unwind: "$ordereditems" },
-        { $lookup: { from: "products", localField: "ordereditems.product", foreignField: "_id", as: "product" } },
+        {
+          $lookup: {
+            from: "products",
+            localField: "ordereditems.product",
+            foreignField: "_id",
+            as: "product",
+          },
+        },
         { $unwind: "$product" },
-        { $group: { _id: "$product._id", totalSales: { $sum: "$ordereditems.quantity" }, productName: { $first: "$product.productName" }, productImage: { $first: { $arrayElemAt: ["$product.productImage", 0] } } } },
+        {
+          $group: {
+            _id: "$product._id",
+            totalSales: { $sum: "$ordereditems.quantity" },
+            productName: { $first: "$product.productName" },
+            productImage: {
+              $first: { $arrayElemAt: ["$product.productImage", 0] },
+            },
+          },
+        },
         { $sort: { totalSales: -1 } },
-        { $limit: 10 }
+        { $limit: 10 },
       ]);
 
       // Get top 10 best-selling categories
       const topCategories = await Order.aggregate([
         { $unwind: "$ordereditems" },
-        { $lookup: { from: "products", localField: "ordereditems.product", foreignField: "_id", as: "product" } },
+        {
+          $lookup: {
+            from: "products",
+            localField: "ordereditems.product",
+            foreignField: "_id",
+            as: "product",
+          },
+        },
         { $unwind: "$product" },
-        { $lookup: { from: "categories", localField: "product.category", foreignField: "_id", as: "category" } },
+        {
+          $lookup: {
+            from: "categories",
+            localField: "product.category",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
         { $unwind: "$category" },
-        { $group: { _id: "$category._id", totalSales: { $sum: "$ordereditems.quantity" }, categoryName: { $first: "$category.name" } } },
+        {
+          $group: {
+            _id: "$category._id",
+            totalSales: { $sum: "$ordereditems.quantity" },
+            categoryName: { $first: "$category.name" },
+          },
+        },
         { $sort: { totalSales: -1 } },
-        { $limit: 10 }
+        { $limit: 10 },
       ]);
 
       // Get top 10 best-selling brands
       const topBrands = await Order.aggregate([
         { $unwind: "$ordereditems" },
-        { $lookup: { from: "products", localField: "ordereditems.product", foreignField: "_id", as: "product" } },
+        {
+          $lookup: {
+            from: "products",
+            localField: "ordereditems.product",
+            foreignField: "_id",
+            as: "product",
+          },
+        },
         { $unwind: "$product" },
-        { $lookup: { from: "brands", localField: "product.brand", foreignField: "_id", as: "brand" } },
+        {
+          $lookup: {
+            from: "brands",
+            localField: "product.brand",
+            foreignField: "_id",
+            as: "brand",
+          },
+        },
         { $unwind: "$brand" },
-        { $group: { _id: "$brand._id", totalSales: { $sum: "$ordereditems.quantity" }, brandName: { $first: "$brand.brandName" } } },
+        {
+          $group: {
+            _id: "$brand._id",
+            totalSales: { $sum: "$ordereditems.quantity" },
+            brandName: { $first: "$brand.brandName" },
+          },
+        },
         { $sort: { totalSales: -1 } },
-        { $limit: 10 }
+        { $limit: 10 },
       ]);
 
-      
       res.render("dashboard", {
         totalProducts,
         totalCategories,
@@ -172,7 +226,7 @@ const loadDashboard = async (req, res) => {
         topBrands,
         salesDataPerMonth,
         months,
-        currentRoute: req.originalUrl
+        currentRoute: req.originalUrl,
       });
     } catch (error) {
       console.error(error);
@@ -182,14 +236,20 @@ const loadDashboard = async (req, res) => {
 };
 
 const getSalesData = async (req, res) => {
-  const { timeFrame } = req.query; 
+  const { timeFrame } = req.query;
   const currentYear = new Date().getFullYear();
   let salesPerTimeFrameData;
   let labels = [];
   let salesDataPerTimeFrame = [];
 
-  if (timeFrame === 'yearly') {
-    const years = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
+  if (timeFrame === "yearly") {
+    const years = [
+      currentYear,
+      currentYear - 1,
+      currentYear - 2,
+      currentYear - 3,
+      currentYear - 4,
+    ];
     labels = years;
 
     salesPerTimeFrameData = await Order.aggregate([
@@ -219,15 +279,25 @@ const getSalesData = async (req, res) => {
         $sort: { _id: 1 },
       },
     ]);
-    
-    years.forEach(year => {
-      const data = salesPerTimeFrameData.find(item => item._id === year);
+
+    years.forEach((year) => {
+      const data = salesPerTimeFrameData.find((item) => item._id === year);
       salesDataPerTimeFrame.push(data ? data.totalSales : 0);
     });
-  } else if (timeFrame === 'monthly') {
+  } else if (timeFrame === "monthly") {
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
     labels = months;
 
@@ -253,16 +323,24 @@ const getSalesData = async (req, res) => {
         $sort: { _id: 1 },
       },
     ]);
-    
+
     salesDataPerTimeFrame = Array(12).fill(0);
-    salesPerTimeFrameData.forEach(item => {
+    salesPerTimeFrameData.forEach((item) => {
       salesDataPerTimeFrame[item._id - 1] = item.totalSales;
     });
-  } else if (timeFrame === 'weekly') {
+  } else if (timeFrame === "weekly") {
     const last7Days = new Date();
     last7Days.setDate(last7Days.getDate() - 7);
-    
-    labels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    labels = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
 
     salesPerTimeFrameData = await Order.aggregate([
       {
@@ -278,7 +356,7 @@ const getSalesData = async (req, res) => {
       },
       {
         $project: {
-          dayOfWeek: { $dayOfWeek: "$createdOn" }, 
+          dayOfWeek: { $dayOfWeek: "$createdOn" },
           ordereditems: 1,
         },
       },
@@ -294,7 +372,7 @@ const getSalesData = async (req, res) => {
     ]);
 
     salesDataPerTimeFrame = Array(7).fill(0);
-    salesPerTimeFrameData.forEach(item => {
+    salesPerTimeFrameData.forEach((item) => {
       salesDataPerTimeFrame[item._id - 1] = item.totalSales;
     });
   }
@@ -318,64 +396,103 @@ const logout = async (req, res) => {
   }
 };
 
-
-
 // Route to get report data (top and least purchased products)
 const salesReport = async (req, res) => {
-    try {
-        // Fetch top purchased products
-        const topProducts = await Order.aggregate([
-            { $unwind: "$ordereditems" },
-            { $group: { _id: "$ordereditems.product", totalQuantity: { $sum: "$ordereditems.quantity" } } },
-            { $sort: { totalQuantity: -1 } },
-            { $limit: 3 },
-            { $lookup: { from: "products", localField: "_id", foreignField: "_id", as: "productDetails" } }
-        ]);
+  try {
+    // Fetch top purchased products
+    const topProducts = await Order.aggregate([
+      { $unwind: "$ordereditems" },
+      {
+        $group: {
+          _id: "$ordereditems.product",
+          totalQuantity: { $sum: "$ordereditems.quantity" },
+        },
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+    ]);
 
-        // Fetch least purchased products
-        const leastProducts = await Order.aggregate([
-            { $unwind: "$ordereditems" },
-            { $group: { _id: "$ordereditems.product", totalQuantity: { $sum: "$ordereditems.quantity" } } },
-            { $sort: { totalQuantity: 1 } },
-            { $limit: 3 },
-            { $lookup: { from: "products", localField: "_id", foreignField: "_id", as: "productDetails" } }
-        ]);
+    // Fetch least purchased products
+    const leastProducts = await Order.aggregate([
+      { $unwind: "$ordereditems" },
+      {
+        $group: {
+          _id: "$ordereditems.product",
+          totalQuantity: { $sum: "$ordereditems.quantity" },
+        },
+      },
+      { $sort: { totalQuantity: 1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+    ]);
 
-        // Send the data to the frontend
-        res.render('reports', { topProducts, leastProducts });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-        console.log('error', error)
-    }
+    // Send the data to the frontend
+    res.render("reports", { topProducts, leastProducts });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log("error", error);
+  }
 };
 
 const salesStatistics = async (req, res) => {
   const { filterType, startDate, endDate } = req.body;
 
   let matchCriteria = {};
-  if (filterType === 'custom') {
-      matchCriteria.createdOn = { $gte: new Date(startDate), $lte: new Date(endDate) };
-  } else if (filterType === 'daily') {
-    matchCriteria.createdOn = { $gte: new Date(new Date().setHours(0, 0, 0, 0)), $lte: new Date() };
-  } else if (filterType === 'weekly') {
-      matchCriteria.createdOn = { $gte: new Date(new Date().setDate(new Date().getDate() - 7)), $lte: new Date() };
-  } else if (filterType === 'monthly') {
-      matchCriteria.createdOn = { $gte: new Date(new Date().setDate(new Date().getDate() - 30)), $lte: new Date() };
+  if (filterType === "custom") {
+    matchCriteria.createdOn = {
+      $gte: new Date(startDate),
+      $lte: new Date(endDate),
+    };
+  } else if (filterType === "daily") {
+    matchCriteria.createdOn = {
+      $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+      $lte: new Date(),
+    };
+  } else if (filterType === "weekly") {
+    matchCriteria.createdOn = {
+      $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+      $lte: new Date(),
+    };
+  } else if (filterType === "monthly") {
+    matchCriteria.createdOn = {
+      $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      $lte: new Date(),
+    };
   }
 
   try {
-      const salesData = await Order.find(matchCriteria);
-      const overallSalesCount = salesData.length;
-      const overallOrderAmount = salesData.reduce((acc, order) => acc + order.finalAmount, 0);
-      const overallDiscount = salesData.reduce((acc, order) => acc + order.discount, 0);
+    const salesData = await Order.find(matchCriteria);
+    const overallSalesCount = salesData.length;
+    const overallOrderAmount = salesData.reduce(
+      (acc, order) => acc + order.finalAmount,
+      0
+    );
+    const overallDiscount = salesData.reduce(
+      (acc, order) => acc + order.discount,
+      0
+    );
 
-      res.json({ overallSalesCount, overallOrderAmount, overallDiscount });
+    res.json({ overallSalesCount, overallOrderAmount, overallDiscount });
   } catch (error) {
-      res.status(500).json({ message: error.message });
-      console.log('error', error);
+    res.status(500).json({ message: error.message });
+    console.log("error", error);
   }
 };
-
 
 const exportSalesReport = async (req, res) => {
   const { format, filterType, startDate, endDate, specificDate } = req.query;
@@ -384,22 +501,41 @@ const exportSalesReport = async (req, res) => {
   const showDiscounts = true;
 
   // Logic to generate the report based on the format
-  if (format === 'pdf') {
-      const pdfBuffer = await generatePDFReport(filterType, specificDate, startDate, endDate, showDiscounts);
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename=sales_report.pdf');
-      res.send(pdfBuffer);
-  } else if (format === 'excel') {
-      const excelBuffer = await generateExcelReport(filterType, specificDate, startDate, endDate, showDiscounts);
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', 'attachment; filename=sales_report.xlsx');
-      res.send(excelBuffer);
+  if (format === "pdf") {
+    const pdfBuffer = await generatePDFReport(
+      filterType,
+      specificDate,
+      startDate,
+      endDate,
+      showDiscounts
+    );
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=sales_report.pdf"
+    );
+    res.send(pdfBuffer);
+  } else if (format === "excel") {
+    const excelBuffer = await generateExcelReport(
+      filterType,
+      specificDate,
+      startDate,
+      endDate,
+      showDiscounts
+    );
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=sales_report.xlsx"
+    );
+    res.send(excelBuffer);
   } else {
-      res.status(400).json({ message: 'Invalid format' });
+    res.status(400).json({ message: "Invalid format" });
   }
 };
-
-
 
 // eslint-disable-next-line no-undef
 module.exports = {

@@ -1,10 +1,7 @@
 <%- include('../../views/partials/admin/header') %>
 
 <head>
-  <link
-    href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet" />
 </head>
 
 <div class="wrapper">
@@ -14,28 +11,14 @@
     <h1 class="my-4">Edit Product</h1>
 
     <!-- Category Form -->
-    <form
-      id="editProductForm"
-      action="/admin/edit-product/<%= product._id %>"
-      method="POST"
-      class="form-horizontal"
-      enctype="multipart/form-data"
-      onsubmit="return validateForm();"
-    >
+    <form id="editProductForm" action="/admin/edit-product/<%= product._id %>" method="POST" class="form-horizontal" enctype="multipart/form-data" onsubmit="return validateForm();">
       <!-- Product Name -->
       <div class="form-group row">
         <label for="productName" class="col-sm-2 col-form-label">
           Product Name
         </label>
         <div class="col-sm-4">
-          <input
-          type="text"
-          id="productName"
-          name="productName"
-          class="form-control"
-          placeholder="Enter Product name"
-          value="<%= product.productName %>"
-          />
+          <input type="text" id="productName" name="productName" class="form-control" placeholder="Enter Product name" value="<%= product.productName %>" />
           <div class="invalid-feedback" id="productNameError">
             Please enter the product name.
           </div>
@@ -43,30 +26,22 @@
         <label for="brand" class="col-sm-2 col-form-label">Brand</label>
         <div class="col-sm-4">
           <select id="brand" name="brand" class="form-control">
-            <option value="" <% if (!product.brand) { %> selected <% } %> >No Brand</option>
+            <option value="" <% if (!product.brand) { %> selected <% } %>>No Brand</option>
             <% brands.forEach(function(brand) { %>
-              <option value="<%= brand._id %>" 
-                <% if (product.brand && brand._id.toString() === product.brand.toString()) { %> selected <% } %>>
-                <%= brand.brandName %>
-              </option>
+            <option value="<%= brand._id %>" <% if (product.brand && brand._id.toString() === product.brand.toString()) { %> selected <% } %>>
+              <%= brand.brandName %>
+            </option>
             <% }); %>
           </select>
         </div>
-        
-        </div>
+
+      </div>
 
       <!-- Product Description -->
       <div class="form-group">
         <label for="description" class="form-label">Product Description</label>
-        <textarea
-          id="description"
-          name="description"
-          class="form-control"
-          required
-          placeholder="Enter product description"
-        >
-<%= product.description %></textarea
-        >
+        <textarea id="description" name="description" class="form-control" required placeholder="Enter product description">
+<%= product.description %></textarea>
       </div>
 
       <div class="form-group">
@@ -74,22 +49,11 @@
         <div id="highlights-list">
           <!-- Pre-fill existing highlights -->
           <% product.highlights.forEach((highlight, index) => { %>
-          <input
-            type="text"
-            name="highlights[]"
-            class="form-control mb-2"
-            value="<%= highlight %>"
-            placeholder="Enter highlight"
-          />
+          <input type="text" name="highlights[]" class="form-control mb-2" value="<%= highlight %>" placeholder="Enter highlight" />
           <% }) %>
 
           <!-- Add button for adding more highlights -->
-          <input
-            type="text"
-            name="highlights[]"
-            class="form-control mb-2"
-            placeholder="Enter highlight"
-          />
+          <input type="text" name="highlights[]" class="form-control mb-2" placeholder="Enter highlight" />
         </div>
         <button type="button" id="add-highlight" class="btn btn-secondary mt-2">
           Add Another Highlight
@@ -98,38 +62,16 @@
 
       <!-- Price and Quantity -->
       <div class="form-group row">
-        <label for="regularPrice" class="col-sm-2 col-form-label"
-          >Regular Price</label
-        >
+        <label for="regularPrice" class="col-sm-2 col-form-label">Regular Price</label>
         <div class="col-sm-4">
-          <input
-            type="number"
-            id="regularPrice"
-            name="regularPrice"
-            class="form-control"
-            value="<%= product.regularPrice %>"
-            placeholder="Enter regular price"
-            min="0"
-            step="0.01"
-          />
+          <input type="number" id="regularPrice" name="regularPrice" class="form-control" value="<%= product.regularPrice %>" placeholder="Enter regular price" min="0" step="0.01" />
           <div class="invalid-feedback" id="regularPriceError">
             Please enter the regular price.
           </div>
         </div>
-        <label for="productOffer" class="col-sm-2 col-form-label"
-          >Offer Percentage</label
-        >
+        <label for="productOffer" class="col-sm-2 col-form-label">Offer Percentage</label>
         <div class="col-sm-4">
-          <input
-            type="number"
-            id="productOffer"
-            name="productOffer"
-            class="form-control"
-            value="<%= product.productOffer %>"
-            placeholder="Enter Offer percentage"
-            min="0"
-            step="0.01"
-          />
+          <input type="number" id="productOffer" name="productOffer" class="form-control" value="<%= product.productOffer %>" placeholder="Enter Offer percentage" min="0" step="0.01" />
           <div class="invalid-feedback" id="productOfferError">
             Please enter the Offer in Percentage.
           </div>
@@ -140,15 +82,7 @@
       <div class="form-group row">
         <label for="quantity" class="col-sm-2 col-form-label">Quantity</label>
         <div class="col-sm-4">
-          <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            class="form-control"
-            value="<%= product.quantity %>"
-            placeholder="Enter quantity"
-            min="0"
-          />
+          <input type="number" id="quantity" name="quantity" class="form-control" value="<%= product.quantity %>" placeholder="Enter quantity" min="0" />
           <div class="invalid-feedback" id="quantityError">
             Please enter the quantity.
           </div>
@@ -156,10 +90,9 @@
         <label for="category" class="col-sm-2 col-form-label">Category</label>
         <div class="col-sm-4">
           <select id="category" name="category" class="form-control">
-            <% categories.forEach(function(category) { %> 
-            <option value="<%= category._id %>" 
-            <% if (category._id.toString() === product.category.toString()) { %> selected <% } %>> 
-            <%= category.name %> <% }); %>
+            <% categories.forEach(function(category) { %>
+            <option value="<%= category._id %>" <% if (category._id.toString() === product.category.toString()) { %> selected <% } %>>
+              <%= category.name %> <% }); %>
           </select>
         </div>
       </div>
@@ -174,23 +107,9 @@
       <div class="col-md-12">
         <div class="mb-4">
           <td>
-            <input
-              type="hidden"
-              id="imageDatas"
-              value="<%= product.productImage[i] %>"
-            />
-            <img
-              src="<%= product.productImage[i] %>"
-              alt=""
-              class="rounded"
-              style="width: 100px; height: 120px"
-            />
-            <i
-              class="bi bi-x delete-image"
-              data-image-id="<%= product.productImage[i] %>"
-              data-product-id="<%= product._id %>"
-              style="position: absolute; margin-left: 0.5rem; cursor: pointer"
-            ></i>
+            <input type="hidden" id="imageDatas" value="<%= product.productImage[i] %>" />
+            <img src="<%= product.productImage[i] %>" alt="" class="rounded" style="width: 100px; height: 120px" />
+            <i class="bi bi-x delete-image" data-image-id="<%= product.productImage[i] %>" data-product-id="<%= product._id %>" style="position: absolute; margin-left: 0.5rem; cursor: pointer"></i>
           </td>
         </div>
       </div>
@@ -199,41 +118,16 @@
       <!-- Image 1 Upload and Cropping -->
       <div class="form-group">
         <label for="image1" class="form-label">Choose Image 1</label>
-        <input
-          type="file"
-          id="image1"
-          name="images"
-          class="form-control"
-          accept="image/*"
-        />
-        <div
-          id="image1-preview"
-          class="image-container"
-          style="width: 100%; height: 400px; display: none"
-        >
-          <img
-            id="image1-preview-img"
-            src=""
-            alt="Image 1"
-            style="max-width: 100%; height: auto"
-          />
+        <input type="file" id="image1" name="images" class="form-control" accept="image/*" />
+        <div id="image1-preview" class="image-container" style="width: 100%; height: 400px; display: none">
+          <img id="image1-preview-img" src="" alt="Image 1" style="max-width: 100%; height: auto" />
         </div>
         <div>
-          <button
-            type="button"
-            id="saveImage1"
-            class="btn btn-secondary"
-            style="display: none"
-          >
+          <button type="button" id="saveImage1" class="btn btn-secondary" style="display: none">
             Save Cropped Image
           </button>
           <div id="croppedImage1Preview" style="margin-top: 10px">
-            <img
-              id="croppedImage1"
-              src=""
-              alt="Cropped Image 1"
-              style="max-width: 100%; height: auto"
-            />
+            <img id="croppedImage1" src="" alt="Cropped Image 1" style="max-width: 100%; height: auto" />
           </div>
         </div>
       </div>
@@ -241,41 +135,16 @@
       <!-- Image 2 Upload and Cropping -->
       <div class="form-group">
         <label for="image2" class="form-label">Choose Image 2</label>
-        <input
-          type="file"
-          id="image2"
-          name="images"
-          class="form-control"
-          accept="image/*"
-        />
-        <div
-          id="image2-preview"
-          class="image-container"
-          style="width: 100%; height: 400px; display: none"
-        >
-          <img
-            id="image2-preview-img"
-            src=""
-            alt="Image 2"
-            style="max-width: 100%; height: auto"
-          />
+        <input type="file" id="image2" name="images" class="form-control" accept="image/*" />
+        <div id="image2-preview" class="image-container" style="width: 100%; height: 400px; display: none">
+          <img id="image2-preview-img" src="" alt="Image 2" style="max-width: 100%; height: auto" />
         </div>
         <div>
-          <button
-            type="button"
-            id="saveImage2"
-            class="btn btn-secondary"
-            style="display: none"
-          >
+          <button type="button" id="saveImage2" class="btn btn-secondary" style="display: none">
             Save Cropped Image
           </button>
           <div id="croppedImage2Preview" style="margin-top: 10px">
-            <img
-              id="croppedImage2"
-              src=""
-              alt="Cropped Image 2"
-              style="max-width: 100%; height: auto"
-            />
+            <img id="croppedImage2" src="" alt="Cropped Image 2" style="max-width: 100%; height: auto" />
           </div>
         </div>
       </div>
@@ -283,41 +152,16 @@
       <!-- Image 3 Upload and Cropping -->
       <div class="form-group">
         <label for="image3" class="form-label">Choose Image 3</label>
-        <input
-          type="file"
-          id="image3"
-          name="images"
-          class="form-control"
-          accept="image/*"
-        />
-        <div
-          id="image3-preview"
-          class="image-container"
-          style="width: 100%; height: 400px; display: none"
-        >
-          <img
-            id="image3-preview-img"
-            src=""
-            alt="Image 3"
-            style="max-width: 100%; height: auto"
-          />
+        <input type="file" id="image3" name="images" class="form-control" accept="image/*" />
+        <div id="image3-preview" class="image-container" style="width: 100%; height: 400px; display: none">
+          <img id="image3-preview-img" src="" alt="Image 3" style="max-width: 100%; height: auto" />
         </div>
         <div>
-          <button
-            type="button"
-            id="saveImage3"
-            class="btn btn-secondary"
-            style="display: none"
-          >
+          <button type="button" id="saveImage3" class="btn btn-secondary" style="display: none">
             Save Cropped Image
           </button>
           <div id="croppedImage3Preview" style="margin-top: 10px">
-            <img
-              id="croppedImage3"
-              src=""
-              alt="Cropped Image 3"
-              style="max-width: 100%; height: auto"
-            />
+            <img id="croppedImage3" src="" alt="Cropped Image 3" style="max-width: 100%; height: auto" />
           </div>
         </div>
       </div>

@@ -61,16 +61,16 @@ const getForgetPass = async (req, res) => {
     res.render("admin-forgot-password");
   } catch (error) {
     res.redirect("/pageError");
-    console.log('Error', error);
+    console.log("Error", error);
   }
 };
 
 const forgotPassValid = async (req, res) => {
   try {
     const { email } = req.body;
-    const findUser  = await User.findOne({ email: email });
+    const findUser = await User.findOne({ email: email });
 
-    if (findUser ) {
+    if (findUser) {
       const otp = generateOtp();
       const emailSent = await sendVeificationMail(email, otp);
 
@@ -93,18 +93,20 @@ const forgotPassValid = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: "Internal server error." });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
   }
 };
 
 const forgetPassOtpPage = async (req, res) => {
   try {
-    res.render('admin-forgotPassOtp');
+    res.render("admin-forgotPassOtp");
   } catch (error) {
-    console.log('error: ', error);
-    res.redirect('/pageError');
+    console.log("error: ", error);
+    res.redirect("/pageError");
   }
-}
+};
 
 const verifyForgetPassOtp = async (req, res) => {
   try {

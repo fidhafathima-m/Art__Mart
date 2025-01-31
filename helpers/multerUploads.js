@@ -1,17 +1,17 @@
 // eslint-disable-next-line no-undef
-const multer = require('multer');
+const multer = require("multer");
 // eslint-disable-next-line no-undef
-const path = require('path');
+const path = require("path");
 
 // Define storage settings for multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Dynamically choose the folder based on the field name
-    let uploadPath = '';
-    if (file.fieldname === 'images') {
-      uploadPath = 'public/uploads/product-images/';
-    } else if (file.fieldname === 'brandImage') {
-      uploadPath = 'public/uploads/brand-images/';
+    let uploadPath = "";
+    if (file.fieldname === "images") {
+      uploadPath = "public/uploads/product-images/";
+    } else if (file.fieldname === "brandImage") {
+      uploadPath = "public/uploads/brand-images/";
     }
 
     // Make sure the uploadPath is set correctly before calling cb()
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     // Generate a unique filename for the uploaded file (timestamp + extension)
     cb(null, Date.now() + path.extname(file.originalname));
-  }
+  },
 });
 
 // Setup the multer upload middleware with the defined storage configuration
