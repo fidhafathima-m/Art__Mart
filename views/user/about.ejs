@@ -1,0 +1,249 @@
+<head>
+    <style>
+        /* General Body and Font Styling */
+body {
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+h3, h6 {
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+}
+
+h3 {
+  color: #2c3e50;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+h6 {
+  color: #16a085;
+  font-size: 20px;
+}
+
+/* Header Styling */
+.shop_title h3 {
+  text-align: center;
+  font-size: 38px;
+  color: #34495e;
+  padding-top: 20px;
+}
+
+/* Breadcrumb Styling */
+.breadcrumb__text {
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.breadcrumb__links a {
+  color: #2980b9;
+  text-decoration: none;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.breadcrumb__links span {
+  color: #7f8c8d;
+}
+
+/* About Section */
+.about-option {
+  background-color: #f4f6f6;
+  padding: 50px 0;
+}
+
+.about-option .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-option .row {
+  margin: 0;
+}
+
+.p-4 {
+  padding: 40px;
+}
+
+.p-4 p {
+  font-size: 18px;
+  color: #7f8c8d;
+}
+
+/* Image Section */
+.img-fluid {
+  border-radius: 8px;
+}
+
+.col-4 img, .col-3 img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* Our Story & Mission Section */
+h3.pb-2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.pt-2, .pt-3, .pt-4 {
+  padding-top: 30px;
+}
+
+/* What We Offer Section */
+.row.pt-3 {
+  margin-top: 30px;
+}
+
+
+.col-3 h6 {
+  margin-top: 10px;
+}
+
+.col-3 p {
+  font-size: 16px;
+  color: #7f8c8d;
+}
+
+/* Why Choose Us Section */
+.row.pt-3.text-center {
+  text-align: center;
+}
+
+.row.pt-3.text-center .col-4 {
+  margin-bottom: 30px;
+}
+
+.row.pt-3.text-center img {
+  max-width: 50px;
+  margin-bottom: 10px;
+}
+
+.row.pt-3.text-center p {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+    </style>
+</head>
+
+<%- include('../../views/partials/user/header') %>
+
+<!-- Breadcrumb Section Begin -->
+<section class="about-option">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="shop_title">
+          <h3 class="justify-content-center">Welcome to Art·Mart</h3>
+        </div>
+        <div class="breadcrumb__text">
+          <div class="breadcrumb__links">
+            <a href="/">Home</a>
+            <span>About</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Breadcrumb Section End -->
+
+<div class="p-4">
+    <p>At Art·Mart, we’re passionate about providing artists with the best quality art supplies to bring their creative visions to life. Whether you’re a professional artist or 
+        just starting out, we are committed to offering a wide range of materials that inspire and empower your artistic journey.</p>
+    
+        <div class="row mt-3">
+            <div class="col-8">
+                <h3 class="pb-2">Our Story</h3>
+                <p>Hi, I’m Fidha Fathima, the founder of Art·Mart. My love for art supplies started 10 years ago when 
+                    I realized how important the right tools are for creating  meaningful artwork. I founded Art·Mart to make 
+                    high-quality, affordable art materials accessible to artists of all levels, from painters and sketch artists 
+                    to illustrators and sculptors.</p>
+
+                    <h3 class="pb-2">Our Mission</h3>
+                    <p>At Art·Mart, we understand the transformative power of creativity. <br><br>
+
+                        Our mission is simple: <br><br>
+                        
+                        To supply artists with top-notch materials that fuel their creativity and help them express themselves to the fullest. 
+                        Whether you need brushes, paints, sketchbooks, or specialized tools, we ensure that every product we offer is 
+                        carefully selected for its quality, durability, and performance.</p>
+            </div>
+            <div class="col-4">
+                <img src="/img/about/image-1.jpg" alt="Image 1" class="img-fluid">
+            </div>
+        </div>
+
+        <div class="pt-2">
+            <h3>What we offer</h3>
+            <div class="row pt-3">
+                <div class="col-3">
+                    <img src="/img/about/image-2.jpg" alt="" class="img-fluid" style="width: 200px;">
+                    <h6 class="pt-4">Paints & Pigments</h6>
+                    <p>From watercolors to oils and <br>
+                        acrylics, we’ve got the perfect <br>
+                        colors for your palette.</p>
+                </div>
+                <div class="col-3">
+                    <img src="/img/about/image-3.jpg" alt="" class="img-fluid" style="width: 200px;">
+                    <h6 class="pt-4">Sketchbooks & Paper</h6>
+                    <p>Premium paper that’s perfect for <br>
+                        drawing, painting, and sketching.</p>
+                </div>
+                <div class="col-3">
+                    <img src="/img/about/image-4.jpg" alt="" class="img-fluid" style="width: 200px;">
+                    <h6 class="pt-4">Brushes & Tools</h6>
+                    <p>A variety of brushes and precision <br>
+                        tools to suit every technique.</p>
+                </div>
+                <div class="col-3">
+                    <img src="/img/about/image-5.jpg" alt="" class="img-fluid" style="width: 200px;">
+                    <h6 class="pt-4">Artist Accessories</h6>
+                    <p>Everything from easels to palettes <br>
+                        to help you create with ease.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-3">
+            <h3 class="pb-4">Why Choose Us</h3>
+            <div class="row pt-3 text-center">
+                <div class="col-4">
+                    <img src="/img/about/icon/reliability.png" alt="" class="img-fluid" style="width: 50px;">
+                    <h6 class="pt-4">Quality You Can Trust</h6>
+                    <p>We only carry materials that we believe in. <br>
+                        Our products are handpicked for their <br>
+                        durability, quality, and ability to bring out the<br>
+                        best in your artwork.</p>
+                </div>
+                <div class="col-4">
+                    <img src="/img/about/icon/low-price.png" alt="" class="img-fluid" style="width: 50px;">
+                    <h6 class="pt-4">Affordable Pricing</h6>
+                    <p>We understand that quality art supplies can be <br>
+                        expensiveso we offer competitive prices without <br>
+                        compromising on the quality of the materials.</p>
+                </div>
+                <div class="col-4">
+                    <img src="/img/about/icon/customer-support.png" alt="" class="img-fluid" style="width: 50px;">
+                    <h6 class="pt-4">Customer Supportt</h6>
+                    <p>Our team is here to help you with any questions, <br>
+                        product recommendations, or specific needs you may <br>
+                        have. Whether you're a beginner or a seasoned artist, <br>
+                        we want to make your art journey as smooth as possible.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-4">
+            <h3 class="pb-4">Thank You for Choosing Us</h3>
+            <p>Thank you for trusting Art·Mart as your go-to destination for all things art supplies. We are excited to be part of your creative process and can’t wait to see
+                what you create! If you have any questions, feel free to reach out—we're always happy to help.Join us on [Instagram/Facebook] for the latest updates, product tutorials, 
+                and artist inspiration!</p>
+        </div>
+
+</div>
+
+<%- include('../../views/partials/user/footer') %>

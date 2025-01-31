@@ -295,7 +295,7 @@ async function generateExcelReport(
     return buffer;
   }
 
-  // column headers
+  // Define column headers first
   worksheet.columns = [
     { header: "Order ID", key: "orderId", width: 30 },
     { header: "Total Amount", key: "totalAmount", width: 15 },
@@ -303,7 +303,32 @@ async function generateExcelReport(
     { header: "Date", key: "date", width: 20 },
   ];
 
-  //sales data to the worksheet
+  // Merge cells for the title (A1:D2)
+  worksheet.mergeCells('A1:D2');
+  const headerCell = worksheet.getCell('A1');
+  headerCell.value = "ART·MART";
+  headerCell.font = { size: 18, bold: true };
+  headerCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+  worksheet.mergeCells('A3:D3');
+  const subHeaderCell = worksheet.getCell('A3');
+  subHeaderCell.value = "Sales report";
+  subHeaderCell.font = { size: 11 , italic: true };
+  subHeaderCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+  // Add an empty row after the title
+  worksheet.addRow([]);
+
+  // Add column headers to the worksheet
+  const headerRow = worksheet.addRow({
+    orderId: "Order ID",
+    totalAmount: "Total Amount",
+    discount: "Discount",
+    date: "Date",
+  });
+  headerRow.font = { bold: true }; // Make header row bold
+
+  // Add sales data to the worksheet
   salesData.forEach((order) => {
     worksheet.addRow({
       orderId: order.orderId,

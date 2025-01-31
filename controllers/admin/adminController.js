@@ -487,7 +487,10 @@ const salesStatistics = async (req, res) => {
       0
     );
 
-    res.json({ overallSalesCount, overallOrderAmount, overallDiscount });
+    res.json({ 
+      overallSalesCount, 
+      overallOrderAmount: overallOrderAmount.toFixed(2), 
+      overallDiscount });
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.log("error", error);

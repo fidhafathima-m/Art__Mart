@@ -4661,3 +4661,12 @@ label {
 .breadcrumb {
   background-color: #f4f4f4;
 }
+
+.about-option {
+  background: url("/img/about//about-background.jpg") no-repeat center
+    center; /* Add background image */
+  background-size: cover; /* Make sure the background covers the entire section */
+  padding: 40px 0; /* Keep the padding as you had */
+  color: white; /* Ensures text color contrasts against the background */
+  height: 300px;
+}

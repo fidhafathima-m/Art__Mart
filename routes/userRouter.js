@@ -148,5 +148,8 @@ router.post("/api/remove-coupon", productController.removeCoupon);
 router.post("/wallet/add-money", userController.addMoney);
 router.post("/wallet/withdraw-money", userController.withdrawMoney);
 
+// About
+router.get("/about", userController.loadAbout);
+
 // eslint-disable-next-line no-undef
 module.exports = router;

@@ -36,9 +36,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="d-none">
+    <div id="loadingSpinner" class="text-center">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-white">Processing your request...</p>
+    </div>
+  </div>
 </div>
 
 <%- include("../../views/partials/user/footer") %>
+
+
 
 <!-- Custom Styles -->
 <style>
@@ -102,6 +114,8 @@
       data[key] = value;
     });
 
+
+
     // Send the payment method and order ID to the backend
     fetch('/retry-payment', {
         method: 'POST',
@@ -156,10 +170,56 @@
               });
             });
 
-          } else if (data.paymentMethod === 'cod' || data.paymentMethod === 'wallet') {
-            // Redirect to the success page for COD or Wallet
-            window.location.href = data.redirectUrl;
+          } else if (data.paymentMethod === 'wallet') {
+  fetch('/wallet/check-balance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        amount: order.finalAmount
+      }),
+    })
+    .then(response => response.json()) // Ensure that the response is parsed as JSON
+    .then(data => {
+      if (data.success) {
+        downloadInvoice(data.orderId);
+
+      } else {
+        // If balance is insufficient, show an alert
+        this.disabled = false; // Re-enable the submit button
+        document.getElementById('loadingOverlay').classList.add('d-none');
+        
+        // Show SweetAlert with the error message
+        Swal.fire({
+          title: 'Insufficient Balance',
+          text: 'You do not have enough balance in your wallet to complete this purchase.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          this.disabled = false; // Re-enable the button after alert
+          document.getElementById('loadingOverlay').classList.add('d-none');
+        });
+      }
+    })
+    .catch(error => {
+      // Handle any unexpected errors with the wallet balance check
+      console.error('Error checking wallet balance:', error);
+      this.disabled = false; // Re-enable the button in case of error
+      document.getElementById('loadingOverlay').classList.add('d-none');
+      Swal.fire({
+        title: 'Error!',
+        text: 'There was an issue checking your wallet balance. Please try again later.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    });
+}
+ else if (data.paymentMethod === 'cod') {
+  console.log('order id: ', data.orderId);
+            downloadInvoice(data.orderId);
           }
+
         } else {
           // Handle error
           console.error('Error:', data.message);

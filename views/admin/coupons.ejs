@@ -44,8 +44,17 @@
               <%= new Date(coupons[i].createdOn).toLocaleString('en-US') %>
             </td>
             <td>
-              <%= new Date(coupons[i].expireOn).toLocaleString('en-US') %>
+              <% 
+                const expireDate = new Date(coupons[i].expireOn);
+                const currentDate = new Date();
+                let expireText = expireDate < currentDate 
+                  ? '<span class="text-danger">Expired</span>'
+                  : expireDate.toLocaleString('en-US');
+              %>
+              <%- expireText %>
             </td>
+            
+            
             <td>
               <% if (coupons[i].isList) { %>
               <span class="badge rounded-pill alert-success" style="width: 60px">

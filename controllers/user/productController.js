@@ -746,15 +746,17 @@ const retryPayment = async (req, res) => {
       return res.json({
         success: true,
         paymentMethod: "cod",
+        orderId: order.orderId,
         redirectUrl: `/checkout/orderSuccess?orderId=${orderId}`,
       });
     } else if (paymentMethod === "wallet") {
       // Check wallet balance
       const wallet = await Wallet.findOne({ userId: orderData.userId });
       if (!wallet || wallet.balance < orderData.finalAmount) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Insufficient wallet balance" });
+        return res.json({ 
+          success: false, 
+          message: "Insufficient wallet balance" 
+        });
       }
 
       // Deduct the amount from the wallet
@@ -779,6 +781,7 @@ const retryPayment = async (req, res) => {
       return res.json({
         success: true,
         paymentMethod: "wallet",
+        orderId: order.orderId,
         redirectUrl: `/checkout/orderSuccess?orderId=${orderId}`,
       });
     }

@@ -1231,6 +1231,25 @@ const withdrawMoney = async (req, res) => {
   }
 };
 
+const loadAbout = async(req, res) => {
+  try {
+    
+    const user = req.session.user || '';
+
+    res.render('about', {
+      activePage: 'about',
+      user
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred.",
+    });
+  }
+}
+
 // eslint-disable-next-line no-undef
 module.exports = {
   loadHomePage,
@@ -1252,4 +1271,5 @@ module.exports = {
   logout,
   addMoney,
   withdrawMoney,
+  loadAbout
 };

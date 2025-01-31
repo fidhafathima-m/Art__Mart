@@ -231,13 +231,15 @@
           <h4>Available Coupons:</h4>
           <ul>
             <% coupons.forEach(coupon => { %>
+              <% if (coupon.minPurchaseAmount <= products.salePrice) { %>
             <li>
               <b><%= coupon.name %></b>: <% if (coupon.expireOn > Date.now()) {%>
               <span>Valid Until: <%= coupon.expireOn.toLocaleDateString() %></span>
               <% } else { %>
-              <span>Expired</span>
+              <span class="text-danger">Expired</span>
               <% } %>
             </li>
+            <% } %>
             <% }) %>
           </ul>
           <% } %>
