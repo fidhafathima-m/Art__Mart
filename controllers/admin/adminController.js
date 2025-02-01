@@ -10,6 +10,10 @@ const Order = require("../../models/orderSchema");
 const bcrypt = require("bcrypt");
 // eslint-disable-next-line no-undef
 const { generatePDFReport, generateExcelReport} = require("../../helpers/generateReports");
+// eslint-disable-next-line no-undef
+const nodemailer = require('nodemailer');
+// eslint-disable-next-line no-undef
+require('dotenv').config();
 
 const pageError = (req, res) => {
   res.render("admin-error");
@@ -540,6 +544,85 @@ const exportSalesReport = async (req, res) => {
   }
 };
 
+const loadAbout = async(req, res) => {
+  try {
+    
+    res.render('admin-about');
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log("error", error);
+  }
+}
+
+const loadContact = async(req, res) => {
+  try {
+    
+    const user = req.session.user || '';
+    // const cart = await Cart.findOne({ userId: user });
+    // const cartItems = cart ? cart.items : [];
+
+    res.render('admin-contact', {
+      activePage: 'contact',
+      user,
+      cartItems: ''
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred.",
+    });
+  }
+}
+
+
+// Create a transporter object using SMTP transport
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  port: 587,
+  secure: false, // Set to true if using SSL (e.g., Gmail uses true for port 465)
+  auth: {
+    // eslint-disable-next-line no-undef
+    user: process.env.NODEMAILER_EMAIL,
+    // eslint-disable-next-line no-undef
+    pass: process.env.NODEMAILER_PASSWORD,
+  },
+});
+
+// Function to send email
+const sendContactEmail = (req, res) => {
+  const { name, email, subject, message } = req.body;
+
+  // Define the email options
+  const mailOptions = {
+    from: email, // Sender's email address
+    // eslint-disable-next-line no-undef
+    to: process.env.NODEMAILER_EMAIL, // Admin email from the .env file
+    subject: `New Contact Form Submission: ${subject}`, // Email subject
+    text: `You have received a new message from the admin ${name} (${email}).\n\nMessage:\n${message}`, // Plain text body
+    html: `
+      <p>You have received a new message from the admin named <strong>${name}</strong> (${email})</p>
+      <p><strong>Subject:</strong> ${subject}</p>
+      <p><strong>Message:</strong><br>${message}</p>
+    `, // HTML body (optional)
+  };
+
+  // Send the email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error('Error sending email:', error);
+      return res.status(500).json({ success: false, message: 'Failed to send message. Please try again later.' });
+    }
+
+    console.log('Message sent:', info.response);
+    return res.status(200).json({ success: true, message: 'Your message has been sent successfully!' });
+  });
+};
+
+
+
 // eslint-disable-next-line no-undef
 module.exports = {
   loadLogin,
@@ -550,5 +633,8 @@ module.exports = {
   salesStatistics,
   exportSalesReport,
   pageError,
+  loadAbout,
+  loadContact,
+  sendContactEmail,
   logout,
 };

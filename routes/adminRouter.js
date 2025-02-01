@@ -242,5 +242,9 @@ router.post(
 router.patch("/delete-brand/:id", brandController.deleteBrand);
 router.patch("/restore-brand/:id", brandController.restoreBrand);
 
+router.get('/about', adminController.loadAbout);
+router.get("/contact", adminController.loadContact);
+router.post('/contact/submit', adminController.sendContactEmail);
+
 // eslint-disable-next-line no-undef
 module.exports = router;

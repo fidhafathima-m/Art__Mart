@@ -4204,8 +4204,8 @@ h5 {
 
 .magnifier-lens {
   position: absolute;
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border: 1px solid #000;
   background-color: rgba(0, 0, 0, 0.3);;
   opacity: 0;
