@@ -28,7 +28,7 @@
               <% if (products.productImage && products.productImage.length > 0) { %>
               <% products.productImage.forEach((image, index) => { %>
               <div class="col-3">
-                <img src="<%= image %>" class="img-fluid thumbnail" alt="Thumbnail" data-target="#main-image" data-image="<%= image %>" />
+                <img src="<%= image %>" class="img-fluid thumbnail" alt="Thumbnail" data-target="#main-image" data-image="<%= image %>"/>
               </div>
               <% }) } else { %>
               <p>No product images available</p>
@@ -196,7 +196,7 @@
           </a>
           <a href="javascript:void(0);" data-product-id="<%= products._id %>" class="btn btn-outline-danger add-wishlist" id="add-to-wishlist">
             <i class="bi bi-heart"></i> Add to Wishlist
-          </a>
+        </a>
 
         </div>
 
@@ -274,7 +274,7 @@
               </a>
               <ul class="product__hover">
                 <li>
-                  <a href="javascript:void(0);" data-product-id="<%= products[i]._id %>" class="add-wishlist">
+                  <a href="javascript:void(0);" data-product-id="<%= products._id %>" class="add-wishlist">
                     <img src="img/icon/heart.png" alt="Add to Wishlist" />
                   </a>
                 </li>

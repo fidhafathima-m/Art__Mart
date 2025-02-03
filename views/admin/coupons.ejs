@@ -50,13 +50,14 @@
                 let expireText = expireDate < currentDate 
                   ? '<span class="text-danger">Expired</span>'
                   : expireDate.toLocaleString('en-US');
+                  let isExpired = expireDate < currentDate;
               %>
               <%- expireText %>
             </td>
             
             
             <td>
-              <% if (coupons[i].isList) { %>
+              <% if (coupons[i].isList && !isExpired) { %>
               <span class="badge rounded-pill alert-success" style="width: 60px">
                 Listed
               </span>
@@ -67,7 +68,9 @@
               <% } %>
             </td>
             <td>
-              <% if (coupons[i].isList) { %>
+              <% if (isExpired) { %>
+                <!-- dont show button -->
+              <% } else if (coupons[i].isList) { %>
               <button class="btn btn-danger" style="width: 70px" onclick="toggleListing('<%= coupons[i]._id %>', false)">
                 Unlist
               </button>

@@ -117,9 +117,11 @@ const loadProductDetails = async (req, res) => {
     const userId = req.session.user;
     const userData = await User.findById(userId);
     const productId = req.query.id;
+    console.log("Product id: ", productId);
     const product = await Product.findById(productId).populate(
       "category brand"
     );
+
     const category = product.category;
     const brand = product.brand;
     const couponData = await Coupon.find({ isList: true });
