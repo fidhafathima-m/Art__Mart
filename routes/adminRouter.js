@@ -23,6 +23,8 @@ const offerController = require("../controllers/admin/offerController");
 const brandController = require("../controllers/admin/brandController");
 // eslint-disable-next-line no-undef
 const upload = require("../helpers/multerUploads");
+// eslint-disable-next-line no-undef
+const ledgerController = require('../controllers/admin/ledgerController');
 
 router.get("/pageError", adminController.pageError);
 router.get("/login", adminAuth.isLogout, adminController.loadLogin);
@@ -245,6 +247,10 @@ router.patch("/restore-brand/:id", brandController.restoreBrand);
 router.get('/about', adminController.loadAbout);
 router.get("/contact", adminController.loadContact);
 router.post('/contact/submit', adminController.sendContactEmail);
+
+router.get('/ledger', ledgerController.getLedger);
+router.get('/ledger/export-pdf', ledgerController.exportPDF);
+
 
 // eslint-disable-next-line no-undef
 module.exports = router;
