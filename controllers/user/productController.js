@@ -293,21 +293,6 @@ const addToCart = async (req, res) => {
       }
     }
 
-      // Find the wishlist and remove the item from it
-      let wishlist = await Wishlist.findOne({ userId });
-
-      if (wishlist) {
-        const itemIndex = wishlist.items.findIndex(
-          (item) => item.productId.toString() === product._id.toString()
-        );
-
-        if (itemIndex !== -1) {
-          wishlist.items.splice(itemIndex, 1); // Remove the item from the wishlist
-          await wishlist.save(); // Save the updated wishlist
-        }
-    }
-
-
     await cart.save();
 
     res.json({ success: true, message: "Item added to cart" });

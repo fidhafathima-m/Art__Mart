@@ -1235,8 +1235,8 @@ const withdrawMoney = async (req, res) => {
 const loadAbout = async(req, res) => {
   try {
     
-    const user = req.session.user || '';
-    const cart = await Cart.findOne({ userId: user });
+    const user = req.session.user || null;
+    const cart = user ? await Cart.findOne({ userId: user }) : null;
     const cartItems = cart ? cart.items : [];
 
     res.render('about', {
