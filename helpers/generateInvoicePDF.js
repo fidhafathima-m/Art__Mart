@@ -74,7 +74,7 @@ async function generateInvoicePDF(orderId) {
       {
         columns: [
           {
-            image: "public/img/logo.png", // Your logo path
+            image: "public/img/logo.png", 
             width: 100,
           },
           {
@@ -108,7 +108,7 @@ async function generateInvoicePDF(orderId) {
         margin: [0, 0, 0, 10],
       },
       {
-        text: `Order ID: ${orderId}`, // Add Order ID
+        text: `Order ID: ${orderId}`, 
         style: "subheader",
         margin: [0, 0, 0, 10],
       },

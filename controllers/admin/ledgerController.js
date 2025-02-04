@@ -96,7 +96,7 @@ const printer = new PdfPrinter(fonts);
 const exportPDF = async (req, res) => {
   try {
     const { filterType, startDate, endDate } = req.query;
-    
+
     // Build date filter criteria
     let dateFilter = {};
     if (filterType === 'custom' && startDate && endDate) {
@@ -124,9 +124,37 @@ const exportPDF = async (req, res) => {
       .populate('userId', 'name email')
       .sort({ date: -1 });
 
+    // Fetch orders with date filter
+    const orders = await Order.find({
+      createdOn: dateFilter.date // Apply the same date filter to orders
+    })
+      .populate('userId', 'name email')
+      .sort({ createdOn: -1 });
+
+    // Combine transactions and orders into a single array
+    const combinedData = [
+      ...transactions.map(t => ({
+        _id: t._id,
+        userId: t.userId,
+        type: t.type,
+        amount: t.amount,
+        date: t.date,
+      })),
+      ...orders.map(o => ({
+        _id: o.orderId,
+        userId: o.userId,
+        type: o.paymentMethod,
+        amount: o.finalAmount,
+        date: o.createdOn,
+      }))
+    ];
+
+    // Sort combined data by date
+    combinedData.sort((a, b) => new Date(b.date) - new Date(a.date));
+
     // Calculate totals
-    const totalTransactions = transactions.length;
-    const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+    const totalTransactions = combinedData.length;
+    const totalAmount = combinedData.reduce((sum, t) => sum + t.amount, 0);
 
     // Prepare document definition
     const docDefinition = {
@@ -156,43 +184,43 @@ const exportPDF = async (req, res) => {
         {
           table: {
             headerRows: 1,
-            widths: ['auto', '*', 'auto', 'auto', 'auto'],
+            widths: ['auto', '*', 'auto', 'auto', 'auto'], // Adjust widths to remove source column
             body: [
               [
-                { text: 'Transaction ID', style: 'tableHeader' },
-                { text: 'User', style: 'tableHeader' },
+                { text: 'ID', style: 'tableHeader' },
+                { text: 'User ', style: 'tableHeader' },
                 { text: 'Type', style: 'tableHeader' },
                 { text: 'Amount', style: 'tableHeader' },
-                { text: 'Date', style: 'tableHeader' }
+                { text: 'Date', style: 'tableHeader' },
               ],
-              ...transactions.map((transaction, index) => [
+              ...combinedData.map((item, index) => [
                 {
-                  text: transaction._id.toString(),
+                  text: item._id.toString(),
                   fillColor: index % 2 === 0 ? '#d8eafc' : null,
                   margin: [5, 5, 5, 5]
                 },
                 {
-                  text: transaction.userId ? (transaction.userId.name || transaction.userId.email) : 'Unknown User',
+                  text: item.userId ? (item.userId.name || item.userId.email) : 'Unknown User',
                   fillColor: index % 2 === 0 ? '#d8eafc' : null,
                   margin: [5, 5, 5, 5]
                 },
                 {
-                  text: transaction.type,
+                  text: item.type,
                   fillColor: index % 2 === 0 ? '#d8eafc' : null,
                   margin: [5, 5, 5, 5]
                 },
                 {
-                  text: transaction.amount.toFixed(2),
+                  text: item.amount.toFixed(2),
                   fillColor: index % 2 === 0 ? '#d8eafc' : null,
                   alignment: 'right',
                   margin: [5, 5, 5, 5]
                 },
                 {
-                  text: new Date(transaction.date).toLocaleString(),
+                  text: new Date(item.date).toLocaleString(),
                   fillColor: index % 2 === 0 ? '#d8eafc' : null,
                   alignment: 'center',
                   margin: [5, 5, 5, 5]
-                }
+                },
               ])
             ]
           }
@@ -231,11 +259,11 @@ const exportPDF = async (req, res) => {
 
     // Generate PDF
     const pdfDoc = printer.createPdfKitDocument(docDefinition);
-    
+
     // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=transaction-ledger-${filterType}.pdf`);
-    
+
     // Pipe the PDF document to the response
     pdfDoc.pipe(res);
     pdfDoc.end();
