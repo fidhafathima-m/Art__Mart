@@ -99,6 +99,7 @@ const loadHomePage = async (req, res) => {
         user: req.session.user || null,
         product: [],
         message: "No products available at the moment",
+        activePage: "home",
       });
     }
 
