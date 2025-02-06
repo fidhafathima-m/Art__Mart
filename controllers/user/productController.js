@@ -117,7 +117,6 @@ const loadProductDetails = async (req, res) => {
     const userId = req.session.user;
     const userData = await User.findById(userId);
     const productId = req.query.id;
-    console.log("Product id: ", productId);
     const product = await Product.findById(productId).populate(
       "category brand"
     );
@@ -185,8 +184,8 @@ const loadProductDetails = async (req, res) => {
       cartItems: cartItems,
       activePage: "shop",
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -230,6 +229,7 @@ const loadCart = async (req, res) => {
       cartItems,
       subtotal,
       activePage: "shop",
+      productStock: cartItems.map((item) => item.productStock),
     });
   } catch (error) {
     console.error(error);
@@ -309,12 +309,10 @@ const updateCartQuantity = async (req, res) => {
     const product = await Product.findOne({ _id: productId });
 
     if (quantity > 5) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Cannot add more than 5 of this product.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Cannot add more than 5 of this product.",
+      });
     }
 
     let cart = await Cart.findOne({ userId });
@@ -356,11 +354,18 @@ const updateCartQuantity = async (req, res) => {
       await cart.save();
     }
 
-    const updatedCartItems = await Cart.find({ userId });
+    // Calculate total cart amount
+    const totalAmount = cart.items.reduce(
+      (sum, item) => sum + item.totalPrice,
+      0
+    );
 
     res.json({
       success: true,
-      updatedCartItems,
+      cartData: {
+        items: cart.items,
+        totalAmount: totalAmount,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -428,10 +433,6 @@ const loadCheckout = async (req, res) => {
       ? userAddress.address.find((addr) => addr.isDefault)
       : null;
 
-    if (!defaultAddress) {
-      console.log("No default address found for the user.");
-    }
-
     const cartItems = cart ? cart.items : [];
 
     res.render("checkout", {
@@ -441,8 +442,8 @@ const loadCheckout = async (req, res) => {
       addresses: userAddress ? userAddress.address : [],
       defaultAddress: defaultAddress || {},
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error loading checkout: ", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -469,12 +470,10 @@ const updateDefaultAddress = async (req, res) => {
     );
 
     if (updatedAddress.nModified === 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Address not found or already set as default",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Address not found or already set as default",
+      });
     }
 
     res
@@ -521,7 +520,7 @@ const codPlaceOrder = async (req, res) => {
       totalprice,
       finalAmount,
       address: defaultAddress._id,
-      status: status || "Pending",
+      status: status || "Order Placed",
       createdOn: new Date(),
       invoiceDate: new Date(),
       couponApplied, // Store if the coupon was applied
@@ -538,12 +537,10 @@ const codPlaceOrder = async (req, res) => {
       const product = await Product.findById(productId);
       if (product) {
         if (product.quantity < orderedQuantity) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              message: `Not enough stock for product ${product.productName}`,
-            });
+          return res.status(400).json({
+            success: false,
+            message: `Not enough stock for product ${product.productName}`,
+          });
         }
         product.quantity -= orderedQuantity;
         await product.save();
@@ -571,12 +568,10 @@ const codPlaceOrder = async (req, res) => {
     );
 
     if (!emailSent) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Failed to send order confirmation email.",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send order confirmation email.",
+      });
     }
 
     return res.status(200).json({
@@ -586,19 +581,15 @@ const codPlaceOrder = async (req, res) => {
     });
   } catch (error) {
     console.error("Error placing order:", error);
-    res
-      .status(500)
-      .json({
-        message: "An error occurred while placing the order. Please try again.",
-      });
+    res.status(500).json({
+      message: "An error occurred while placing the order. Please try again.",
+    });
   }
 };
 
 const codOrderSuccess = async (req, res) => {
   try {
     const { orderId } = req.query;
-
-    console.log("orderId", orderId);
 
     const user = req.session.user;
     const cart = await Cart.findOne({ userId: user });
@@ -618,8 +609,8 @@ const codOrderSuccess = async (req, res) => {
       user: user,
       cartItems: cartItems,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error retrieving order:", error);
     return res
       .status(500)
       .json({ message: "An error occurred while fetching the order details." });
@@ -651,8 +642,8 @@ const razorpayOrderFailed = async (req, res) => {
       user: user,
       cartItems: cartItems,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error retrieving order:", error);
     return res
       .status(500)
       .json({ message: "An error occurred while fetching the order details." });
@@ -726,7 +717,7 @@ const retryPayment = async (req, res) => {
 
       const razorpayOrder = await razorpay.orders.create(options);
       order.orderId = razorpayOrder.id; // Store Razorpay order ID in the order document
-      order.status = "Pending";
+      order.status = "Order Placed";
       await order.save();
 
       // Return Razorpay order details to frontend
@@ -740,7 +731,7 @@ const retryPayment = async (req, res) => {
         paymentMethod: "razorpay",
       });
     } else if (paymentMethod === "cod") {
-      order.status = "Pending"; // Update the order status
+      order.status = "Order Placed"; // Update the order status
       order.paymentMethod = "COD";
       await order.save();
 
@@ -755,9 +746,9 @@ const retryPayment = async (req, res) => {
       // Check wallet balance
       const wallet = await Wallet.findOne({ userId: orderData.userId });
       if (!wallet || wallet.balance < orderData.finalAmount) {
-        return res.json({ 
-          success: false, 
-          message: "Insufficient wallet balance" 
+        return res.json({
+          success: false,
+          message: "Insufficient wallet balance",
         });
       }
 
@@ -775,7 +766,7 @@ const retryPayment = async (req, res) => {
       await transaction.save();
 
       // Update order status to "Paid"
-      order.status = "Pending"; // Update the order status
+      order.status = "Order Placed"; // Update the order status
       order.paymentMethod = "wallet";
       await order.save();
 
@@ -812,12 +803,10 @@ const walletBalanceCheck = async (req, res) => {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error checking wallet balance:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while checking the wallet balance.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while checking the wallet balance.",
+    });
   }
 };
 
@@ -879,7 +868,7 @@ const walletPlaceOrder = async (req, res) => {
       totalprice,
       finalAmount,
       address: defaultAddress._id,
-      status: status || "Pending",
+      status: status || "Order Placed",
       createdOn: new Date(),
       invoiceDate: new Date(),
       couponApplied,
@@ -897,12 +886,10 @@ const walletPlaceOrder = async (req, res) => {
       const product = await Product.findById(productId);
       if (product) {
         if (product.quantity < orderedQuantity) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              message: `Not enough stock for product ${product.productName}`,
-            });
+          return res.status(400).json({
+            success: false,
+            message: `Not enough stock for product ${product.productName}`,
+          });
         }
         product.quantity -= orderedQuantity;
         await product.save();
@@ -930,12 +917,10 @@ const walletPlaceOrder = async (req, res) => {
     );
 
     if (!emailSent) {
-      return res
-        .status(500)
-        .json({
-          success: false,
-          message: "Failed to send order confirmation email.",
-        });
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send order confirmation email.",
+      });
     }
 
     return res.status(200).json({
@@ -945,11 +930,9 @@ const walletPlaceOrder = async (req, res) => {
     });
   } catch (error) {
     console.error("Error placing order:", error);
-    res
-      .status(500)
-      .json({
-        message: "An error occurred while placing the order. Please try again.",
-      });
+    res.status(500).json({
+      message: "An error occurred while placing the order. Please try again.",
+    });
   }
 };
 
@@ -988,7 +971,7 @@ const razorpayPlaceOrder = async (req, res) => {
       totalprice,
       finalAmount,
       address: defaultAddress._id,
-      status: status || "Pending",
+      status: status || "Order Placed",
       createdOn: new Date(),
       invoiceDate: new Date(),
       couponApplied,
@@ -1006,12 +989,10 @@ const razorpayPlaceOrder = async (req, res) => {
       const product = await Product.findById(productId);
       if (product) {
         if (product.quantity < orderedQuantity) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              message: `Not enough stock for product ${product.productName}`,
-            });
+          return res.status(400).json({
+            success: false,
+            message: `Not enough stock for product ${product.productName}`,
+          });
         }
         product.quantity -= orderedQuantity;
         await product.save();
@@ -1055,8 +1036,8 @@ const razorpayPlaceOrder = async (req, res) => {
       razorpayKey: process.env.RAZORPAY_ID_KEY,
       paymentMethod: "razorpay",
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error placing Razorpay order:", error);
     res
       .status(500)
       .json({ success: false, message: "Failed to create Razorpay order" });
@@ -1094,8 +1075,8 @@ const loadReview = async (req, res) => {
       cartItems: cartItems,
       existingReview,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.status(500).json({ success: false, message: "Failed to load review" });
   }
 };
@@ -1267,10 +1248,9 @@ const coupons = async (req, res) => {
       isDeleted: false,
       expireOn: { $gte: new Date() },
     });
-    console.log("coupons: ", coupons);
     res.json(coupons);
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.status(500).json({ message: "Error fetching coupons" });
   }
 };
@@ -1291,11 +1271,9 @@ const applyCoupon = async (req, res) => {
     }
 
     if (totalPrice < coupon.minPurchaseAmount) {
-      return res
-        .status(400)
-        .json({
-          message: `Minimum purchase amount of ₹${coupon.minPurchaseAmount} not met`,
-        });
+      return res.status(400).json({
+        message: `Minimum purchase amount of ₹${coupon.minPurchaseAmount} not met`,
+      });
     }
 
     if (coupon.userId && coupon.userId.toString() === userId.toString()) {
@@ -1311,8 +1289,8 @@ const applyCoupon = async (req, res) => {
     const newTotalPrice = totalPrice - coupon.offerPrice;
 
     res.json({ success: true, offerPrice: coupon.offerPrice, newTotalPrice });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.status(500).json({ message: "Error applying coupon" });
   }
 };
@@ -1338,8 +1316,8 @@ const removeCoupon = async (req, res) => {
     } else {
       res.status(400).json({ message: "Coupon was not applied by you" });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.status(500).json({ message: "Error removing coupon" });
   }
 };

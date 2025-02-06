@@ -9,26 +9,16 @@
 </nav>
 
 <div class="cart-container" style="display: flex; justify-content: space-between; padding: 20px">
-  <!--  (shopping cart items) -->
+  <!-- Shopping Cart Items -->
   <div class="cart-items bg-white p-4 rounded" style="width: 70%">
-    <div style="
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-      ">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%">
       <h2>Shopping Cart</h2>
       <span class="text-muted pe-5" style="text-align: right">Price</span>
     </div>
     <hr />
     <% if (cartItems.length > 0) { %> <% cartItems.forEach(item => { %>
     <div class="cart-item" style="display: flex; align-items: center; margin-bottom: 20px">
-      <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" style="
-          width: 100px;
-          height: 100px;
-          object-fit: cover;
-          margin-right: 15px;
-        " />
+      <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" style="width: 100px; height: 100px; object-fit: cover; margin-right: 15px" />
       <div class="item-details" style="flex-grow: 1">
         <h3><%= item.productName %></h3>
         <% if (item.productStock > 0) { %>
@@ -38,13 +28,9 @@
         <% } %>
         <!-- Quantity Control -->
         <div class="quantity-control d-flex align-items-center mb-4">
-          <% if (item.cartQuantity === 1) { %>
-          <a href="" class="text-dark delete-item"><i class="bi bi-trash"></i></a>
-          <% } else { %>
           <button class="btn btn-light decrease-quantity">
             <i class="bi bi-dash"></i>
           </button>
-          <% } %>
           <input type="text" class="form-control mx-2 quantity-input" value="<%= item.cartQuantity %>" readonly style="width: 60px; text-align: center" data-product-id="<%= item.productId %>" data-max-quantity="<%= item.productStock %>" />
           <button class="btn btn-light increase-quantity">
             <i class="bi bi-plus"></i>
@@ -64,59 +50,32 @@
     <hr />
     <% }) %>
     <div style="display: flex; justify-content: flex-end; align-items: center">
-      <span style="margin-right: 10px; margin-top: -16px">Subtotal(<%= cartItems.length %> items):
-      </span>
-      <% let subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal +=
-      item.salePrice * item.cartQuantity; %> <% }) %>
-      <p><strong> &#8377; <%= subtotal %>.00</strong></p>
+      <span style="margin-right: 10px; margin-top: -16px">Subtotal(<%= cartItems.length %> items):</span>
+      <% let subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal += item.salePrice * item.cartQuantity; %> <% }) %>
+      <p class="subtotal-bottom"><strong> &#8377; <%= subtotal %></strong></p>
     </div>
     <% } else { %>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <h5 class="text-center text-black mt-4">
-        Oops! There is nothing in your Cart!!
-      </h5>
-      <a href="/shop" class="btn" style="
-            width: 20%;
-            padding: 10px;
-            background: #4caf50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            text-align: center; 
-            margin-top: 10px; /* Optional: Add some space between the heading and button */
-          ">
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <h5 class="text-center text-black mt-4">Oops! There is nothing in your Cart!!</h5>
+      <a href="/shop" class="btn" style="width: 20%; padding: 10px; background: #4caf50; color: white; border: none; cursor: pointer; text-align: center; margin-top: 10px">
         Go to shop
       </a>
     </div>
     <% } %>
   </div>
 
-  <!--  (subtotal & proceed to buy) -->
+  <!-- Subtotal & Proceed to Buy -->
   <div class="subtotal bg-white p-4 rounded ml-4" style="width: 30%; padding: 20px; height: 50%">
     <h3>Subtotal(<%= cartItems.length %> items):</h3>
     <hr />
     <div class="pb-5">
-      <% subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal +=
-      item.salePrice * item.cartQuantity; %> <% }) %>
-      <p style="font-size: 20px">
-        <strong>Total: &#8377; <%= subtotal %></strong>
-      </p>
+      <% subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal += item.salePrice * item.cartQuantity; %> <% }) %>
+      <p style="font-size: 20px"><strong>Total: &#8377; <%= subtotal %></strong></p>
     </div>
     <% if (cartItems.length === 0) { %>
-    <button class="btn btn-secondary" style=" width: 100%; padding: 10px;" disabled>
-      Proceed to Buy
-    </button>
+    <button class="btn btn-secondary" style="width: 100%; padding: 10px" disabled>Proceed to Buy</button>
     <% } else { %>
-    <a href="/checkout" class="proceed-to-buy btn" style="
-        width: 100%;
-        padding: 10px;
-        background: #4caf50;
-        color: white;
-        border: none;
-        cursor: pointer;
-      ">
-      Proceed to Buy
-    </a>
+    <a href="/checkout" class="proceed-to-buy btn" style="width: 100%; padding: 10px; background: #4caf50; color: white; border: none; cursor: pointer" onclick="quantity()">Proceed to Buy</a>
     <% } %>
   </div>
 </div>
@@ -127,47 +86,100 @@
   document.addEventListener("DOMContentLoaded", () => {
     const increaseButtons = document.querySelectorAll(".increase-quantity");
     const decreaseButtons = document.querySelectorAll(".decrease-quantity");
+    const deleteButtons = document.querySelectorAll(".delete-item");
 
-    increaseButtons.forEach((button) => {
-      button.addEventListener("click", async (event) => {
-        const inputField = event.target
-          .closest(".quantity-control")
-          .querySelector(".quantity-input");
-        const productId = inputField.getAttribute("data-product-id");
-        const maxQuantity = parseInt(
-          inputField.getAttribute("data-max-quantity")
-        );
-        let quantity = parseInt(inputField.value);
+    // Function to update the cart display
+    function updateCartDisplay(cartItem, quantity, newTotalPrice, cartTotalAmount) {
+      // Update quantity input
+      const inputField = cartItem.querySelector(".quantity-input");
+      inputField.value = quantity;
 
-        // Increase quantity
-        if (quantity < 5) {
-          quantity += 1;
+      // Update item total price
+      const priceElement = cartItem.querySelector(".price-details h3");
+      const itemPrice = parseFloat(priceElement.innerText.replace("₹", "").trim());
 
-          const response = await fetch(`/cart/update-quantity/${productId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              productId,
-              quantity
-            }),
-          });
+      const subtotalBottom = document.querySelector('.subtotal-bottom strong');
+      if (subtotalBottom) {
+        subtotalBottom.innerHTML = `&#8377; ${cartTotalAmount}`;
+      }
 
-          const data = await response.json();
+      // Update cart total in both places
+      const subtotalRight = document.querySelector('.subtotal p strong');
+      if (subtotalRight) {
+        subtotalRight.innerHTML = `Total: &#8377; ${cartTotalAmount}`;
+      }
 
-          if (data.success) {
-            inputField.value = quantity;
+      // Update items count
+      const itemCountElements = document.querySelectorAll('h3');
+      itemCountElements.forEach(element => {
+        if (element.innerText.includes('Subtotal(')) {
+          const totalItems = document.querySelectorAll('.cart-item').length;
+          element.innerText = `Subtotal(${totalItems} items):`;
+        }
+      });
+    }
 
-            updateSubtotal();
-            location.reload();
-          } else {
-            alert("Failed to update quantity");
+    // Function to update quantity via AJAX
+    async function updateQuantity(productId, quantity, cartItem) {
+      try {
+        const response = await fetch(`/cart/update-quantity/${productId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productId,
+            quantity,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Find the updated item in the response
+          const updatedItem = data.cartData.items.find(
+            item => item.productId === productId
+          );
+
+          if (updatedItem) {
+            updateCartDisplay(
+              cartItem,
+              updatedItem.quantity,
+              updatedItem.totalPrice,
+              data.cartData.totalAmount
+            );
           }
         } else {
+          throw new Error(data.message || "Failed to update quantity");
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          title: "Error",
+          text: error.message || "Failed to update quantity",
+          icon: "error",
+        });
+      }
+    }
+
+    // Increase Quantity
+    increaseButtons.forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        const cartItem = event.target.closest(".cart-item");
+        const inputField = cartItem.querySelector(".quantity-input");
+        const productId = inputField.getAttribute("data-product-id");
+        const maxQuantity = parseInt(inputField.getAttribute("data-max-quantity"));
+        let quantity = parseInt(inputField.value);
+
+        if (quantity < maxQuantity && quantity < 5) {
+          quantity += 1;
+          await updateQuantity(productId, quantity, cartItem);
+        } else {
           Swal.fire({
-            title: "Limit Reached!",
-            text: "You can only add a maximum of 5 items of this product.",
+            title: quantity >= 5 ? "Limit Reached!" : "Stock Limit Reached!",
+            text: quantity >= 5 ?
+              "You can only add a maximum of 5 items of this product." :
+              `You can only add a maximum of ${maxQuantity} items based on available stock.`,
             icon: "warning",
             confirmButtonText: "OK",
           });
@@ -175,47 +187,28 @@
       });
     });
 
+    // Decrease Quantity
     decreaseButtons.forEach((button) => {
       button.addEventListener("click", async (event) => {
-        const inputField = event.target
-          .closest(".quantity-control")
-          .querySelector(".quantity-input");
+        const cartItem = event.target.closest(".cart-item");
+        const inputField = cartItem.querySelector(".quantity-input");
         const productId = inputField.getAttribute("data-product-id");
         let quantity = parseInt(inputField.value);
 
-        // Decrease quantity only if greater than 1
         if (quantity > 1) {
           quantity -= 1;
-
-          const response = await fetch(`/cart/update-quantity/${productId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              productId,
-              quantity
-            }),
-          });
-
-          const data = await response.json();
-
-          if (data.success) {
-            inputField.value = quantity;
-
-            updateSubtotal();
-            location.reload();
-          } else {
-            alert("Failed to update quantity");
-          }
+          await updateQuantity(productId, quantity, cartItem);
         } else {
-          alert("You should select one quantity!");
+          Swal.fire({
+            title: "Minimum Quantity",
+            text: "You should select at least one quantity!",
+            icon: "warning",
+          });
         }
       });
     });
 
-    const deleteButtons = document.querySelectorAll(".delete-item");
-
+    // Delete Item
     deleteButtons.forEach((button) => {
       button.addEventListener("click", async (event) => {
         event.preventDefault();
@@ -247,8 +240,10 @@
             const data = await response.json();
 
             if (data.success) {
+              // Remove the item from the DOM
               event.target.closest(".cart-item").remove();
 
+              // Update the subtotal
               updateSubtotal();
 
               Swal.fire(
@@ -277,27 +272,80 @@
       });
     });
 
+    // Function to update subtotal
     function updateSubtotal() {
       let subtotal = 0;
       const cartItems = document.querySelectorAll(".cart-item");
 
       cartItems.forEach((item) => {
-        const price = parseFloat(
-          item
-          .querySelector(".price-details h3")
-          .innerText.replace("₹", "")
-          .trim()
-        );
+        const price = parseFloat(item.querySelector(".price-details h3").innerText.replace("₹", "").trim());
         const quantity = parseInt(item.querySelector(".quantity-input").value);
         subtotal += price * quantity;
       });
 
-      const subtotalElement = document.querySelector(".subtotal p strong");
-      if (subtotalElement) {
-        subtotalElement.innerHTML = `Total: ₹ ${subtotal}.00`;
+      // Update the subtotal in the cart items section
+      const cartSubtotalElement = document.querySelector(".cart-items p strong");
+      if (cartSubtotalElement) {
+        cartSubtotalElement.innerHTML = `&#8377; ${subtotal}.00`;
+      }
+
+      // Update the subtotal in the right-hand panel
+      const panelSubtotalElement = document.querySelector(".subtotal p strong");
+      if (panelSubtotalElement) {
+        panelSubtotalElement.innerHTML = `Total: &#8377; ${subtotal}.00`;
       }
     }
   });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const proceedButton = document.querySelector(".proceed-to-buy");
+
+    // Function to check quantities before proceeding to checkout
+    async function checkQuantitiesBeforeCheckout(event) {
+      const cartItems = document.querySelectorAll(".cart-item");
+      let invalidQuantity = false;
+
+      for (let cartItem of cartItems) {
+        const inputField = cartItem.querySelector(".quantity-input");
+        const productId = inputField.getAttribute("data-product-id");
+        const maxQuantity = parseInt(inputField.getAttribute("data-max-quantity"));
+        let quantity = parseInt(inputField.value);
+
+        // Check if the quantity exceeds available stock
+        if (quantity > maxQuantity) {
+          invalidQuantity = true;
+
+          // Show SweetAlert with the available stock message
+          await Swal.fire({
+            title: "Stock Limit Exceeded!",
+            text: `You can only add a maximum of ${maxQuantity} items for this product.`,
+            icon: "warning",
+            confirmButtonText: "OK",
+          });
+
+          // Focus on the quantity input field for correction
+          inputField.focus();
+          return;  // Prevent proceeding to checkout
+        }
+      }
+
+      if (!invalidQuantity) {
+        // If no invalid quantity, proceed to checkout
+        window.location.href = "/checkout";
+      }
+    }
+
+    // Attach the checkQuantitiesBeforeCheckout function to the Proceed to Buy button
+    if (proceedButton) {
+      proceedButton.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevent default navigation to checkout
+
+        // Check the quantities before proceeding
+        checkQuantitiesBeforeCheckout(event);
+      });
+    }
+  });
+
 </script>
 
 <%- include('../../views/partials/user/footer') %>

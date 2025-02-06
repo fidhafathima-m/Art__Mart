@@ -54,8 +54,8 @@
               %>
               <%- expireText %>
             </td>
-            
-            
+
+
             <td>
               <% if (coupons[i].isList && !isExpired) { %>
               <span class="badge rounded-pill alert-success" style="width: 60px">
@@ -69,7 +69,7 @@
             </td>
             <td>
               <% if (isExpired) { %>
-                <!-- dont show button -->
+              <!-- dont show button -->
               <% } else if (coupons[i].isList) { %>
               <button class="btn btn-danger" style="width: 70px" onclick="toggleListing('<%= coupons[i]._id %>', false)">
                 Unlist

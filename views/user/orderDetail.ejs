@@ -12,21 +12,21 @@
       <li class="breadcrumb-item active" aria-current="page">Order Details</li>
     </ol>
   </nav>
-  
+
   <div class="mb-5" style="position: relative;">
     <h3 class="display-4 text-center mb-0">Order Details</h3>
-    <% if (order.status !== 'Payment Pending') { %>
+    <% if (order.status !== 'Payment Pending' && order.status !== 'Cancelled') { %>
     <button class="btn btn-dark text-end" onclick="downloadInvoice('<%= order.orderId %>')" style="position: absolute; right: 0; top: -20px;">Download Invoice</button>
-      <% } %>
+    <% } %>
     <h5 class="text-muted">Order ID: <%= order.orderId %></h5>
-  <p class="text-center">
-    <strong>Placed on:</strong> <%= new Date(order.createdOn).toLocaleDateString() %> - <%= order.paymentMethod %>
-  </p>
+    <p class="text-center">
+      <strong>Placed on:</strong> <%= new Date(order.createdOn).toLocaleDateString() %> - <%= order.paymentMethod %>
+    </p>
   </div>
-  
+
 
   <div class="d-flex justify-content-center">
-    <% if ((order.status === 'Processing' || order.status === 'Pending') && !order.status === 'Payment Pending') { %>
+    <% if ((order.status === 'Processing' || order.status === 'Order Placed' || !order.status === 'Payment Pending')) { %>
     <button class="btn btn-danger my-2 cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
     <% } %>
     <% if (order.status === 'Payment Pending') { %>
@@ -35,7 +35,7 @@
     </div>
     <% } %>
     <% if (order.status === 'Delivered') { %>
-    <button class="btn btn-danger my-2 return-order-btn" data-order-id="<%= order._id %>">Return Order</button>
+    <button class="btn btn-danger my-2 return-order-btn" data-order-id="<%= order._id %>" data-payment-method="<%= order.paymentMethod %>">Return Order</button>
     <% } %>
     <% if (order.status === 'Return Request') { %>
     <div class="return-reason text-center">
@@ -43,8 +43,11 @@
       <button class="btn btn-danger my-2 cancel-return-order-btn" data-order-id="<%= order._id %>">Cancel Return Request</button>
     </div>
     <% } %>
+    <% if (order.status === 'Cancelled') { %>
+      <p class="text-center text-danger">Your Order is cancelled for the reason: <%= order.cancellationReason %>. </p>
+      <% } %>
     <% if (order.status === 'Returned') { %>
-    <p class="text-center">Your Order is returned for the reason: <%= order.ordereditems[0].returnReason %></p>
+    <p class="text-center">Your Order is returned for the reason: <%= order.ordereditems[0].returnReason %>. </p>
     <% } %>
 
     <% if(order.moneySent) { %>
@@ -118,43 +121,56 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-  // Handle cancel order action with SweetAlert confirmation
-  $('.cancel-order-btn').on('click', function() {
+$('.cancel-order-btn').on('click', function() {
     const orderId = $(this).data('order-id');
 
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to cancel this order?',
+      text: 'Do you want to cancel this order? Please provide a reason.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, cancel it!',
-      cancelButtonText: 'No, keep it'
+      cancelButtonText: 'No, keep it',
+      input: 'textarea',
+      inputPlaceholder: 'Please provide a reason for cancelling this order...',
+      inputAttributes: {
+        'aria-label': 'Reason for cancelling',
+        'maxlength': 300
+      },
+      showLoaderOnConfirm: true,
+      preConfirm: (cancelReason) => {
+        if (!cancelReason) {
+          Swal.showValidationMessage('You must provide a reason for cancelling');
+          return false;
+        }
+
+        // Send the cancellation request to the server
+        return fetch(`/order/cancel/${orderId}`, {
+            method: 'POST',
+            body: JSON.stringify({
+              cancelReason
+            }),
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          })
+          .then(response => response.json())
+          .catch(error => Swal.showValidationMessage('Request failed: ' + error));
+      },
     }).then((result) => {
       if (result.isConfirmed) {
-        $.ajax({
-          url: `/order/cancel/${orderId}`,
-          method: 'POST',
-          success: function(response) {
-            if (response.success) {
-              let message = response.message || 'Your order has been cancelled.';
-              Swal.fire('Cancelled!', message, 'success').then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire('Error!', response.message, 'error');
-            }
-          },
-          error: function() {
-            Swal.fire('Error!', 'An error occurred while cancelling the order. Please try again.', 'error');
-          }
+        Swal.fire('Cancelled', 'Your order has been cancelled.', 'success').then(() => {
+          location.reload(); // Reload page after cancelling
         });
       }
     });
-  });
+});
+
 
   // Handle return order action
   $('.return-order-btn').on('click', function() {
     const orderId = $(this).data('order-id');
+    const paymentMethod = $(this).data('payment-method');
 
     Swal.fire({
       title: 'Are you sure?',
@@ -178,16 +194,24 @@
 
         // Send the return request to the server
         return fetch(`/order/return/${orderId}`, {
-          method: 'POST',
-          body: JSON.stringify({ returnReason }),
-          headers: { 'Content-Type': 'application/json' },
-        })
-        .then(response => response.json())
-        .catch(error => Swal.showValidationMessage('Request failed: ' + error));
+            method: 'POST',
+            body: JSON.stringify({
+              returnReason
+            }),
+            headers: {
+              'Content-Type': 'application/json'
+            },
+          })
+          .then(response => response.json())
+          .catch(error => Swal.showValidationMessage('Request failed: ' + error));
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire('Return Requested', 'Your return request is under review.', 'success').then(() => {
+        let successMessage = 'Your return request is under review.';
+        if (paymentMethod === 'prepaid') {
+          successMessage += ' Your prepaid money will be credited after the request is approved.';
+        }
+        Swal.fire('Return Requested', successMessage, 'success').then(() => {
           location.reload(); // Reload page after returning
         });
       }
@@ -209,20 +233,22 @@
       }).then((result) => {
         if (result.isConfirmed) {
           fetch(`/order/cancel-return/${orderId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              Swal.fire('Cancelled!', 'Your return request has been cancelled.', 'success').then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire('Error!', data.message, 'error');
-            }
-          })
-          .catch(error => Swal.fire('Error!', 'An error occurred while cancelling the return request. Please try again.', 'error'));
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire('Cancelled!', 'Your return request has been cancelled.', 'success').then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire('Error!', data.message, 'error');
+              }
+            })
+            .catch(error => Swal.fire('Error!', 'An error occurred while cancelling the return request. Please try again.', 'error'));
         }
       });
     });
@@ -248,7 +274,7 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url); 
+        URL.revokeObjectURL(url);
 
       })
       .catch(error => {
@@ -262,4 +288,3 @@
       });
   }
 </script>
-

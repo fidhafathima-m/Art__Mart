@@ -27,13 +27,13 @@
           Brand Name
         </label>
         <div class="col-sm-4">
-            <select id="brand" name="brand" class="form-control">
-              <option selected>No Brand</option>
-              <% brands.forEach(function(brand) { %>
-              <option value="<%= brand._id %>"><%= brand.brandName %></option>
-              <% }); %>
-            </select>
-            <a href="/admin/brands/add-brand" class="text-muted mt-2 ml-3" >Add brand</a>
+          <select id="brand" name="brand" class="form-control">
+            <option selected>No Brand</option>
+            <% brands.forEach(function(brand) { %>
+            <option value="<%= brand._id %>"><%= brand.brandName %></option>
+            <% }); %>
+          </select>
+          <a href="/admin/brands/add-brand" class="text-muted mt-2 ml-3">Add brand</a>
         </div>
       </div>
       <!-- Product Description -->

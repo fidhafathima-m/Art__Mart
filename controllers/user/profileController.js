@@ -55,11 +55,10 @@ const sendVeificationMail = async (email, otp) => {
       html: `<b><h4>Your OTP: ${otp}</h4><br></b>`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: ", info.messageId);
+    await transporter.sendMail(mailOptions);
     return true;
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error sending mail", error);
     return false;
   }
 };
@@ -69,8 +68,8 @@ const securePassword = async (password) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error.message);
     console.error("Error in hashing");
   }
 };
@@ -78,8 +77,8 @@ const securePassword = async (password) => {
 const getForgetPass = async (req, res) => {
   try {
     res.render("forgot-password");
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error.message);
     res.redirect("/pageNotFound");
   }
 };
@@ -96,7 +95,6 @@ const forgotPassValid = async (req, res) => {
       if (emailSent) {
         req.session.otp = otp;
         req.session.email = email;
-        console.log("OTP: ", otp);
         return res.json({ success: true });
       } else {
         return res.json({
@@ -122,7 +120,7 @@ const forgotPassOtpLoad = async (req, res) => {
   try {
     res.render("forgotPassOtp");
   } catch (error) {
-    console.log("error: ", error);
+    console.error(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -130,8 +128,6 @@ const forgotPassOtpLoad = async (req, res) => {
 const verifyForgetPassOtp = async (req, res) => {
   try {
     const { otp } = req.body;
-    // console.log('Received OTP:', otp);
-    // console.log('Stored OTP in session:', req.session.otp);
 
     if (otp === req.session.otp) {
       res.json({ success: true, redirectUrl: "/reset-password" });
@@ -149,11 +145,9 @@ const resendForgetPassOtp = async (req, res) => {
     const otp = generateOtp();
     req.session.otp = otp;
     const email = req.session.email;
-    console.log("Resending OTP to mail: ", email);
     const emailSent = sendVeificationMail(email, otp);
 
     if (emailSent) {
-      console.log("Resent OTP: ", otp);
       res
         .status(200)
         .json({ success: true, message: "OTP Resent Successfully" });
@@ -168,7 +162,7 @@ const resetPasswordLoad = async (req, res) => {
   try {
     res.render("reset-password");
   } catch (error) {
-    console.log("error: ", error);
+    console.error(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -177,8 +171,6 @@ const resetPassword = async (req, res) => {
   try {
     const { password, confirmPassword } = req.body;
     const email = req.session.email;
-
-    console.log("Email in session:", email);
 
     if (password === confirmPassword) {
       const passwordHash = await securePassword(password);
@@ -190,8 +182,8 @@ const resetPassword = async (req, res) => {
     } else {
       res.json({ success: false, message: "Passwords don't match" });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error during password reset:", error);
     res.json({
       success: false,
       message: "An error occurred. Please try again.",
@@ -217,14 +209,6 @@ const loadUserProfile = async (req, res) => {
 
     if (section === "addresses") {
       const addresses = await Address.find({ userId });
-      // console.log("Fetched Addresses:", addresses);
-      if (addresses && addresses.length > 0) {
-        addresses.forEach((address) => {
-          console.log("Address Object:", address);
-        });
-      } else {
-        console.log("No addresses found for this user.");
-      }
 
       const userAddresses = await Address.findOne({ userId: userId });
 
@@ -233,13 +217,8 @@ const loadUserProfile = async (req, res) => {
           (addr) => addr.isDefault === true
         );
 
-        if (!defaultAddress) {
-          console.log("No default address found");
-        }
-
         content = { addresses, defaultAddress };
       } else {
-        console.log("No user address found.");
         content = { addresses: [], defaultAddress: null };
       }
     } else if (section === "orders") {
@@ -348,8 +327,8 @@ const loadChangeEmail = async (req, res) => {
       activePage: "userProfile",
       cartItems: cartItems,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in changing email", error);
     res.redirect("/userProfile");
   }
 };
@@ -387,8 +366,8 @@ const changeEmail = async (req, res) => {
         message: "Error sending OTP. Please try again later.",
       });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("error", error);
     res.json({
       success: false,
       message: "An unexpected error occurred. Please try again.",
@@ -401,30 +380,23 @@ const otpPage = async (req, res) => {
     const userId = req.session.user;
     res.render("change-email-otp", { user: userId });
   } catch (error) {
-    console.log("error: ", error);
+    console.error(error);
   }
 };
 
 const verifyEmailOtp = async (req, res) => {
   try {
     const user = req.session.user;
-    // console.log('Request body:', req.body);
-    // console.log('Session userOtp:', req.session.userOtp);
 
     const otp = req.body.otp ? req.body.otp.trim() : undefined;
     const sessionOtp = req.session.userOtp
       ? req.session.userOtp.trim()
       : undefined;
 
-    // console.log('Received OTP:', otp);
-    // console.log('Session OTP:', sessionOtp);
-
-    // console.log('Is OTP equal?', otp === sessionOtp);
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
 
     if (!otp || !sessionOtp) {
-      console.log("OTP or session OTP not found.");
       return res.render("change-email-otp", {
         message: "OTP not received or session expired",
         userData: req.session.userData,
@@ -434,7 +406,6 @@ const verifyEmailOtp = async (req, res) => {
     }
 
     if (otp === sessionOtp) {
-      // console.log('OTP match successful!');
       req.session.userData = req.body.userData;
       res.json({
         success: true,
@@ -442,7 +413,6 @@ const verifyEmailOtp = async (req, res) => {
         redirectUrl: "/profile/new-email",
       });
     } else {
-      console.log("OTP mismatch!");
       res.json({
         success: false,
         message: "OTP not matching",
@@ -494,8 +464,8 @@ const loadNewMail = async (req, res) => {
       activePage: "userProfile",
       cartItems: cartItems,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in loading", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -515,15 +485,15 @@ const updateEmail = async (req, res) => {
         message: "This email is already in use. Please choose a different one.",
         activePage: "userProfile",
         cartItems: cartItems,
-        user: userId
+        user: userId,
       });
     }
 
     await User.findByIdAndUpdate(userId, { email: newEmail });
 
     res.redirect("/userProfile");
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in updating mail", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -539,8 +509,8 @@ const loadEmailPageforPassChange = async (req, res) => {
       activePage: "userProfile",
       cartItems: cartItems,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in loading", error);
     res.redirect("/pageNotFound");
   }
 };
@@ -578,8 +548,8 @@ const changePassValid = async (req, res) => {
         message: "Error sending OTP. Please try again later.",
       });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in change password validation:", error);
     res.json({
       success: false,
       message: "An unexpected error occurred. Please try again.",
@@ -592,7 +562,7 @@ const passOtpPage = async (req, res) => {
     const userId = req.session.user;
     res.render("change-pass-otp", { user: userId });
   } catch (error) {
-    console.log("error: ", error);
+    console.error(error);
   }
 };
 
@@ -606,11 +576,11 @@ const verifyChangePassOtp = async (req, res) => {
     } else {
       res.json({ success: false, message: "OTP not matching" });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res
       .status(500)
       .json({ success: false, message: "An error occured, please try again" });
-    console.log("Error", error);
   }
 };
 
@@ -633,7 +603,6 @@ const loadAddAddress = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    console.log("Request Body:", req.body);
     const userId = req.session.user;
     const userData = await User.findOne({ _id: userId });
     if (!userData) {
@@ -655,12 +624,10 @@ const addAddress = async (req, res) => {
     } = req.body;
 
     if (!addressType || !name || !city || !state || !pincode || !phone) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "All required fields must be filled",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be filled",
+      });
     }
 
     const addressExists = await Address.findOne({
@@ -669,12 +636,10 @@ const addAddress = async (req, res) => {
     });
 
     if (addressExists) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "This location address already exists",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "This location address already exists",
+      });
     }
 
     const newAddress = {
@@ -709,21 +674,17 @@ const addAddress = async (req, res) => {
       await userAddress.save();
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Address added successfully",
-        newAddress: newAddress,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Address added successfully",
+      newAddress: newAddress,
+    });
   } catch (error) {
     console.error("Error in adding address:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred, please try again.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred, please try again.",
+    });
   }
 };
 
@@ -740,10 +701,7 @@ const loadEditAddress = async (req, res) => {
       "address._id": addressId,
     });
 
-    // console.log('current address: ', currAddress)
-
     if (!currAddress) {
-      console.log("Address not found");
       return res.redirect("/pageNotFound");
     }
 
@@ -752,7 +710,6 @@ const loadEditAddress = async (req, res) => {
     );
 
     if (!addressData) {
-      console.log("Address data not found");
       return res.redirect("/pageNotFound");
     }
     const cart = await Cart.findOne({ userId: user });
@@ -778,7 +735,6 @@ const editAddress = async (req, res) => {
 
     const findAddress = await Address.findOne({ "address._id": addressId });
     if (!findAddress) {
-      console.log("Address not found");
       return res
         .status(404)
         .json({ success: false, message: "Address not found" });
@@ -791,16 +747,11 @@ const editAddress = async (req, res) => {
     });
 
     if (addressExists) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "This pincode is already associated with another address",
-        });
-    } else {
-      console.log("Pincode is unique, proceeding to update");
+      return res.status(400).json({
+        success: false,
+        message: "This pincode is already associated with another address",
+      });
     }
-
     const isDefault = data.isDefault === "on";
 
     if (isDefault) {
@@ -810,7 +761,7 @@ const editAddress = async (req, res) => {
       );
     }
 
-    const updated = await Address.updateOne(
+    await Address.updateOne(
       { "address._id": addressId },
       {
         $set: {
@@ -830,17 +781,13 @@ const editAddress = async (req, res) => {
       }
     );
 
-    updated ? console.log("Updated") : console.log("not updated");
-
     res.json({ success: true, message: "Address updated successfully" });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in editing address", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred, please try again.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred, please try again.",
+    });
   }
 };
 
@@ -850,7 +797,6 @@ const deleteAddress = async (req, res) => {
 
     const findAddress = await Address.findOne({ "address._id": addressId });
     if (!findAddress) {
-      console.log("Address not found");
       return res
         .status(404)
         .json({ success: false, message: "Address not found" });
@@ -868,14 +814,12 @@ const deleteAddress = async (req, res) => {
     );
 
     res.json({ success: true, message: "Address deleted successfully" });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in deleting address", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred, please try again.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred, please try again.",
+    });
   }
 };
 
@@ -883,7 +827,6 @@ const editAddressInCheckout = async (req, res) => {
   try {
     const data = req.body;
     const addressId = new mongoose.Types.ObjectId(data.addressId);
-    console.log("Address ID:", addressId);
 
     const user = req.session.user;
 
@@ -893,11 +836,8 @@ const editAddressInCheckout = async (req, res) => {
         .json({ success: false, message: "Invalid address ID" });
     }
 
-    console.log("Address ID:", data.addressId);
-
     const findAddress = await Address.findOne({ "address._id": addressId });
     if (!findAddress) {
-      console.log("Address not found");
       return res
         .status(404)
         .json({ success: false, message: "Address not found" });
@@ -910,14 +850,10 @@ const editAddressInCheckout = async (req, res) => {
     });
 
     if (addressExists) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "This pincode is already associated with another address",
-        });
-    } else {
-      console.log("Pincode is unique, proceeding to update");
+      return res.status(400).json({
+        success: false,
+        message: "This pincode is already associated with another address",
+      });
     }
 
     const updated = await Address.updateOne(
@@ -940,21 +876,17 @@ const editAddressInCheckout = async (req, res) => {
       }
     );
 
-    updated ? console.log("Updated") : console.log("not updated");
-
     res.json({
       success: true,
       message: "Address updated successfully",
       updatedAddress: updated,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in editing address", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred, please try again.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred, please try again.",
+    });
   }
 };
 
@@ -996,8 +928,6 @@ const viewOrderDetails = async (req, res) => {
       ? userAddresses.address.find((addr) => addr.isDefault)
       : null;
 
-    console.log("Address: ", address);
-
     res.render("orderDetail", {
       order,
       user: userId,
@@ -1005,6 +935,7 @@ const viewOrderDetails = async (req, res) => {
       cartItems: cartItems,
       reviews,
       address,
+      paymentMethod: order.paymentMethod,
     });
   } catch (error) {
     console.error("Error loading order details:", error);
@@ -1016,54 +947,78 @@ const cancelOrder = async (req, res) => {
   try {
     const orderId = req.params.orderId;
     const userId = req.session.user;
+    const { cancelReason } = req.body; 
 
-    const order = await Order.findById(orderId);
+    // Populate the product details in ordereditems
+    const order = await Order.findById(orderId).populate(
+      "ordereditems.product"
+    );
 
     if (!order || order.userId.toString() !== userId) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message:
-            "Order not found or you are not authorized to cancel this order.",
-        });
+      return res.status(404).json({
+        success: false,
+        message:
+          "Order not found or you are not authorized to cancel this order.",
+      });
     }
 
-    if (order.status !== "Pending" && order.status !== "Processing") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Order cannot be canceled at this stage.",
-        });
+    if (order.status !== "Order Placed" && order.status !== "Processing") {
+      return res.status(400).json({
+        success: false,
+        message: "Order cannot be canceled at this stage.",
+      });
     }
 
+    order.cancellationReason = cancelReason;
+
+    // Get all items from the order
+    const orderItems = order.ordereditems;
+
+    // Update product quantities for each item in the order
+    for (const item of orderItems) {
+      try {
+        const product = await Product.findById(item.product);
+
+        if (product) {
+          // Add back the cancelled quantity to product stock
+          product.quantity = (product.quantity || 0) + item.quantity;
+
+          // Update status if necessary
+          if (product.status === "Out of Stock" && product.quantity > 0) {
+            product.status = "Available";
+          }
+
+          // Save the updated product
+          await product.save();
+        }
+      } catch (err) {
+        console.error(`Error updating product ${item.product} stock:`, err);
+        // Continue with other products even if one fails
+      }
+    }
+
+    // Update order status
     order.status = "Cancelled";
     await order.save();
 
-    if (order.paymentMethod === "prepaid") {
+    // Handle different payment methods
+    if (order.paymentMethod === "prepaid" || order.paymentMethod === "wallet") {
       return res.json({
         success: true,
         message: `Your order has been cancelled. The prepaid amount of ₹${order.finalAmount} will be credited to your wallet within 24 hours.`,
       });
     }
 
-    if (order.paymentMethod === "wallet") {
-      return res.json({
-        success: true,
-        message: `Your order has been cancelled. The prepaid amount of ₹${order.finalAmount} will be credited to your wallet within 24 hours.`,
-      });
-    }
-
-    res.json({ success: true, message: "Order has been cancelled." });
+    res.json({
+      success: true,
+      message: "Order has been cancelled.",
+    });
   } catch (error) {
     console.error("Error cancelling order:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while cancelling the order.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while cancelling the order.",
+    });
   }
 };
 
@@ -1122,12 +1077,10 @@ const cancelReturn = async (req, res) => {
     );
 
     if (!returnRequestedItem) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "No active return request to cancel",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "No active return request to cancel",
+      });
     }
 
     order.ordereditems.forEach((item) => {
@@ -1163,8 +1116,8 @@ const loadEditProfile = async (req, res) => {
       currentPage: "dashboard",
       cartItems: cartItems,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -1185,8 +1138,8 @@ const editProfile = async (req, res) => {
 
     // Send a success response as JSON
     res.json({ success: true, message: "Profile updated successfully!" });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     // Send an error response as JSON
     res.json({
       success: false,

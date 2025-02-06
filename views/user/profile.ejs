@@ -210,17 +210,7 @@
                 <% } else { %>
                 <p><strong>Payment method: </strong><%= order.paymentMethod %></p>
                 <% } %>
-
-
-                <% if(order.status === 'Cancelled') { %>
-                <p class="text-danger">This order was cancelled!</p>
-                <% } %>
-                <% if(order.status === 'Delivered') { %>
-                <p class="text-success">Delivered</p>
-                <% } %>
-                <% if(order.status === 'Pending') { %>
-                <p class="text-warning">Pending</p>
-                <% } %>
+                <p class="text-muted"><%= order.status %></p>
 
               </div>
 

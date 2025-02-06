@@ -151,7 +151,7 @@ router.post("/wallet/withdraw-money", userController.withdrawMoney);
 // About
 router.get("/about", userController.loadAbout);
 router.get("/contact", userController.loadContact);
-router.post('/contact/submit', userController.sendContactEmail);
+router.post("/contact/submit", userController.sendContactEmail);
 
 // eslint-disable-next-line no-undef
 module.exports = router;

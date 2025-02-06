@@ -2,7 +2,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-
 const walletSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -12,7 +11,7 @@ const walletSchema = new Schema({
   balance: {
     type: Number,
     required: true,
-    default: 0
+    default: 0,
   },
   lastTransactionDate: {
     type: Date,

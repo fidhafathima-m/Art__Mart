@@ -57,8 +57,8 @@ const loadAddProduct = async (req, res) => {
     const category = await Category.find({ isListed: true, isDeleted: false });
     const brand = await Brand.find({ isDeleted: false });
     res.render("add-product", { categories: category, brands: brand });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error.message);
     res.redirect("/pageError");
   }
 };
@@ -171,7 +171,6 @@ const addProduct = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Only image files are allowed" });
     } else {
-      console.log(error);
       res
         .status(500)
         .json({ success: false, message: "Internal Server Error" });
@@ -184,19 +183,16 @@ const loadEditProduct = async (req, res) => {
     const id = req.query.id;
 
     if (!id || id.trim() === "") {
-      console.log("ID is missing or empty");
       return res.redirect("/admin/pageError");
     }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log("Invalid ID format");
       return res.redirect("/admin/pageError");
     }
 
     const product = await Product.findOne({ _id: id });
 
     if (!product) {
-      console.log("Product not found");
       return res.redirect("/admin/pageError");
     }
 
@@ -207,8 +203,8 @@ const loadEditProduct = async (req, res) => {
       categories: category,
       brands: brand,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error.message);
     res.redirect("/admin/pageError");
   }
 };
@@ -350,8 +346,8 @@ const editProduct = async (req, res) => {
     res
       .status(200)
       .json({ success: true, message: "Product updated successfully" });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -394,8 +390,6 @@ const deleteSingleImage = async (req, res) => {
       path.basename(imageNameToServer)
     );
 
-    console.log("Deleting image at path:", imagePath);
-
     if (!fs.existsSync(imagePath)) {
       return res
         .status(404)
@@ -434,8 +428,8 @@ const addProductOffer = async (req, res) => {
     }
     await findProduct.save();
     res.json({ status: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/admin/pageError");
     res.status(500).json({ status: false, message: "Internal Server Error" });
   }
@@ -452,8 +446,8 @@ const removeProductOffer = async (req, res) => {
     findProduct.productOffer = 0;
     await findProduct.save();
     res.json({ status: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/admin/pageError");
   }
 };
@@ -464,8 +458,8 @@ const blockProduct = async (req, res) => {
     const productId = req.body.id;
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } });
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.json({ success: false, message: "Error blocking product" });
   }
 };
@@ -476,8 +470,8 @@ const unblockProduct = async (req, res) => {
     const productId = req.body.id;
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } });
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.json({ success: false, message: "Error unblocking product" });
   }
 };

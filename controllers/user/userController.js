@@ -23,7 +23,6 @@ const bcrypt = require("bcrypt");
 // eslint-disable-next-line no-undef
 const Brand = require("../../models/brandSchema");
 
-
 // generate OTP
 const generateOtp = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -56,7 +55,6 @@ const sendVeificationMail = async (email, otp) => {
 
     return info.accepted.length > 0;
   } catch (error) {
-    console.log("Error sending mail", error);
     console.error("Stack Trace:", error.stack);
     throw new Error("Failed to send verification email");
   }
@@ -67,8 +65,8 @@ const securePassword = async (password) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in hashing", error);
     throw new Error("Failed to secure password");
   }
 };
@@ -76,8 +74,8 @@ const securePassword = async (password) => {
 const pageNotFound = async (req, res) => {
   try {
     res.render("page-404");
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error loading 404 page", error);
     res.status(500).send("Internal Server Error: Unable to load page.");
   }
 };
@@ -97,7 +95,6 @@ const loadHomePage = async (req, res) => {
     productsData = productsData.slice(0, 4);
 
     if (productsData.length === 0) {
-      console.log("No products found");
       return res.render("home", {
         user: req.session.user || null,
         product: [],
@@ -127,7 +124,6 @@ const loadHomePage = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("Error loading home page", error.message);
     res
       .status(500)
       .send(
@@ -140,8 +136,12 @@ const loadSignUp = async (req, res) => {
   try {
     res.render("signup");
   } catch (error) {
-    console.log("Error loading sign-up page", error);
-    res.status(500).send("Internal Server Error: Unable to load sign-up page.");
+    res
+      .status(500)
+      .send(
+        "Internal Server Error: Unable to load sign-up page.",
+        error.message
+      );
   }
 };
 
@@ -267,12 +267,10 @@ const verifyOtp = async (req, res) => {
     }
   } catch (error) {
     console.error("Error verifying OTP", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Internal Server Error: Unable to verify OTP.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error: Unable to verify OTP.",
+    });
   }
 };
 
@@ -285,11 +283,9 @@ function generateRandomReferralCode(name) {
 
 const veryreferralCode = async (req, res) => {
   const { referralCode } = req.body;
-  console.log("body: ", referralCode);
 
   try {
     const user = await User.findOne({ referralCode });
-    console.log("user: ", user);
 
     // Initialize userData if it doesn't exist
     if (!req.session.userData) {
@@ -339,7 +335,6 @@ const resendOtp = async (req, res) => {
     const emailSent = await sendVeificationMail(email, otp);
 
     if (emailSent) {
-      // console.log("Resent OTP:", otp);
       res
         .status(200)
         .json({ success: true, message: "OTP resent successfully" });
@@ -366,8 +361,9 @@ const loadLogin = async (req, res) => {
       res.redirect("/");
     }
   } catch (error) {
-    console.log("Error loading login page", error);
-    res.status(500).send("Internal Server Error: Unable to load login page.");
+    res
+      .status(500)
+      .send("Internal Server Error: Unable to load login page.", error.message);
   }
 };
 
@@ -404,7 +400,6 @@ const login = async (req, res) => {
       }
       console.log("Session saved after login");
     });
-    // console.log('Session after login:', req.session);
     res.redirect("/");
   } catch (error) {
     console.error("Login error", error);
@@ -514,8 +509,8 @@ const loadShopping = async (req, res) => {
       gt: "",
       lt: "",
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error fetching data:", error);
     res.status(500).send("Internal Server Error");
   }
 };
@@ -648,8 +643,8 @@ const filterProduct = async (req, res) => {
       activePage: "shop",
       rating,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -744,8 +739,8 @@ const filterByPrice = async (req, res) => {
       activePage: "shop",
       rating,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -839,8 +834,8 @@ const filterRating = async (req, res) => {
       lt,
       noProductsinCategory,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -938,8 +933,8 @@ const sortBy = async (req, res) => {
       activePage: "shop",
       rating,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -1008,8 +1003,8 @@ const sortByPrice = async (req, res) => {
       activePage: "shop",
       rating,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -1111,8 +1106,8 @@ const searchProducts = async (req, res) => {
       noProductsinCategory,
       noProductsMessage,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/pageNotFound");
   }
 };
@@ -1121,13 +1116,12 @@ const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
       if (err) {
-        console.log("Session destruction error", err.message);
         return res.status(500).redirect("/pageNotFound");
       }
       return res.redirect("/");
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Log out error", error);
     res.status(500).redirect("/pageNotFound");
   }
 };
@@ -1232,19 +1226,17 @@ const withdrawMoney = async (req, res) => {
   }
 };
 
-const loadAbout = async(req, res) => {
+const loadAbout = async (req, res) => {
   try {
-    
     const user = req.session.user || null;
     const cart = user ? await Cart.findOne({ userId: user }) : null;
     const cartItems = cart ? cart.items : [];
 
-    res.render('about', {
-      activePage: 'about',
+    res.render("about", {
+      activePage: "about",
       user,
-      cartItems
+      cartItems,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1252,21 +1244,19 @@ const loadAbout = async(req, res) => {
       message: "An error occurred.",
     });
   }
-}
+};
 
-const loadContact = async(req, res) => {
+const loadContact = async (req, res) => {
   try {
-    
-    const user = req.session.user || '';
+    const user = req.session.user || "";
     // const cart = await Cart.findOne({ userId: user });
     // const cartItems = cart ? cart.items : [];
 
-    res.render('contact', {
-      activePage: 'contact',
+    res.render("contact", {
+      activePage: "contact",
       user,
-      cartItems: ''
+      cartItems: "",
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -1274,8 +1264,7 @@ const loadContact = async(req, res) => {
       message: "An error occurred.",
     });
   }
-}
-
+};
 
 // Create a transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
@@ -1309,17 +1298,25 @@ const sendContactEmail = (req, res) => {
   };
 
   // Send the email
-  transporter.sendMail(mailOptions, (error, info) => {
+  transporter.sendMail(mailOptions, (error) => {
     if (error) {
-      console.error('Error sending email:', error);
-      return res.status(500).json({ success: false, message: 'Failed to send message. Please try again later.' });
+      console.error("Error sending email:", error);
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Failed to send message. Please try again later.",
+        });
     }
 
-    console.log('Message sent:', info.response);
-    return res.status(200).json({ success: true, message: 'Your message has been sent successfully!' });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Your message has been sent successfully!",
+      });
   });
 };
-
 
 // eslint-disable-next-line no-undef
 module.exports = {

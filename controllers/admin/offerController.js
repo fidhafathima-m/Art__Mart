@@ -22,8 +22,8 @@ const loadOffer = async (req, res) => {
       products: products,
       categories: categories,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -64,8 +64,8 @@ const addCategoryOffer = async (req, res) => {
       success: true,
       message: "Category Offer Added Successfully",
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     return res.json({
       success: false,
       message: "Failed to Add Category Offer",
@@ -88,8 +88,8 @@ const getCategoryOffer = async (req, res) => {
       success: true,
       offer: category.categoryOffer || 0, // Return the existing offer or 0 if none
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     return res.json({
       success: false,
       message: "Failed to fetch category offer",
@@ -129,8 +129,8 @@ const removeCategoryOffer = async (req, res) => {
       success: true,
       message: "Category Offer Removed Successfully",
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     return res.json({
       success: false,
       message: "Failed to Remove Category Offer",
@@ -165,8 +165,8 @@ const addProductsOffer = async (req, res) => {
       success: true,
       message: "Product Offer Added Successfully",
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     return res.json({
       success: false,
       message: "Failed to Add Product Offer",
@@ -189,8 +189,8 @@ const getProductOffer = async (req, res) => {
       success: true,
       offer: product.productOffer || 0,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     return res.json({
       success: false,
       message: "Failed to fetch product offer",
@@ -225,8 +225,8 @@ const removeProductsOffer = async (req, res) => {
       success: true,
       message: "Product Offer Removed Successfully",
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     return res.json({
       success: false,
       message: "Failed to Remove Product Offer",

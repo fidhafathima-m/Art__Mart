@@ -31,8 +31,8 @@ const getBrand = async (req, res) => {
       totalBrands,
       search: search,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in loading brands", error);
     res.redirect("/admin/pageError");
   }
 };
@@ -40,8 +40,8 @@ const getBrand = async (req, res) => {
 const loadAddBrand = async (req, res) => {
   try {
     res.render("add-brand");
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in loading add brands", error);
     res.redirect("/admin/pageError");
   }
 };
@@ -63,8 +63,8 @@ const addBrand = async (req, res) => {
       // Send failure response if brand already exists
       res.json({ success: false, message: "Brand already exists!" });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in adding brands", error);
     res.json({ success: false, message: "Failed to add brand!" });
   }
 };
@@ -74,8 +74,8 @@ const loadEditBrand = async (req, res) => {
     const brandId = req.query.id;
     const brand = await Brand.findById(brandId);
     res.render("edit-brand", { brand });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in adding brands", error);
     res.json({ success: false, message: "Failed to add brand!" });
   }
 };
@@ -107,8 +107,8 @@ const deleteLogo = async (req, res) => {
     await brand.save();
 
     res.json({ success: true, message: "Brand logo deleted successfully!" });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in deleting brand logo", error);
     res.json({ success: false, message: "Failed to delete brand logo!" });
   }
 };
@@ -118,8 +118,8 @@ const brandBlocked = async (req, res) => {
     let id = req.body.id;
     await Brand.updateOne({ _id: id }, { $set: { isBlocked: true } });
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.json({ success: false, message: "Error blocking brand" });
   }
 };
@@ -129,8 +129,8 @@ const brandUnblocked = async (req, res) => {
     let id = req.body.id;
     await Brand.updateOne({ _id: id }, { $set: { isBlocked: false } });
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.json({ success: false, message: "Error unblocking brand" });
   }
 };

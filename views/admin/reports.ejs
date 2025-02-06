@@ -11,75 +11,75 @@
     </div>
 
     <!-- Modal for selecting filters -->
-<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="reportModalLabel">Generate Sales Report</h5>
-        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="reportForm">
-          <!-- Filter by period -->
-          <div class="form-group mb-4">
-            <label for="modalFilterType" class="form-label fw-bold">Filter by Period</label>
-            <select class="form-select" id="modalFilterType" onchange="toggleModalCustomDateFields(this.value)">
-              <option value="daily">1 Day</option>
-              <option value="weekly" selected>1 Week</option>
-              <option value="monthly">1 Month</option>
-              <option value="custom">Custom Date Range</option>
-            </select>
+    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="reportModalLabel">Generate Sales Report</h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-
-          <!-- Specific Date Field -->
-          <div id="modalSpecificDateField" class="form-group mb-4" style="display: none;">
-            <label for="modalSpecificDate" class="form-label fw-bold">Select Date</label>
-            <input type="date" class="form-control" id="modalSpecificDate">
-          </div>
-
-          <!-- Custom Date Range -->
-          <div id="modalCustomDateFields" class="form-group mb-4" style="display: none;">
-            <label class="form-label fw-bold mb-3">Date Range</label>
-            <div class="mb-3">
-              <label for="modalStartDate" class="form-label">Start Date</label>
-              <input type="date" class="form-control" id="modalStartDate">
-            </div>
-            <div>
-              <label for="modalEndDate" class="form-label">End Date</label>
-              <input type="date" class="form-control" id="modalEndDate">
-            </div>
-          </div>
-
-          <!-- Report Format Selection -->
-          <div class="form-group mb-4">
-            <label class="form-label fw-bold mb-3">Select Report Format</label>
-            <div class="d-flex gap-4">
-              <div class="form-check">
-                <input type="radio" class="form-check-input" id="pdfFormat" name="reportFormat" value="pdf" checked>
-                <label class="form-check-label" for="pdfFormat">
-                  <i class="fas fa-file-pdf me-2"></i> PDF
-                </label>
+          <div class="modal-body">
+            <form id="reportForm">
+              <!-- Filter by period -->
+              <div class="form-group mb-4">
+                <label for="modalFilterType" class="form-label fw-bold">Filter by Period</label>
+                <select class="form-select" id="modalFilterType" onchange="toggleModalCustomDateFields(this.value)">
+                  <option value="daily">1 Day</option>
+                  <option value="weekly" selected>1 Week</option>
+                  <option value="monthly">1 Month</option>
+                  <option value="custom">Custom Date Range</option>
+                </select>
               </div>
-              <div class="form-check">
-                <input type="radio" class="form-check-input" id="excelFormat" name="reportFormat" value="excel">
-                <label class="form-check-label" for="excelFormat">
-                  <i class="fas fa-file-excel me-2"></i> Excel
-                </label>
-              </div>
-            </div>
-          </div>
 
-          <div class="modal-footer p-0 pt-4 border-0">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Generate Report</button>
+              <!-- Specific Date Field -->
+              <div id="modalSpecificDateField" class="form-group mb-4" style="display: none;">
+                <label for="modalSpecificDate" class="form-label fw-bold">Select Date</label>
+                <input type="date" class="form-control" id="modalSpecificDate">
+              </div>
+
+              <!-- Custom Date Range -->
+              <div id="modalCustomDateFields" class="form-group mb-4" style="display: none;">
+                <label class="form-label fw-bold mb-3">Date Range</label>
+                <div class="mb-3">
+                  <label for="modalStartDate" class="form-label">Start Date</label>
+                  <input type="date" class="form-control" id="modalStartDate">
+                </div>
+                <div>
+                  <label for="modalEndDate" class="form-label">End Date</label>
+                  <input type="date" class="form-control" id="modalEndDate">
+                </div>
+              </div>
+
+              <!-- Report Format Selection -->
+              <div class="form-group mb-4">
+                <label class="form-label fw-bold mb-3">Select Report Format</label>
+                <div class="d-flex gap-4">
+                  <div class="form-check">
+                    <input type="radio" class="form-check-input" id="pdfFormat" name="reportFormat" value="pdf" checked>
+                    <label class="form-check-label" for="pdfFormat">
+                      <i class="fas fa-file-pdf me-2"></i> PDF
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input type="radio" class="form-check-input" id="excelFormat" name="reportFormat" value="excel">
+                    <label class="form-check-label" for="excelFormat">
+                      <i class="fas fa-file-excel me-2"></i> Excel
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer p-0 pt-4 border-0">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
     <div class="row">
       <!-- Top Purchased Products Card -->
@@ -299,77 +299,77 @@
 </script>
 
 <style>
+  .modal-content {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  }
 
-.modal-content {
-  border-radius: 10px;
-  border: none;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-}
+  .modal-header {
+    border-radius: 10px 10px 0 0;
+    padding: 1rem 1.5rem;
+  }
 
-.modal-header {
-  border-radius: 10px 10px 0 0;
-  padding: 1rem 1.5rem;
-}
+  .modal-header .close {
+    padding: 1rem;
+    margin: -1rem -1rem -1rem auto;
+    background: transparent;
+    border: none;
+    opacity: 0.8;
+  }
 
-.modal-header .close {
-  padding: 1rem;
-  margin: -1rem -1rem -1rem auto;
-  background: transparent;
-  border: none;
-  opacity: 0.8;
-}
+  .modal-header .close:hover {
+    opacity: 1;
+  }
 
-.modal-header .close:hover {
-  opacity: 1;
-}
+  .modal-body {
+    padding: 1.5rem;
+  }
 
-.modal-body {
-  padding: 1.5rem;
-}
+  .form-label {
+    color: #444;
+    margin-bottom: 0.5rem;
+  }
 
-.form-label {
-  color: #444;
-  margin-bottom: 0.5rem;
-}
+  .form-select,
+  .form-control {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.5rem;
+    transition: border-color 0.15s ease-in-out;
+  }
 
-.form-select,
-.form-control {
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 0.5rem;
-  transition: border-color 0.15s ease-in-out;
-}
+  .form-select:focus,
+  .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
 
-.form-select:focus,
-.form-control:focus {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
+  .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
 
-.form-check-input:checked {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
+  .btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+  }
 
-.btn {
-  padding: 0.5rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 500;
-}
+  .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
 
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
+  .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
 
-.btn-secondary {
-  background-color: #6c757d;
-  border-color: #6c757d;
-}
+  .gap-4 {
+    gap: 1.5rem;
+  }
 
-.gap-4 {
-  gap: 1.5rem;
-}
   .card {
     border-radius: 10px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;

@@ -7,7 +7,7 @@ const path = require("path");
 // eslint-disable-next-line no-undef
 const session = require("express-session");
 // eslint-disable-next-line no-undef
-const flash = require('connect-flash');
+const flash = require("connect-flash");
 
 // custom
 // eslint-disable-next-line no-undef
@@ -34,7 +34,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      secure: false,  // Should be true if using HTTPS in production
+      secure: false, // Should be true if using HTTPS in production
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
     },

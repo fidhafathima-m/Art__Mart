@@ -30,14 +30,10 @@ const orderSchema = new Schema({
         type: Number,
         default: 0,
       },
-      returnStatus: { 
-        type: String, 
-        enum: [
-          'Not Requested', 
-          'Requested', 
-          'Returned'
-        ], 
-        default: 'Not Requested' 
+      returnStatus: {
+        type: String,
+        enum: ["Not Requested", "Requested", "Returned"],
+        default: "Not Requested",
       },
       returnReason: {
         type: String,
@@ -69,14 +65,14 @@ const orderSchema = new Schema({
     type: String,
     required: true,
     enum: [
-      "Pending",
+      "Order Placed",
       "Processing",
       "Shipped",
       "Delivered",
       "Cancelled",
       "Return Request",
       "Returned",
-      "Payment Pending"
+      "Payment Pending",
     ],
   },
   createdOn: {
@@ -88,14 +84,14 @@ const orderSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  paymentMethod: { 
+  paymentMethod: {
     type: String,
-    enum: ['prepaid', 'COD', 'wallet'],  
+    enum: ["prepaid", "COD", "wallet"],
     required: true,
   },
   moneySent: {
     type: Boolean,
-    default: false 
+    default: false,
   },
   deliveredAt: {
     type: Date,
@@ -106,7 +102,7 @@ const orderSchema = new Schema({
     required: false,
   },
   cancellationReason: {
-    type: Number,
+    type: String,
     required: false,
   },
 });

@@ -931,7 +931,7 @@
       if (totalPrice >= coupon.minPurchaseAmount) {
         const couponItem = document.createElement('div');
         couponItem.className = 'dropdown-item';
-        couponItem.textContent = coupon.name;
+        couponItem.textContent = coupon.name + ' - ₹ ' + coupon.offerPrice + ' - min. prchase amount: ' + coupon.minPurchaseAmount;
         couponItem.onclick = () => {
           couponInput.value = coupon.name;
           couponList.style.display = 'none';
@@ -1077,7 +1077,7 @@
     const discount = parseInt(document.getElementById('discountAmount').textContent.replace('₹', '')) || 0;
     const finalAmount = totalPrice - discount; // Adjust final amount after coupon discount
     const address = "<%= defaultAddress._id %>";
-    const status = "Pending";
+    const status = "Order Placed";
     const couponApplied = discount > 0;
 
     const orderData = {

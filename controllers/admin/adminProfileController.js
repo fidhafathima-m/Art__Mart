@@ -37,11 +37,10 @@ const sendVeificationMail = async (email, otp) => {
       html: `<b><h4>Your OTP: ${otp}</h4><br></b>`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: ", info.messageId);
+    await transporter.sendMail(mailOptions);
     return true;
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error sending mail", error);
     return false;
   }
 };
@@ -51,17 +50,18 @@ const securePassword = async (password) => {
   try {
     const passwordHash = await bcrypt.hash(password, 10);
     return passwordHash;
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error in hashing", error);
+    return false;
   }
 };
 
 const getForgetPass = async (req, res) => {
   try {
     res.render("admin-forgot-password");
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/pageError");
-    console.log("Error", error);
   }
 };
 
@@ -77,7 +77,6 @@ const forgotPassValid = async (req, res) => {
       if (emailSent) {
         req.session.otp = otp;
         req.session.email = email;
-        console.log("OTP: ", otp);
         return res.json({ success: true });
       } else {
         return res.json({
@@ -102,8 +101,8 @@ const forgotPassValid = async (req, res) => {
 const forgetPassOtpPage = async (req, res) => {
   try {
     res.render("admin-forgotPassOtp");
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("error: ", error);
     res.redirect("/pageError");
   }
 };
@@ -111,8 +110,6 @@ const forgetPassOtpPage = async (req, res) => {
 const verifyForgetPassOtp = async (req, res) => {
   try {
     const { otp } = req.body;
-    // console.log('Received OTP:', otp);
-    // console.log('Stored OTP in session:', req.session.otp);
 
     if (otp === req.session.otp) {
       res.json({ success: true, redirectUrl: "/admin/reset-password" });
@@ -130,11 +127,9 @@ const resendForgetPassOtp = async (req, res) => {
     const otp = generateOtp();
     req.session.otp = otp;
     const email = req.session.email;
-    console.log("Resending OTP to mail: ", email);
     const emailSent = sendVeificationMail(email, otp);
 
     if (emailSent) {
-      console.log("Resent OTP: ", otp);
       res
         .status(200)
         .json({ success: true, message: "OTP Resent Successfully" });
@@ -148,9 +143,9 @@ const resendForgetPassOtp = async (req, res) => {
 const resetPasswordLoad = async (req, res) => {
   try {
     res.render("admin-reset-password");
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/pageError");
-    console.log("Error: ", error);
   }
 };
 
@@ -167,9 +162,9 @@ const resetPassword = async (req, res) => {
         message: "Passwords doesn't match",
       });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/pageError");
-    console.log("Error: ", error);
   }
 };
 

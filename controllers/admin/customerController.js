@@ -15,7 +15,7 @@ const customerInfo = async (req, res) => {
         { email: { $regex: ".*" + search + ".*", $options: "i" } },
       ],
     })
-    .sort({createdOn: -1})
+      .sort({ createdOn: -1 })
       .limit(limit)
       .skip((page - 1) * limit)
       .exec();
@@ -49,8 +49,8 @@ const customerBlocked = async (req, res) => {
     let id = req.body.id;
     await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.json({ success: false, message: "Error blocking user" });
   }
 };
@@ -60,8 +60,8 @@ const customerUnblocked = async (req, res) => {
     let id = req.body.id;
     await User.updateOne({ _id: id }, { $set: { isBlocked: false } });
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error);
     res.json({ success: false, message: "Error unblocking user" });
   }
 };

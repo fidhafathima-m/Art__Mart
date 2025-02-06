@@ -41,8 +41,8 @@ const LoadAddCoupon = async (req, res) => {
   try {
     const userData = await User.find({ isBlocked: false });
     res.render("add-coupon", { users: userData });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/admin/pageError");
   }
 };
@@ -130,8 +130,8 @@ const loadEditCoupon = async (req, res) => {
     }
 
     res.render("edit-coupon", { coupon: couponData });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.redirect("/admin/pageError");
   }
 };
@@ -161,8 +161,8 @@ const editCoupon = async (req, res) => {
         .status(500)
         .json({ success: false, message: "Failed to update coupon" });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error.message);
     return res
       .status(500)
       .json({ success: false, message: "An error occurred" });
@@ -220,12 +220,10 @@ const restoreCoupon = async (req, res) => {
     return res.json({ success: true, message: "Coupon restored successfully" });
   } catch (error) {
     console.error("Error restoring coupon:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error while restoring coupon.",
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Server error while restoring coupon.",
+    });
   }
 };
 

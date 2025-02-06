@@ -9,11 +9,11 @@ const Order = require("../../models/orderSchema");
 // eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
 // eslint-disable-next-line no-undef
-const { generatePDFReport, generateExcelReport} = require("../../helpers/generateReports");
+const {generatePDFReport,generateExcelReport } = require("../../helpers/generateReports");
 // eslint-disable-next-line no-undef
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 // eslint-disable-next-line no-undef
-require('dotenv').config();
+require("dotenv").config();
 
 const pageError = (req, res) => {
   res.render("admin-error");
@@ -49,7 +49,7 @@ const login = async (req, res) => {
       return res.redirect("/admin/login");
     }
   } catch (error) {
-    console.log("Login error", error);
+    res.status(500).json({ success: false, message: error.message });
     return res.redirect("/pageError");
   }
 };
@@ -388,14 +388,15 @@ const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
       if (err) {
-        console.log("Error destroying session:", err.message);
+        res.status(500).json({ success: false, message: err.message });
+
         return res.redirect("/pageError");
       }
       res.clearCookie("connect.sid");
       res.redirect("/admin/login");
     });
   } catch (error) {
-    console.log("Unexpected error during logout:", error);
+    res.status(500).json({ success: false, message: error.message });
     res.redirect("/pageError");
   }
 };
@@ -449,7 +450,6 @@ const salesReport = async (req, res) => {
     res.render("reports", { topProducts, leastProducts });
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.log("error", error);
   }
 };
 
@@ -491,13 +491,13 @@ const salesStatistics = async (req, res) => {
       0
     );
 
-    res.json({ 
-      overallSalesCount, 
-      overallOrderAmount: overallOrderAmount.toFixed(2), 
-      overallDiscount });
+    res.json({
+      overallSalesCount,
+      overallOrderAmount: overallOrderAmount.toFixed(2),
+      overallDiscount,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.log("error", error);
   }
 };
 
@@ -544,30 +544,25 @@ const exportSalesReport = async (req, res) => {
   }
 };
 
-const loadAbout = async(req, res) => {
+const loadAbout = async (req, res) => {
   try {
-    
-    res.render('admin-about');
-
+    res.render("admin-about");
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.log("error", error);
   }
-}
+};
 
-const loadContact = async(req, res) => {
+const loadContact = async (req, res) => {
   try {
-    
-    const user = req.session.user || '';
+    const user = req.session.user || "";
     // const cart = await Cart.findOne({ userId: user });
     // const cartItems = cart ? cart.items : [];
 
-    res.render('admin-contact', {
-      activePage: 'contact',
+    res.render("admin-contact", {
+      activePage: "contact",
       user,
-      cartItems: ''
+      cartItems: "",
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -575,8 +570,7 @@ const loadContact = async(req, res) => {
       message: "An error occurred.",
     });
   }
-}
-
+};
 
 // Create a transporter object using SMTP transport
 const transporter = nodemailer.createTransport({
@@ -610,18 +604,21 @@ const sendContactEmail = (req, res) => {
   };
 
   // Send the email
-  transporter.sendMail(mailOptions, (error, info) => {
+  transporter.sendMail(mailOptions, (error) => {
     if (error) {
-      console.error('Error sending email:', error);
-      return res.status(500).json({ success: false, message: 'Failed to send message. Please try again later.' });
+      console.error("Error sending email:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send message. Please try again later.",
+      });
     }
 
-    console.log('Message sent:', info.response);
-    return res.status(200).json({ success: true, message: 'Your message has been sent successfully!' });
+    return res.status(200).json({
+      success: true,
+      message: "Your message has been sent successfully!",
+    });
   });
 };
-
-
 
 // eslint-disable-next-line no-undef
 module.exports = {

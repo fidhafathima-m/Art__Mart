@@ -8,6 +8,8 @@ const User = require("../../models/userSchema");
 const Wallet = require("../../models/walletSchema");
 // eslint-disable-next-line no-undef
 const Transaction = require("../../models/transactionSchema");
+// eslint-disable-next-line no-undef
+const Product = require("../../models/productSchema");
 
 const loadOrder = async (req, res) => {
   try {
@@ -110,39 +112,109 @@ const updateOrderStatus = async (req, res) => {
       "Returned",
     ];
 
+    // Validate the status
     if (!validStatuses.includes(status)) {
-      return res.status(400).send("Invalid status");
-    }
-
-    const order = await Order.findOne({ orderId });
-
-    if (!order) {
-      return res.status(404).send("Order not found");
-    }
-
-    if (status === "Delivered" && !order.firstDeliveredAt) {
-      order.firstDeliveredAt = Date.now();
-    }
-
-    order.status = status;
-
-    // If the status is "Delivered", set the delivery timestamp
-    if (status === "Delivered") {
-      order.deliveredAt = Date.now();
-    }
-
-    if (status === "Returned") {
-      order.ordereditems.forEach((item) => {
-        item.returnStatus = "Returned"; // Update the returnStatus for each item
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status",
       });
     }
 
+    // Find the order
+    const order = await Order.findOne({ orderId });
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Handle refunds for returned or cancelled prepaid orders
+    if (
+      (status === "Returned" || status === "Cancelled") &&
+      order.paymentMethod === "prepaid" &&
+      !order.moneySent
+    ) {
+      // Find or create user's wallet
+      let wallet = await Wallet.findOne({ userId: order.userId });
+      if (!wallet) {
+        wallet = new Wallet({
+          userId: order.userId,
+          balance: order.finalAmount,
+        });
+      } else {
+        wallet.balance += order.finalAmount;
+      }
+      await wallet.save();
+
+      // Record the transaction
+      const transaction = new Transaction({
+        userId: order.userId,
+        type: "refund for returned prepaid order",
+        amount: order.finalAmount,
+        balance: wallet.balance,
+      });
+      await transaction.save();
+
+      // Mark money as sent
+      order.moneySent = true;
+    }
+
+    // Update the order status
+    order.status = status;
+
+    // Set the delivery timestamp if the status is "Delivered"
+    if (status === "Delivered" && !order.firstDeliveredAt) {
+      order.firstDeliveredAt = Date.now();
+      order.deliveredAt = Date.now();
+    }
+
+    if (status === "Cancelled") {
+      // Get all items from the order
+      const orderItems = order.ordereditems;
+
+      // Update product quantities for each item in the order
+      for (const item of orderItems) {
+        try {
+          const product = await Product.findById(item.product);
+
+          if (product) {
+            // Add back the cancelled quantity to product stock
+            product.quantity = (product.quantity || 0) + item.quantity;
+
+            // Update status if necessary
+            if (product.status === "Out of Stock" && product.quantity > 0) {
+              product.status = "Available";
+            }
+
+            console.log(
+              `Updating product ${product._id} quantity to: ${product.quantity}`
+            );
+
+            // Save the updated product
+            await product.save();
+          }
+        } catch (err) {
+          console.error(`Error updating product ${item.product} stock:`, err);
+          // Continue with other products even if one fails
+        }
+      }
+    }
+
+    // Save the updated order
     await order.save();
 
-    res.json({ success: true, message: `Order status updated to ${status}` });
+    // Return success response
+    res.json({
+      success: true,
+      message: `Order status updated to ${status}`,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Server Error");
+    console.error("Error updating order status:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
   }
 };
 
@@ -195,12 +267,10 @@ const sendMoneyToWallet = async (req, res) => {
         message: "Money has been sent to the user's wallet.",
       });
     } else {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Order is not eligible for money transfer.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Order is not eligible for money transfer.",
+      });
     }
   } catch (error) {
     console.error(error);

@@ -66,7 +66,7 @@ const loadAddCategory = async (req, res) => {
   try {
     res.render("add-category", { currentRoute: req.originalUrl });
   } catch (error) {
-    console.log(error.message);
+    console.error(error);
   }
 };
 
@@ -88,8 +88,8 @@ const addCategory = async (req, res) => {
     await newCategory.save();
 
     return res.json({ success: true, message: "Category added successfully." });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log("Error: ", error.message);
     return res
       .status(500)
       .json({ success: false, message: "Internal Server Error" });
@@ -101,19 +101,16 @@ const loadEditCategory = async (req, res) => {
     const id = req.query.id;
 
     if (!id || id.trim() === "") {
-      console.log("ID is missing or empty");
       return res.redirect("/admin/pageError");
     }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      console.log("Invalid ID format");
       return res.redirect("/admin/pageError");
     }
 
     const category = await Category.findOne({ _id: id });
 
     if (!category) {
-      console.log("Category not found");
       return res.redirect("/admin/pageError");
     }
 
@@ -121,8 +118,8 @@ const loadEditCategory = async (req, res) => {
       category: category,
       currentRoute: req.originalUrl,
     });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error.message);
     res.redirect("/admin/pageError");
   }
 };
@@ -154,8 +151,8 @@ const editCategory = async (req, res) => {
         .status(500)
         .json({ success: false, message: "Failed to update category" });
     }
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error.message);
     return res
       .status(500)
       .json({ success: false, message: "An error occurred" });
@@ -179,12 +176,10 @@ const addCategoryOffer = async (req, res) => {
       (product) => product.productOffer > percentage
     );
     if (hasProductOffer) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Category already has a product offer",
-        }); // Change to 400
+      return res.status(400).json({
+        success: false,
+        message: "Category already has a product offer",
+      }); // Change to 400
     }
 
     // Update category offer
@@ -199,8 +194,8 @@ const addCategoryOffer = async (req, res) => {
     }
 
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -230,8 +225,8 @@ const removeCategoryOffer = async (req, res) => {
     }
 
     res.json({ success: true });
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.log(error);
     res
       .status(500)
       .json({ success: false, message: "Failed to remove product offer" });

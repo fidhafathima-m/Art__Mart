@@ -28,7 +28,7 @@
               <% if (products.productImage && products.productImage.length > 0) { %>
               <% products.productImage.forEach((image, index) => { %>
               <div class="col-3">
-                <img src="<%= image %>" class="img-fluid thumbnail" alt="Thumbnail" data-target="#main-image" data-image="<%= image %>"/>
+                <img src="<%= image %>" class="img-fluid thumbnail" alt="Thumbnail" data-target="#main-image" data-image="<%= image %>" />
               </div>
               <% }) } else { %>
               <p>No product images available</p>
@@ -196,7 +196,7 @@
           </a>
           <a href="javascript:void(0);" data-product-id="<%= products._id %>" class="btn btn-outline-danger add-wishlist" id="add-to-wishlist">
             <i class="bi bi-heart"></i> Add to Wishlist
-        </a>
+          </a>
 
         </div>
 
@@ -231,7 +231,7 @@
           <h4>Available Coupons:</h4>
           <ul>
             <% coupons.forEach(coupon => { %>
-              <% if (coupon.minPurchaseAmount <= products.salePrice) { %>
+            <% if (coupon.minPurchaseAmount <= products.salePrice) { %>
             <li>
               <b><%= coupon.name %></b>: <% if (coupon.expireOn > Date.now()) {%>
               <span>Valid Until: <%= coupon.expireOn.toLocaleDateString() %></span>

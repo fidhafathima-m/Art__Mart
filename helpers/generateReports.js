@@ -117,12 +117,14 @@ async function generatePDFReport(
       {
         table: {
           headerRows: 1,
-          widths: ["*", "auto", "auto", "auto"],
+          widths: ["*", "auto", "auto", "auto", "auto", "auto"],
           body: [
             [
               { text: "Order ID", style: "tableHeader" },
               { text: "Total Amount", style: "tableHeader" },
               { text: "Discount", style: "tableHeader" },
+              { text: "Quantity", style: "tableHeader" },
+              { text: "Payment Type", style: "tableHeader" },
               { text: "Date", style: "tableHeader" },
             ],
             ...salesData.map((order, index) => [
@@ -141,6 +143,21 @@ async function generatePDFReport(
                 text: includeDiscounts ? order.discount.toFixed(2) : "N/A",
                 fillColor: index % 2 === 0 ? "#d8eafc" : null,
                 alignment: "right",
+                margin: [5, 5, 5, 5],
+              },
+              {
+                text: order.ordereditems.reduce(
+                  (sum, item) => sum + item.quantity,
+                  0
+                ),
+                fillColor: index % 2 === 0 ? "#d8eafc" : null,
+                alignment: "center",
+                margin: [5, 5, 5, 5],
+              },
+              {
+                text: order.paymentMethod,
+                fillColor: index % 2 === 0 ? "#d8eafc" : null,
+                alignment: "center",
                 margin: [5, 5, 5, 5],
               },
               {
@@ -300,21 +317,23 @@ async function generateExcelReport(
     { header: "Order ID", key: "orderId", width: 30 },
     { header: "Total Amount", key: "totalAmount", width: 15 },
     { header: "Discount", key: "discount", width: 15 },
+    { header: "Quantity", key: "quantity", width: 10 },
+    { header: "Payment Type", key: "paymentType", width: 15 },
     { header: "Date", key: "date", width: 20 },
   ];
 
   // Merge cells for the title (A1:D2)
-  worksheet.mergeCells('A1:D2');
-  const headerCell = worksheet.getCell('A1');
+  worksheet.mergeCells("A1:F2");
+  const headerCell = worksheet.getCell("A1");
   headerCell.value = "ART·MART";
   headerCell.font = { size: 18, bold: true };
-  headerCell.alignment = { horizontal: 'center', vertical: 'middle' };
+  headerCell.alignment = { horizontal: "center", vertical: "middle" };
 
-  worksheet.mergeCells('A3:D3');
-  const subHeaderCell = worksheet.getCell('A3');
+  worksheet.mergeCells("A3:F3");
+  const subHeaderCell = worksheet.getCell("A3");
   subHeaderCell.value = "Sales report";
-  subHeaderCell.font = { size: 11 , italic: true };
-  subHeaderCell.alignment = { horizontal: 'center', vertical: 'middle' };
+  subHeaderCell.font = { size: 11, italic: true };
+  subHeaderCell.alignment = { horizontal: "center", vertical: "middle" };
 
   // Add an empty row after the title
   worksheet.addRow([]);
@@ -324,16 +343,24 @@ async function generateExcelReport(
     orderId: "Order ID",
     totalAmount: "Total Amount",
     discount: "Discount",
+    quantity: "Quantity",
+    paymentType: "Payment Type",
     date: "Date",
   });
   headerRow.font = { bold: true }; // Make header row bold
 
   // Add sales data to the worksheet
   salesData.forEach((order) => {
+    const quantity = order.ordereditems.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
     worksheet.addRow({
       orderId: order.orderId,
       totalAmount: order.finalAmount,
       discount: includeDiscounts ? order.discount : "N/A",
+      quantity,
+      paymentType: order.paymentMethod,
       date: order.createdOn.toLocaleDateString(),
     });
   });

@@ -6,7 +6,6 @@ const path = require("path");
 // Define storage settings for multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Dynamically choose the folder based on the field name
     let uploadPath = "";
     if (file.fieldname === "images") {
       uploadPath = "public/uploads/product-images/";
@@ -14,24 +13,21 @@ const storage = multer.diskStorage({
       uploadPath = "public/uploads/brand-images/";
     }
 
-    // Make sure the uploadPath is set correctly before calling cb()
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    // Generate a unique filename for the uploaded file (timestamp + extension)
     cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
-// Setup the multer upload middleware with the defined storage configuration
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 20 * 1024 * 1024, fieldSize: 50 * 1024 * 1024 }, // Set size limits as needed
+  limits: { fileSize: 20 * 1024 * 1024, fieldSize: 50 * 1024 * 1024 }, 
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith("image/")) {
-      cb(null, true); // Accept the file if it's an image
+      cb(null, true); 
     } else {
-      cb(new Error("Only image files are allowed"), false); // Reject if not an image
+      cb(new Error("Only image files are allowed"), false); 
     }
   },
 });

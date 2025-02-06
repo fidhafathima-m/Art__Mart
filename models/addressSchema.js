@@ -43,9 +43,9 @@ const addressSchema = new Schema({
         required: false,
       },
       isDefault: {
-         type: Boolean, 
-         default: false 
-        }, 
+        type: Boolean,
+        default: false,
+      },
     },
   ],
 });
