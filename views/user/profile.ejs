@@ -1,121 +1,6 @@
 <head>
   <style>
-    /* Base sidebar styles */
-.sidebar {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 250px;
-  background-color: #f8f9fa;
-  transition: all 0.3s ease;
-  z-index: 1000;
-  padding-top: 20px;
-}
-
-.sidebar a {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  color: #333;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.sidebar a i {
-  width: 20px;
-  margin-right: 10px;
-  text-align: center;
-}
-
-.sidebar a:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-.sidebar a:hover i {
-  color: white;
-}
-
-.sidebar a.active {
-  background-color: #007bff;
-  color: white;
-}
-
-.sidebar a.active i {
-  color: white;
-}
-
-/* Main content wrapper */
-.content-wrapper {
-  margin-left: 250px;
-  padding: 20px;
-  transition: all 0.3s ease;
-}
-
-/* Mobile styles */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 60px;
-  }
-  
-  .sidebar a {
-    padding: 15px;
-    justify-content: center;
-  }
-  
-  .sidebar a span {
-    display: none;
-  }
-  
-  .sidebar a i {
-    margin: 0;
-    font-size: 1.2em;
-  }
-  
-  .content-wrapper {
-    margin-left: 60px;
-    padding: 15px;
-  }
-  
-  /* Show tooltips on hover for mobile */
-  .sidebar a:after {
-    content: attr(data-title);
-    position: absolute;
-    left: 100%;
-    padding: 5px 10px;
-    background: #333;
-    color: white;
-    font-size: 12px;
-    border-radius: 3px;
-    white-space: nowrap;
-    display: none;
-  }
-  
-  .sidebar a:hover:after {
-    display: block;
-  }
-}
-
-/* Card and content styles */
-.profile-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
-
-.profile-card .card-body {
-  padding: 20px;
-}
-
-/* Utility classes */
-.text-overflow-ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
+   
     .alert {
       margin-top: 20px;
     }
@@ -183,6 +68,10 @@
       font-style: italic;
     }
 
+    .main-content {
+      margin-left: 1000px;
+    }
+
     /* Responsive adjustments */
     @media (max-width: 600px) {
       .referral-users {
@@ -211,7 +100,7 @@
     }) %>
 
     <!-- Main Content -->
-    <div class="ml-5 col-md-8">
+    <div class="ml-5 col-md-8 main-content">
       <h2 class="mt-4 text-center mb-4">
         <%= section === 'addresses' ? 'Your Addresses' : section === 'orders' ?
         'Your Orders' :  section === 'wishlist' ? '': section === 'referrals' ? '' : 'Your Profile' %>
@@ -571,12 +460,12 @@
 
 
 
-          <a href="/profile/edit" class="btn btn-info">
+          <a href="/profile/edit" class="btn btn-info mt-2">
             <i class="fas fa-user-edit"></i> Edit Profile
           </a>
 
-          <a href="/profile/change-email" class="btn btn-primary">Change Email</a>
-          <a href="/profile/change-password" class="btn btn-warning">Change Password</a>
+          <a href="/profile/change-email" class="btn btn-primary mt-2">Change Email</a>
+          <a href="/profile/change-password" class="btn btn-warning mt-2">Change Password</a>
         </div>
       </div>
     </div>
