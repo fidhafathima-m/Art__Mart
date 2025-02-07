@@ -100,6 +100,7 @@ const loadHomePage = async (req, res) => {
         product: [],
         message: "No products available at the moment",
         activePage: "home",
+        cartItems: cartItems || '',
       });
     }
 
@@ -122,6 +123,7 @@ const loadHomePage = async (req, res) => {
         product: productsData,
         user: null,
         activePage: "home",
+        cartItems: cartItems || '',
       });
     }
   } catch (error) {
