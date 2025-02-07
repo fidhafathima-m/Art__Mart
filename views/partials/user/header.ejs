@@ -179,7 +179,10 @@
             <a href="/userProfile?section=wishlist"><img src="/img/icon/heart.png" alt="wishlist icon" /></a>
             <a href="/cart" class="cart-icon">
               <img src="/img/icon/cart.png" alt="cart icon" style="width: 30px;" />
-              <span class="badge badge-info"><%= cartItems ? cartItems.length : 0 %></span>
+              <% if (typeof cartItems === 'undefined') { %>
+                <% cartItems = []; %>
+              <% } %>
+              <span class="badge badge-info"><%= cartItems.length %></span>
             </a>
 
             <div class="dropdown">
