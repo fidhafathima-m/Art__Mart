@@ -88,46 +88,32 @@ const loadHomePage = async (req, res) => {
     let productsData = await Product.find({
       isBlocked: false,
       category: { $in: categories.map((category) => category._id) },
-      // quantity: { $gt: 0 }
     });
 
     productsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     productsData = productsData.slice(0, 4);
 
-    
     const userData = user ? await User.findOne({ _id: user }) : null;
-
     const cart = await Cart.findOne({ userId: user });
-
     const cartItems = cart ? cart.items : [];
 
     if (productsData.length === 0) {
       return res.render("home", {
-        user: req.session.user || null,
+        user: userData || null, // Use userData here
         product: [],
         message: "No products available at the moment",
-        cartItems: cartItems,
+        cartItems: cartItems, // Pass cartItems here
         activePage: "home",
       });
     }
 
-
-    if (userData) {
-      res.locals.user = userData;
-      res.render("home", {
-        user: userData,
-        product: productsData,
-        cartItems: cartItems,
-        activePage: "home",
-      });
-    } else {
-      res.render("home", {
-        product: productsData,
-        user: null,
-        cartItems: cartItems,
-        activePage: "home",
-      });
-    }
+    // If products are available, render them
+    res.render("home", {
+      user: userData,
+      product: productsData,
+      cartItems: cartItems, // Pass cartItems here as well
+      activePage: "home",
+    });
   } catch (error) {
     res
       .status(500)
