@@ -3,68 +3,71 @@
 
 <style>
   .sidebar {
-    position:sticky;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 200px; /* Default width for desktop */
-    background-color: #f8f9fa;
-    padding-top: 20px;
-    transition: width 0.3s; /* Smooth transition for width change */
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 200px; /* Default width for desktop */
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  transition: width 0.3s;
+  z-index: 1; /* Sidebar stays below footer on mobile */
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #000;
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+
+.sidebar a i {
+  margin-right: 10px;
+}
+
+.sidebar a.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.sidebar a.active i {
+  color: white;
+}
+
+@media (max-width: 760px) {
+  .sidebar {
+    width: 50px; /* Smaller width for mobile */
+    position: fixed;
+    height: 100vh; /* Sidebar takes the full viewport height */
+    margin-top: 50px; /* Leave some space for the top bar (if any) */
+    z-index: 0; /* Push sidebar behind the footer */
   }
 
   .sidebar a {
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Center items vertically */
-    padding: 10px 15px;
-    color: #000;
-    text-decoration: none;
-    margin-bottom: 10px;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .sidebar a span {
+    display: none;
   }
 
   .sidebar a i {
-    margin-right: 10px; /* Space between icon and text */
+    margin-right: 0;
   }
 
-  .sidebar a.active {
-      background-color: #007bff;
-      color: white;
-    }
-
-    .sidebar a.active i {
-      color: white;
-    }
-
-
-  @media (max-width: 760px) {
-    .sidebar {
-      width: 50px; /* Smaller width for mobile */
-      position: fixed;
-      height: auto;
-      margin-top: 50px;
-    }
-
-    .sidebar a {
-      justify-content: center; /* Center items horizontally */
-      padding: 10px; /* Adjust padding for smaller sidebar */
-    }
-
-    .sidebar a span {
-      display: none; /* Hide text on small screens */
-    }
-
-    .sidebar a i {
-      margin-right: 0; /* Remove margin for icons only */
-    }
-
-    .ml-5 {
-      margin-left: 60px; /* Adjust margin for main content */
-    }
-    footer {
-      margin-top: 70px;
-      z-index: 99999;
-    }
+  .ml-5 {
+    margin-left: 60px; 
   }
+
+  footer {
+    position: relative; /* Ensure the footer is always at the bottom */
+    margin-top: 70px; /* Adjust based on sidebar height */
+    z-index: 2; /* Make sure footer stays above sidebar */
+  }
+}
+
 </style>
 
 <div class="col-md-3 sidebar pt-5" style="max-height: 600px;">
