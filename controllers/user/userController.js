@@ -94,20 +94,23 @@ const loadHomePage = async (req, res) => {
     productsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     productsData = productsData.slice(0, 4);
 
-    if (productsData.length === 0) {
-      return res.render("home", {
-        user: req.session.user || null,
-        product: [],
-        message: "No products available at the moment",
-        activePage: "home",
-      });
-    }
-
+    
     const userData = user ? await User.findOne({ _id: user }) : null;
 
     const cart = await Cart.findOne({ userId: user });
 
     const cartItems = cart ? cart.items : [];
+
+    if (productsData.length === 0) {
+      return res.render("home", {
+        user: req.session.user || null,
+        product: [],
+        message: "No products available at the moment",
+        cartItems: cartItems,
+        activePage: "home",
+      });
+    }
+
 
     if (userData) {
       res.locals.user = userData;
@@ -121,6 +124,7 @@ const loadHomePage = async (req, res) => {
       res.render("home", {
         product: productsData,
         user: null,
+        cartItems: cartItems,
         activePage: "home",
       });
     }
