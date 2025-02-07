@@ -72,9 +72,9 @@
 
 <body>
   <!-- Page Preloder -->
-  <div id="preloder">
+  <!-- <div id="preloder">
     <div class="loader"></div>
-  </div>
+  </div> -->
 
   <!-- Offcanvas Menu Begin -->
   <div class="offcanvas-menu-overlay"></div>
@@ -95,8 +95,14 @@
     </div>
     <div class="offcanvas__nav__option">
       <a href="#" class="search-switch"><img src="img/icon/search.png" alt="" /></a>
-      <a href="#"><img src="img/icon/heart.png" alt="" /></a>
-      <a href="#"><img src="img/icon/cart.png" alt="" /></a>
+      <a href="/userProfile?section=wishlist"><img src="/img/icon/heart.png" alt="wishlist icon" /></a>
+            <a href="/cart" class="cart-icon">
+              <img src="/img/icon/cart.png" alt="cart icon" style="width: 30px;" />
+              <% if (typeof cartItems === 'undefined') { %>
+                <% cartItems = []; %>
+              <% } %>
+              <span class="badge badge-info"><%= cartItems.length %></span>
+            </a>
       <div class="price">$0.00</div>
     </div>
     <div id="mobile-menu-wrap"></div>
