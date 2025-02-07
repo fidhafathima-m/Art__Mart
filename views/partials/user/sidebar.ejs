@@ -1,96 +1,13 @@
 <!-- Font Awesome CDN for Icons -->
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
 
-<style>
-  /* Default styles for desktop */
-  .sidebar {
-    position: sticky;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 200px; /* Default width for desktop */
-    background-color: #f8f9fa;
-    padding-top: 20px;
-    transition: width 0.3s; /* Smooth transition for width change */
-    height: 100vh; /* Full height of the viewport */
-    overflow-y: auto; /* Enable scrolling if content overflows */
-  }
-
-  .sidebar a {
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Center items vertically */
-    padding: 10px 15px;
-    color: #000;
-    text-decoration: none;
-    margin-bottom: 10px;
-  }
-
-  .sidebar a i {
-    margin-right: 10px; /* Space between icon and text */
-  }
-
-  .sidebar a.active {
-    background-color: #007bff;
-    color: white;
-  }
-
-  .sidebar a.active i {
-    color: white;
-  }
-
-  /* Mobile-specific styles */
-  @media (max-width: 760px) {
-    .sidebar {
-      width: 50px; /* Smaller width for mobile */
-      position: fixed;
-      height: 100vh; /* Full height of the viewport */
-      margin-top: 50px;
-      z-index: 1000; /* Ensure sidebar is above other content */
-    }
-
-    .sidebar a {
-      justify-content: center; /* Center items horizontally */
-      padding: 10px; /* Adjust padding for smaller sidebar */
-    }
-
-    .sidebar a span {
-      display: none; /* Hide text on small screens */
-    }
-
-    .sidebar a i {
-      margin-right: 0; /* Remove margin for icons only */
-    }
-
-    .ml-5 {
-      margin-left: 60px; /* Adjust margin for main content */
-    }
-
-    footer {
-      margin-top: 70px;
-    }
-  }
-</style>
-
 <div class="col-md-3 sidebar pt-5" style="max-height: 600px;">
-  <a href="/userProfile?section=dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %> py-3" id="dashboardLink">
-    <i class="fas fa-tachometer-alt"></i> <span>Profile</span>
-  </a>
-  <a href="/userProfile?section=addresses" class="<%= currentPage === 'addresses' ? 'active' : '' %> py-3" id="addressesLink">
-    <i class="fas fa-address-book"></i> <span>My Addresses</span>
-  </a>
-  <a href="/userProfile?section=orders" class="<%= currentPage === 'orders' ? 'active' : '' %> py-3" id="ordersLink">
-    <i class="fas fa-box"></i> <span>Orders</span>
-  </a>
-  <a href="/userProfile?section=wishlist" class="<%= currentPage === 'wishlist' ? 'active' : '' %> py-3" id="wishlistLink">
-    <i class="bi bi-bag-heart"></i> <span>Wishlist</span>
-  </a>
-  <a href="/userProfile?section=wallet" class="<%= currentPage === 'wallet' ? 'active' : '' %> py-3" id="walletLink">
-    <i class="fas fa-wallet"></i> <span>Wallet</span>
-  </a>
-  <a href="/userProfile?section=referrals" class="<%= currentPage === 'referrals' ? 'active' : '' %> py-3" id="referralsLink">
-    <i class="fas fa-star"></i> <span>Referrals</span>
-  </a>
-  <a href="/logout" id="logout">
-    <i class="fas fa-sign-out"></i> <span>Logout</span>
-  </a>
+  <a href="/userProfile?section=dashboard" class="<%= currentPage === 'dashboard' ? 'active' : '' %> py-3" id="dashboardLink"><i class="fas fa-tachometer-alt"></i> Profile</a>
+  <a href="/userProfile?section=addresses" class="<%= currentPage === 'addresses' ? 'active' : '' %> py-3" id="addressesLink"><i class="fas fa-address-book"></i> My Addresses</a>
+  <a href="/userProfile?section=orders" class="<%= currentPage === 'orders' ? 'active' : '' %> py-3" id="ordersLink"><i class="fas fa-box"></i> Orders</a>
+  <a href="/userProfile?section=wishlist" class="<%= currentPage === 'wishlist' ? 'active' : '' %> py-3" id="wishlistLink"><i class="bi bi-bag-heart"></i> Wishlist</a>
+  <a href="/userProfile?section=wallet" class="<%= currentPage === 'wallet' ? 'active' : '' %> py-3" id="walletLink"><i class="fas fa-wallet"></i> Wallet</a>
+  <a href="/userProfile?section=referrals" class="<%= currentPage === 'referrals' ? 'active' : '' %> py-3" id="referralsLink"><i class="fas fa-star"></i> Referrals</a>
+  <a href="/logout" id="logout"><i class="fas fa-sign-out"></i> Logout</a>
 </div>

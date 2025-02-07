@@ -1,6 +1,38 @@
 <head>
   <style>
-   
+    .sidebar a.active {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .sidebar a.active i {
+      color: white;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      background-color: #f8f9fa;
+      padding-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      margin-bottom: 10px;
+    }
+
+    .sidebar a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
     .alert {
       margin-top: 20px;
     }
@@ -68,10 +100,6 @@
       font-style: italic;
     }
 
-    .main-content {
-      margin-left: 1000px;
-    }
-
     /* Responsive adjustments */
     @media (max-width: 600px) {
       .referral-users {
@@ -89,9 +117,6 @@
         margin-bottom: 5px;
       }
     }
-    .main-content {
-      margin-left: 100px;
-    }
   </style>
 </head>
 <%- include('../../views/partials/user/header') %>
@@ -103,7 +128,7 @@
     }) %>
 
     <!-- Main Content -->
-    <div class="ml-5 col-md-8 main-content">
+    <div class="ml-5 col-md-8">
       <h2 class="mt-4 text-center mb-4">
         <%= section === 'addresses' ? 'Your Addresses' : section === 'orders' ?
         'Your Orders' :  section === 'wishlist' ? '': section === 'referrals' ? '' : 'Your Profile' %>
@@ -463,12 +488,12 @@
 
 
 
-          <a href="/profile/edit" class="btn btn-info mt-2">
+          <a href="/profile/edit" class="btn btn-info">
             <i class="fas fa-user-edit"></i> Edit Profile
           </a>
 
-          <a href="/profile/change-email" class="btn btn-primary mt-2">Change Email</a>
-          <a href="/profile/change-password" class="btn btn-warning mt-2">Change Password</a>
+          <a href="/profile/change-email" class="btn btn-primary">Change Email</a>
+          <a href="/profile/change-password" class="btn btn-warning">Change Password</a>
         </div>
       </div>
     </div>
@@ -479,6 +504,7 @@
 </div>
 </div>
 
+<%- include('../../views/partials/user/footer') %>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -614,33 +640,6 @@
         }
       });
     });
-
-    const sidebar = document.querySelector(".sidebar");
-    const footer = document.querySelector("footer");
-    const mainContent = document.querySelector(".main-content");
-
-    function handleScroll() {
-      const sidebarRect = sidebar.getBoundingClientRect();
-      const footerRect = footer.getBoundingClientRect();
-
-      // Check if the footer is in view
-      if (footerRect.top <= window.innerHeight) {
-        // Footer is in view, stop fixing the sidebar
-        sidebar.style.position = "absolute";
-        sidebar.style.top = `${mainContent.offsetHeight - sidebar.offsetHeight}px`;
-      } else {
-        // Footer is not in view, fix the sidebar
-        sidebar.style.position = "fixed";
-        sidebar.style.top = "0";
-      }
-    }
-
-    // Attach the scroll event listener
-    window.addEventListener("scroll", handleScroll);
-
-    // Initial check in case the page loads with the footer already in view
-    handleScroll();
-
   });
   // When clicking on the delete button
   document.querySelectorAll("#deleteAddressLink").forEach((link) => {
@@ -825,6 +824,3 @@
     });
   });
 </script>
-
-
-<%- include('../../views/partials/user/footer') %>
