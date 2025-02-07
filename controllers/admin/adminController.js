@@ -7,8 +7,6 @@ const Category = require("../../models/categorySchema");
 // eslint-disable-next-line no-undef
 const Order = require("../../models/orderSchema");
 // eslint-disable-next-line no-undef
-const bcrypt = require("bcrypt");
-// eslint-disable-next-line no-undef
 const {generatePDFReport,generateExcelReport } = require("../../helpers/generateReports");
 // eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
@@ -36,8 +34,7 @@ const login = async (req, res) => {
     const admin = await User.findOne({ email, isAdmin: true });
 
     if (admin) {
-      const passwordMatch = await bcrypt.compare(password, admin.password);
-      if (passwordMatch) {
+      if (password === admin.password) {
         req.session.admin = true;
         return res.redirect("/admin");
       } else {
