@@ -611,6 +611,33 @@
         }
       });
     });
+
+    const sidebar = document.querySelector(".sidebar");
+    const footer = document.querySelector("footer");
+    const mainContent = document.querySelector(".main-content");
+
+    function handleScroll() {
+      const sidebarRect = sidebar.getBoundingClientRect();
+      const footerRect = footer.getBoundingClientRect();
+
+      // Check if the footer is in view
+      if (footerRect.top <= window.innerHeight) {
+        // Footer is in view, stop fixing the sidebar
+        sidebar.style.position = "absolute";
+        sidebar.style.top = `${mainContent.offsetHeight - sidebar.offsetHeight}px`;
+      } else {
+        // Footer is not in view, fix the sidebar
+        sidebar.style.position = "fixed";
+        sidebar.style.top = "0";
+      }
+    }
+
+    // Attach the scroll event listener
+    window.addEventListener("scroll", handleScroll);
+
+    // Initial check in case the page loads with the footer already in view
+    handleScroll();
+
   });
   // When clicking on the delete button
   document.querySelectorAll("#deleteAddressLink").forEach((link) => {

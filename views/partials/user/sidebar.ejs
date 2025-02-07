@@ -2,8 +2,9 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
 
 <style>
+  /* Default styles for desktop */
   .sidebar {
-    position:sticky;
+    position: sticky;
     top: 0;
     bottom: 0;
     left: 0;
@@ -11,6 +12,8 @@
     background-color: #f8f9fa;
     padding-top: 20px;
     transition: width 0.3s; /* Smooth transition for width change */
+    height: 100vh; /* Full height of the viewport */
+    overflow-y: auto; /* Enable scrolling if content overflows */
   }
 
   .sidebar a {
@@ -27,21 +30,22 @@
   }
 
   .sidebar a.active {
-      background-color: #007bff;
-      color: white;
-    }
+    background-color: #007bff;
+    color: white;
+  }
 
-    .sidebar a.active i {
-      color: white;
-    }
+  .sidebar a.active i {
+    color: white;
+  }
 
-
+  /* Mobile-specific styles */
   @media (max-width: 760px) {
     .sidebar {
       width: 50px; /* Smaller width for mobile */
       position: fixed;
-      height: auto;
+      height: 100vh; /* Full height of the viewport */
       margin-top: 50px;
+      z-index: 1000; /* Ensure sidebar is above other content */
     }
 
     .sidebar a {
@@ -60,8 +64,9 @@
     .ml-5 {
       margin-left: 60px; /* Adjust margin for main content */
     }
+
     footer {
-      margin-top: 200px;
+      margin-top: 70px;
     }
   }
 </style>
