@@ -2,17 +2,17 @@
   <style>
 
 .wrapper {
-  display: flex;
   width: 100%;
   overflow-x: hidden;
+  display: flex;
+  justify-content: center;
 }
 
 /* Main content styling */
 .main-content {
-  flex: 1;
   margin-left: 60px; /* Adjust based on sidebar width */
   padding: 20px;
-  width: calc(100% - 60px); /* Adjust based on sidebar width */
+  max-width: 1200px; /* Adjust based on sidebar width */
   box-sizing: border-box; /* Ensure padding doesn't add to the width */
 }
 
@@ -53,8 +53,6 @@
 /* Mobile View */
 @media (max-width: 767.98px) {
   .main-content {
-    margin-left: -10px; /* Remove margin for mobile */
-    width: 100%; /* Full width on mobile */
     padding: 10px; /* Adjust padding for smaller screens */
   }
   .sidebar {
