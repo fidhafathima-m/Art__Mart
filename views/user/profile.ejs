@@ -10,23 +10,49 @@
     }
 
     .sidebar {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      width: 50px;
-      background-color: #f8f9fa;
-      padding-top: 20px;
-      margin-bottom: 30px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 50px; /* Default width for desktop */
+    background-color: #f8f9fa;
+    padding-top: 20px;
+    margin-bottom: 30px;
+    transition: width 0.3s; /* Smooth transition for width change */
+  }
+
+  .sidebar a {
+    display: block;
+    padding: 10px 15px;
+    color: #000;
+    text-decoration: none;
+    margin-bottom: 10px;
+    text-align: center; /* Center text for smaller sidebar */
+  }
+
+  /* Adjust sidebar width and main content on mobile */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 40px; /* Smaller width for mobile */
     }
 
     .sidebar a {
-      display: block;
-      padding: 10px 15px;
-      color: #000;
-      text-decoration: none;
-      margin-bottom: 10px;
+      padding: 10px; /* Adjust padding for smaller sidebar */
     }
+
+    .ml-5 {
+      margin-left: 60px; /* Adjust margin for main content */
+    }
+
+    .wrapper {
+      display: flex; /* Use flexbox for layout */
+    }
+
+    .col-md-8 {
+      flex: 1; /* Allow main content to take remaining space */
+      margin-left: 0; /* Remove left margin on mobile */
+    }
+  }
 
     .sidebar a:hover {
       background-color: #007bff;
