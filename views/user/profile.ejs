@@ -1,5 +1,20 @@
 <head>
   <style>
+
+.wrapper {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Main content styling */
+.main-content {
+  margin-left: 60px; /* Adjust based on sidebar width */
+  padding: 20px;
+  width: calc(100% - 60px); /* Adjust based on sidebar width */
+  box-sizing: border-box; /* Ensure padding doesn't add to the width */
+}
+
+
     .sidebar {
   position: fixed;
   top: 0;
@@ -35,6 +50,11 @@
 
 /* Mobile View */
 @media (max-width: 767.98px) {
+  .main-content {
+    margin-left: 0; /* Remove margin for mobile */
+    width: 100%; /* Full width on mobile */
+    padding: 10px; /* Adjust padding for smaller screens */
+  }
   .sidebar {
     position: fixed;
     top: auto;
@@ -164,7 +184,7 @@
     }) %>
 
     <!-- Main Content -->
-    <div class="ml-5 ml-md-2 col-md-8">
+    <div class="ml-5 col-md-8">
       <h2 class="mt-4 text-center mb-4">
         <%= section === 'addresses' ? 'Your Addresses' : section === 'orders' ?
         'Your Orders' :  section === 'wishlist' ? '': section === 'referrals' ? '' : 'Your Profile' %>
