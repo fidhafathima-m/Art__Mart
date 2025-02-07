@@ -92,34 +92,47 @@ const loadHomePage = async (req, res) => {
 
     productsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     productsData = productsData.slice(0, 4);
-
+    
     const userData = user ? await User.findOne({ _id: user }) : null;
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
+    
+    // Initialize cartItems as an empty array by default
+    let cartItems = [];
+    
+    // Only try to fetch cart if user is logged in
+    if (user) {
+      const cart = await Cart.findOne({ userId: user });
+      if (cart) {
+        cartItems = cart.items;
+      }
+    }
+
+    // Common render data object to avoid repetition
+    const renderData = {
+      user: userData || null,
+      cartItems: cartItems,
+      activePage: "home",
+      product: productsData
+    };
 
     if (productsData.length === 0) {
       return res.render("home", {
-        user: userData || null, // Use userData here
+        ...renderData,
         product: [],
-        message: "No products available at the moment",
-        cartItems: cartItems, // Pass cartItems here
-        activePage: "home",
+        message: "No products available at the moment"
       });
     }
 
-    // If products are available, render them
-    res.render("home", {
-      user: userData,
-      product: productsData,
-      cartItems: cartItems, // Pass cartItems here as well
-      activePage: "home",
-    });
+    res.render("home", renderData);
+
   } catch (error) {
-    res
-      .status(500)
-      .send(
-        `Internal Server Error: Unable to load home page. Error: ${error.message}`
-      );
+    // Even in error case, we need to pass cartItems
+    res.status(500).render("home", {
+      user: null,
+      cartItems: [],
+      activePage: "home",
+      product: [],
+      error: `Internal Server Error: Unable to load home page. Error: ${error.message}`
+    });
   }
 };
 
