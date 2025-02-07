@@ -1,63 +1,120 @@
 <head>
   <style>
-    .sidebar a.active {
-      background-color: #007bff;
-      color: white;
-    }
+    /* Base sidebar styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 250px;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  padding-top: 20px;
+}
 
-    .sidebar a.active i {
-      color: white;
-    }
+.sidebar a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
 
-    .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 50px; /* Default width for desktop */
-    background-color: #f8f9fa;
-    padding-top: 20px;
-    margin-bottom: 30px;
-    transition: width 0.3s; /* Smooth transition for width change */
+.sidebar a i {
+  width: 20px;
+  margin-right: 10px;
+  text-align: center;
+}
+
+.sidebar a:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.sidebar a:hover i {
+  color: white;
+}
+
+.sidebar a.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.sidebar a.active i {
+  color: white;
+}
+
+/* Main content wrapper */
+.content-wrapper {
+  margin-left: 250px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
   }
-
+  
   .sidebar a {
+    padding: 15px;
+    justify-content: center;
+  }
+  
+  .sidebar a span {
+    display: none;
+  }
+  
+  .sidebar a i {
+    margin: 0;
+    font-size: 1.2em;
+  }
+  
+  .content-wrapper {
+    margin-left: 60px;
+    padding: 15px;
+  }
+  
+  /* Show tooltips on hover for mobile */
+  .sidebar a:after {
+    content: attr(data-title);
+    position: absolute;
+    left: 100%;
+    padding: 5px 10px;
+    background: #333;
+    color: white;
+    font-size: 12px;
+    border-radius: 3px;
+    white-space: nowrap;
+    display: none;
+  }
+  
+  .sidebar a:hover:after {
     display: block;
-    padding: 10px 15px;
-    color: #000;
-    text-decoration: none;
-    margin-bottom: 10px;
-    text-align: center; /* Center text for smaller sidebar */
   }
+}
 
-  /* Adjust sidebar width and main content on mobile */
-  @media (max-width: 768px) {
-    .sidebar {
-      width: 40px; /* Smaller width for mobile */
-    }
+/* Card and content styles */
+.profile-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
 
-    .sidebar a {
-      padding: 10px; /* Adjust padding for smaller sidebar */
-    }
+.profile-card .card-body {
+  padding: 20px;
+}
 
-    .ml-5 {
-      margin-left: 60px; /* Adjust margin for main content */
-    }
-
-    .wrapper {
-      display: flex; /* Use flexbox for layout */
-    }
-
-    .col-md-8 {
-      flex: 1; /* Allow main content to take remaining space */
-      margin-left: 0; /* Remove left margin on mobile */
-    }
-  }
-
-    .sidebar a:hover {
-      background-color: #007bff;
-      color: white;
-    }
+/* Utility classes */
+.text-overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
     .alert {
       margin-top: 20px;
