@@ -49,10 +49,6 @@
   box-sizing: border-box; 
 }
 
-.address-card {
-    flex: 1 1 100%; /* Full width on mobile */
-  }
-
   .sidebar {
     position: fixed;
     top: auto;
@@ -84,6 +80,12 @@
 
   .sidebar a span {
     display: none; 
+  }
+}
+
+@media (max-width: 768px) {
+  .address-card {
+    flex: 1 1 100%; /* Full width on mobile */
   }
 }
 
@@ -204,11 +206,7 @@
         <!-- Loop through each address -->
         <% address.address.forEach((addr, addrIndex) => { %>
         <!-- Loop through address types inside each address -->
-        <div class="card p-4 mb-5 me-4 shadow" style="flex: 1 1 40%; @media (max-width: 768px) {
-          .address-card {
-            flex: 1 1 100%; /* Full width on mobile */
-          }
-        }">
+        <div class="card p-4 mb-5 me-4 shadow address-card" style="flex: 1 1 40%">
           <!-- Flexbox for responsiveness -->
           <div class="card-title text-center mt-2">
             <% if (addr.isDefault === true) { %> Default <% } else { %> Address
