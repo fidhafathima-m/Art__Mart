@@ -19,7 +19,9 @@
     <% if (cartItems.length > 0) { %> <% cartItems.forEach(item => { %>
     <div class="cart-item">
       <div class="item-image">
+        <a href="/product-details?id=<%= item.id %>">
         <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>"/>
+        </a>
       </div>
       <div class="item-details">
         <h3 class="product-name"><%= item.productName %></h3>
