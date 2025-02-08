@@ -51,7 +51,7 @@ async function generatePDFReport(
 
   // Prepare the document definition
   const docDefinition = {
-    pageSize: { width: 900, height: 1200 }, // Custom larger page size
+    pageSize: { width: 1200, height: 1200 }, // Custom larger page size
     content: [
       {
         image: "public/img/logo.png",
