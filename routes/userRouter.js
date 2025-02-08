@@ -37,7 +37,7 @@ router.get(
   (req, res) => {
     // console.log("Authenticated user:", req.user); // For debugging
     req.session.user = req.user._id;
-    res.redirect("/");
+    res.redirect("https://www.art-mart.shop");
   }
 );
 
