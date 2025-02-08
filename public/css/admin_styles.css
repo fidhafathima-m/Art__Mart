@@ -643,6 +643,7 @@ ol {
   flex-grow: 1; /* Ensure wrapper takes available space, leaving footer at bottom */
 }
 
+/* Sidebar styling */
 .sidebar {
   top: 90px;
   left: 0;
@@ -652,29 +653,70 @@ ol {
   padding-top: 20px;
   overflow-y: auto;
   margin-bottom: 20px;
+  position: fixed; /* Make sure it stays fixed on the left */
 }
 
+/* Sidebar links */
 .sidebar a {
   color: #000;
+  display: flex;
+  align-items: center;
 }
 
-.sidebar a:hover {
-  color: #3e3d3d;
+/* Icon styling */
+.sidebar .icon {
+  margin-right: 10px; /* Space between the icon and the text */
 }
 
+/* Sidebar text */
+.sidebar span {
+  display: inline-block;
+}
+
+/* Hide text in mobile view */
+@media (max-width: 768px) {
+  .sidebar span {
+    display: none; /* Hide the text on mobile */
+  }
+
+  .sidebar {
+    width: 60px; /* Adjust width for mobile */
+  }
+
+  .sidebar a {
+    justify-content: center; /* Center the icons */
+  }
+}
+
+/* Sidebar list */
 .sidebar ul {
   list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
+/* Sidebar list items */
 .sidebar li {
   padding: 15px;
   display: flex;
   align-items: center;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
+/* Sidebar hover effect */
 .sidebar li:hover {
-  background-color: #ffffff;
+  background-color: #f4f4f4;
+}
+
+/* Active menu item */
+.sidebar li.active {
+  background-color: #dcdcdc;
+}
+
+/* Hover effect on sidebar links */
+.sidebar a:hover {
+  color: #3e3d3d;
 }
 
 
