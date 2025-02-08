@@ -1,3 +1,45 @@
+<head>
+  <style>
+    /* Mobile Icons Row */
+.mobile-icons-row {
+  display: none; /* Hidden by default */
+  justify-content: space-around;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.mobile-icon {
+  cursor: pointer;
+  font-size: 20px;
+  color: #333;
+}
+
+.mobile-icon:hover {
+  color: #007bff;
+}
+
+/* Hide accordion headers on mobile */
+@media (max-width: 768px) {
+  .card-heading {
+    display: none;
+  }
+
+  .mobile-icons-row {
+    display: flex;
+  }
+
+  .accordion .collapse {
+    display: none;
+  }
+
+  .accordion .collapse.show {
+    display: block;
+  }
+}
+  </style>
+</head>
+
 <%- include('../../views/partials/user/header') %>
 
 <!-- Breadcrumb Section Begin -->
@@ -50,14 +92,30 @@
       <div class="col-lg-3">
         <div class="shop__sidebar">
           <div class="shop__sidebar__accordion">
+            <!-- Mobile Icons Row -->
+            <div class="mobile-icons-row">
+              <div class="mobile-icon" data-target="#collapseSortBy">
+                <i class="fas fa-sort"></i>
+              </div>
+              <div class="mobile-icon" data-target="#collapseOne">
+                <i class="fas fa-list"></i>
+              </div>
+              <div class="mobile-icon" data-target="#collapseThree">
+                <i class="fas fa-filter"></i>
+              </div>
+              <div class="mobile-icon" data-target="#collapseRating">
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+      
+            <!-- Accordion Sections -->
             <div class="accordion" id="accordionExample">
-
               <!-- Sort By Section -->
               <div class="card">
                 <div class="card-heading">
                   <a data-toggle="collapse" data-target="#collapseSortBy" class="accordion-header">Sort By</a>
                 </div>
-                <div id="collapseSortBy" class="collapse show" data-parent="#accordionExample">
+                <div id="collapseSortBy" class="collapse" data-parent="#accordionExample">
                   <div class="card-body">
                     <div class="shop__sidebar__sort">
                       <ul class="sidebar-list">
@@ -78,19 +136,17 @@
                   </div>
                 </div>
               </div>
-
-              <!-- Categories Section -->
+      
               <!-- Categories Section -->
               <div class="card">
                 <div class="card-heading">
                   <a data-toggle="collapse" data-target="#collapseOne" class="accordion-header">Categories</a>
                 </div>
-                <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                <div id="collapseOne" class="collapse" data-parent="#accordionExample">
                   <div class="card-body">
                     <div class="shop__sidebar__categories">
                       <ul class="sidebar-list">
                         <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %>
-                        <!-- Only show 3 categories initially -->
                         <li>
                           <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
                             <%= categories[i].name %>
@@ -98,17 +154,14 @@
                         </li>
                         <% } %>
                       </ul>
-
-                      <!-- Show More Button if there are more than 3 categories -->
+      
                       <% if (categories.length > 3) { %>
                       <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
                       <% } %>
-
-                      <!-- Extra Categories, initially hidden -->
+      
                       <div id="extraCategories" style="display:none;">
                         <ul class="sidebar-list">
                           <% for (let i = 3; i < categories.length; i++) { %>
-                          <!-- Show the rest of the categories -->
                           <li>
                             <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
                               <%= categories[i].name %>
@@ -116,53 +169,48 @@
                           </li>
                           <% } %>
                         </ul>
-
-                        <!-- Show Less Link -->
                         <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
+      
               <!-- Filter Price Section -->
               <div class="card">
                 <div class="card-heading">
                   <a data-toggle="collapse" data-target="#collapseThree" class="accordion-header">Filter Price</a>
                 </div>
-                <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                <div id="collapseThree" class="collapse" data-parent="#accordionExample">
                   <div class="card-body">
                     <div class="shop__sidebar__price">
-                      <div class="shop__sidebar__price">
-                        <ul class="sidebar-list">
-                          <li>
-                            <a href="/filterPrice?gt=0&lt=500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
-                          </li>
-                          <li>
-                            <a href="/filterPrice?gt=500&lt=1000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
-                          </li>
-                          <li>
-                            <a href="/filterPrice?gt=1000&lt=1500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
-                          </li>
-                          <li>
-                            <a href="/filterPrice?gt=1500&lt=100000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
-                          </li>
-                        </ul>
-                      </div>
+                      <ul class="sidebar-list">
+                        <li>
+                          <a href="/filterPrice?gt=0&lt=500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
+                        </li>
+                        <li>
+                          <a href="/filterPrice?gt=500&lt=1000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
+                        </li>
+                        <li>
+                          <a href="/filterPrice?gt=1000&lt=1500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
+                        </li>
+                        <li>
+                          <a href="/filterPrice?gt=1500&lt=100000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
               </div>
-
+      
               <!-- Rating Filter Accordion -->
               <div class="card">
                 <div class="card-heading">
                   <a data-toggle="collapse" data-target="#collapseRating" class="accordion-header">Filter by Rating</a>
                 </div>
-                <div id="collapseRating" class="collapse show" data-parent="#accordionExample">
+                <div id="collapseRating" class="collapse" data-parent="#accordionExample">
                   <div class="card-body">
                     <div class="shop__sidebar__rating">
-                      <!-- Rating filter options -->
                       <ul class="sidebar-list">
                         <li>
                           <a href="/shop?rating=1&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
@@ -180,7 +228,6 @@
                           <a href="/shop?rating=5&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
                         </li>
                       </ul>
-
                     </div>
                   </div>
                 </div>
@@ -189,7 +236,6 @@
           </div>
         </div>
       </div>
-
 
       <div class="col-lg-9" style="margin-top: -70px;">
         <div class="shop__product__option">
@@ -469,6 +515,27 @@
     });
 
   });
+
+  document.addEventListener('DOMContentLoaded', function() {
+  const mobileIcons = document.querySelectorAll('.mobile-icon');
+
+  mobileIcons.forEach(icon => {
+    icon.addEventListener('click', function() {
+      const target = this.getAttribute('data-target');
+      const collapseElement = document.querySelector(target);
+
+      // Close all other accordion sections
+      document.querySelectorAll('.accordion .collapse').forEach(collapse => {
+        if (collapse.id !== collapseElement.id) {
+          collapse.classList.remove('show');
+        }
+      });
+
+      // Toggle the clicked accordion section
+      collapseElement.classList.toggle('show');
+    });
+  });
+});
 </script>
 
 <%- include('../../views/partials/user/footer') %>
