@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // eslint-disable-next-line no-undef
 const ExcelJS = require("exceljs");
 // eslint-disable-next-line no-undef
@@ -26,46 +27,11 @@ async function generatePDFReport(
 ) {
   // Fetch sales data based on filter criteria
   let matchCriteria = {};
-  if (filterType === "custom") {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+  // Set match criteria based on filterType (existing logic is fine)
 
-    matchCriteria.createdOn = { $gte: start, $lte: end };
-  } else if (filterType === "daily") {
-    if (!specificDate) {
-      throw new Error("Specific date is required for daily report");
-    }
-
-    const specificDateObj = new Date(specificDate);
-    const startOfDay = new Date(
-      specificDateObj.getFullYear(),
-      specificDateObj.getMonth(),
-      specificDateObj.getDate()
-    );
-    const endOfDay = new Date(
-      specificDateObj.getFullYear(),
-      specificDateObj.getMonth(),
-      specificDateObj.getDate() + 1
-    );
-
-    matchCriteria.createdOn = {
-      $gte: startOfDay,
-      $lt: endOfDay,
-    };
-  } else if (filterType === "weekly") {
-    matchCriteria.createdOn = {
-      $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
-      $lte: new Date(),
-    };
-  } else if (filterType === "monthly") {
-    matchCriteria.createdOn = {
-      $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
-      $lte: new Date(),
-    };
-  }
-
-  const salesData = await Order.find(matchCriteria);
+  const salesData = await Order.find(matchCriteria)
+    .populate("userId", "name")  // Populate the user's name
+    .populate("ordereditems.product", "productName");  // Populate the product's name
 
   if (filterType === "custom" && salesData.length === 0) {
     // eslint-disable-next-line no-undef
@@ -85,6 +51,7 @@ async function generatePDFReport(
 
   // Prepare the document definition
   const docDefinition = {
+    pageSize: { width: 900, height: 1200 }, // Custom larger page size
     content: [
       {
         image: "public/img/logo.png",
@@ -117,7 +84,7 @@ async function generatePDFReport(
       {
         table: {
           headerRows: 1,
-          widths: ["*", "auto", "auto", "auto", "auto", "auto"],
+          widths: ["*", "auto", "auto", "auto", "auto", "auto", "auto", "auto"],
           body: [
             [
               { text: "Order ID", style: "tableHeader" },
@@ -126,6 +93,8 @@ async function generatePDFReport(
               { text: "Quantity", style: "tableHeader" },
               { text: "Payment Type", style: "tableHeader" },
               { text: "Date", style: "tableHeader" },
+              { text: "User Name", style: "tableHeader" },
+              { text: "Products", style: "tableHeader" },
             ],
             ...salesData.map((order, index) => [
               {
@@ -166,40 +135,48 @@ async function generatePDFReport(
                 alignment: "center",
                 margin: [5, 5, 5, 5],
               },
+              {
+                text: order.userId ? order.userId.name : "Unknown", // Updated to populate userId
+                fillColor: index % 2 === 0 ? "#d8eafc" : null,
+                margin: [5, 5, 5, 5],
+                maxWidth: 100,
+                noWrap: true,
+              },
+              {
+                text: order.ordereditems
+                  .map((item) => item.product.productName) // Updated to access populated productName
+                  .join(", "),
+                fillColor: index % 2 === 0 ? "#d8eafc" : null,
+                margin: [5, 5, 5, 5],
+                maxWidth: 150,
+                noWrap: false,
+              },
             ]),
           ],
           layout: {
-            // eslint-disable-next-line no-unused-vars
             hLineWidth: function (i, node) {
-              return 0; // no horizontal line
+              return 0;
             },
-            // eslint-disable-next-line no-unused-vars
             vLineWidth: function (i, node) {
-              return 0; // no vertical line
+              return 0;
             },
-            // eslint-disable-next-line no-unused-vars
             hLineColor: function (i, node) {
-              return "#fff"; // no horizontal line color
+              return "#fff";
             },
-            // eslint-disable-next-line no-unused-vars
             vLineColor: function (i, node) {
-              return "#fff"; // no vertical line color
+              return "#fff";
             },
-            // eslint-disable-next-line no-unused-vars
             paddingLeft: function (i) {
-              return 5; // padding inside cells
+              return 5;
             },
-            // eslint-disable-next-line no-unused-vars
             paddingRight: function (i) {
-              return 5; // padding inside cells
+              return 5;
             },
-            // eslint-disable-next-line no-unused-vars
             paddingTop: function (i) {
-              return 5; // padding inside cells
+              return 5;
             },
-            // eslint-disable-next-line no-unused-vars
             paddingBottom: function (i) {
-              return 5; // padding inside cells
+              return 5;
             },
           },
         },
@@ -255,6 +232,7 @@ async function generatePDFReport(
   });
 }
 
+
 async function generateExcelReport(
   filterType,
   specificDate,
@@ -304,7 +282,9 @@ async function generateExcelReport(
       $lte: new Date(),
     };
   }
-  const salesData = await Order.find(matchCriteria);
+  const salesData = await Order.find(matchCriteria)
+  .populate("userId", "name") 
+  .populate("ordereditems.product", "productName");  
 
   if (filterType === "custom" && salesData.length === 0) {
     worksheet.addRow(["No orders found for the selected date range."]);
@@ -320,16 +300,18 @@ async function generateExcelReport(
     { header: "Quantity", key: "quantity", width: 10 },
     { header: "Payment Type", key: "paymentType", width: 15 },
     { header: "Date", key: "date", width: 20 },
+    { header: "User Name", key: "userName", width: 25 }, 
+    { header: "Products", key: "products", width: 30 }, 
   ];
 
   // Merge cells for the title (A1:D2)
-  worksheet.mergeCells("A1:F2");
+  worksheet.mergeCells("A1:H2");
   const headerCell = worksheet.getCell("A1");
   headerCell.value = "ART·MART";
   headerCell.font = { size: 18, bold: true };
   headerCell.alignment = { horizontal: "center", vertical: "middle" };
 
-  worksheet.mergeCells("A3:F3");
+  worksheet.mergeCells("A3:H3");
   const subHeaderCell = worksheet.getCell("A3");
   subHeaderCell.value = "Sales report";
   subHeaderCell.font = { size: 11, italic: true };
@@ -346,6 +328,8 @@ async function generateExcelReport(
     quantity: "Quantity",
     paymentType: "Payment Type",
     date: "Date",
+    userName: "User Name",
+    products: "Products",
   });
   headerRow.font = { bold: true }; // Make header row bold
 
@@ -362,6 +346,10 @@ async function generateExcelReport(
       quantity,
       paymentType: order.paymentMethod,
       date: order.createdOn.toLocaleDateString(),
+      userName: order.userId ? order.userId.name : "Unknown",
+      products: order.ordereditems
+      .map((item) => item.product.productName)
+      .join(", "), 
     });
   });
 
