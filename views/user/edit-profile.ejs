@@ -1,37 +1,86 @@
 <head>
   <style>
-    .sidebar a.active {
-      background-color: #007bff;
-      color: white;
-    }
+   .sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  margin-bottom: 30px;
+}
 
-    .sidebar a.active i {
-      color: white;
-    }
+.sidebar a {
+  display: block;
+  padding: 10px 15px;
+  color: #000;
+  text-decoration: none;
+  margin-bottom: 10px;
+}
 
-    .sidebar {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      width: 50px;
-      background-color: #f8f9fa;
-      padding-top: 20px;
-      margin-bottom: 30px;
-    }
+.sidebar a:hover {
+  background-color: #007bff;
+  color: white;
+}
 
-    .sidebar a {
-      display: block;
-      padding: 10px 15px;
-      color: #000;
-      text-decoration: none;
-      margin-bottom: 10px;
-    }
+.sidebar a.active {
+  background-color: #007bff;
+  color: white;
+}
 
-    .sidebar a:hover {
-      background-color: #007bff;
-      color: white;
-    }
+.sidebar a.active i {
+  color: white;
+}
+
+/* Mobile View */
+@media (max-width: 767.98px) {
+  .wrapper {
+  width: 100%;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+/* Main content styling */
+.main-content {
+  align-items: center;
+  box-sizing: border-box; 
+}
+
+  .sidebar {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 0;
+    z-index: 1000;
+  }
+
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    padding: 10px;
+    flex: 1;
+  }
+
+  .sidebar a i {
+    font-size: 1.2rem;
+  }
+
+  .sidebar a span {
+    display: none; 
+  }
+}
 
     .alert {
       margin-top: 20px;
@@ -45,7 +94,7 @@
   <div class="row">
     <%- include('../../views/partials/user/sidebar', { currentPage: currentPage }) %>
 
-    <div class="ml-5 col-md-8">
+    <div class="ml-5 col-md-8 main-content">
       <h2 class="mt-4 text-center mb-4">Edit Profile</h2>
 
       <!-- Edit Profile Form -->
