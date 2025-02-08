@@ -45,8 +45,7 @@
 /* Main content styling */
 .main-content {
   margin-left: -100px;
-  max-width: 1200px; /* Adjust based on sidebar width */
-  box-sizing: border-box; /* Ensure padding doesn't add to the width */
+  box-sizing: border-box; 
 }
 
   .sidebar {
@@ -178,7 +177,7 @@
     }) %>
 
     <!-- Main Content -->
-    <div class="ml-5 col-md-8 main-content">
+    <div class="ml-md-5 col-md-8 main-content">
       <h2 class="mt-4 text-center mb-4">
         <%= section === 'addresses' ? 'Your Addresses' : section === 'orders' ?
         'Your Orders' :  section === 'wishlist' ? '': section === 'referrals' ? '' : 'Your Profile' %>
