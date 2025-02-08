@@ -676,11 +676,7 @@ ol {
 .sidebar li:hover {
   background-color: #ffffff;
 }
-@media (max-width: 767.98px) {
-  .sidebar a span {
-    display: none; 
-  }
-}
+
 
 .icon {
   margin-right: 15px;
