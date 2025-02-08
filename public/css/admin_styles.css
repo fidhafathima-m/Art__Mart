@@ -653,7 +653,6 @@ ol {
   padding-top: 20px;
   overflow-y: auto;
   margin-bottom: 20px;
-  position: fixed; /* Make sure it stays fixed on the left */
 }
 
 /* Sidebar links */
