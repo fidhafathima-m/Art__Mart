@@ -491,144 +491,192 @@
       </div>
 
       <!-- wallet content -->
-      <% } else if (section === 'wallet') { %>
+<% } else if (section === 'wallet') { %>
 
-      <!-- This is the start of your wallet page design -->
-      <div class="container mt-4">
-        <!-- Wallet Card Section -->
-        <div class="card mb-4 shadow-sm p-5">
-          <div class="card-body d-flex align-items-center">
-            <!-- Left Column: Wallet Icon -->
-            <div class="d-flex align-items-center">
-              <i class="fas fa-wallet fa-3x text-muted"></i>
-            </div>
-
-            <!-- Middle Column: Wallet Balance -->
-            <div class="ml-3">
-              <h4 class="card-title mb-0">Wallet Balance</h4>
-              <% if (wallet && wallet.balance !== undefined) { %>
-              <p class="h5 text-muted mb-0">&#8377; <%= wallet.balance.toFixed(2) %></p>
-              <% } else { %>
-              <p class="h5 text-muted mb-0">&#8377; 0.00</p>
-              <% } %>
-            </div>
-
-            <!-- Right Column: Add Money Button -->
-            <div class="ml-auto">
-              <button class="btn btn-success" data-toggle="modal" data-target="#addMoneyModal">
+  <div class="container mt-4">
+    <!-- Wallet Card Section -->
+    <div class="card mb-4 shadow-sm p-3 p-md-5">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <!-- Left Column: Wallet Icon -->
+          <div class="col-12 col-md-auto text-center text-md-left mb-3 mb-md-0">
+            <i class="fas fa-wallet fa-3x text-muted"></i>
+          </div>
+  
+          <!-- Middle Column: Wallet Balance -->
+          <div class="col-12 col-md text-center text-md-left mb-3 mb-md-0">
+            <h4 class="card-title mb-2">Wallet Balance</h4>
+            <% if (wallet && wallet.balance !== undefined) { %>
+            <p class="h5 text-muted mb-0">&#8377; <%= wallet.balance.toFixed(2) %></p>
+            <% } else { %>
+            <p class="h5 text-muted mb-0">&#8377; 0.00</p>
+            <% } %>
+          </div>
+  
+          <!-- Right Column: Add Money Button -->
+          <div class="col-12 col-md-auto text-center">
+            <div class="d-flex flex-column flex-md-row justify-content-center">
+              <button class="btn btn-success mb-2 mb-md-0 mr-md-2" data-toggle="modal" data-target="#addMoneyModal">
                 Add Money
               </button>
-              <button class="btn btn-danger ml-2" data-toggle="modal" data-target="#withdrawMoneyModal">
-                Withdraw Money
+              <button class="btn btn-danger" data-toggle="modal" data-target="#withdrawMoneyModal">
+                Withdraw
               </button>
             </div>
           </div>
         </div>
-
-        <% if (transactions.length > 0) { %>
-        <!-- Transaction History Table -->
-        <h4>Transaction History</h4>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Transaction</th>
-              <th>Amount</th>
-              <th>Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% transactions.forEach(function(transaction) { %>
-            <tr>
-              <td>
-                <%= new Date(transaction.date).toLocaleString('en-US', {
-                  weekday: 'short',   
-                  year: 'numeric',    
-                  month: 'short',    
-                  day: 'numeric',     
-                  hour: '2-digit',   
-                  minute: '2-digit',  
-                  second: '2-digit',  
-                  hour12: true        
-                }) %>
-              </td>
-
-              <td><%= transaction.type %></td>
-              <td>&#8377; <%= transaction.amount.toFixed(2) %></td>
-              <td>&#8377; <%= transaction.balance.toFixed(2) %></td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-        <% } else { %>
-        <p>No transactions found.</p>
-        <% } %>
-        <!-- Pagination -->
-        <div class="container mt-3 mb-3">
-          <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mb-20" style="margin-right: 200px">
-              <% for(let i = 1; i <= totalPages; i++) { %>
-              <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-                <a class="page-link" href="/userProfile?section=wallet&page=<%= i %>"><%= i %></a>
-              </li>
-              <% } %>
-            </ul>
-          </nav>
-        </div>
       </div>
     </div>
-
-    <!-- Modal for Adding Money -->
-    <div class="modal fade" id="addMoneyModal" tabindex="-1" role="dialog" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addMoneyModalLabel">Add Money to Wallet</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+  
+    <% if (transactions.length > 0) { %>
+    <!-- Transaction History Table -->
+    <h4 class="mb-3">Transaction History</h4>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Transaction</th>
+            <th>Amount</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% transactions.forEach(function(transaction) { %>
+          <tr>
+            <td>
+              <%= new Date(transaction.date).toLocaleString('en-US', {
+                weekday: 'short',   
+                year: 'numeric',    
+                month: 'short',    
+                day: 'numeric',     
+                hour: '2-digit',   
+                minute: '2-digit',  
+                second: '2-digit',  
+                hour12: true        
+              }) %>
+            </td>
+            <td><%= transaction.type %></td>
+            <td>&#8377; <%= transaction.amount.toFixed(2) %></td>
+            <td>&#8377; <%= transaction.balance.toFixed(2) %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% } else { %>
+    <p class="text-center">No transactions found.</p>
+    <% } %>
+    
+    <!-- Pagination -->
+    <div class="container mt-3 mb-3">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center flex-wrap">
+          <% for(let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+            <a class="page-link" href="/userProfile?section=wallet&page=<%= i %>"><%= i %></a>
+          </li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  
+  <!-- Modal for Adding Money -->
+  <div class="modal fade" id="addMoneyModal" tabindex="-1" role="dialog" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addMoneyModalLabel">Add Money to Wallet</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="addMoneyForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="amount">Amount</label>
+              <input type="number" class="form-control" id="amount" name="amount" required placeholder="Enter amount to add" min="0.01" step="0.01">
+            </div>
           </div>
-          <form id="addMoneyForm">
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="amount">Amount</label>
-                <input type="number" class="form-control" id="amount" name="amount" required placeholder="Enter amount to add" min="0.01" step="0.01">
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Add Money</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Withdraw Money Modal -->
-    <div class="modal fade" id="withdrawMoneyModal" tabindex="-1" role="dialog" aria-labelledby="withdrawMoneyModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="withdrawMoneyModalLabel">Withdraw Money from Wallet</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Add Money</button>
           </div>
-          <form id="withdrawMoneyForm">
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="withdrawAmount">Amount</label>
-                <input type="number" class="form-control" id="withdrawAmount" name="amount" required placeholder="Enter amount to withdraw" min="0.01" step="0.01">
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-danger">Withdraw Money</button>
-            </div>
-          </form>
-        </div>
+        </form>
       </div>
     </div>
+  </div>
+  
+  <!-- Withdraw Money Modal -->
+  <div class="modal fade" id="withdrawMoneyModal" tabindex="-1" role="dialog" aria-labelledby="withdrawMoneyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="withdrawMoneyModalLabel">Withdraw Money from Wallet</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form id="withdrawMoneyForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="withdrawAmount">Amount</label>
+              <input type="number" class="form-control" id="withdrawAmount" name="amount" required placeholder="Enter amount to withdraw" min="0.01" step="0.01">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Withdraw Money</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+  @media (max-width: 768px) {
+    .card {
+      padding: 1rem !important;
+    }
+    
+    .table-responsive {
+      margin: 0 -15px;
+      padding: 0 15px;
+      width: calc(100% + 30px);
+    }
+    
+    .table td, .table th {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .pagination {
+      margin: 0;
+    }
+    
+    .pagination .page-link {
+      padding: 0.4rem 0.75rem;
+    }
+    
+    .modal-dialog {
+      margin: 0.5rem;
+    }
+  }
+  
+  /* Ensure buttons have proper spacing on mobile */
+  @media (max-width: 767px) {
+    .btn {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+    
+    .modal-footer .btn {
+      width: auto;
+      margin-bottom: 0;
+    }
+  }
+  </style>
 
 
     <% } else if (section === 'referrals') { %>
