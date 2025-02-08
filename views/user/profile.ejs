@@ -33,6 +33,18 @@
   color: white;
 }
 
+/* Ensure the address cards are responsive */
+.d-flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1 1 40%; /* For desktop or large screens, cards will take 40% of the width */
+  margin-bottom: 1rem;
+  margin-right: 1rem;
+}
+
 /* Mobile View */
 @media (max-width: 767.98px) {
   .wrapper {
@@ -79,6 +91,14 @@
 
   .sidebar a span {
     display: none; 
+  }
+  .card {
+    flex: 1 1 100%; /* For mobile screens, make the cards take full width */
+    margin-right: 0;
+  }
+
+  .d-flex {
+    justify-content: center; /* Center the cards on mobile */
   }
 }
 
