@@ -31,16 +31,21 @@ app.use(
   session({
     // eslint-disable-next-line no-undef
     secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    saveUninitialized: false,
     cookie: {
       // eslint-disable-next-line no-undef
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
+      sameSite: 'lax',
+      // eslint-disable-next-line no-undef
+      domain: process.env.NODE_ENV === 'production' ? '.art-mart.shop' : 'localhost' 
     },
   })
 );
+
+
 
 // Flash middleware (after session middleware)
 app.use(flash());

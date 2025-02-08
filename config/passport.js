@@ -13,7 +13,7 @@ const User = require("../models/userSchema");
 // eslint-disable-next-line no-undef
 const callbackURL = process.env.NODE_ENV === 'production'
   ? 'https://www.art-mart.shop/auth/google/callback'
-  : 'http://localhost:3000/auth/google/callback';  // Replace 3000 with your port
+  : 'http://localhost:3000/auth/google/callback';  
 
 
 passport.use(
