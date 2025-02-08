@@ -16,85 +16,70 @@
       <span class="text-muted price-label">Price</span>
     </div>
     <hr />
-    <% if (cartItems.length > 0) { %>
-      <% cartItems.forEach(item => { %>
-        <div class="cart-item">
-          <div class="item-image">
-            <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" />
-          </div>
-          <div class="item-details">
-            <h3 class="product-name"><%= item.productName %></h3>
-            <% if (item.productStock > 0) { %>
-              <p>In Stock</p>
-            <% } else { %>
-              <p class="text-danger">Out of Stock</p>
-            <% } %>
-            <!-- Quantity Control -->
-            <div class="quantity-control">
-              <button class="btn btn-light decrease-quantity">
-                <i class="bi bi-dash"></i>
-              </button>
-              <input 
-                type="text" 
-                class="form-control quantity-input" 
-                value="<%= item.cartQuantity %>" 
-                readonly
-                data-product-id="<%= item.productId %>"
-                data-max-quantity="<%= item.productStock %>"
-              />
-              <button class="btn btn-light increase-quantity">
-                <i class="bi bi-plus"></i>
-              </button>
-            </div>
-            <div class="delete-container">
-              <a href="" class="text-danger delete-item">Delete</a>
-            </div>
-          </div>
-          <div class="price-details">
-            <h3>&#8377; <%= item.salePrice %></h3>
-            <% if(item.productOffer > 0) { %>
-              <small class="text-danger"><%= item.productOffer %>% off</small>
-            <% } %>
-          </div>
+    <% if (cartItems.length > 0) { %> <% cartItems.forEach(item => { %>
+    <div class="cart-item">
+      <div class="item-image">
+        <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>"/>
+      </div>
+      <div class="item-details">
+        <h3 class="product-name"><%= item.productName %></h3>
+        <% if (item.productStock > 0) { %>
+        <p>In Stock</p>
+        <% } else { %>
+        <p class="text-danger">Out of Stock</p>
+        <% } %>
+        <!-- Quantity Control -->
+        <div class="quantity-control">
+          <button class="btn btn-light decrease-quantity">
+            <i class="bi bi-dash"></i>
+          </button>
+          <input type="text" class="form-control quantity-input" value="<%= item.cartQuantity %>" readonly data-product-id="<%= item.productId %>" data-max-quantity="<%= item.productStock %>" />
+          <button class="btn btn-light increase-quantity">
+            <i class="bi bi-plus"></i>
+          </button>
         </div>
-        <hr />
-      <% }) %>
-      <div class="subtotal-section">
-        <span>Subtotal(<%= cartItems.length %> items):</span>
-        <% let subtotal = 0; %>
-        <% cartItems.forEach(item => { %>
-          <% subtotal += item.salePrice * item.cartQuantity; %>
-        <% }) %>
-        <p class="subtotal-amount"><strong>&#8377; <%= subtotal %></strong></p>
+        <div class="delete-container">
+          <a href="" class="text-danger delete-item">Delete</a>
+        </div>
       </div>
+      <div class="price-details">
+        <h3>&#8377; <%= item.salePrice %></h3>
+        <% if(item.productOffer > 0) { %>
+        <small class="text-danger"><%= item.productOffer %>% off</small>
+        <% } %>
+      </div>
+    </div>
+    <hr />
+    <% }) %>
+    <div class="subtotal-section">
+      <span>Subtotal(<%= cartItems.length %> items):</span>
+      <% let subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal += item.salePrice * item.cartQuantity; %> <% }) %>
+      <p class="subtotal-bottom"><strong> &#8377; <%= subtotal %></strong></p>
+    </div>
     <% } else { %>
-      <div class="empty-cart">
-        <h5>Oops! There is nothing in your Cart!!</h5>
-        <a href="/shop" class="btn shop-btn">Go to shop</a>
-      </div>
+    <div class="empty-cart">
+      <h5">Oops! There is nothing in your Cart!!</h5>
+      <a href="/shop" class="btn shop-btn">
+        Go to shop
+      </a>
+    </div>
     <% } %>
   </div>
 
   <!-- Subtotal & Proceed to Buy -->
-  <div class="subtotal-sidebar bg-white p-4 rounded">
+  <div class="subtotal bg-white p-4 rounded">
     <h3>Subtotal(<%= cartItems.length %> items):</h3>
     <hr />
     <div class="total-section">
-      <% subtotal = 0; %>
-      <% cartItems.forEach(item => { %>
-        <% subtotal += item.salePrice * item.cartQuantity; %>
-      <% }) %>
+      <% subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal += item.salePrice * item.cartQuantity; %> <% }) %>
       <p><strong>Total: &#8377; <%= subtotal %></strong></p>
     </div>
     <% if (cartItems.length === 0) { %>
-      <button class="btn btn-secondary proceed-btn" disabled>Proceed to Buy</button>
+    <button class="btn btn-secondary" disabled>Proceed to Buy</button>
     <% } else { %>
-      <a href="/checkout" class="proceed-to-buy btn proceed-btn" onclick="quantity()">
-        Proceed to Buy
-      </a>
+    <a href="/checkout" class="proceed-to-buy btn proceed-btn" onclick="quantity()">Proceed to Buy</a>
     <% } %>
   </div>
-
   <style>
     .cart-container {
       display: flex;
@@ -109,7 +94,7 @@
       flex: 7;
     }
 
-    .subtotal-sidebar {
+    .subtotal {
       flex: 3;
       height: fit-content;
       position: sticky;
@@ -248,12 +233,12 @@
         gap: 5px;
       }
 
-      .subtotal-sidebar {
+      .subtotal {
         position: static;
         margin-top: 20px;
       }
 
-      .subtotal-sidebar h3 {
+      .subtotal h3 {
         font-size: 1.2rem;
       }
 
