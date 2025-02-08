@@ -20,10 +20,9 @@ const fonts = {
 const printer = new PdfPrinter(fonts);
 
 async function generateInvoicePDF(orderId) {
-  // Fetch the order from the database and populate the necessary fields
   const order = await Order.findOne({ orderId: orderId }).populate(
     "ordereditems.product"
-  ); // Populate the product details in ordereditems
+  ); 
 
   if (!order) {
     throw new Error("Order not found");
@@ -31,7 +30,6 @@ async function generateInvoicePDF(orderId) {
 
   console.log("Order: ", order);
 
-  // Fetch the user's addresses from the Address collection
   const userAddresses = await Address.findOne({ userId: order.userId });
 
   const user = await User.findOne({ _id: order.userId });
