@@ -1,88 +1,3 @@
-<head>
-  <style>
-    /* General styles for the cart container */
-.cart-container {
-  display: flex;
-  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-  justify-content: space-between;
-  padding: 20px;
-}
-
-/* Cart items styling */
-.cart-items {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 100%; /* Full width on mobile */
-  margin-bottom: 20px; /* Space between cart items and subtotal */
-}
-
-/* Subtotal section styling */
-.subtotal {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 100%; /* Full width on mobile */
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-  .cart-container {
-    flex-direction: column; /* Stack items vertically */
-  }
-
-  .cart-items {
-    width: 100%; /* Full width for cart items */
-  }
-
-  .subtotal {
-    width: 100%; /* Full width for subtotal */
-    margin-top: 20px; /* Space above subtotal */
-  }
-
-  .cart-item {
-    flex-direction: column; /* Stack item details vertically */
-    align-items: flex-start; /* Align items to the start */
-  }
-
-  .item-details {
-    width: 100%; /* Full width for item details */
-  }
-
-  .price-details {
-    text-align: left; /* Align price to the left */
-    padding-left: 0; /* Remove left padding */
-  }
-
-  .quantity-control {
-    width: 100%; /* Full width for quantity control */
-    justify-content: space-between; /* Space between buttons and input */
-  }
-
-  .quantity-input {
-    width: 60px; /* Fixed width for quantity input */
-  }
-
-  h2, h3, h5 {
-    font-size: 1.5rem; /* Adjust font size for headings */
-  }
-
-  p {
-    font-size: 1rem; /* Adjust font size for paragraphs */
-  }
-
-  .subtotal-bottom {
-    font-size: 1.2rem; /* Adjust font size for subtotal */
-  }
-
-  .btn {
-    width: 100%; /* Full width for buttons */
-    padding: 12px; /* Increase padding for better touch targets */
-  }
-}
-  </style>
-</head>
-
 <%- include('../../views/partials/user/header', { user: user }) %>
 
 <!-- Breadcrumbs -->
@@ -93,76 +8,293 @@
   </ol>
 </nav>
 
-<div class="cart-container" style="display: flex; justify-content: space-between; padding: 20px">
+<div class="cart-container">
   <!-- Shopping Cart Items -->
-  <div class="cart-items bg-white p-4 rounded" style="width: 70%">
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%">
+  <div class="cart-items bg-white p-4 rounded">
+    <div class="cart-header">
       <h2>Shopping Cart</h2>
-      <span class="text-muted pe-5" style="text-align: right">Price</span>
+      <span class="text-muted price-label">Price</span>
     </div>
     <hr />
-    <% if (cartItems.length > 0) { %> <% cartItems.forEach(item => { %>
-    <div class="cart-item" style="display: flex; align-items: center; margin-bottom: 20px">
-      <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" style="width: 100px; height: 100px; object-fit: cover; margin-right: 15px" />
-      <div class="item-details" style="flex-grow: 1">
-        <h3><%= item.productName %></h3>
-        <% if (item.productStock > 0) { %>
-        <p>In Stock</p>
-        <% } else { %>
-        <p class="text-danger">Out of Stock</p>
-        <% } %>
-        <!-- Quantity Control -->
-        <div class="quantity-control d-flex align-items-center mb-4">
-          <button class="btn btn-light decrease-quantity">
-            <i class="bi bi-dash"></i>
-          </button>
-          <input type="text" class="form-control mx-2 quantity-input" value="<%= item.cartQuantity %>" readonly style="width: 60px; text-align: center" data-product-id="<%= item.productId %>" data-max-quantity="<%= item.productStock %>" />
-          <button class="btn btn-light increase-quantity">
-            <i class="bi bi-plus"></i>
-          </button>
+    <% if (cartItems.length > 0) { %>
+      <% cartItems.forEach(item => { %>
+        <div class="cart-item">
+          <div class="item-image">
+            <img src="<%= item.productImage[0] %>" alt="<%= item.productName %>" />
+          </div>
+          <div class="item-details">
+            <h3 class="product-name"><%= item.productName %></h3>
+            <% if (item.productStock > 0) { %>
+              <p>In Stock</p>
+            <% } else { %>
+              <p class="text-danger">Out of Stock</p>
+            <% } %>
+            <!-- Quantity Control -->
+            <div class="quantity-control">
+              <button class="btn btn-light decrease-quantity">
+                <i class="bi bi-dash"></i>
+              </button>
+              <input 
+                type="text" 
+                class="form-control quantity-input" 
+                value="<%= item.cartQuantity %>" 
+                readonly
+                data-product-id="<%= item.productId %>"
+                data-max-quantity="<%= item.productStock %>"
+              />
+              <button class="btn btn-light increase-quantity">
+                <i class="bi bi-plus"></i>
+              </button>
+            </div>
+            <div class="delete-container">
+              <a href="" class="text-danger delete-item">Delete</a>
+            </div>
+          </div>
+          <div class="price-details">
+            <h3>&#8377; <%= item.salePrice %></h3>
+            <% if(item.productOffer > 0) { %>
+              <small class="text-danger"><%= item.productOffer %>% off</small>
+            <% } %>
+          </div>
         </div>
-        <div>
-          <a href="" class="text-danger delete-item">Delete</a>
-        </div>
+        <hr />
+      <% }) %>
+      <div class="subtotal-section">
+        <span>Subtotal(<%= cartItems.length %> items):</span>
+        <% let subtotal = 0; %>
+        <% cartItems.forEach(item => { %>
+          <% subtotal += item.salePrice * item.cartQuantity; %>
+        <% }) %>
+        <p class="subtotal-amount"><strong>&#8377; <%= subtotal %></strong></p>
       </div>
-      <div class="price-details" style="text-align: right; padding-left: 20px">
-        <h3>&#8377; <%= item.salePrice %></h3>
-        <% if(item.productOffer > 0) { %>
-        <small class="text-danger"><%= item.productOffer %>% off</small>
-        <% } %>
-      </div>
-    </div>
-    <hr />
-    <% }) %>
-    <div style="display: flex; justify-content: flex-end; align-items: center">
-      <span style="margin-right: 10px; margin-top: -16px">Subtotal(<%= cartItems.length %> items):</span>
-      <% let subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal += item.salePrice * item.cartQuantity; %> <% }) %>
-      <p class="subtotal-bottom"><strong> &#8377; <%= subtotal %></strong></p>
-    </div>
     <% } else { %>
-    <div style="display: flex; flex-direction: column; align-items: center">
-      <h5 class="text-center text-black mt-4">Oops! There is nothing in your Cart!!</h5>
-      <a href="/shop" class="btn" style="width: 20%; padding: 10px; background: #4caf50; color: white; border: none; cursor: pointer; text-align: center; margin-top: 10px">
-        Go to shop
-      </a>
-    </div>
+      <div class="empty-cart">
+        <h5>Oops! There is nothing in your Cart!!</h5>
+        <a href="/shop" class="btn shop-btn">Go to shop</a>
+      </div>
     <% } %>
   </div>
 
   <!-- Subtotal & Proceed to Buy -->
-  <div class="subtotal bg-white p-4 rounded ml-4" style="width: 30%; padding: 20px; height: 50%">
+  <div class="subtotal-sidebar bg-white p-4 rounded">
     <h3>Subtotal(<%= cartItems.length %> items):</h3>
     <hr />
-    <div class="pb-5">
-      <% subtotal = 0; %> <% cartItems.forEach(item => { %> <% subtotal += item.salePrice * item.cartQuantity; %> <% }) %>
-      <p style="font-size: 20px"><strong>Total: &#8377; <%= subtotal %></strong></p>
+    <div class="total-section">
+      <% subtotal = 0; %>
+      <% cartItems.forEach(item => { %>
+        <% subtotal += item.salePrice * item.cartQuantity; %>
+      <% }) %>
+      <p><strong>Total: &#8377; <%= subtotal %></strong></p>
     </div>
     <% if (cartItems.length === 0) { %>
-    <button class="btn btn-secondary" style="width: 100%; padding: 10px" disabled>Proceed to Buy</button>
+      <button class="btn btn-secondary proceed-btn" disabled>Proceed to Buy</button>
     <% } else { %>
-    <a href="/checkout" class="proceed-to-buy btn" style="width: 100%; padding: 10px; background: #4caf50; color: white; border: none; cursor: pointer" onclick="quantity()">Proceed to Buy</a>
+      <a href="/checkout" class="proceed-to-buy btn proceed-btn" onclick="quantity()">
+        Proceed to Buy
+      </a>
     <% } %>
   </div>
+
+  <style>
+    .cart-container {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .cart-items {
+      flex: 7;
+    }
+
+    .subtotal-sidebar {
+      flex: 3;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .item-image img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+    }
+
+    .item-details {
+      flex-grow: 1;
+    }
+
+    .product-name {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .quantity-input {
+      width: 60px;
+      text-align: center;
+    }
+
+    .price-details {
+      text-align: right;
+      min-width: 100px;
+    }
+
+    .subtotal-section {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .proceed-btn {
+      width: 100%;
+      padding: 10px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .proceed-btn:disabled {
+      background: #cccccc;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 20px;
+    }
+
+    .shop-btn {
+      background: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 15px;
+      display: inline-block;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+      .cart-container {
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .cart-header h2 {
+        font-size: 1.5rem;
+      }
+
+      .price-label {
+        display: none;
+      }
+
+      .cart-item {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .item-image img {
+        width: 120px;
+        height: 120px;
+      }
+
+      .product-name {
+        font-size: 1rem;
+      }
+
+      .price-details {
+        text-align: left;
+        width: 100%;
+      }
+
+      .price-details h3 {
+        font-size: 1.2rem;
+        margin: 5px 0;
+      }
+
+      .quantity-control {
+        margin: 10px 0;
+      }
+
+      .quantity-input {
+        width: 50px;
+      }
+
+      .subtotal-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+
+      .subtotal-sidebar {
+        position: static;
+        margin-top: 20px;
+      }
+
+      .subtotal-sidebar h3 {
+        font-size: 1.2rem;
+      }
+
+      .total-section p {
+        font-size: 1.1rem;
+      }
+    }
+
+    /* Small Mobile Styles */
+    @media (max-width: 480px) {
+      .cart-container {
+        padding: 5px;
+      }
+
+      .cart-header h2 {
+        font-size: 1.3rem;
+      }
+
+      .item-image img {
+        width: 100px;
+        height: 100px;
+      }
+
+      .product-name {
+        font-size: 0.9rem;
+      }
+
+      .price-details h3 {
+        font-size: 1.1rem;
+      }
+
+      .quantity-control button {
+        padding: 5px 8px;
+      }
+
+      .quantity-input {
+        width: 40px;
+        height: 30px;
+      }
+    }
+  </style>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
