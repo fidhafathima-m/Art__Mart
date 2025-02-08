@@ -212,7 +212,6 @@ async function generatePDFReport(
     },
   };
 
-  // Create the PDF and return the buffer
   const pdfDoc = printer.createPdfKitDocument(docDefinition);
   let buffers = [];
   pdfDoc.on("data", buffers.push.bind(buffers));
@@ -317,7 +316,6 @@ async function generateExcelReport(
   subHeaderCell.font = { size: 11, italic: true };
   subHeaderCell.alignment = { horizontal: "center", vertical: "middle" };
 
-  // Add an empty row after the title
   worksheet.addRow([]);
 
   // Add column headers to the worksheet
@@ -353,7 +351,6 @@ async function generateExcelReport(
     });
   });
 
-  // Generate buffer for the Excel file
   const buffer = await workbook.xlsx.writeBuffer();
   return buffer;
 }
