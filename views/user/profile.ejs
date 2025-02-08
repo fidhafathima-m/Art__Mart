@@ -33,6 +33,147 @@
   color: white;
 }
 
+  @media (max-width: 768px) {
+    /* Container adjustments */
+    .container.mt-4 {
+      padding: 10px;
+    }
+
+    /* Wishlist title */
+    h2.text-center {
+      font-size: 1.5rem;
+      margin-bottom: 1rem !important;
+    }
+
+    /* Wishlist items container */
+    .wishlist-items {
+      padding: 10px !important;
+    }
+
+    /* Individual wishlist item */
+    .wishlist-item {
+      flex-direction: column !important;
+      align-items: center !important;
+      padding: 15px 0 !important;
+      margin-bottom: 15px !important;
+      position: relative;
+    }
+
+    /* Product image column */
+    .wishlist-item .col-md-3 {
+      width: 100% !important;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .wishlist-item .col-md-3 img {
+      width: 120px !important;
+      height: 120px !important;
+      margin: 0 auto !important;
+    }
+
+    /* Product info column */
+    .wishlist-item .col-md-6 {
+      width: 100% !important;
+      text-align: center;
+      padding: 0 10px;
+    }
+
+    /* Product name */
+    .wishlist-item h5 {
+      font-size: 1rem;
+      margin-bottom: 8px !important;
+    }
+
+    /* Price section */
+    .wishlist-item p {
+      margin-bottom: 10px !important;
+    }
+
+    /* Quantity input and Add to cart button */
+    .quantity-input {
+      margin: 10px auto !important;
+      display: block !important;
+    }
+
+    .add-cart.btn {
+      display: block !important;
+      width: 100% !important;
+      margin: 10px 0 !important;
+    }
+
+    /* Delete icon column */
+    .wishlist-item .col-md-3.text-right {
+      width: auto !important;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    .delete-wishlist-item {
+      font-size: 1.2rem;
+    }
+
+    /* Empty wishlist message */
+    .text-center h5 {
+      font-size: 1rem;
+      margin: 15px 0;
+    }
+
+    .text-center .btn-primary {
+      width: 80%;
+      max-width: 200px;
+    }
+  }
+
+  /* Extra small devices */
+  @media (max-width: 480px) {
+    /* Further reduce container padding */
+    .container.mt-4 {
+      padding: 5px;
+    }
+
+    /* Smaller title */
+    h2.text-center {
+      font-size: 1.3rem;
+    }
+
+    /* Adjust product image size */
+    .wishlist-item .col-md-3 img {
+      width: 100px !important;
+      height: 100px !important;
+    }
+
+    /* Make prices and text more compact */
+    .wishlist-item p {
+      font-size: 0.9rem;
+    }
+
+    /* Smaller quantity input */
+    .quantity-input {
+      width: 50px !important;
+      height: 30px !important;
+    }
+
+    /* More compact buttons */
+    .add-cart.btn {
+      padding: 8px !important;
+      font-size: 0.9rem;
+    }
+
+    /* Smaller delete icon */
+    .delete-wishlist-item {
+      font-size: 1rem;
+    }
+
+    /* Empty wishlist adjustments */
+    .text-center .btn-primary {
+      width: 90%;
+      max-width: 180px;
+      font-size: 0.9rem;
+    }
+  }
+
 
 /* Mobile View */
 @media (max-width: 767.98px) {
@@ -83,11 +224,6 @@
   }
 }
 
-@media (max-width: 768px) {
-  .address-card {
-    flex: 1 1 100%; /* Full width on mobile */
-  }
-}
 
     .alert {
       margin-top: 20px;
