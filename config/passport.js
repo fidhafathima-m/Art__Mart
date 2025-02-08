@@ -8,6 +8,14 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 // eslint-disable-next-line no-undef
 const User = require("../models/userSchema");
 
+
+// Set the callback URL based on environment
+// eslint-disable-next-line no-undef
+const callbackURL = process.env.NODE_ENV === 'production'
+  ? 'https://www.art-mart.shop/auth/google/callback'
+  : 'http://localhost:3000/auth/google/callback';  // Replace 3000 with your port
+
+
 passport.use(
   new GoogleStrategy(
     {
@@ -15,8 +23,7 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       // eslint-disable-next-line no-undef
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-       // eslint-disable-next-line no-undef
-       callbackURL: process.env.CALLBACK_URL
+       callbackURL: callbackURL,
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
