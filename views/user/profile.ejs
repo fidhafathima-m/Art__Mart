@@ -204,7 +204,11 @@
         <!-- Loop through each address -->
         <% address.address.forEach((addr, addrIndex) => { %>
         <!-- Loop through address types inside each address -->
-        <div class="card p-4 mb-5 me-4 shadow address-card" style="flex: 1 1 40%">
+        <div class="card p-4 mb-5 me-4 shadow" style="flex: 1 1 40%; @media (max-width: 768px) {
+          .address-card {
+            flex: 1 1 100%; /* Full width on mobile */
+          }
+        }">
           <!-- Flexbox for responsiveness -->
           <div class="card-title text-center mt-2">
             <% if (addr.isDefault === true) { %> Default <% } else { %> Address
