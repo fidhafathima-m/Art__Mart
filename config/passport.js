@@ -15,7 +15,7 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       // eslint-disable-next-line no-undef
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://www.art-mart.shop/auth/google/callback",
+       callbackURL: "https://www.art-mart.shop/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
