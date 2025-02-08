@@ -1,4 +1,16 @@
 <style>
+  #loadingOverlay {
+  display: flex; /* Use flexbox to center the spinner */
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+  z-index: 9999; /* Ensure it appears above other content */
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
   @media (max-width: 768px) {
     /* Container adjustments */
     .container.mt-5 {
@@ -173,13 +185,20 @@
   <div class="mb-5" style="position: relative;">
     <h3 class="display-4 text-center mb-0">Order Details</h3>
     <% if (order.status !== 'Payment Pending' && order.status !== 'Cancelled') { %>
-    <button class="btn btn-dark text-end" onclick="downloadInvoice('<%= order.orderId %>')" style="position: absolute; right: 0; top: -20px;">Download Invoice</button>
+    <button class="btn btn-dark text-center" onclick="downloadInvoice('<%= order.orderId %>')" style="position: absolute; right: 0; top: -20px;">Download Invoice</button>
     <% } %>
     <h5 class="text-muted">Order ID: <%= order.orderId %></h5>
     <p class="text-center">
       <strong>Placed on:</strong> <%= new Date(order.createdOn).toLocaleDateString() %> - <%= order.paymentMethod %>
     </p>
   </div>
+
+  <!-- Loading Overlay -->
+<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; justify-content: center; align-items: center;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
 
 
   <div class="d-flex justify-content-center">
@@ -412,7 +431,7 @@ $('.cancel-order-btn').on('click', function() {
   });
 
   function downloadInvoice(orderId) {
-    console.log('Starting download for order:', orderId);
+    document.getElementById('loadingOverlay').style.display = 'flex';
 
     fetch(`/checkout/generate-invoice/${orderId}`)
       .then(response => {
@@ -432,7 +451,7 @@ $('.cancel-order-btn').on('click', function() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-
+        document.getElementById('loadingOverlay').style.display = 'none';
       })
       .catch(error => {
         console.error('Error downloading invoice:', error);
@@ -442,6 +461,7 @@ $('.cancel-order-btn').on('click', function() {
           icon: 'error',
           confirmButtonText: 'OK'
         });
+        document.getElementById('loadingOverlay').style.display = 'none';
       });
   }
 </script>
