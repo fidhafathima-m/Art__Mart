@@ -1,3 +1,160 @@
+<style>
+  @media (max-width: 768px) {
+    /* Container adjustments */
+    .container.mt-5 {
+      padding: 10px;
+      margin-top: 1rem !important;
+    }
+
+    /* Header section */
+    .display-4 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem !important;
+    }
+
+    /* Download invoice button */
+    .btn-dark {
+      position: static !important;
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+    }
+
+    /* Order ID and date */
+    h5.text-muted {
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      font-size: 0.8rem;
+      flex-wrap: wrap;
+      padding: 0.5rem !important;
+    }
+
+    /* Order item cards */
+    .card {
+      margin: 10px 0;
+      padding: 10px !important;
+    }
+
+    .card-body {
+      padding: 0.5rem !important;
+    }
+
+    /* Order item layout */
+    .row.align-items-center {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .row.align-items-center > div {
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 0 0 100% !important;
+      margin-bottom: 10px;
+    }
+
+    /* Product image */
+    .img-fluid {
+      max-height: 120px !important;
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Product details */
+    .font-weight-bold {
+      font-size: 1rem;
+      margin: 8px 0;
+    }
+
+    /* Price and discount */
+    .text-end {
+      text-align: center !important;
+    }
+
+    /* Status indicator */
+    .status-dot {
+      margin: 5px !important;
+    }
+
+    /* Action buttons */
+    .btn {
+      width: 100%;
+      margin: 5px 0;
+      padding: 8px;
+    }
+
+    /* Address section */
+    .text-center.mb-4 {
+      margin: 15px 0;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+    }
+
+    /* Return reason section */
+    .return-reason {
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    /* Status messages */
+    .text-success,
+    .text-danger {
+      text-align: center;
+      margin: 10px 0;
+      padding: 5px;
+    }
+  }
+
+  /* Extra small devices */
+  @media (max-width: 480px) {
+    /* Further reduce font sizes */
+    .display-4 {
+      font-size: 1.5rem;
+    }
+
+    /* Adjust product image size */
+    .img-fluid {
+      max-height: 100px !important;
+    }
+
+    /* Make prices and text more readable */
+    span, p {
+      font-size: 0.9rem;
+    }
+
+    /* Tighten up spacing */
+    .card {
+      margin: 5px 0;
+    }
+
+    /* Adjust button sizes */
+    .btn {
+      font-size: 0.9rem;
+      padding: 6px;
+    }
+
+    /* Status indicator adjustments */
+    .status-dot {
+      width: 12px !important;
+      height: 12px !important;
+    }
+
+    /* Rate & Review link */
+    .text-muted.fw-bolder {
+      font-size: 0.8rem;
+    }
+
+    /* Already reviewed text */
+    .text-warning {
+      font-size: 0.8rem !important;
+    }
+  }
+</style>
+
 <%- include('../../views/partials/user/header') %>
 
 <div class="container mt-5">
