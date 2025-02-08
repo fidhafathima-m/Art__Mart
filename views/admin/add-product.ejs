@@ -1,18 +1,3 @@
-<style>
-  #loadingOverlay {
-  display: flex; /* Use flexbox to center the spinner */
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
-  z-index: 9999; /* Ensure it appears above other content */
-}
-
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-}
-</style>
-
 <%- include('../../views/partials/admin/header') %>
 
 <head>
@@ -168,12 +153,6 @@
       <a href="/admin/products" class="btn btn-danger mb-4">Cancel</a>
     </form>
   </div>
-  <!-- Loading Overlay -->
-<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; justify-content: center; align-items: center;">
-  <div class="spinner-border" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-</div>
 </div>
 
 <%- include('../../views/partials/admin/footer') %>
@@ -254,7 +233,6 @@
 
   $("#productForm").on("submit", function(e) {
     e.preventDefault();
-    document.getElementById('loadingOverlay').style.display = 'flex';
 
     $.ajax({
       type: "POST",
@@ -265,19 +243,16 @@
       success: function(response) {
         if (response.success) {
           Swal.fire({
-            document.getElementById('loadingOverlay').style.display = 'none';
             icon: "success",
             title: "Product Added",
             text: response.message,
             showConfirmButton: false,
             timer: 1500,
           }).then(() => {
-            document.getElementById('loadingOverlay').style.display = 'none';
             window.location.href = "/admin/products";
           });
         } else {
           Swal.fire({
-            document.getElementById('loadingOverlay').style.display = 'none';
             icon: "error",
             title: "Error",
             text: response.message || "There was an error adding the product.",
