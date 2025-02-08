@@ -1,3 +1,88 @@
+<head>
+  <style>
+    /* General styles for the cart container */
+.cart-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+  justify-content: space-between;
+  padding: 20px;
+}
+
+/* Cart items styling */
+.cart-items {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%; /* Full width on mobile */
+  margin-bottom: 20px; /* Space between cart items and subtotal */
+}
+
+/* Subtotal section styling */
+.subtotal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%; /* Full width on mobile */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .cart-container {
+    flex-direction: column; /* Stack items vertically */
+  }
+
+  .cart-items {
+    width: 100%; /* Full width for cart items */
+  }
+
+  .subtotal {
+    width: 100%; /* Full width for subtotal */
+    margin-top: 20px; /* Space above subtotal */
+  }
+
+  .cart-item {
+    flex-direction: column; /* Stack item details vertically */
+    align-items: flex-start; /* Align items to the start */
+  }
+
+  .item-details {
+    width: 100%; /* Full width for item details */
+  }
+
+  .price-details {
+    text-align: left; /* Align price to the left */
+    padding-left: 0; /* Remove left padding */
+  }
+
+  .quantity-control {
+    width: 100%; /* Full width for quantity control */
+    justify-content: space-between; /* Space between buttons and input */
+  }
+
+  .quantity-input {
+    width: 60px; /* Fixed width for quantity input */
+  }
+
+  h2, h3, h5 {
+    font-size: 1.5rem; /* Adjust font size for headings */
+  }
+
+  p {
+    font-size: 1rem; /* Adjust font size for paragraphs */
+  }
+
+  .subtotal-bottom {
+    font-size: 1.2rem; /* Adjust font size for subtotal */
+  }
+
+  .btn {
+    width: 100%; /* Full width for buttons */
+    padding: 12px; /* Increase padding for better touch targets */
+  }
+}
+  </style>
+</head>
+
 <%- include('../../views/partials/user/header', { user: user }) %>
 
 <!-- Breadcrumbs -->
