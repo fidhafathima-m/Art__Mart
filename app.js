@@ -31,7 +31,7 @@ app.use(
   session({
     // eslint-disable-next-line no-undef
     secret: process.env.SESSION_SECRET,
-    resave: true,
+    resave: false,
     saveUninitialized: false,
     cookie: {
       // eslint-disable-next-line no-undef
@@ -40,7 +40,7 @@ app.use(
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
       sameSite: 'lax',
       // eslint-disable-next-line no-undef
-      domain: process.env.NODE_ENV === 'production' ? '.art-mart.shop' : 'localhost' 
+      domain: process.env.NODE_ENV === 'production' ? '.art-mart.shop' : undefined
     },
   })
 );
