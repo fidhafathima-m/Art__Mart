@@ -8,6 +8,8 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 // eslint-disable-next-line no-undef
 const User = require("../models/userSchema");
 
+// eslint-disable-next-line no-undef
+console.log(process.env.NODE_ENV)
 
 // Set the callback URL based on environment
 // eslint-disable-next-line no-undef

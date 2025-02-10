@@ -36,7 +36,6 @@ router.get(
   }),
   (req, res) => {
     req.session.user = req.user._id;
-    console.log("Session User ID:", req.session.user);  // Debugging
     res.redirect("https://www.art-mart.shop");
   }
   
