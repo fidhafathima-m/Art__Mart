@@ -50,20 +50,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-// Flash middleware (after session middleware)
-app.use(flash());
-
+// Add this middleware to sync passport user with session
 app.use((req, res, next) => {
-  // eslint-disable-next-line no-undef
-  console.log('Current ENV:', process.env.NODE_ENV);
-  console.log('Session ID:', req.sessionID);
-  console.log('Is Authenticated:', req.isAuthenticated());
-  console.log('Session User:', req.session?.user);
-  console.log('Passport User:', req.session?.passport?.user);
+  if (req.session && req.session.passport && req.session.passport.user) {
+    req.session.user_id = req.session.passport.user;
+  }
   next();
 });
 
+
+// Flash middleware (after session middleware)
+app.use(flash());
 
 // Prevent caching
 app.use((req, res, next) => {

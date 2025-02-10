@@ -33,31 +33,34 @@ router.get(
   userAuth.isLogout,
   passport.authenticate("google", {
     failureRedirect: "/signup",
-    session: true  // Explicitly enable session
+    session: true
   }),
   (req, res) => {
-    // Force session save before redirect
     req.session.save((err) => {
       if (err) {
         console.error('Session save error:', err);
         return res.redirect('/signup');
       }
       
-      // Add debug logging
-      console.log('Session ID:', req.sessionID);
-      console.log('Full session:', req.session);
-      console.log('Is authenticated:', req.isAuthenticated());
-      
-      // For production, ensure we're using the correct domain
+      // Redirect based on environment
       // eslint-disable-next-line no-undef
-      if (process.env.NODE_ENV === 'production') {
-        res.redirect("https://www.art-mart.shop");
-      } else {
-        res.redirect("http://localhost:3000");
-      }
+      const redirectURL = process.env.NODE_ENV === 'production' 
+        ? 'https://www.art-mart.shop/home'
+        : 'http://localhost:3000/home';
+        
+      res.redirect(redirectURL);
     });
   }
 );
+
+router.get('/debug-session', (req, res) => {
+  res.json({
+    isAuthenticated: req.isAuthenticated(),
+    user: req.user,
+    session: req.session,
+    sessionID: req.sessionID
+  });
+});
 
 router.get("/login", userAuth.isLogout, userController.loadLogin);
 router.post("/login", userController.login);
