@@ -35,10 +35,14 @@ router.get(
     failureRedirect: "/signup",
   }),
   (req, res) => {
-    console.log("User authenticated:", req.user); // Debug authenticated user
-    req.session.user = req.user._id; // Ensure this is set correctly
-    console.log("Session after authentication:", req.session); // Debug session
-    res.redirect("https://www.art-mart.shop");
+    req.session.user = req.user._id;
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.redirect('/signup');
+      }
+      res.redirect("https://www.art-mart.shop");
+    });
   }
 );
 

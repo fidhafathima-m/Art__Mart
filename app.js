@@ -40,7 +40,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24,
       sameSite: 'lax',
       // eslint-disable-next-line no-undef
-      domain: process.env.NODE_ENV === 'production' ? '.art-mart.shop' : undefined
+      domain: process.env.NODE_ENV === 'production' ? 'www.art-mart.shop' : undefined
     },
   })
 );
