@@ -24,13 +24,11 @@ router.post("/resend-otp", userController.resendOtp);
 // google signup routes
 router.get(
   "/auth/google",
-  userAuth.isLogout,
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 router.get(
   "/auth/google/callback",
-  userAuth.isLogout,
   passport.authenticate("google", {
     failureRedirect: "/signup",
     session: true
