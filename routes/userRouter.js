@@ -21,6 +21,9 @@ router.post("/signup", userController.signUp);
 router.post("/verify-referral-code", userController.veryreferralCode);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
+
+// eslint-disable-next-line no-undef
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
 // google signup routes
 router.get(
   "/auth/google",
