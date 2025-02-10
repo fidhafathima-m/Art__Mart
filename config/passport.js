@@ -29,8 +29,10 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
+        console.log("Google profile:", profile); // Debug profile object
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
+          console.log("User found:", user); // Debug existing user
           return done(null, user);
         } else {
           user = new User({
@@ -39,9 +41,11 @@ passport.use(
             googleId: profile.id,
           });
           await user.save();
+          console.log("New user created:", user); // Debug new user
           return done(null, user);
         }
       } catch (error) {
+        console.error("Error in GoogleStrategy:", error); // Debug errors
         return done(error, null);
       }
     }

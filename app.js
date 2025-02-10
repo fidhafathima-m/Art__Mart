@@ -32,7 +32,7 @@ app.use(
     // eslint-disable-next-line no-undef
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       // eslint-disable-next-line no-undef
       secure: process.env.NODE_ENV === 'production',
