@@ -4,7 +4,6 @@ require("dotenv").config();
 
 const dbConnect = async () => {
   try {
-    console.log("MongoDB URI: ", process.env.MONGODB_URL);
     // Make sure you use the environment variable MONGODB_URL
     await mongoose.connect(process.env.MONGODB_URL, {
       useNewUrlParser: true,

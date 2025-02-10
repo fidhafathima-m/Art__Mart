@@ -35,7 +35,7 @@ router.get(
   (req, res) => {
     console.log("User authenticated:", req.user); // Debug authenticated user
     req.session.user = req.user._id; // Ensure this is set correctly
-    res.redirect("https://www.art-mart.shop");
+    res.redirect("https://www.art-mart.shop/");
   }
 );
 
