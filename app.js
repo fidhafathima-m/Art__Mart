@@ -45,6 +45,15 @@ app.use(
   })
 );
 
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// Flash middleware (after session middleware)
+app.use(flash());
+
 app.use((req, res, next) => {
   // eslint-disable-next-line no-undef
   console.log('Current ENV:', process.env.NODE_ENV);
@@ -55,14 +64,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
-
-// Flash middleware (after session middleware)
-app.use(flash());
-
-// Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Prevent caching
 app.use((req, res, next) => {
