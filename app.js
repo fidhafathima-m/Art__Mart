@@ -37,33 +37,22 @@ app.use(
       // eslint-disable-next-line no-undef
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 72 * 60 * 60 * 1000, // 72 hours
       sameSite: 'lax',
       // eslint-disable-next-line no-undef
-      domain: process.env.NODE_ENV === 'production' ? 'www.art-mart.shop' : undefined
+      domain: process.env.NODE_ENV === 'production' ? '.art-mart.shop' : undefined
     },
   })
 );
 
 
-// Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
-
 
 // Flash middleware (after session middleware)
 app.use(flash());
 
-app.use((req, res, next) => {
-  // eslint-disable-next-line no-undef
-  console.log('Current ENV:', process.env.NODE_ENV);
-  console.log('Session ID:', req.sessionID);
-  console.log('Is Authenticated:', req.isAuthenticated());
-  console.log('Session User:', req.session?.user);
-  console.log('Passport User:', req.session?.passport?.user);
-  next();
-});
-
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Prevent caching
 app.use((req, res, next) => {

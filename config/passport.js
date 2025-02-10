@@ -1,12 +1,4 @@
 // eslint-disable-next-line no-undef
-if (process.env.NODE_ENV === undefined) {
-  // eslint-disable-next-line no-undef
-  require('dotenv').config();
-}
-// eslint-disable-next-line no-undef
-console.log('Current NODE_ENV:', process.env.NODE_ENV);
-
-// eslint-disable-next-line no-undef
 const env = require("dotenv");
 env.config();
 // eslint-disable-next-line no-undef
@@ -16,8 +8,6 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 // eslint-disable-next-line no-undef
 const User = require("../models/userSchema");
 
-// eslint-disable-next-line no-undef
-console.log(process.env.NODE_ENV)
 
 // Set the callback URL based on environment
 // eslint-disable-next-line no-undef
@@ -37,10 +27,8 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log("Google profile:", profile); // Debug profile object
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
-          console.log("User found:", user); // Debug existing user
           return done(null, user);
         } else {
           user = new User({
@@ -49,11 +37,9 @@ passport.use(
             googleId: profile.id,
           });
           await user.save();
-          console.log("New user created:", user); // Debug new user
           return done(null, user);
         }
       } catch (error) {
-        console.error("Error in GoogleStrategy:", error); // Debug errors
         return done(error, null);
       }
     }
@@ -61,20 +47,18 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log("Serializing user:", user._id); // Debug serialization
   done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
   User.findById(id)
     .then((user) => {
-      console.log("Deserializing user:", user); // Debug deserialization
       done(null, user);
     })
     .catch((err) => {
-      console.error("Deserialization error:", err); // Debug errors
       done(err, null);
     });
 });
+
 // eslint-disable-next-line no-undef
 module.exports = passport;

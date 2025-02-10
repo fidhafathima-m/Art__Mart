@@ -21,45 +21,25 @@ router.post("/signup", userController.signUp);
 router.post("/verify-referral-code", userController.veryreferralCode);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
-
 // google signup routes
 router.get(
   "/auth/google",
+  userAuth.isLogout,
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
 router.get(
   "/auth/google/callback",
+  userAuth.isLogout,
   passport.authenticate("google", {
     failureRedirect: "/signup",
-    session: true
   }),
   (req, res) => {
-    req.session.save((err) => {
-      if (err) {
-        console.error('Session save error:', err);
-        return res.redirect('/signup');
-      }
-      
-      // Redirect based on environment
-      // eslint-disable-next-line no-undef
-      const redirectURL = process.env.NODE_ENV === 'production' 
-        ? 'https://www.art-mart.shop/'
-        : 'http://localhost:3000/';
-        
-      res.redirect(redirectURL);
-    });
+    req.session.user = req.user._id;
+    res.redirect("https://www.art-mart.shop");
   }
+  
 );
-
-router.get('/debug-session', (req, res) => {
-  res.json({
-    isAuthenticated: req.isAuthenticated(),
-    user: req.user,
-    session: req.session,
-    sessionID: req.sessionID
-  });
-});
 
 router.get("/login", userAuth.isLogout, userController.loadLogin);
 router.post("/login", userController.login);
