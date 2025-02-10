@@ -45,8 +45,8 @@ router.get(
       // Redirect based on environment
       // eslint-disable-next-line no-undef
       const redirectURL = process.env.NODE_ENV === 'production' 
-        ? 'https://www.art-mart.shop/home'
-        : 'http://localhost:3000/home';
+        ? 'https://www.art-mart.shop/'
+        : 'http://localhost:3000/';
         
       res.redirect(redirectURL);
     });
