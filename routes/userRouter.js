@@ -33,10 +33,10 @@ router.get(
     failureRedirect: "/signup",
   }),
   (req, res) => {
-    req.session.user = req.user._id;
+    console.log("User authenticated:", req.user); // Debug authenticated user
+    req.session.user = req.user._id; // Ensure this is set correctly
     res.redirect("https://www.art-mart.shop");
   }
-  
 );
 
 router.get("/login", userAuth.isLogout, userController.loadLogin);
