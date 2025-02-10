@@ -1,4 +1,12 @@
 // eslint-disable-next-line no-undef
+if (process.env.NODE_ENV === undefined) {
+  // eslint-disable-next-line no-undef
+  require('dotenv').config();
+}
+// eslint-disable-next-line no-undef
+console.log('Current NODE_ENV:', process.env.NODE_ENV);
+
+// eslint-disable-next-line no-undef
 const env = require("dotenv");
 env.config();
 // eslint-disable-next-line no-undef

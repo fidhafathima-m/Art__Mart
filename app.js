@@ -31,8 +31,8 @@ app.use(
   session({
     // eslint-disable-next-line no-undef
     secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    saveUninitialized: false,
     cookie: {
       // eslint-disable-next-line no-undef
       secure: process.env.NODE_ENV === 'production',
@@ -44,6 +44,16 @@ app.use(
     },
   })
 );
+
+app.use((req, res, next) => {
+  // eslint-disable-next-line no-undef
+  console.log('Current ENV:', process.env.NODE_ENV);
+  console.log('Session ID:', req.sessionID);
+  console.log('Is Authenticated:', req.isAuthenticated());
+  console.log('Session User:', req.session?.user);
+  console.log('Passport User:', req.session?.passport?.user);
+  next();
+});
 
 
 
