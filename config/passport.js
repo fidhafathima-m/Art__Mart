@@ -53,18 +53,20 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
+  console.log("Serializing user:", user._id); // Debug serialization
   done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
   User.findById(id)
     .then((user) => {
+      console.log("Deserializing user:", user); // Debug deserialization
       done(null, user);
     })
     .catch((err) => {
+      console.error("Deserialization error:", err); // Debug errors
       done(err, null);
     });
 });
-
 // eslint-disable-next-line no-undef
 module.exports = passport;

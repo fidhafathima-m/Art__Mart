@@ -37,7 +37,7 @@ app.use(
       // eslint-disable-next-line no-undef
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 72 * 60 * 60 * 1000, // 72 hours
+      maxAge: 1000 * 60 * 60 * 24,
       sameSite: 'lax',
       // eslint-disable-next-line no-undef
       domain: process.env.NODE_ENV === 'production' ? '.art-mart.shop' : undefined
