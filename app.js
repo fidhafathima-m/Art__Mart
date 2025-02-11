@@ -1,15 +1,22 @@
-/* eslint-disable no-undef */
+// eslint-disable-next-line no-undef
 const express = require("express");
-require("dotenv").config();
+// eslint-disable-next-line no-undef, no-unused-vars
+const env = require("dotenv").config();
+// eslint-disable-next-line no-undef
 const path = require("path");
+// eslint-disable-next-line no-undef
 const session = require("express-session");
-const MongoStore = require('connect-mongo');
+// eslint-disable-next-line no-undef
 const flash = require("connect-flash");
 
 // custom
+// eslint-disable-next-line no-undef
 const db = require("./config/db");
+// eslint-disable-next-line no-undef
 const userRoute = require("./routes/userRouter");
+// eslint-disable-next-line no-undef
 const adminRoute = require("./routes/adminRouter");
+// eslint-disable-next-line no-undef
 const passport = require("./config/passport");
 
 db();
@@ -22,22 +29,19 @@ app.use(express.urlencoded({ limit: "100mb", extended: true }));
 // Session middleware (must be before flash middleware)
 app.use(
   session({
+    // eslint-disable-next-line no-undef
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: false,
     cookie: {
+      // eslint-disable-next-line no-undef
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 72 * 60 * 60 * 1000,
+      maxAge: 72 * 60 * 60 * 1000, // 72 hours
       sameSite: 'lax',
+      // eslint-disable-next-line no-undef
       domain: process.env.NODE_ENV === 'production' ? 'www.art-mart.shop' : undefined
     },
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGODB_URL,
-      ttl: 72 * 60 * 60, // = 72 hours
-      autoRemove: 'native',
-      touchAfter: 24 * 3600 // = 24 hours
-    })
   })
 );
 
@@ -59,9 +63,12 @@ app.use((req, res, next) => {
 // Set view engine and static files
 app.set("view engine", "ejs");
 app.set("views", [
+  // eslint-disable-next-line no-undef
   path.join(__dirname, "views/user"),
+  // eslint-disable-next-line no-undef
   path.join(__dirname, "views/admin"),
 ]);
+// eslint-disable-next-line no-undef
 app.use(express.static(path.join(__dirname, "public")));
 
 // Routes
@@ -69,8 +76,11 @@ app.use("/", userRoute);
 app.use("/admin", adminRoute);
 
 // Start server
+// eslint-disable-next-line no-undef
 app.listen(process.env.PORT, () => {
+  // eslint-disable-next-line no-undef
   console.log(`Server listening to port ${process.env.PORT}`);
 });
 
+// eslint-disable-next-line no-undef
 module.exports = app;
