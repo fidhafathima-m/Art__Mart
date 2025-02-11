@@ -1,19 +1,19 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Product = require("../../models/productSchema");
-// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
-// eslint-disable-next-line no-undef
 const Brand = require("../../models/brandSchema");
-// eslint-disable-next-line no-undef
-const sharp = require("sharp");
-// eslint-disable-next-line no-undef
-const fs = require("fs");
-// eslint-disable-next-line no-undef
-const path = require("path");
-// eslint-disable-next-line no-undef
 const mongoose = require("mongoose");
-// eslint-disable-next-line no-undef
 const multer = require("multer");
+
+const cloudinary = require('cloudinary').v2;
+
+// Configure Cloudinary
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 
 const productInfo = async (req, res) => {
   try {
@@ -80,20 +80,24 @@ const addProduct = async (req, res) => {
         const base64Data = products[`croppedImage${i}`];
 
         if (base64Data) {
-          // eslint-disable-next-line no-undef
-          const buffer = Buffer.from(base64Data.split(",")[1], "base64");
-          const croppedImagePath = path.join(
-            "public",
-            "uploads",
-            "product-images",
-            Date.now() + `-cropped-image${i}.jpg`
-          );
-
-          await sharp(buffer)
-            .resize({ width: 440, height: 440 })
-            .toFile(croppedImagePath);
-
-          images.push(croppedImagePath.replace("public", ""));
+          try {
+            // Upload to Cloudinary
+            const result = await cloudinary.uploader.upload(base64Data, {
+              folder: 'product-images',
+              transformation: [
+                { width: 440, height: 440, crop: 'fill' }
+              ]
+            });
+            
+            // Store the Cloudinary URL
+            images.push(result.secure_url);
+          } catch (uploadError) {
+            console.error('Cloudinary upload error:', uploadError);
+            return res.status(400).json({ 
+              success: false, 
+              message: "Error uploading image to cloud storage" 
+            });
+          }
         }
       }
 
@@ -253,9 +257,8 @@ const editProduct = async (req, res) => {
   try {
     const id = req.params.id;
     const products = req.body;
-
     const product = await Product.findById(id);
-
+    
     if (!product) {
       return res
         .status(404)
@@ -267,23 +270,25 @@ const editProduct = async (req, res) => {
     // Process cropped images (base64 data)
     for (let i = 1; i <= 3; i++) {
       const base64Data = products[`croppedImage${i}`];
-
       if (base64Data) {
-        // eslint-disable-next-line no-undef
-        const buffer = Buffer.from(base64Data.split(",")[1], "base64");
-
-        const croppedImagePath = path.join(
-          "public",
-          "uploads",
-          "product-images",
-          Date.now() + `-cropped-image${i}.jpg`
-        );
-
-        await sharp(buffer)
-          .resize({ width: 440, height: 440 })
-          .toFile(croppedImagePath);
-
-        images.push(croppedImagePath.replace("public", ""));
+        try {
+          // Upload to Cloudinary
+          const result = await cloudinary.uploader.upload(base64Data, {
+            folder: 'product-images',
+            transformation: [
+              { width: 440, height: 440, crop: 'fill' }
+            ]
+          });
+          
+          // Store the Cloudinary URL
+          images.push(result.secure_url);
+        } catch (uploadError) {
+          console.error('Cloudinary upload error:', uploadError);
+          return res.status(400).json({ 
+            success: false, 
+            message: "Error uploading image to cloud storage" 
+          });
+        }
       }
     }
 
@@ -292,7 +297,7 @@ const editProduct = async (req, res) => {
       isListed: true,
       isDeleted: false,
     });
-
+    
     if (!categoryId) {
       return res
         .status(400)
@@ -303,7 +308,7 @@ const editProduct = async (req, res) => {
       _id: new mongoose.Types.ObjectId(products.brand.trim()),
       isDeleted: false,
     });
-
+    
     if (!brandId) {
       return res
         .status(400)
@@ -314,9 +319,11 @@ const editProduct = async (req, res) => {
     const salePrice =
       products.regularPrice -
       Math.floor(products.regularPrice * (percentage / 100));
+    
     const highlights = products.highlights.filter(
       (highlight) => highlight.trim() !== ""
     );
+    
     const status = products.quantity > 0 ? "Available" : "Out of Stock";
 
     if (salePrice < 0) {
@@ -342,12 +349,11 @@ const editProduct = async (req, res) => {
     };
 
     await Product.findByIdAndUpdate(id, updateData, { new: true });
-
     res
       .status(200)
       .json({ success: true, message: "Product updated successfully" });
-    // eslint-disable-next-line no-unused-vars
   } catch (error) {
+    console.error('Product update error:', error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -355,7 +361,7 @@ const editProduct = async (req, res) => {
 const deleteSingleImage = async (req, res) => {
   try {
     const { imageNameToServer, productIdToServer } = req.body;
-
+    
     if (!imageNameToServer || !productIdToServer) {
       return res
         .status(400)
@@ -377,27 +383,20 @@ const deleteSingleImage = async (req, res) => {
         .json({ status: false, message: "Image not found in product." });
     }
 
-    product.productImage.splice(imageIndex, 1);
+    // Extract public_id from Cloudinary URL
+    const urlParts = imageNameToServer.split('/');
+    const publicId = `product-images/${urlParts[urlParts.length - 1].split('.')[0]}`;
 
-    const imagePath = path.join(
-      // eslint-disable-next-line no-undef
-      __dirname,
-      "..",
-      "..",
-      "public",
-      "uploads",
-      "product-images",
-      path.basename(imageNameToServer)
-    );
-
-    if (!fs.existsSync(imagePath)) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Image not found on server." });
+    try {
+      // Delete from Cloudinary
+      await cloudinary.uploader.destroy(publicId);
+    } catch (cloudinaryError) {
+      console.error('Error deleting from Cloudinary:', cloudinaryError);
+      // Continue with product update even if Cloudinary delete fails
     }
 
-    await fs.promises.unlink(imagePath);
-
+    // Remove from product's image array
+    product.productImage.splice(imageIndex, 1);
     await product.save();
 
     return res.json({ status: true, message: "Image deleted successfully." });
@@ -476,7 +475,6 @@ const unblockProduct = async (req, res) => {
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   productInfo,
   loadAddProduct,

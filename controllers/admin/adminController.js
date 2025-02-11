@@ -1,19 +1,11 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const User = require("../../models/userSchema");
-// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
-// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
-// eslint-disable-next-line no-undef
 const Order = require("../../models/orderSchema");
-// eslint-disable-next-line no-undef
 const bcrypt = require("bcrypt");
-// eslint-disable-next-line no-undef
 const {generatePDFReport,generateExcelReport } = require("../../helpers/generateReports");
-// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
-// eslint-disable-next-line no-undef
-require("dotenv").config();
 
 const pageError = (req, res) => {
   res.render("admin-error");
@@ -578,9 +570,7 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // Set to true if using SSL (e.g., Gmail uses true for port 465)
   auth: {
-    // eslint-disable-next-line no-undef
     user: process.env.NODEMAILER_EMAIL,
-    // eslint-disable-next-line no-undef
     pass: process.env.NODEMAILER_PASSWORD,
   },
 });
@@ -592,7 +582,6 @@ const sendContactEmail = (req, res) => {
   // Define the email options
   const mailOptions = {
     from: email, // Sender's email address
-    // eslint-disable-next-line no-undef
     to: process.env.NODEMAILER_EMAIL, // Admin email from the .env file
     subject: `New Contact Form Submission: ${subject}`, // Email subject
     text: `You have received a new message from the admin ${name} (${email}).\n\nMessage:\n${message}`, // Plain text body
@@ -620,7 +609,6 @@ const sendContactEmail = (req, res) => {
   });
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   loadLogin,
   login,
