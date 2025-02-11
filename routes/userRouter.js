@@ -35,9 +35,17 @@ router.get(
   (req, res) => {
     console.log("User authenticated:", req.user); // Debug authenticated user
     req.session.user = req.user._id; // Ensure this is set correctly
-    res.redirect("https://www.art-mart.shop/");
+
+    // Conditional redirect based on environment
+    // eslint-disable-next-line no-undef
+    if (process.env.NODE_ENV === 'production') {
+      res.redirect("https://www.art-mart.shop/");
+    } else {
+      res.redirect("http://localhost:3000/"); // Adjust the local redirect URL
+    }
   }
 );
+
 
 router.get("/login", userAuth.isLogout, userController.loadLogin);
 router.post("/login", userController.login);

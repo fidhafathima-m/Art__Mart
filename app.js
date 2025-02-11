@@ -7,6 +7,8 @@ const path = require("path");
 // eslint-disable-next-line no-undef
 const session = require("express-session");
 // eslint-disable-next-line no-undef
+const MongoStore = require('connect-mongo');
+// eslint-disable-next-line no-undef
 const flash = require("connect-flash");
 
 // custom
@@ -33,6 +35,10 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: false,
+    store: MongoStore.create({
+      // eslint-disable-next-line no-undef
+      mongoUrl: process.env.MONGODB_URL,
+      }),
     cookie: {
       // eslint-disable-next-line no-undef
       secure: process.env.NODE_ENV === 'production',
