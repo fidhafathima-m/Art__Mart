@@ -12,6 +12,7 @@ const userAuth = require("../middlewares/auth");
 // eslint-disable-next-line no-undef
 const passport = require("passport");
 
+
 router.get("/pageNotFound", userController.pageNotFound);
 router.get("/", userController.loadHomePage);
 

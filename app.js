@@ -8,6 +8,8 @@ const path = require("path");
 const session = require("express-session");
 // eslint-disable-next-line no-undef
 const flash = require("connect-flash");
+// eslint-disable-next-line no-undef
+const mongoose = require("mongoose");
 
 // custom
 // eslint-disable-next-line no-undef
@@ -71,6 +73,22 @@ app.set("views", [
 // eslint-disable-next-line no-undef
 app.use(express.static(path.join(__dirname, "public")));
 
+// Add this route near the top of your routes
+app.get('/health', async (req, res) => {
+  try {
+    // Check MongoDB connection
+    const dbState = mongoose.connection.readyState;
+    console.log('MongoDB connection state:', dbState);
+    // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+    res.json({ 
+      status: 'ok',
+      mongodb: dbState === 1 ? 'connected' : 'disconnected'
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(500).json({ status: 'error', error: error.message });
+  }
+});
 // Routes
 app.use("/", userRoute);
 app.use("/admin", adminRoute);
