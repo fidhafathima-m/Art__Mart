@@ -26,16 +26,6 @@ const upload = require("../helpers/multerUploads");
 // eslint-disable-next-line no-undef
 const ledgerController = require("../controllers/admin/ledgerController");
 
-router.get('/admin/health', (req, res) => {
-  console.log('Admin health check');
-  console.log('Session:', req.session);
-  res.json({
-    status: 'ok',
-    session: req.session ? 'exists' : 'none',
-    isAdmin: req.session?.admin ? true : false
-  });
-});
-
 router.get("/pageError", adminController.pageError);
 router.get("/login", adminAuth.isLogout, adminController.loadLogin);
 router.post("/login", adminController.login);

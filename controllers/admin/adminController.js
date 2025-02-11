@@ -20,76 +20,37 @@ const pageError = (req, res) => {
 };
 
 const loadLogin = async (req, res) => {
-  try {
-    console.log('Loading admin login page');
-    console.log('Session state:', req.session);
-    
-    if (req.session.admin) {
-      console.log('Admin already logged in, redirecting to admin panel');
-      res.setHeader(
-        "Cache-Control",
-        "no-store, no-cache, must-revalidate, proxy-revalidate"
-      );
-      return res.redirect("/admin");
-    }
-    console.log('Rendering admin login page');
-    res.render("admin-login", { message: null });
-  } catch (error) {
-    console.error('Error in loadLogin:', error);
-    res.status(500).render("admin-login", { message: "An error occurred" });
+  if (req.session.admin) {
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    return res.redirect("/admin");
   }
+  res.render("admin-login", { message: null });
 };
 
 const login = async (req, res) => {
   try {
-    console.log('Admin login attempt started');
     const { email, password } = req.body;
-    console.log('Searching for admin with email:', email);
-
     const admin = await User.findOne({ email, isAdmin: true });
-    console.log('Admin search completed:', admin ? 'found' : 'not found');
 
-    if (!admin) {
-      console.log('No admin found with this email');
-      return res.render("admin-login", {
-        message: "Invalid credentials"
-      });
-    }
-
-    console.log('Comparing passwords');
-    const passwordMatch = await bcrypt.compare(password, admin.password);
-    console.log('Password comparison completed:', passwordMatch ? 'matched' : 'not matched');
-
-    if (passwordMatch) {
-      console.log('Setting admin session');
-      req.session.admin = true;
-      req.session.adminId = admin._id; // Add this line
-      
-      // Save session explicitly
-      req.session.save((err) => {
-        if (err) {
-          console.error('Session save error:', err);
-          return res.render("admin-login", {
-            message: "Login failed - please try again"
-          });
-        }
-        console.log('Session saved successfully');
-        console.log('Final session state:', req.session);
-        
-        // Use res.status() before redirect
-        res.status(302).redirect("/admin");
-      });
+    if (admin) {
+      const passwordMatch = await bcrypt.compare(password, admin.password);
+      if (passwordMatch) {
+        req.session.admin = true;
+        return res.redirect("/admin");
+      } else {
+        return res.render("admin-login", {
+          message: "Password is incorrect or corrupted",
+        });
+      }
     } else {
-      console.log('Password incorrect');
-      return res.render("admin-login", {
-        message: "Password is incorrect"
-      });
+      return res.redirect("/admin/login");
     }
   } catch (error) {
-    console.error('Error in admin login:', error);
-    return res.render("admin-login", {
-      message: "An error occurred during login"
-    });
+    res.status(500).json({ success: false, message: error.message });
+    return res.redirect("/pageError");
   }
 };
 
