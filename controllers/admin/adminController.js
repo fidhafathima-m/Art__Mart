@@ -63,12 +63,22 @@ const login = async (req, res) => {
     if (passwordMatch) {
       console.log('Setting admin session');
       req.session.admin = true;
+      req.session.adminId = admin._id; // Add this line
       
-      // Wait for session to be saved
-      await new Promise((resolve) => req.session.save(resolve));
-      console.log('Session saved, redirecting to admin panel');
-      
-      return res.redirect("/admin");
+      // Save session explicitly
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+          return res.render("admin-login", {
+            message: "Login failed - please try again"
+          });
+        }
+        console.log('Session saved successfully');
+        console.log('Final session state:', req.session);
+        
+        // Use res.status() before redirect
+        res.status(302).redirect("/admin");
+      });
     } else {
       console.log('Password incorrect');
       return res.render("admin-login", {
@@ -77,7 +87,6 @@ const login = async (req, res) => {
     }
   } catch (error) {
     console.error('Error in admin login:', error);
-    // Don't send JSON response if you're rendering views
     return res.render("admin-login", {
       message: "An error occurred during login"
     });

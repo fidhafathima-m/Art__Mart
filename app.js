@@ -31,19 +31,39 @@ app.use(
   session({
     // eslint-disable-next-line no-undef
     secret: process.env.SESSION_SECRET,
-    resave: true,
+    resave: true,  // Changed to true
     saveUninitialized: false,
     cookie: {
-      // eslint-disable-next-line no-undef
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,  // Since you're using HTTPS
       httpOnly: true,
-      maxAge: 72 * 60 * 60 * 1000, // 72 hours
+      maxAge: 259200000,  // Matching your current cookie settings
       sameSite: 'lax',
-      // eslint-disable-next-line no-undef
-      domain: process.env.NODE_ENV === 'production' ? 'www.art-mart.shop' : undefined
+      domain: '.art-mart.shop'  // Added dot prefix to work with subdomains
     },
+    // store: MongoStore.create({
+    //   mongoUrl: process.env.MONGODB_URL,
+    //   ttl: 259200,  // Matching cookie maxAge in seconds
+    //   autoRemove: 'native',
+    //   touchAfter: 24 * 3600,
+    //   stringify: false,  // Added this
+    //   mongoOptions: {     // Added connection options
+    //     useUnifiedTopology: true,
+    //     serverSelectionTimeoutMS: 5000
+    //   }
+    // })
   })
 );
+
+// Add this middleware to log session data
+app.use((req, res, next) => {
+  const oldRedirect = res.redirect;
+  res.redirect = function newRedirect(url) {
+    console.log('Redirecting to:', url);
+    console.log('Session state at redirect:', req.session);
+    oldRedirect.apply(this, arguments);
+  };
+  next();
+});
 
 
 
