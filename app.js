@@ -8,6 +8,8 @@ const path = require("path");
 const session = require("express-session");
 // eslint-disable-next-line no-undef
 const flash = require("connect-flash");
+// eslint-disable-next-line no-undef
+const MongoStore = require('connect-mongo');
 
 // custom
 // eslint-disable-next-line no-undef
@@ -31,8 +33,10 @@ app.use(
   session({
     // eslint-disable-next-line no-undef
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: false,
+    resave: false,
+    saveUninitialized: true,
+    // eslint-disable-next-line no-undef
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URL }),
     cookie: {
       secure: true,
       httpOnly: true,
@@ -71,6 +75,7 @@ app.set("views", [
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/test-session", (req, res) => {
+  console.log("Cookies:", req.headers.cookie); // Log cookies
   if (!req.session.views) {
     req.session.views = 0;
   }
