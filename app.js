@@ -38,13 +38,15 @@ app.use(
     // eslint-disable-next-line no-undef
     store: MongoStore.create({ mongoUrl: process.env.MONGODB_URL }),
     cookie: {
-      secure: true,
+      // eslint-disable-next-line no-undef
+      secure: process.env.NODE_ENV === 'production',  // Only secure cookies in production
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
       sameSite: 'lax',
       // eslint-disable-next-line no-undef
       domain: process.env.NODE_ENV === 'production' ? 'www.art-mart.shop' : null
-    },
+    }
+    
   })
 );
 
