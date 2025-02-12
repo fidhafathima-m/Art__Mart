@@ -34,8 +34,7 @@ app.use(
     resave: true,
     saveUninitialized: false,
     cookie: {
-      // eslint-disable-next-line no-undef
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
       sameSite: 'lax',
@@ -70,6 +69,14 @@ app.set("views", [
 ]);
 // eslint-disable-next-line no-undef
 app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/test-session", (req, res) => {
+  if (!req.session.views) {
+    req.session.views = 0;
+  }
+  req.session.views++;
+  res.send(`Session views: ${req.session.views}`);
+});
 
 // Routes
 app.use("/", userRoute);
