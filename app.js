@@ -50,7 +50,7 @@ app.use(
   })
 );
 
-
+app.set('trust proxy', 1);
 
 // Flash middleware (after session middleware)
 app.use(flash());
