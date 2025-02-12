@@ -1138,6 +1138,7 @@ const addToWishlist = async (req, res) => {
   try {
     const userId = req.session.user;
 
+    // Check if the user is logged in
     if (!userId) {
       return res.status(401).json({
         success: false,
@@ -1147,17 +1148,23 @@ const addToWishlist = async (req, res) => {
 
     const productId = req.body.productId;
 
+    // Check if the product exists
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).send("Product not found");
+      return res.status(404).json({
+        success: false,
+        message: "Product not found.",
+      });
     }
 
+    // Find or create the user's wishlist
     let wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
+      // If no wishlist exists, create a new one
       wishlist = new Wishlist({
         userId,
-        items: [
+        products: [
           {
             productId: product._id,
             addedOn: Date.now(),
@@ -1176,20 +1183,24 @@ const addToWishlist = async (req, res) => {
         });
       }
 
-      // Add the new item to the wishlist
+      // Add the new product to the wishlist
       wishlist.products.push({
         productId: product._id,
         addedOn: Date.now(),
       });
     }
 
-    // Save the wishlist
+    // Save the wishlist to the database
     await wishlist.save();
 
+    // Send a success response
     res.json({ success: true, message: "Item added to wishlist" });
   } catch (error) {
-    console.error(error);
-    return res.status(500).send("Error adding item to wishlist");
+    console.error("Error adding item to wishlist:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while adding the item to the wishlist.",
+    });
   }
 };
 
