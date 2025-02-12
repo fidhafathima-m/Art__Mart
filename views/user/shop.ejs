@@ -2,69 +2,295 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
   <style>
-    /* Mobile Icons Row */
-.mobile-icons-row {
-  display: none; /* Hidden by default */
-  justify-content: space-around;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #ddd;
+
+@media screen and (max-width: 767px) {
+    /* Adjust grid for mobile - 2 items per row */
+    .col-lg-4.col-md-6.col-sm-6 {
+        width: 50%;
+        padding: 0 8px;
+        float: left;
+    }
+
+    /* Style product container */
+    .product__item {
+        margin-bottom: 20px;
+    }
+
+    /* Image container styling */
+    .product__item__pic {
+        position: relative;
+        padding-top: 100%; /* Square aspect ratio */
+    }
+
+    .product__item__pic img.default-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Always show wishlist on mobile */
+    .product__hover {
+        opacity: 1;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        transform: none;
+        width: auto;
+    }
+
+    .product__hover li {
+        width: auto;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        margin-bottom: 10px;
+    }
+
+    /* Product text content adjustments */
+    .product__item__text {
+        padding: 10px 5px;
+        text-align: left;
+    }
+
+    /* Brand name styling */
+    .product__item__text h6.text-muted {
+        font-size: 12px;
+        margin: 5px 0;
+        text-align: left;
+    }
+
+    /* Product name styling */
+    .product__item__text h6:not(.text-muted) {
+        font-size: 13px;
+        margin: 5px 0;
+        height: 36px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-align: left;
+    }
+
+    /* Add to cart button styling */
+    .product__item__text .add-cart {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #000;
+        color: #fff;
+        border-radius: 4px;
+        margin: 8px 0;
+        font-size: 12px;
+        width: 90%;
+        text-align: center;
+    }
+
+    /* Price and offer styling */
+    .product__item__text .h5 {
+        font-size: 15px;
+        margin: 5px 0;
+        display: block;
+    }
+
+    .product__item__text .small {
+        font-size: 11px;
+        display: inline-block;
+    }
+
+    .product__item__text .text-muted s {
+        font-size: 12px;
+        margin: 0;
+    }
+
+    /* Out of stock badge */
+    .bg-danger.text-white.rounded {
+        display: inline-block;
+        margin: 5px 0;
+        font-size: 10px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Rating stars sizing */
+    .rating {
+        margin-top: 5px;
+    }
+
+    .rating i {
+        font-size: 14px;
+        margin: 0 1px;
+    }
+
+    /* No products message styling */
+    h4.text-danger {
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    h4.text-danger + p {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+    }
 }
 
-.mobile-icon {
-  cursor: pointer;
-  font-size: 20px;
-  color: #333;
+/* Preserve desktop hover effects */
+@media screen and (min-width: 768px) {
+    .product__hover {
+        opacity: 0;
+        transition: all 0.5s;
+    }
+
+    .product__item:hover .product__hover {
+        opacity: 1;
+    }
 }
-
-.mobile-icon:hover {
-  color: #007bff;
-}
-
-
-/* General styles for the sorting dropdown */
-.shop__product__option__right {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem; /* Add some space below the dropdown */
-}
-/* Hide accordion headers on mobile */
-@media (max-width: 768px) {
-  .card-heading {
-    display: none;
-  }
-
-  .mobile-icons-row {
+/* Filter Button */
+.mobile-filter-btn {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 25px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 999;
     display: flex;
-  }
+    align-items: center;
+    gap: 8px;
+}
 
-  .accordion .collapse {
+/* Filter Modal */
+.mobile-filter-modal {
     display: none;
-  }
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    z-index: 1000;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+}
 
-  .accordion .collapse.show {
-    display: block;
-  }
-  .shop__product__option__right {
-    flex-direction: column; /* Stack items vertically */
-    padding: 10px; /* Add padding around the container */
-    background-color: #f8f9fa; /* Light background for better visibility */
-    border-radius: 5px; /* Rounded corners */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  }
+.mobile-filter-modal.show {
+    transform: translateY(0);
+}
 
-  .shop__product__option__right p {
-    margin-bottom: 0.5rem; /* Space between the label and dropdown */
-    font-weight: bold; /* Make the label bold */
-  }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
 
-  #sortDropdown {
-    width: 100%; /* Full width for the dropdown */
-    padding: 10px; /* Add padding inside the dropdown */
-    border: 1px solid #ced4da; /* Border color */
-    border-radius: 5px; /* Rounded corners */
-    font-size: 16px; /* Increase font size for better readability */
-  }
+.modal-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #666;
+    padding: 5px;
+}
+
+.modal-body {
+    height: 80vh;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+/* Overlay */
+.mobile-filter-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-filter-overlay.show {
+    opacity: 1;
+}
+
+/* Mobile Specific Styles */
+@media (max-width: 768px) {
+    .shop__sidebar {
+        display: none; /* Hide original sidebar */
+    }
+    
+    .mobile-filter-btn {
+        display: flex;
+    }
+    
+    .mobile-filter-modal {
+        display: block;
+    }
+    
+    /* Style accordion inside modal */
+    .mobile-filter-modal .accordion .card {
+        border: none;
+        margin-bottom: 8px;
+    }
+    
+    .mobile-filter-modal .card-heading {
+        display: block;
+        padding: 12px 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 2px;
+    }
+    
+    .mobile-filter-modal .accordion-header {
+        color: #333;
+        font-weight: 500;
+        text-decoration: none;
+        display: block;
+    }
+    
+    .mobile-filter-modal .sidebar-link {
+        padding: 12px 15px;
+        display: block;
+        color: #666;
+        text-decoration: none;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .mobile-filter-modal .sidebar-link.active {
+        color: #007bff;
+        background: #f0f7ff;
+    }
+    
+    /* Clear filters button */
+    .clear-filters {
+        display: block;
+        width: calc(100% - 30px);
+        margin: 15px;
+        padding: 12px;
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        color: #666;
+        text-decoration: none;
+    }
 }
 
 </style>
@@ -122,21 +348,6 @@
       <div class="col-lg-3">
         <div class="shop__sidebar">
           <div class="shop__sidebar__accordion">
-            <!-- Mobile Icons Row -->
-            <div class="mobile-icons-row">
-              <div class="mobile-icon" data-target="#collapseSortBy">
-                <i class="fas fa-sort"></i>
-              </div>
-              <div class="mobile-icon" data-target="#collapseOne">
-                <i class="fas fa-list"></i>
-              </div>
-              <div class="mobile-icon" data-target="#collapseThree">
-                <i class="fas fa-filter"></i>
-              </div>
-              <div class="mobile-icon" data-target="#collapseRating">
-                <i class="fas fa-star"></i>
-              </div>
-            </div>
       
             <!-- Accordion Sections -->
             <div class="accordion" id="accordionExample">
@@ -565,6 +776,147 @@
       collapseElement.classList.toggle('show');
     });
   });
+
+    // Create and append filter button
+    const filterBtn = document.createElement('button');
+    filterBtn.className = 'mobile-filter-btn';
+    filterBtn.innerHTML = '<i class="fas fa-filter"></i> Filters';
+    document.body.appendChild(filterBtn);
+
+    const modalHTML = `
+    <div class="mobile-filter-overlay"></div>
+    <div class="mobile-filter-modal">
+        <div class="modal-header">
+            <h5>Filters</h5>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Filter Sections -->
+            <div class="shop__sidebar__sort">
+                <h6 class="filter-title">Sort By</h6>
+                <ul class="sidebar-list">
+                    <li>
+                        <a href="/sortBy?sortBy=featured&page=1" class="sidebar-link <%= sortBy === 'featured' ? 'active' : '' %>">Featured</a>
+                    </li>
+                    <li>
+                        <a href="/sortBy?sortBy=newArrivals&page=1" class="sidebar-link <%= sortBy === 'newArrivals' ? 'active' : '' %>">New Arrivals</a>
+                    </li>
+                    <li>
+                        <a href="/sortBy?sortBy=aToZ&page=1" class="sidebar-link <%= sortBy === 'aToZ' ? 'active' : '' %>">A - Z</a>
+                    </li>
+                    <li>
+                        <a href="/sortBy?sortBy=zToA&page=1" class="sidebar-link <%= sortBy === 'zToA' ? 'active' : '' %>">Z - A</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="shop__sidebar__categories">
+                <h6 class="filter-title">Categories</h6>
+                <ul class="sidebar-list">
+                    <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %>
+                    <li>
+                        <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
+                            <%= categories[i].name %>
+                        </a>
+                    </li>
+                    <% } %>
+                </ul>
+
+                <% if (categories.length > 3) { %>
+                <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
+                <% } %>
+
+                <div id="extraCategories" style="display:none;">
+                    <ul class="sidebar-list">
+                        <% for (let i = 3; i < categories.length; i++) { %>
+                        <li>
+                            <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
+                                <%= categories[i].name %>
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                    <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
+                </div>
+            </div>
+
+            <div class="shop__sidebar__price">
+                <h6 class="filter-title">Filter Price</h6>
+                <ul class="sidebar-list">
+                    <li>
+                        <a href="/filterPrice?gt=0&lt=500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
+                    </li>
+                    <li>
+                        <a href="/filterPrice?gt=500&lt=1000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
+                    </li>
+                    <li>
+                        <a href="/filterPrice?gt=1000&lt=1500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
+                    </li>
+                    <li>
+                        <a href="/filterPrice?gt=1500&lt=100000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="shop__sidebar__rating">
+                <h6 class="filter-title">Filter by Rating</h6>
+                <ul class="sidebar-list">
+                    <li>
+                        <a href="/shop?rating=1&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
+                    </li>
+                    <li>
+                        <a href="/shop?rating=2&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
+                    </li>
+                    <li>
+                        <a href="/shop?rating=3&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
+                    </li>
+                    <li>
+                        <a href="/shop?rating=4&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
+                    </li>
+                    <li>
+                        <a href="/shop?rating=5&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+`;
+document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Get references to elements
+    const modal = document.querySelector('.mobile-filter-modal');
+    const overlay = document.querySelector('.mobile-filter-overlay');
+    const closeBtn = document.querySelector('.modal-close');
+    const sidebar = document.querySelector('.shop__sidebar');
+    const modalBody = document.querySelector('.modal-body');
+
+    // Clone sidebar content to modal
+    if (sidebar && modalBody) {
+        modalBody.appendChild(sidebar.cloneNode(true));
+    }
+
+    // Open modal
+    filterBtn.addEventListener('click', () => {
+        modal.classList.add('show');
+        overlay.style.display = 'block';
+        setTimeout(() => overlay.classList.add('show'), 10);
+        document.body.style.overflow = 'hidden';
+    });
+
+    // Close modal function
+    const closeModal = () => {
+        modal.classList.remove('show');
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.style.display = 'none', 300);
+        document.body.style.overflow = '';
+    };
+
+    // Close modal events
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', closeModal);
+
+    // Prevent modal close when clicking inside
+    modal.addEventListener('click', (e) => e.stopPropagation());
 });
 </script>
 
