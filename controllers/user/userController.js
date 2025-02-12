@@ -22,6 +22,8 @@ const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 // eslint-disable-next-line no-undef
 const Brand = require("../../models/brandSchema");
+// eslint-disable-next-line no-undef
+const Fuse = require('fuse.js'); 
 
 // generate OTP
 const generateOtp = () => {
@@ -494,6 +496,7 @@ const loadShopping = async (req, res) => {
       _id: brand._id,
       name: brand.brandName,
     }));
+    let search = req.query.search || "";
 
     res.render("shop", {
       user: userData,
@@ -512,6 +515,7 @@ const loadShopping = async (req, res) => {
       selectedCategory: "",
       gt: "",
       lt: "",
+      search
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
@@ -1017,48 +1021,54 @@ const searchProducts = async (req, res) => {
   try {
     const user = req.session.user;
     const userData = await User.findOne({ _id: user });
-    let search = req.query.search || ""; // Default to empty string if no search term
+    let search = req.query.search || ""; 
     const categories = await Category.find({ isListed: true }).lean();
     categories.map((category) => category._id.toString());
     let searchResult = [];
-
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
-
     const sortBy = req.query.sortBy || "newest";
     const selectedCategory = req.query.category || null;
     const gt = parseFloat(req.query.gt) || 0;
     const lt = parseFloat(req.query.lt) || Infinity;
     const rating = parseInt(req.query.rating) || 0;
-
     const query = {
       isBlocked: false,
       isDeleted: false,
       salePrice: { $gt: gt, $lt: lt },
       ...(selectedCategory && { category: selectedCategory }),
     };
-
     let findProducts = await Product.find(query).lean();
-
     let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
         product_id: product._id,
         verified_purchase: true,
       }).lean();
-
       let averageRating = 0;
       if (reviews.length > 0) {
         averageRating =
           reviews.reduce((total, review) => total + review.rating, 0) /
           reviews.length;
       }
-
       product.averageRating = averageRating;
-
       if (rating === 0 || averageRating >= rating) {
         filteredProducts.push(product);
       }
+    }
+    let noProductsMessage = "";
+    let noProductsinCategory = "";
+
+
+    // Fuzzy search logic
+    if (req.xhr) { // Check if it's an AJAX request
+      const fuseOptions = {
+        keys: ['productName'], // Search by product name
+        threshold: 0.3, // Adjust threshold for fuzzy search
+      };
+      const fuse = new Fuse(filteredProducts, fuseOptions);
+      searchResult = fuse.search(search).map(result => result.item);
+      return res.json(searchResult); // Return JSON for AJAX response
     }
 
     if (filteredProducts.length > 0) {
@@ -1067,27 +1077,12 @@ const searchProducts = async (req, res) => {
       );
     }
 
-    let noProductsMessage = "";
-    let noProductsinCategory = "";
-
-    if (sortBy === "priceLowToHigh") {
-      searchResult.sort((a, b) => a.salePrice - b.salePrice);
-    } else if (sortBy === "priceHighToLow") {
-      searchResult.sort((a, b) => b.salePrice - a.salePrice);
-    } else {
-      searchResult.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-    }
-
-    // Pagination
+    // Rest of your existing logic for pagination and rendering
     let itemsPerPage = 6;
     let currentPage = parseInt(req.query.page) || 1;
-
     if (isNaN(currentPage) || currentPage < 1) {
       currentPage = 1;
     }
-
     let startIndex = (currentPage - 1) * itemsPerPage;
     let endIndex = startIndex + itemsPerPage;
     let totalPages = Math.ceil(searchResult.length / itemsPerPage);
@@ -1109,8 +1104,9 @@ const searchProducts = async (req, res) => {
       rating,
       noProductsinCategory,
       noProductsMessage,
+      search, // Pass the search term back to the view
     });
-    // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/pageNotFound");
   }
