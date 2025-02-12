@@ -7,6 +7,8 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 // eslint-disable-next-line no-undef
 const User = require("../models/userSchema");
+// eslint-disable-next-line no-undef
+const { generateRandomReferralCode } = require("../controllers/user/userController");
 
 
 // Set the callback URL based on environment
@@ -37,6 +39,7 @@ const callbackURL = process.env.NODE_ENV === 'production'
               name: profile.displayName,
               email: profile.emails[0].value,
               googleId: profile.id,
+              referralCode: generateRandomReferralCode(profile.displayName),
             });
             await user.save();
             console.log("New user created:", user); // Debug new user

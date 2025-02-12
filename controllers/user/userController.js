@@ -1346,4 +1346,5 @@ module.exports = {
   loadAbout,
   loadContact,
   sendContactEmail,
+  generateRandomReferralCode,
 };

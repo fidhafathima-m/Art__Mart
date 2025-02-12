@@ -81,7 +81,7 @@
           <!-- Sign Up Button -->
           <button type="submit" class="primary-btn">Sign Up</button>
 
-          <a href="/auth/google" class="google-btn">
+          <a href="#" onclick="return handleGoogleSignUp()" class="google-btn">
             <i class="fab fa-google"></i> Sign Up with Google
           </a>
 
@@ -316,6 +316,18 @@
         console.log("One or more elements not found");
       }
     });
+
+    function handleGoogleSignUp() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const referralCode = urlParams.get('referralCode');
+  
+  if (referralCode) {
+    window.location.href = `/auth/google?referralCode=${referralCode}`;
+  } else {
+    window.location.href = '/auth/google';
+  }
+  return false;
+}
   </script>
 </body>
 

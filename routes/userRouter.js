@@ -11,8 +11,12 @@ const productController = require("../controllers/user/productController");
 const userAuth = require("../middlewares/auth");
 // eslint-disable-next-line no-undef
 const passport = require("passport");
-
-
+// eslint-disable-next-line no-undef
+const User = require("../models/userSchema");
+// eslint-disable-next-line no-undef
+const Wallet = require("../models/walletSchema");
+// eslint-disable-next-line no-undef
+const Transaction = require("../models/transactionSchema");
 
 router.get("/pageNotFound", userController.pageNotFound);
 router.get("/", userController.loadHomePage);
@@ -24,30 +28,80 @@ router.post("/verify-referral-code", userController.veryreferralCode);
 router.post("/verify-otp", userController.verifyOtp);
 router.post("/resend-otp", userController.resendOtp);
 // google signup routes
-router.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.get('/auth/google', (req, res, next) => {
+  // Store referral code in session if provided
+  const referralCode = req.query.referralCode;
+  if (referralCode) {
+    req.session.pendingReferralCode = referralCode;
+  }
+  
+  passport.authenticate('google', { 
+    scope: ['profile', 'email']
+  })(req, res, next);
+});
 
-router.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/signup",
-  }),
-  (req, res) => {
-    console.log("User authenticated:", req.user); // Debug authenticated user
-    req.session.user = req.user._id; // Ensure this is set correctly
-
-    // Conditional redirect based on environment
-    // eslint-disable-next-line no-undef
-    if (process.env.NODE_ENV === 'production') {
-      res.redirect("https://www.art-mart.shop/");
-    } else {
-      res.redirect("http://localhost:3000/"); // Adjust the local redirect URL
+router.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/signup' }),
+  async (req, res) => {
+    try {
+      // Handle referral code redemption if exists
+      if (req.session.pendingReferralCode) {
+        const referralCode = req.session.pendingReferralCode;
+        const referrer = await User.findOne({ referralCode });
+        
+        if (referrer && !referrer.redeemedUsers.includes(req.user._id)) {
+          // Credit new user
+          const userWallet = await Wallet.findOne({ userId: req.user._id });
+          userWallet.balance += 100;
+          await userWallet.save();
+          
+          // Create transaction for new user
+          const newTransaction = new Transaction({
+            userId: req.user._id,
+            type: "Referral code - Credit",
+            amount: 100,
+            balance: userWallet.balance
+          });
+          await newTransaction.save();
+          
+          // Credit referrer
+          const referrerWallet = await Wallet.findOne({ userId: referrer._id });
+          referrerWallet.balance += 200;
+          await referrerWallet.save();
+          
+          // Create transaction for referrer
+          const referrerTransaction = new Transaction({
+            userId: referrer._id,
+            type: "Referral Reward - Credit",
+            amount: 200,
+            balance: referrerWallet.balance
+          });
+          await referrerTransaction.save();
+          
+          // Update referrer's redeemed status
+          referrer.redeemedUsers.push(req.user._id);
+          await referrer.save();
+        }
+        
+        // Clear the pending referral code
+        delete req.session.pendingReferralCode;
+      }
+      
+      req.session.user = req.user._id;
+      
+      // Redirect based on environment
+      // eslint-disable-next-line no-undef
+      if (process.env.NODE_ENV === 'production') {
+        res.redirect('https://www.art-mart.shop/');
+      } else {
+        res.redirect('http://localhost:3000/');
+      }
+    } catch (error) {
+      console.error('Error processing referral:', error);
+      res.redirect('/');
     }
   }
 );
-
 
 router.get("/login", userAuth.isLogout, userController.loadLogin);
 router.post("/login", userController.login);
