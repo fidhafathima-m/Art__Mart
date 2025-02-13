@@ -1,7 +1,10 @@
 body {
   font-family: "Arial", sans-serif;
-  background-color: #f4f4f4; /* Light blue background */
+  background: url("/img/signup.jpg") no-repeat center center;
+  background-size: cover;
+  background-blend-mode:lighten;
 }
+
 .container {
   display: flex;
   justify-content: center;
@@ -28,20 +31,26 @@ body {
   max-width: 500px;
   text-align: left;
   padding: 20px;
-  background-color: #f4f4f4;
+  background-color: transparent;
   margin-top: 50px;
 }
+
+.form-group ::placeholder {
+  color: #fff;
+}
+
 .head {
   font-size: 36px;
   font-weight: bold;
-  color: #333;
+  color: #ffffff;
   text-align: center;
   margin-bottom: 40px; /* Add margin to separate from the form */
   padding-bottom: 40px;
+  margin-top: -50px;
 }
 .signup-container p {
   font-size: 16px;
-  color: #666;
+  color: #fffefe;
   margin-bottom: 30px;
 }
 .input-line {
@@ -52,7 +61,7 @@ body {
   padding: 10px 0;
   width: 100%;
   font-size: 16px;
-  background-color: #f4f4f4; /* Match background color of the page */
+  background-color: transparent;
   transition: all 0.3s ease;
 }
 .input-line:focus {
@@ -117,6 +126,9 @@ body {
   .form-container {
     width: 100%;
   }
+  .container {
+    height: 120vh;
+  }
 }
 
 .dropdown {
@@ -152,7 +164,7 @@ body {
 }
 
 .f-pass {
-  color: #c1351d;
+  color: #811300;
   font-size: 0.875rem;
   text-decoration: none;
   margin-bottom: 20px;
@@ -160,4 +172,10 @@ body {
 .f-pass:hover {
   color: #9e2813;
   text-decoration: underline;
+}
+a {
+  color: #f5f5f5;
+}
+a:hover {
+  color: rgb(84, 83, 83);
 }
