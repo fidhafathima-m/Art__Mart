@@ -115,8 +115,7 @@ body {
   /* Media Queries for responsiveness */
   @media (max-width: 768px) {
     body {
-        background-position: top center;
-        background: fixed;
+        background-image: url("/img/login.jpg") no-repeat center fixed;
     }
     .signup-container {
       flex-direction: column;
