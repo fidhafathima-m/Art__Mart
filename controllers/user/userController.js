@@ -427,7 +427,7 @@ const loadShopping = async (req, res) => {
     const brands = await Brand.find({ isDeleted: false });
     const brandIds = brands.map((brand) => brand._id.toString());
     const page = parseInt(req.query.page) || 1;
-    const limit = 6;
+    const limit = 9;
     // eslint-disable-next-line no-unused-vars
     const skip = (page - 1) * limit;
 

@@ -229,6 +229,118 @@
 .mobile-filter-overlay.show {
     opacity: 1;
 }
+/* Modern Sidebar Container */
+.shop__sidebar {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+}
+
+/* Section Container */
+.sidebar-section {
+  margin-bottom: 32px;
+}
+
+.sidebar-section:last-child {
+  margin-bottom: 0;
+}
+
+/* Section Headers */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f5f5f5;
+}
+
+/* List Styling */
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-list li {
+  margin-bottom: 12px;
+}
+
+.sidebar-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* Link Styling */
+.sidebar-link {
+  display: block;
+  padding: 10px 16px;
+  color: #4a5568;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.sidebar-link:hover {
+  background-color: #f7fafc;
+  color: #2b6cb0;
+  transform: translateX(4px);
+}
+
+.sidebar-link.active {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+  font-weight: 500;
+}
+
+/* Show More/Less Button */
+.show-more,
+.show-less {
+  display: inline-block;
+  color: #2b6cb0;
+  font-size: 14px;
+  margin-top: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.show-more:hover,
+.show-less:hover {
+  color: #1a4971;
+}
+
+/* Categories Extra Section */
+#extraCategories {
+  margin-top: 12px;
+}
+
+/* Clear Filters Button */
+.clear-filters-btn {
+  display: inline-block;
+  padding: 12px 16px;
+  background-color: #e5e7eb;
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 8px;
+  width: 100%;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+  background-color: #1e3a8a;
+  color: #fff;
+}
+
+.clear-filters-btn:active {
+  background-color: #2563eb;
+}
+
 
 /* Mobile Specific Styles */
 @media (max-width: 768px) {
@@ -395,137 +507,115 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-3">
-        <div class="shop__sidebar">
-          <div class="shop__sidebar__accordion">
+  <div class="shop__sidebar">
+    <!-- Sort By Section -->
+    <div class="sidebar-section">
+      <h3 class="section-title">Sort By</h3>
       
-            <!-- Accordion Sections -->
-            <div class="accordion" id="accordionExample">
-              <!-- Sort By Section -->
-              <div class="card">
-                <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseSortBy" class="accordion-header">Sort By</a>
-                </div>
-                <div id="collapseSortBy" class="collapse" data-parent="#accordionExample">
-                  <div class="card-body">
-                    <div class="shop__sidebar__sort">
-                      <ul class="sidebar-list">
-                        <li>
-                          <a href="/sortBy?sortBy=featured&page=1" class="sidebar-link <%= sortBy === 'featured' ? 'active' : '' %>">Featured</a>
-                        </li>
-                        <li>
-                          <a href="/sortBy?sortBy=newArrivals&page=1" class="sidebar-link <%= sortBy === 'newArrivals' ? 'active' : '' %>">New Arrivals</a>
-                        </li>
-                        <li>
-                          <a href="/sortBy?sortBy=aToZ&page=1" class="sidebar-link <%= sortBy === 'aToZ' ? 'active' : '' %>">A - Z</a>
-                        </li>
-                        <li>
-                          <a href="/sortBy?sortBy=zToA&page=1" class="sidebar-link <%= sortBy === 'zToA' ? 'active' : '' %>">Z - A</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-      
-              <!-- Categories Section -->
-              <div class="card">
-                <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseOne" class="accordion-header">Categories</a>
-                </div>
-                <div id="collapseOne" class="collapse" data-parent="#accordionExample">
-                  <div class="card-body">
-                    <div class="shop__sidebar__categories">
-                      <ul class="sidebar-list">
-                        <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %>
-                        <li>
-                          <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
-                            <%= categories[i].name %>
-                          </a>
-                        </li>
-                        <% } %>
-                      </ul>
-      
-                      <% if (categories.length > 3) { %>
-                      <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
-                      <% } %>
-      
-                      <div id="extraCategories" style="display:none;">
-                        <ul class="sidebar-list">
-                          <% for (let i = 3; i < categories.length; i++) { %>
-                          <li>
-                            <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
-                              <%= categories[i].name %>
-                            </a>
-                          </li>
-                          <% } %>
-                        </ul>
-                        <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-      
-              <!-- Filter Price Section -->
-              <div class="card">
-                <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseThree" class="accordion-header">Filter Price</a>
-                </div>
-                <div id="collapseThree" class="collapse" data-parent="#accordionExample">
-                  <div class="card-body">
-                    <div class="shop__sidebar__price">
-                      <ul class="sidebar-list">
-                        <li>
-                          <a href="/filterPrice?gt=0&lt=500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
-                        </li>
-                        <li>
-                          <a href="/filterPrice?gt=500&lt=1000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
-                        </li>
-                        <li>
-                          <a href="/filterPrice?gt=1000&lt=1500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
-                        </li>
-                        <li>
-                          <a href="/filterPrice?gt=1500&lt=100000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-      
-              <!-- Rating Filter Accordion -->
-              <div class="card">
-                <div class="card-heading">
-                  <a data-toggle="collapse" data-target="#collapseRating" class="accordion-header">Filter by Rating</a>
-                </div>
-                <div id="collapseRating" class="collapse" data-parent="#accordionExample">
-                  <div class="card-body">
-                    <div class="shop__sidebar__rating">
-                      <ul class="sidebar-list">
-                        <li>
-                          <a href="/shop?rating=1&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
-                        </li>
-                        <li>
-                          <a href="/shop?rating=2&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
-                        </li>
-                        <li>
-                          <a href="/shop?rating=3&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
-                        </li>
-                        <li>
-                          <a href="/shop?rating=4&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
-                        </li>
-                        <li>
-                          <a href="/shop?rating=5&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div class="shop__sidebar__sort">
+        <ul class="sidebar-list">
+          <li>
+            <a href="/sortBy?sortBy=featured&page=1" class="sidebar-link <%= sortBy === 'featured' ? 'active' : '' %>">Featured</a>
+          </li>
+          <li>
+            <a href="/sortBy?sortBy=newArrivals&page=1" class="sidebar-link <%= sortBy === 'newArrivals' ? 'active' : '' %>">New Arrivals</a>
+          </li>
+          <li>
+            <a href="/sortBy?sortBy=aToZ&page=1" class="sidebar-link <%= sortBy === 'aToZ' ? 'active' : '' %>">A - Z</a>
+          </li>
+          <li>
+            <a href="/sortBy?sortBy=zToA&page=1" class="sidebar-link <%= sortBy === 'zToA' ? 'active' : '' %>">Z - A</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="sidebar-section">
+      <h3 class="section-title">Categories</h3>
+      <div class="shop__sidebar__categories">
+        <ul class="sidebar-list">
+          <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %>
+          <li>
+            <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
+              <%= categories[i].name %>
+            </a>
+          </li>
+          <% } %>
+        </ul>
+
+        <% if (categories.length > 3) { %>
+        <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
+        <% } %>
+
+        <div id="extraCategories" style="display:none;">
+          <ul class="sidebar-list">
+            <% for (let i = 3; i < categories.length; i++) { %>
+            <li>
+              <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
+                <%= categories[i].name %>
+              </a>
+            </li>
+            <% } %>
+          </ul>
+          <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
         </div>
       </div>
+    </div>
+
+    <!-- Filter Price Section -->
+    <div class="sidebar-section">
+      <h3 class="section-title">Price Range</h3>
+      <div class="shop__sidebar__price">
+        <ul class="sidebar-list">
+          <li>
+            <a href="/filterPrice?gt=0&lt=500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
+          </li>
+          <li>
+            <a href="/filterPrice?gt=500&lt=1000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
+          </li>
+          <li>
+            <a href="/filterPrice?gt=1000&lt=1500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
+          </li>
+          <li>
+            <a href="/filterPrice?gt=1500&lt=100000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Rating Filter Section -->
+    <div class="sidebar-section">
+      <h3 class="section-title">Filter by Rating</h3>
+      <div class="shop__sidebar__rating">
+        <ul class="sidebar-list">
+          <li>
+            <a href="/shop?rating=1&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=2&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=3&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=4&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
+          </li>
+          <li>
+            <a href="/shop?rating=5&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- Clear Filters Button -->
+    <div class="sidebar-section">
+      <a href="/shop" class="clear-filters-btn">
+        Clear Filters
+      </a>
+    </div>
+
+  </div>
+</div>
 
       <div class="col-lg-9" style="margin-top: -70px;">
         <div class="shop__product__option">
