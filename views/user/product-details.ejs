@@ -335,25 +335,7 @@
           </ul>
         </div>
 
-        <% if (coupons.length > 0) { %>
-
-        <!-- Coupon Section -->
-        <div class="coupon-section">
-          <h4>Available Coupons:</h4>
-          <ul>
-            <% coupons.forEach(coupon => { %>
-            <% if (coupon.minPurchaseAmount <= products.salePrice) { %>
-            <li>
-              <b><%= coupon.name %></b>: <% if (coupon.expireOn > Date.now()) {%>
-              <span>Valid Until: <%= coupon.expireOn.toLocaleDateString() %></span>
-              <% } else { %>
-              <span class="text-danger">Expired</span>
-              <% } %>
-            </li>
-            <% } %>
-            <% }) %>
-          </ul>
-          <% } %>
+        
 
           <!-- Coupon Input Field -->
           <!-- <h4>Apply Coupon:</h4>

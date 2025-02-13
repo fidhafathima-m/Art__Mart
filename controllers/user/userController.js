@@ -634,6 +634,7 @@ const filterProduct = async (req, res) => {
     }
 
     req.session.filteredProducts = currentProduct;
+    let search = req.query.search || ""; 
 
     res.render("shop", {
       user: userData,
@@ -650,6 +651,7 @@ const filterProduct = async (req, res) => {
       cartItems: cartItems,
       activePage: "shop",
       rating,
+      search
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
@@ -730,6 +732,7 @@ const filterByPrice = async (req, res) => {
     req.session.filteredProducts = findProducts;
 
     let noProductsinCategory = "";
+    let search = req.query.search || ""; 
 
     res.render("shop", {
       user: userData,
@@ -746,6 +749,7 @@ const filterByPrice = async (req, res) => {
       cartItems: cartItems,
       activePage: "shop",
       rating,
+      search
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
@@ -824,6 +828,7 @@ const filterRating = async (req, res) => {
     const currentProduct = filteredProducts.slice(startIndex, endIndex);
 
     req.session.filteredProducts = filteredProducts;
+    let search = req.query.search || ""; 
 
     res.render("shop", {
       user: userData,
@@ -841,6 +846,7 @@ const filterRating = async (req, res) => {
       gt,
       lt,
       noProductsinCategory,
+      search
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
@@ -924,6 +930,7 @@ const sortBy = async (req, res) => {
     let endIndex = startIndex + itemsPerPage;
     let totalPages = Math.ceil(findProducts.length / itemsPerPage);
     const currentProduct = findProducts.slice(startIndex, endIndex);
+    let search = req.query.search || ""; 
 
     res.render("shop", {
       user: userData,
@@ -940,6 +947,7 @@ const sortBy = async (req, res) => {
       cartItems: cartItems,
       activePage: "shop",
       rating,
+      search
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
@@ -998,6 +1006,7 @@ const sortByPrice = async (req, res) => {
         filteredProducts.push(product);
       }
     }
+    let search = req.query.search || ""; 
 
     const currentProducts = findProducts.slice(startIndex, endIndex);
     res.render("shop", {
@@ -1010,6 +1019,7 @@ const sortByPrice = async (req, res) => {
       cartItems: cartItems,
       activePage: "shop",
       rating,
+      search
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
