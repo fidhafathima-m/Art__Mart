@@ -579,6 +579,22 @@
           </div>
         </div>
         <div id="discountMessage" class="mt-2"></div>
+        <% if (coupon && coupon.length > 0) { %>
+          <div class="row">
+              <div class="col-md-12">
+                  <h6 class="text-muted pb-2">Available Coupons</h6>
+                  <% coupon.forEach(function(couponItem) { %>
+                    <p>
+                      <%= couponItem.name %> |
+                      Expire on: <%= new Date(couponItem.expireOn).toLocaleDateString('en-GB') %>
+                  </p>
+                  <% }); %>
+              </div>
+          </div>
+      <% } else { %>
+          <p>No coupons available at the moment.</p>
+      <% } %>
+        
       </div>
 
       <!-- Payment Method -->

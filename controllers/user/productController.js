@@ -435,12 +435,15 @@ const loadCheckout = async (req, res) => {
 
     const cartItems = cart ? cart.items : [];
 
+    const coupon = await Coupon.find();
+
     res.render("checkout", {
       activePage: "shop",
       user: userId,
       cartItems: cartItems,
       addresses: userAddress ? userAddress.address : [],
       defaultAddress: defaultAddress || {},
+      coupon,
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
