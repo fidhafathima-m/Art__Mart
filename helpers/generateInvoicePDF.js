@@ -28,7 +28,6 @@ async function generateInvoicePDF(orderId) {
     throw new Error("Order not found");
   }
 
-  console.log("Order: ", order);
 
   const userAddresses = await Address.findOne({ userId: order.userId });
 

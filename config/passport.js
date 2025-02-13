@@ -29,10 +29,8 @@ const callbackURL = process.env.NODE_ENV === 'production'
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log("Google profile received:", profile); // Debug profile
           let user = await User.findOne({ googleId: profile.id });
           if (user) {
-            console.log("User found in database:", user); // Debug existing user
             return done(null, user);
           } else {
             user = new User({
@@ -42,7 +40,6 @@ const callbackURL = process.env.NODE_ENV === 'production'
               referralCode: generateRandomReferralCode(profile.displayName),
             });
             await user.save();
-            console.log("New user created:", user); // Debug new user
             return done(null, user);
           }
         } catch (error) {

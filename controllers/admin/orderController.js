@@ -187,9 +187,6 @@ const updateOrderStatus = async (req, res) => {
               product.status = "Available";
             }
 
-            console.log(
-              `Updating product ${product._id} quantity to: ${product.quantity}`
-            );
 
             // Save the updated product
             await product.save();
