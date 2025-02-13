@@ -116,6 +116,7 @@ body {
   @media (max-width: 768px) {
     body {
         background-position: top center;
+        background: fixed;
     }
     .signup-container {
       flex-direction: column;
