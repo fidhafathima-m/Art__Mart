@@ -1086,8 +1086,9 @@ document.body.insertAdjacentHTML('beforeend', modalHTML);
         .map(
           (product) => `
             <div class="product-item">
-              <a href="/product-details?id=${product._id}"><h5>${product.productName}</h5></a>
-              <p>Price: ₹${product.salePrice}</p>
+
+              <a href="/product-details?id=${product._id}"><h5>${product.productName}</h5>
+              <p>${product.brand.brandName} | Price: ₹${product.salePrice}</p></a>
             </div>
           `
         )
