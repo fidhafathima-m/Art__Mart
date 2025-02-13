@@ -898,7 +898,24 @@
   });
 
   document.addEventListener('DOMContentLoaded', function() {
-  
+  const mobileIcons = document.querySelectorAll('.mobile-icon');
+
+  mobileIcons.forEach(icon => {
+    icon.addEventListener('click', function() {
+      const target = this.getAttribute('data-target');
+      const collapseElement = document.querySelector(target);
+
+      // Close all other accordion sections
+      document.querySelectorAll('.accordion .collapse').forEach(collapse => {
+        if (collapse.id !== collapseElement.id) {
+          collapse.classList.remove('show');
+        }
+      });
+
+      // Toggle the clicked accordion section
+      collapseElement.classList.toggle('show');
+    });
+  });
 
     // Create and append filter button
     const filterBtn = document.createElement('button');
@@ -936,7 +953,7 @@
             <div class="shop__sidebar__categories">
                 <h6 class="filter-title">Categories</h6>
                 <ul class="sidebar-list">
-                    <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %>
+                    <% for (let i = 0; i < categories.length; i++) { %>
                     <li>
                         <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
                             <%= categories[i].name %>
@@ -945,22 +962,6 @@
                     <% } %>
                 </ul>
 
-                <% if (categories.length > 3) { %>
-                <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
-                <% } %>
-
-                <div id="extraCategories" style="display:none;">
-                    <ul class="sidebar-list">
-                        <% for (let i = 3; i < categories.length; i++) { %>
-                        <li>
-                            <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
-                                <%= categories[i].name %>
-                            </a>
-                        </li>
-                        <% } %>
-                    </ul>
-                    <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
-                </div>
             </div>
 
             <div class="shop__sidebar__price">
@@ -1071,7 +1072,7 @@ document.body.insertAdjacentHTML('beforeend', modalHTML);
             <div class="product-item">
 
               <a href="/product-details?id=${product._id}"><h5>${product.productName}</h5>
-              <p>${product.brand.brandName} | Price: ₹${product.salePrice}</p></a>
+              <p>${product.brand.brandName} | Price: ₹${product.salePrice}</p>
             </div>
           `
         )
@@ -1086,25 +1087,6 @@ document.body.insertAdjacentHTML('beforeend', modalHTML);
     if (!e.target.closest('#product-list') && !e.target.closest('input[name="search"]')) {
       productListContainer.innerHTML = '';
     }
-  });
-
-  const mobileIcons = document.querySelectorAll('.mobile-icon');
-
-  mobileIcons.forEach(icon => {
-    icon.addEventListener('click', function() {
-      const target = this.getAttribute('data-target');
-      const collapseElement = document.querySelector(target);
-
-      // Close all other accordion sections
-      document.querySelectorAll('.accordion .collapse').forEach(collapse => {
-        if (collapse.id !== collapseElement.id) {
-          collapse.classList.remove('show');
-        }
-      });
-
-      // Toggle the clicked accordion section
-      collapseElement.classList.toggle('show');
-    });
   });
 </script>
 
