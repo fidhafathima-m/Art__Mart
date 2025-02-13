@@ -898,24 +898,7 @@
   });
 
   document.addEventListener('DOMContentLoaded', function() {
-  const mobileIcons = document.querySelectorAll('.mobile-icon');
-
-  mobileIcons.forEach(icon => {
-    icon.addEventListener('click', function() {
-      const target = this.getAttribute('data-target');
-      const collapseElement = document.querySelector(target);
-
-      // Close all other accordion sections
-      document.querySelectorAll('.accordion .collapse').forEach(collapse => {
-        if (collapse.id !== collapseElement.id) {
-          collapse.classList.remove('show');
-        }
-      });
-
-      // Toggle the clicked accordion section
-      collapseElement.classList.toggle('show');
-    });
-  });
+  
 
     // Create and append filter button
     const filterBtn = document.createElement('button');
@@ -1103,6 +1086,25 @@ document.body.insertAdjacentHTML('beforeend', modalHTML);
     if (!e.target.closest('#product-list') && !e.target.closest('input[name="search"]')) {
       productListContainer.innerHTML = '';
     }
+  });
+
+  const mobileIcons = document.querySelectorAll('.mobile-icon');
+
+  mobileIcons.forEach(icon => {
+    icon.addEventListener('click', function() {
+      const target = this.getAttribute('data-target');
+      const collapseElement = document.querySelector(target);
+
+      // Close all other accordion sections
+      document.querySelectorAll('.accordion .collapse').forEach(collapse => {
+        if (collapse.id !== collapseElement.id) {
+          collapse.classList.remove('show');
+        }
+      });
+
+      // Toggle the clicked accordion section
+      collapseElement.classList.toggle('show');
+    });
   });
 </script>
 
