@@ -32,6 +32,13 @@ const callbackURL = process.env.NODE_ENV === 'production'
           let user = await User.findOne({ googleId: profile.id });
           if (user) {
             return done(null, user);
+          } 
+          
+          const existingUser = await User.findOne({ email: profile.emails[0].value });
+          if (existingUser) {
+            existingUser.googleId = profile.id;
+            await existingUser.save();
+            return done(null, existingUser);
           } else {
             user = new User({
               name: profile.displayName,
