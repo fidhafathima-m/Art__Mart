@@ -146,25 +146,6 @@
         opacity: 1;
     }
 }
-/* Filter Button */
-.mobile-filter-btn {
-    display: none !important; 
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #000;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    padding: 12px 25px;
-    font-size: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 999;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 /* Filter Modal */
 .mobile-filter-modal {
     display: none;
@@ -228,7 +209,7 @@
 
 .mobile-filter-overlay.show {
     opacity: 1;
-}
+} */
 /* Modern Sidebar Container */
 .shop__sidebar {
   background: #fff;
@@ -237,7 +218,6 @@
   padding: 24px;
 }
 
-/* Section Container */
 .sidebar-section {
   margin-bottom: 32px;
 }
@@ -246,7 +226,6 @@
   margin-bottom: 0;
 }
 
-/* Section Headers */
 .section-title {
   font-size: 18px;
   font-weight: 600;
@@ -256,7 +235,6 @@
   border-bottom: 2px solid #f5f5f5;
 }
 
-/* List Styling */
 .sidebar-list {
   list-style: none;
   padding: 0;
@@ -271,29 +249,171 @@
   margin-bottom: 0;
 }
 
-/* Link Styling */
-.sidebar-link {
-  display: block;
+/* Custom Checkbox Styles */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  position: relative;
   padding: 10px 16px;
-  color: #4a5568;
-  text-decoration: none;
+  cursor: pointer;
   border-radius: 8px;
   transition: all 0.2s ease;
-  font-size: 14px;
 }
 
-.sidebar-link:hover {
+.checkbox-container:hover {
   background-color: #f7fafc;
-  color: #2b6cb0;
   transform: translateX(4px);
 }
 
-.sidebar-link.active {
-  background-color: #ebf8ff;
+.checkbox-container input[type="checkbox"] {
+  margin-right: 10px;
+  cursor: pointer;
+  accent-color: #2b6cb0;
+}
+
+.checkbox-label {
+  color: #4a5568;
+  font-size: 14px;
+}
+
+/* Active state for checkbox container */
+.checkbox-container input[type="checkbox"]:checked + .checkbox-label {
   color: #2b6cb0;
   font-weight: 500;
 }
 
+.checkbox-container input[type="checkbox"]:checked {
+  background-color: #2b6cb0;
+}
+
+/* Show More/Less Button */
+.show-more,
+.show-less {
+  display: inline-block;
+  color: #2b6cb0;
+  font-size: 14px;
+  margin-top: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.show-more:hover,
+.show-less:hover {
+  color: #1a4971;
+}
+
+/* Categories Extra Section */
+#extraCategories {
+  margin-top: 12px;
+}
+
+/* Clear Filters Button */
+.clear-filters-btn {
+  display: inline-block;
+  padding: 12px 16px;
+  background-color: #e5e7eb;
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 8px;
+  width: 100%;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+  background-color: #1e3a8a;
+  color: #fff;
+}
+
+.clear-filters-btn:active {
+  background-color: #2563eb;
+}
+
+/* Mobile styles from your original code */
+.mobile-filter-btn {
+    display: none !important; 
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #000;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 25px;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-filter-modal {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    z-index: 1000;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+}
+
+.mobile-filter-modal.show {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #666;
+    padding: 5px;
+}
+
+.modal-body {
+    height: 80vh;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.mobile-filter-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-filter-overlay.show {
+    opacity: 1;
+}
 /* Show More/Less Button */
 .show-more,
 .show-less {
@@ -507,115 +627,155 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-3">
-  <div class="shop__sidebar">
-    <!-- Sort By Section -->
-    <div class="sidebar-section">
-      <h3 class="section-title">Sort By</h3>
+        <div class="shop__sidebar">
+          <!-- Sort By Section -->
+          <div class="sidebar-section">
+            <h3 class="section-title">Sort By</h3>
+            
+            <div class="shop__sidebar__sort">
+              <ul class="sidebar-list">
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="featured" <%= sortBy === 'featured' ? 'checked' : '' %>>
+                    <span class="checkbox-label">Featured</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="newArrivals" <%= sortBy === 'newArrivals' ? 'checked' : '' %>>
+                    <span class="checkbox-label">New Arrivals</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="aToZ" <%= sortBy === 'aToZ' ? 'checked' : '' %>>
+                    <span class="checkbox-label">A - Z</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="zToA" <%= sortBy === 'zToA' ? 'checked' : '' %>>
+                    <span class="checkbox-label">Z - A</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
       
-      <div class="shop__sidebar__sort">
-        <ul class="sidebar-list">
-          <li>
-            <a href="/sortBy?sortBy=featured&page=1" class="sidebar-link <%= sortBy === 'featured' ? 'active' : '' %>">Featured</a>
-          </li>
-          <li>
-            <a href="/sortBy?sortBy=newArrivals&page=1" class="sidebar-link <%= sortBy === 'newArrivals' ? 'active' : '' %>">New Arrivals</a>
-          </li>
-          <li>
-            <a href="/sortBy?sortBy=aToZ&page=1" class="sidebar-link <%= sortBy === 'aToZ' ? 'active' : '' %>">A - Z</a>
-          </li>
-          <li>
-            <a href="/sortBy?sortBy=zToA&page=1" class="sidebar-link <%= sortBy === 'zToA' ? 'active' : '' %>">Z - A</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Categories Section -->
-    <div class="sidebar-section">
-      <h3 class="section-title">Categories</h3>
-      <div class="shop__sidebar__categories">
-        <ul class="sidebar-list">
-          <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %>
-          <li>
-            <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
-              <%= categories[i].name %>
+          <!-- Categories Section -->
+          <div class="sidebar-section">
+            <h3 class="section-title">Categories</h3>
+            <div class="shop__sidebar__categories">
+              <ul class="sidebar-list">
+                <% for (let i = 0; i < Math.min(categories.length, 3); i++) { %>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="category-checkbox" data-filter="category" data-value="<%= categories[i]._id %>" <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'checked' : '' %>>
+                    <span class="checkbox-label"><%= categories[i].name %></span>
+                  </label>
+                </li>
+                <% } %>
+              </ul>
+      
+              <% if (categories.length > 3) { %>
+              <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
+              <% } %>
+      
+              <div id="extraCategories" style="display:none;">
+                <ul class="sidebar-list">
+                  <% for (let i = 3; i < categories.length; i++) { %>
+                  <li>
+                    <label class="checkbox-container">
+                      <input type="checkbox" class="category-checkbox" data-filter="category" data-value="<%= categories[i]._id %>" <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'checked' : '' %>>
+                      <span class="checkbox-label"><%= categories[i].name %></span>
+                    </label>
+                  </li>
+                  <% } %>
+                </ul>
+                <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Filter Price Section -->
+          <div class="sidebar-section">
+            <h3 class="section-title">Price Range</h3>
+            <div class="shop__sidebar__price">
+              <ul class="sidebar-list">
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="0" data-lt="500" <%= (gt == 0 && lt == 500) ? 'checked' : '' %>>
+                    <span class="checkbox-label">Under ₹500.00</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="500" data-lt="1000" <%= (gt == 500 && lt == 1000) ? 'checked' : '' %>>
+                    <span class="checkbox-label">₹500.00 - ₹1000.00</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="1000" data-lt="1500" <%= (gt == 1000 && lt == 1500) ? 'checked' : '' %>>
+                    <span class="checkbox-label">₹1000.00 - ₹1500.00</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="1500" data-lt="100000" <%= (gt == 1500 && lt == 100000) ? 'checked' : '' %>>
+                    <span class="checkbox-label">₹1500.00+</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+      
+          <!-- Rating Filter Section -->
+          <div class="sidebar-section">
+            <h3 class="section-title">Filter by Rating</h3>
+            <div class="shop__sidebar__rating">
+              <ul class="sidebar-list">
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="1" <%= rating == 1 ? 'checked' : '' %>>
+                    <span class="checkbox-label">1 Star & above</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="2" <%= rating == 2 ? 'checked' : '' %>>
+                    <span class="checkbox-label">2 Stars & above</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="3" <%= rating == 3 ? 'checked' : '' %>>
+                    <span class="checkbox-label">3 Stars & above</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="4" <%= rating == 4 ? 'checked' : '' %>>
+                    <span class="checkbox-label">4 Stars & above</span>
+                  </label>
+                </li>
+                <li>
+                  <label class="checkbox-container">
+                    <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="5" <%= rating == 5 ? 'checked' : '' %>>
+                    <span class="checkbox-label">5 Stars</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- Clear Filters Button -->
+          <div class="sidebar-section">
+            <a href="/shop" class="clear-filters-btn">
+              Clear Filters
             </a>
-          </li>
-          <% } %>
-        </ul>
-
-        <% if (categories.length > 3) { %>
-        <a href="javascript:void(0);" id="showMoreBtn" class="show-more">Show More</a>
-        <% } %>
-
-        <div id="extraCategories" style="display:none;">
-          <ul class="sidebar-list">
-            <% for (let i = 3; i < categories.length; i++) { %>
-            <li>
-              <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
-                <%= categories[i].name %>
-              </a>
-            </li>
-            <% } %>
-          </ul>
-          <a href="javascript:void(0);" id="showLessBtn" class="show-less" style="display:none;">Show Less</a>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Filter Price Section -->
-    <div class="sidebar-section">
-      <h3 class="section-title">Price Range</h3>
-      <div class="shop__sidebar__price">
-        <ul class="sidebar-list">
-          <li>
-            <a href="/filterPrice?gt=0&lt=500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
-          </li>
-          <li>
-            <a href="/filterPrice?gt=500&lt=1000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
-          </li>
-          <li>
-            <a href="/filterPrice?gt=1000&lt=1500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
-          </li>
-          <li>
-            <a href="/filterPrice?gt=1500&lt=100000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Rating Filter Section -->
-    <div class="sidebar-section">
-      <h3 class="section-title">Filter by Rating</h3>
-      <div class="shop__sidebar__rating">
-        <ul class="sidebar-list">
-          <li>
-            <a href="/shop?rating=1&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
-          </li>
-          <li>
-            <a href="/shop?rating=2&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
-          </li>
-          <li>
-            <a href="/shop?rating=3&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
-          </li>
-          <li>
-            <a href="/shop?rating=4&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
-          </li>
-          <li>
-            <a href="/shop?rating=5&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <!-- Clear Filters Button -->
-    <div class="sidebar-section">
-      <a href="/shop" class="clear-filters-btn">
-        Clear Filters
-      </a>
-    </div>
-
-  </div>
-</div>
 
       <div class="col-lg-9" style="margin-top: -70px;">
         <div class="shop__product__option">
@@ -741,21 +901,7 @@
 
 
 <script>
-  document.getElementById('showMoreBtn')?.addEventListener('click', function() {
-    document.getElementById('extraCategories').style.display = 'block';
-
-    document.getElementById('showMoreBtn').style.display = 'none';
-
-    document.getElementById('showLessBtn').style.display = 'inline';
-  });
-
-  document.getElementById('showLessBtn')?.addEventListener('click', function() {
-    document.getElementById('extraCategories').style.display = 'none';
-
-    document.getElementById('showMoreBtn').style.display = 'inline';
-
-    document.getElementById('showLessBtn').style.display = 'none';
-  });
+  
   document.addEventListener('DOMContentLoaded', () => {
     const addToCartButtons = document.querySelectorAll('.add-cart');
 
@@ -895,6 +1041,177 @@
   });
 });
 
+const showMoreBtn = document.getElementById('showMoreBtn');
+const showLessBtn = document.getElementById('showLessBtn');
+const extraCategories = document.getElementById('extraCategories');
+
+if (showMoreBtn) {
+  showMoreBtn.addEventListener('click', function() {
+    extraCategories.style.display = 'block';
+    showMoreBtn.style.display = 'none';
+    showLessBtn.style.display = 'inline-block';
+  });
+}
+
+if (showLessBtn) {
+  showLessBtn.addEventListener('click', function() {
+    extraCategories.style.display = 'none';
+    showMoreBtn.style.display = 'inline-block';
+    showLessBtn.style.display = 'none';
+  });
+}
+
+// Handle Sort By checkboxes
+const sortCheckboxes = document.querySelectorAll('.sort-checkbox');
+sortCheckboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    if (this.checked) {
+      // Uncheck other sort checkboxes
+      sortCheckboxes.forEach(cb => {
+        if (cb !== this) cb.checked = false;
+      });
+
+      // Apply filter
+      applyFilters({
+        sortBy: this.getAttribute('data-value')
+      });
+    } else {
+      // If unchecked, remove sortBy filter
+      const currentFilters = getCurrentFilters();
+      delete currentFilters.sortBy;
+      applyFilters(currentFilters);
+    }
+  });
+});
+
+// Handle Category checkboxes
+const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+categoryCheckboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const currentFilters = getCurrentFilters();
+    const categoryValue = this.getAttribute('data-value');
+
+    if (this.checked) {
+      // Uncheck other category checkboxes
+      categoryCheckboxes.forEach(cb => {
+        if (cb !== this) cb.checked = false;
+      });
+
+      // Apply category filter
+      applyFilters({
+        category: categoryValue
+      });
+    } else {
+      // If unchecked, remove category filter
+      delete currentFilters.category;
+      applyFilters(currentFilters);
+    }
+  });
+});
+
+// Handle Price Range checkboxes
+const priceCheckboxes = document.querySelectorAll('.price-checkbox');
+priceCheckboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const currentFilters = getCurrentFilters();
+    const gt = this.getAttribute('data-gt');
+    const lt = this.getAttribute('data-lt');
+
+    if (this.checked) {
+      // Uncheck other price checkboxes
+      priceCheckboxes.forEach(cb => {
+        if (cb !== this) cb.checked = false;
+      });
+
+      // Apply price range filter
+      applyFilters({
+        gt: gt,
+        lt: lt
+      });
+    } else {
+      // If unchecked, remove price range filter
+      delete currentFilters.gt;
+      delete currentFilters.lt;
+      applyFilters(currentFilters);
+    }
+  });
+});
+
+// Handle Rating checkboxes
+const ratingCheckboxes = document.querySelectorAll('.rating-checkbox');
+ratingCheckboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', function() {
+    const currentFilters = getCurrentFilters();
+    const ratingValue = this.getAttribute('data-value');
+
+    if (this.checked) {
+      // Uncheck other rating checkboxes
+      ratingCheckboxes.forEach(cb => {
+        if (cb !== this) cb.checked = false;
+      });
+
+      // Apply rating filter
+      applyFilters({
+        rating: ratingValue
+      });
+    } else {
+      // If unchecked, remove rating filter
+      delete currentFilters.rating;
+      applyFilters(currentFilters);
+    }
+  });
+});
+
+
+// Function to get current URL parameters
+function getCurrentFilters() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const currentFilters = {};
+  
+  // Get all parameters
+  for (const [key, value] of urlParams.entries()) {
+    currentFilters[key] = value;
+  }
+  
+  return currentFilters;
+}
+
+// Function to navigate to filtered URL
+function applyFilters(filtersToApply) {
+  const currentFilters = getCurrentFilters();
+  const newParams = new URLSearchParams();
+  
+  // For removals, identify keys with null/undefined/empty values
+  const keysToRemove = [];
+  for (const [key, value] of Object.entries(filtersToApply)) {
+    if (value === null || value === undefined || value === '') {
+      keysToRemove.push(key);
+      delete filtersToApply[key]; // Remove from the object
+    }
+  }
+  
+  // Combine current filters with new ones (overwrite if same key)
+  const combinedFilters = {...currentFilters, ...filtersToApply};
+  
+  // Remove the keys marked for removal
+  keysToRemove.forEach(key => delete combinedFilters[key]);
+  
+  // Remove page parameter when filters change
+  if ('page' in combinedFilters && Object.keys(filtersToApply).length > 0) {
+    delete combinedFilters.page;
+  }
+  
+  // Build query string
+  for (const [key, value] of Object.entries(combinedFilters)) {
+    if (value !== null && value !== undefined && value !== '') {
+      newParams.append(key, value);
+    }
+  }
+  
+  // Navigate to new URL
+  window.location.href = `/filter?${newParams.toString()}`;
+}
+
   });
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -925,87 +1242,130 @@
 
     const modalHTML = `
     <div class="mobile-filter-overlay"></div>
-    <div class="mobile-filter-modal">
-        <div class="modal-header">
-            <h5>Filters</h5>
-            <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-            <!-- Filter Sections -->
-            <div class="shop__sidebar__sort">
-                <h6 class="filter-title">Sort By</h6>
-                <ul class="sidebar-list">
-                    <li>
-                        <a href="/sortBy?sortBy=featured&page=1" class="sidebar-link <%= sortBy === 'featured' ? 'active' : '' %>">Featured</a>
-                    </li>
-                    <li>
-                        <a href="/sortBy?sortBy=newArrivals&page=1" class="sidebar-link <%= sortBy === 'newArrivals' ? 'active' : '' %>">New Arrivals</a>
-                    </li>
-                    <li>
-                        <a href="/sortBy?sortBy=aToZ&page=1" class="sidebar-link <%= sortBy === 'aToZ' ? 'active' : '' %>">A - Z</a>
-                    </li>
-                    <li>
-                        <a href="/sortBy?sortBy=zToA&page=1" class="sidebar-link <%= sortBy === 'zToA' ? 'active' : '' %>">Z - A</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="shop__sidebar__categories">
-                <h6 class="filter-title">Categories</h6>
-                <ul class="sidebar-list">
-                    <% for (let i = 0; i < categories.length; i++) { %>
-                    <li>
-                        <a href="/filter?category=<%= categories[i]._id %>" class="sidebar-link <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'active' : '' %>">
-                            <%= categories[i].name %>
-                        </a>
-                    </li>
-                    <% } %>
-                </ul>
-
-            </div>
-
-            <div class="shop__sidebar__price">
-                <h6 class="filter-title">Filter Price</h6>
-                <ul class="sidebar-list">
-                    <li>
-                        <a href="/filterPrice?gt=0&lt=500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 0 && lt === 500) ? 'active' : '' %>">Under ₹500.00</a>
-                    </li>
-                    <li>
-                        <a href="/filterPrice?gt=500&lt=1000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 500 && lt === 1000) ? 'active' : '' %>">₹500.00 - ₹1000.00</a>
-                    </li>
-                    <li>
-                        <a href="/filterPrice?gt=1000&lt=1500&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1000 && lt === 1500) ? 'active' : '' %>">₹1000.00 - ₹1500.00</a>
-                    </li>
-                    <li>
-                        <a href="/filterPrice?gt=1500&lt=100000&sortBy=<%= sortBy %>" class="sidebar-link <%= (gt === 1500 && lt === 100000) ? 'active' : '' %>">₹1500.00+</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="shop__sidebar__rating">
-                <h6 class="filter-title">Filter by Rating</h6>
-                <ul class="sidebar-list">
-                    <li>
-                        <a href="/shop?rating=1&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 1 ? 'active' : '' %>">1 Star & above</a>
-                    </li>
-                    <li>
-                        <a href="/shop?rating=2&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 2 ? 'active' : '' %>">2 Stars & above</a>
-                    </li>
-                    <li>
-                        <a href="/shop?rating=3&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 3 ? 'active' : '' %>">3 Stars & above</a>
-                    </li>
-                    <li>
-                        <a href="/shop?rating=4&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 4 ? 'active' : '' %>">4 Stars & above</a>
-                    </li>
-                    <li>
-                        <a href="/shop?rating=5&page=1&sortBy=<%= sortBy %>" class="sidebar-link <%= rating === 5 ? 'active' : '' %>">5 Stars</a>
-                    </li>
-                </ul>
-            </div>
-            <!-- Clear Filters Button -->
-        <a href="/shop" class="clear-filters">Clear Filters</a>
-        </div>
+<div class="mobile-filter-modal">
+    <div class="modal-header">
+        <h5>Filters</h5>
+        <button class="modal-close">&times;</button>
     </div>
+    <div class="modal-body">
+        <!-- Sort By Section -->
+        <div class="sidebar-section">
+            <h6 class="filter-title">Sort By</h6>
+            <ul class="sidebar-list">
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="featured" <%= sortBy === 'featured' ? 'checked' : '' %>>
+                        <span class="checkbox-label">Featured</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="newArrivals" <%= sortBy === 'newArrivals' ? 'checked' : '' %>>
+                        <span class="checkbox-label">New Arrivals</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="aToZ" <%= sortBy === 'aToZ' ? 'checked' : '' %>>
+                        <span class="checkbox-label">A - Z</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="sort-checkbox" data-filter="sortBy" data-value="zToA" <%= sortBy === 'zToA' ? 'checked' : '' %>>
+                        <span class="checkbox-label">Z - A</span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Categories Section -->
+        <div class="sidebar-section">
+            <h6 class="filter-title">Categories</h6>
+            <ul class="sidebar-list">
+                <% for (let i = 0; i < categories.length; i++) { %>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="category-checkbox" data-filter="category" data-value="<%= categories[i]._id %>" <%= selectedCategory && selectedCategory.toString() === categories[i]._id.toString() ? 'checked' : '' %>>
+                        <span class="checkbox-label"><%= categories[i].name %></span>
+                    </label>
+                </li>
+                <% } %>
+            </ul>
+        </div>
+
+        <!-- Price Range Section -->
+        <div class="sidebar-section">
+            <h6 class="filter-title">Price Range</h6>
+            <ul class="sidebar-list">
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="0" data-lt="500" <%= (gt == 0 && lt == 500) ? 'checked' : '' %>>
+                        <span class="checkbox-label">Under ₹500.00</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="500" data-lt="1000" <%= (gt == 500 && lt == 1000) ? 'checked' : '' %>>
+                        <span class="checkbox-label">₹500.00 - ₹1000.00</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="1000" data-lt="1500" <%= (gt == 1000 && lt == 1500) ? 'checked' : '' %>>
+                        <span class="checkbox-label">₹1000.00 - ₹1500.00</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="price-checkbox" data-filter="price" data-gt="1500" data-lt="100000" <%= (gt == 1500 && lt == 100000) ? 'checked' : '' %>>
+                        <span class="checkbox-label">₹1500.00+</span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Rating Section -->
+        <div class="sidebar-section">
+            <h6 class="filter-title">Filter by Rating</h6>
+            <ul class="sidebar-list">
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="1" <%= rating == 1 ? 'checked' : '' %>>
+                        <span class="checkbox-label">1 Star & above</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="2" <%= rating == 2 ? 'checked' : '' %>>
+                        <span class="checkbox-label">2 Stars & above</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="3" <%= rating == 3 ? 'checked' : '' %>>
+                        <span class="checkbox-label">3 Stars & above</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="4" <%= rating == 4 ? 'checked' : '' %>>
+                        <span class="checkbox-label">4 Stars & above</span>
+                    </label>
+                </li>
+                <li>
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="rating-checkbox" data-filter="rating" data-value="5" <%= rating == 5 ? 'checked' : '' %>>
+                        <span class="checkbox-label">5 Stars</span>
+                    </label>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Clear Filters Button -->
+        <a href="/shop" class="clear-filters">Clear Filters</a>
+    </div>
+</div>
 `;
 document.body.insertAdjacentHTML('beforeend', modalHTML);
 
@@ -1043,6 +1403,32 @@ document.body.insertAdjacentHTML('beforeend', modalHTML);
 
     // Prevent modal close when clicking inside
     modal.addEventListener('click', (e) => e.stopPropagation());
+
+    // Handle checkbox interactions
+    const checkboxes = document.querySelectorAll('.mobile-filter-modal input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            const filterType = this.getAttribute('data-filter');
+            const filterValue = this.getAttribute('data-value') || `${this.getAttribute('data-gt')}-${this.getAttribute('data-lt')}`;
+
+            if (this.checked) {
+                // Uncheck other checkboxes in the same group
+                checkboxes.forEach(cb => {
+                    if (cb !== this && cb.getAttribute('data-filter') === filterType) {
+                        cb.checked = false;
+                    }
+                });
+
+                // Apply filter
+                applyFilters({ [filterType]: filterValue });
+            } else {
+                // Remove filter
+                const currentFilters = getCurrentFilters();
+                delete currentFilters[filterType];
+                applyFilters(currentFilters);
+            }
+        });
+      });
     
 });
 

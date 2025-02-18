@@ -108,12 +108,9 @@ router.post("/login", userController.login);
 
 // Shopping page
 router.get("/shop", userController.loadShopping);
-router.get("/filter", userController.filterProduct);
-router.get("/filterPrice", userController.filterByPrice);
-router.get("/filterRating", userController.filterRating);
+router.get("/filter", userController.consolidatedFilter);
 router.get("/search", userController.searchProducts);
-router.get("/sortBy", userController.sortBy);
-router.get("/sortByPrice", userController.sortByPrice);
+
 
 router.get("/logout", userController.logout);
 

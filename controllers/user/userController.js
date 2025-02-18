@@ -523,83 +523,89 @@ const loadShopping = async (req, res) => {
   }
 };
 
-const filterProduct = async (req, res) => {
+const consolidatedFilter = async (req, res) => {
   try {
     const user = req.session.user;
+    
+    // Get all filter parameters from query
     const category = req.query.category;
-    const sortBy = req.query.sortBy || "newest";
-    const priceRange = req.query.gt && req.query.lt;
-
+    const sortBy = req.query.sortBy || "featured";
+    
+    // Handle price range parameters
+    const gt = req.query.gt !== undefined ? parseFloat(req.query.gt) : 0;
+    const lt = req.query.lt !== undefined ? parseFloat(req.query.lt) : 100000;
+    const priceRange = req.query.gt !== undefined && req.query.lt !== undefined;
+    
+    // Handle rating parameter
+    let rating = 0;
+    if (req.query.rating !== undefined && req.query.rating !== '') {
+      rating = parseInt(req.query.rating);
+    }
+    
+    const search = req.query.search || "";
+    const page = parseInt(req.query.page) || 1;
+    
+    // Build base query
+    const query = {
+      isBlocked: false,
+      isDeleted: false,
+    };
+    
+    // Add category filter if provided and valid
+    if (category && mongoose.Types.ObjectId.isValid(category)) {
+      query.category = new mongoose.Types.ObjectId(category);
+    }
+    
+    // Add price range filter if provided
+    if (priceRange) {
+      query.salePrice = { $gt: gt, $lt: lt };
+    }
+    
+    // Fetch all relevant data
+    const categories = await Category.find({ isListed: true });
+    const userData = user ? await User.findOne({ _id: user }) : null;
+    
+    // Find category object if selected
     let findCategory = null;
     if (category && mongoose.Types.ObjectId.isValid(category)) {
       findCategory = await Category.findOne({ _id: category });
     }
 
-    const query = {
-      isBlocked: false,
-      // quantity: { $gt: 0 }
-    };
+    // Fetch products with base filters
+    let findProducts = await Product.find(query)
+      .populate('brand', 'brandName')
+      .populate('category', 'name')
+      .lean();
 
-    if (findCategory) {
-      query.category = findCategory._id;
+    // Apply search filter if provided
+    if (search) {
+      findProducts = findProducts.filter((product) => {
+        const searchTerm = search.toLowerCase();
+        return (
+          product.productName.toLowerCase().includes(searchTerm) ||
+          (product.brand?.brandName && product.brand.brandName.toLowerCase().includes(searchTerm)) ||
+          (product.category?.name && product.category.name.toLowerCase().includes(searchTerm))
+        );
+      });
     }
-
-    if (priceRange) {
-      query.salePrice = { $gt: req.query.gt, $lt: req.query.lt };
-    }
-
-    // Add population to the product query
-    let findProducts = [];
-    if (sortBy === "newest") {
-      findProducts = await Product.find(query)
-        .populate('brand', 'brandName')    // Populate brand
-        .populate('category', 'name')      // Populate category
-        .sort({ createdAt: -1 })
-        .lean();
-    } else if (sortBy === "lowToHigh") {
-      findProducts = await Product.find(query)
-        .populate('brand', 'brandName')
-        .populate('category', 'name')
-        .sort({ salePrice: 1 })
-        .lean();
-    } else if (sortBy === "highToLow") {
-      findProducts = await Product.find(query)
-        .populate('brand', 'brandName')
-        .populate('category', 'name')
-        .sort({ salePrice: -1 })
-        .lean();
-    }
-
-    let noProductsMessage = "";
-    let noProductsinCategory = "";
-
-    if (priceRange && findProducts.length === 0) {
-      noProductsMessage = "Sorry, there is no products found in the selected price range.";
-    }
-
-    if (category && findProducts.length === 0) {
-      noProductsinCategory = "Sorry, there is no products available in this category now.";
-    }
-
-    const categories = await Category.find({ isListed: true });
-
-    let itemsPerPage = 6;
-    let currentPage = parseInt(req.query.page) || 1;
-
-    let gt = req.query.gt || "";
-    let lt = req.query.lt || "";
-
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
-
-    if (isNaN(currentPage) || currentPage < 1) {
-      currentPage = 1;
-    }
-
-    const rating = parseInt(req.query.rating) || 0;
-    let filteredProducts = [];
     
-    // Process ratings and create filtered products
+    // Apply sorting
+    if (sortBy === "featured") {
+      findProducts.sort((a, b) => b.featured - a.featured);
+    } else if (sortBy === "newArrivals") {
+      findProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (sortBy === "aToZ") {
+      findProducts.sort((a, b) => a.productName.localeCompare(b.productName));
+    } else if (sortBy === "zToA") {
+      findProducts.sort((a, b) => b.productName.localeCompare(a.productName));
+    } else if (sortBy === "lowToHigh") {
+      findProducts.sort((a, b) => a.salePrice - b.salePrice);
+    } else if (sortBy === "highToLow") {
+      findProducts.sort((a, b) => b.salePrice - a.salePrice);
+    }
+    
+    // Apply rating filter and calculate average ratings
+    let filteredProducts = [];
     for (let product of findProducts) {
       const reviews = await Review.find({
         product_id: product._id,
@@ -608,9 +614,7 @@ const filterProduct = async (req, res) => {
 
       let averageRating = 0;
       if (reviews.length > 0) {
-        averageRating =
-          reviews.reduce((total, review) => total + review.rating, 0) /
-          reviews.length;
+        averageRating = reviews.reduce((total, review) => total + review.rating, 0) / reviews.length;
       }
 
       product.averageRating = averageRating;
@@ -619,34 +623,54 @@ const filterProduct = async (req, res) => {
         filteredProducts.push(product);
       }
     }
+    
+    // Add to user search history if category is selected
+    if (user && findCategory) {
+      const searchEntry = {
+        category: findCategory._id,
+        searchedOn: new Date(),
+      };
 
-    // Use filteredProducts for pagination instead of findProducts
-    let startIndex = (currentPage - 1) * itemsPerPage;
-    let endIndex = startIndex + itemsPerPage;
-    let totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-    const currentProduct = filteredProducts.slice(startIndex, endIndex);
-
-    let userData = null;
-    if (user) {
-      userData = await User.findOne({ _id: user });
-      if (userData && findCategory) {
-        const searchEntry = {
-          category: findCategory._id,
-          searchedOn: new Date(),
-        };
-
-        if (!userData.searchHistory.some(
-          (entry) => entry.category?.toString() === searchEntry.category?.toString()
-        )) {
-          userData.searchHistory.push(searchEntry);
-          await userData.save();
-        }
+      if (!userData.searchHistory.some(
+        (entry) => entry.category?.toString() === searchEntry.category?.toString()
+      )) {
+        userData.searchHistory.push(searchEntry);
+        await userData.save();
       }
     }
-
+    
+    // Setup pagination
+    const itemsPerPage = 6;
+    const currentPage = page < 1 ? 1 : page;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    const currentProduct = filteredProducts.slice(startIndex, endIndex);
+    
+    // Get cart items
+    const cart = await Cart.findOne({ userId: user });
+    const cartItems = cart ? cart.items : [];
+    
+    // Error messages
+    let noProductsMessage = "";
+    let noProductsinCategory = "";
+    
+    if (priceRange && filteredProducts.length === 0) {
+      noProductsMessage = "Sorry, there are no products found in the selected price range.";
+    }
+    
+    if (category && filteredProducts.length === 0) {
+      noProductsinCategory = "Sorry, there are no products available in this category now.";
+    }
+    
+    if (rating > 0 && filteredProducts.length === 0) {
+      noProductsMessage = "So sorry! No products available with the selected rating!";
+    }
+    
+    // Store filtered products in session
     req.session.filteredProducts = currentProduct;
-    let search = req.query.search || ""; 
-
+    
+    // Render the shop page with all parameters
     res.render("shop", {
       user: userData,
       products: currentProduct,
@@ -654,397 +678,20 @@ const filterProduct = async (req, res) => {
       totalPages,
       currentPage,
       selectedCategory: category || null,
-      noProductsMessage,
-      noProductsinCategory,
       sortBy,
       gt,
       lt,
-      cartItems: cartItems,
-      activePage: "shop",
       rating,
-      search
-    });
-
-  } catch (error) {
-    console.error('Filter product error:', error);
-    res.redirect("/pageNotFound");
-  }
-};
-
-const filterByPrice = async (req, res) => {
-  try {
-    const user = req.session.user;
-    const userData = await User.findOne({ _id: user });
-    const categories = await Category.find({ isListed: true }).lean();
-
-    const gt = parseFloat(req.query.gt) || 0;
-    const lt = parseFloat(req.query.lt) || 100000;
-
-    const sortBy = req.query.sortBy || "lowToHigh";
-    const selectedCategory = req.query.category || null;
-    let sortQuery = {};
-
-    if (sortBy === "lowToHigh") {
-      sortQuery = { salePrice: 1 };
-    } else if (sortBy === "highToLow") {
-      sortQuery = { salePrice: -1 };
-    }
-
-    let findProducts = await Product.find({
-      salePrice: { $gt: gt, $lt: lt },
-      isBlocked: false,
-      isDeleted: false,
-    })
-    .populate('brand', 'brandName')    // Populate brand information
-    .populate('category', 'name')      
-      .sort(sortQuery)
-      .lean();
-
-    let noProductsMessage = "";
-    if (findProducts.length === 0) {
-      noProductsMessage =
-        "So sorry! No products available in this price range!";
-    }
-
-    const cart = await Cart.findOne({ userId: user });
-
-    const cartItems = cart ? cart.items : [];
-
-    let itemsPerPage = 6;
-    let currentPage = parseInt(req.query.page) || 1;
-
-    if (isNaN(currentPage) || currentPage < 1) {
-      currentPage = 1;
-    }
-    const rating = parseInt(req.query.rating) || 0;
-    let filteredProducts = [];
-    for (let product of findProducts) {
-      const reviews = await Review.find({
-        product_id: product._id,
-        verified_purchase: true,
-      }).lean();
-
-      let averageRating = 0;
-      if (reviews.length > 0) {
-        averageRating =
-          reviews.reduce((total, review) => total + review.rating, 0) /
-          reviews.length;
-      }
-
-      product.averageRating = averageRating;
-
-      if (rating === 0 || averageRating >= rating) {
-        filteredProducts.push(product);
-      }
-    }
-
-    let startIndex = (currentPage - 1) * itemsPerPage;
-    let endIndex = startIndex + itemsPerPage;
-    let totalPages = Math.ceil(findProducts.length / itemsPerPage);
-    const currentProduct = findProducts.slice(startIndex, endIndex);
-
-    req.session.filteredProducts = findProducts;
-
-    let noProductsinCategory = "";
-    let search = req.query.search || ""; 
-
-    res.render("shop", {
-      user: userData,
-      products: currentProduct,
-      categories: categories,
-      totalPages,
-      currentPage,
-      sortBy,
-      noProductsMessage,
-      noProductsinCategory,
-      selectedCategory: selectedCategory,
-      gt: gt,
-      lt: lt,
-      cartItems: cartItems,
-      activePage: "shop",
-      rating,
-      search
-    });
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.redirect("/pageNotFound");
-  }
-};
-
-const filterRating = async (req, res) => {
-  try {
-    const user = req.session.user;
-    const userData = await User.findOne({ _id: user });
-    const categories = await Category.find({ isListed: true }).lean();
-
-    let gt = "",
-      lt = "",
-      noProductsinCategory = "";
-
-    const sortBy = req.query.sortBy || "lowToHigh";
-    const selectedCategory = req.query.category || null;
-    let sortQuery = {};
-
-    if (sortBy === "lowToHigh") {
-      sortQuery = { salePrice: 1 };
-    } else if (sortBy === "highToLow") {
-      sortQuery = { salePrice: -1 };
-    }
-
-    let findProducts = await Product.find({
-      isBlocked: false,
-      isDeleted: false,
-    })
-    .populate('brand', 'brandName')    // Populate brand information
-    .populate('category', 'name')     
-      .sort(sortQuery)
-      .lean();
-
-    let filteredProducts = [];
-    for (let product of findProducts) {
-      const reviews = await Review.find({
-        product_id: product._id,
-        verified_purchase: true,
-      }).lean();
-
-      let averageRating = 0;
-      if (reviews.length > 0) {
-        averageRating =
-          reviews.reduce((total, review) => total + review.rating, 0) /
-          reviews.length;
-      }
-
-      product.averageRating = averageRating;
-
-      // eslint-disable-next-line no-undef
-      if (rating === 0 || averageRating >= rating) {
-        filteredProducts.push(product);
-      }
-    }
-
-    let noProductsMessage = "";
-    if (filteredProducts.length === 0) {
-      noProductsMessage =
-        "So sorry! No products available with the selected rating!";
-    }
-
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
-
-    let itemsPerPage = 6;
-    let currentPage = parseInt(req.query.page) || 1;
-
-    if (isNaN(currentPage) || currentPage < 1) {
-      currentPage = 1;
-    }
-
-    let startIndex = (currentPage - 1) * itemsPerPage;
-    let endIndex = startIndex + itemsPerPage;
-    let totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-    const currentProduct = filteredProducts.slice(startIndex, endIndex);
-
-    req.session.filteredProducts = filteredProducts;
-    let search = req.query.search || ""; 
-
-    res.render("shop", {
-      user: userData,
-      products: currentProduct,
-      categories: categories,
-      totalPages,
-      currentPage,
-      sortBy,
-      noProductsMessage,
-      selectedCategory,
-      // eslint-disable-next-line no-undef
-      rating,
-      cartItems,
-      activePage: "shop",
-      gt,
-      lt,
-      noProductsinCategory,
-      search
-    });
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.redirect("/pageNotFound");
-  }
-};
-
-const sortBy = async (req, res) => {
-  try {
-    const user = req.session.user;
-    const userData = await User.findOne({ _id: user });
-    const categories = await Category.find({ isListed: true }).lean();
-
-    const sortBy = req.query.sortBy || "newArrivals";
-
-    let findProducts = await Product.find({
-      isBlocked: false,
-      isDeleted: false,
-    })
-    .populate('brand', 'brandName')    // Populate brand information
-    .populate('category', 'name')      // Populate category information if needed
-    .lean();
-
-    if (sortBy === "featured") {
-      findProducts.sort((a, b) => b.featured - a.featured);
-    } else if (sortBy === "newArrivals") {
-      findProducts.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-    } else if (sortBy === "aToZ") {
-      findProducts.sort((a, b) => {
-        const nameA = a.productName || "";
-        const nameB = b.productName || "";
-        return nameA.localeCompare(nameB);
-      });
-    } else if (sortBy === "zToA") {
-      findProducts.sort((a, b) => {
-        const nameA = a.productName || "";
-        const nameB = b.productName || "";
-        return nameB.localeCompare(nameA);
-      });
-    }
-
-    let selectedCategory = "";
-    let gt = "";
-    let lt = "";
-    let noProductsMessage = "";
-    let noProductsinCategory = "";
-
-    const rating = parseInt(req.query.rating) || 0;
-    let filteredProducts = [];
-    for (let product of findProducts) {
-      const reviews = await Review.find({
-        product_id: product._id,
-        verified_purchase: true,
-      }).lean();
-
-      let averageRating = 0;
-      if (reviews.length > 0) {
-        averageRating =
-          reviews.reduce((total, review) => total + review.rating, 0) /
-          reviews.length;
-      }
-
-      product.averageRating = averageRating;
-
-      if (rating === 0 || averageRating >= rating) {
-        filteredProducts.push(product);
-      }
-    }
-
-    const cart = await Cart.findOne({ userId: user });
-
-    const cartItems = cart ? cart.items : [];
-
-    let itemsPerPage = 6;
-    let currentPage = parseInt(req.query.page) || 1;
-
-    if (isNaN(currentPage) || currentPage < 1) {
-      currentPage = 1;
-    }
-
-    let startIndex = (currentPage - 1) * itemsPerPage;
-    let endIndex = startIndex + itemsPerPage;
-    let totalPages = Math.ceil(findProducts.length / itemsPerPage);
-    const currentProduct = findProducts.slice(startIndex, endIndex);
-    let search = req.query.search || ""; 
-
-    res.render("shop", {
-      user: userData,
-      products: currentProduct,
-      categories: categories,
-      totalPages,
-      currentPage,
-      sortBy,
-      selectedCategory,
-      gt,
-      lt,
+      search,
       noProductsMessage,
       noProductsinCategory,
       cartItems: cartItems,
-      activePage: "shop",
-      rating,
-      search
+      activePage: "shop"
     });
-    // eslint-disable-next-line no-unused-vars
+    
   } catch (error) {
-    res.redirect("/pageNotFound");
-  }
-};
-
-const sortByPrice = async (req, res) => {
-  try {
-    const user = req.session.user;
-    const userData = await User.findOne({ _id: user });
-    const categories = await Category.find({ isListed: true }).lean();
-
-    const sortBy = req.query.sortBy || "lowToHigh";
-
-    let findProducts = await Product.find({
-      isBlocked: false,
-      isDeleted: false,
-    })
-    .populate('brand', 'brandName')    // Populate brand information
-    .populate('category', 'name')      // Populate category information if needed
-    .lean();
-
-    if (sortBy === "lowToHigh") {
-      findProducts.sort((a, b) => a.salePrice - b.salePrice);
-    } else if (sortBy === "highToLow") {
-      findProducts.sort((a, b) => b.salePrice - a.salePrice);
-    }
-
-    const cart = await Cart.findOne({ userId: user });
-
-    const cartItems = cart ? cart.items : [];
-
-    const itemsPerPage = 6;
-    const currentPage = parseInt(req.query.page) || 1;
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    const totalPages = Math.ceil(findProducts.length / itemsPerPage);
-
-    const rating = parseInt(req.query.rating) || 0;
-    let filteredProducts = [];
-    for (let product of findProducts) {
-      const reviews = await Review.find({
-        product_id: product._id,
-        verified_purchase: true,
-      }).lean();
-
-      let averageRating = 0;
-      if (reviews.length > 0) {
-        averageRating =
-          reviews.reduce((total, review) => total + review.rating, 0) /
-          reviews.length;
-      }
-
-      product.averageRating = averageRating;
-
-      if (rating === 0 || averageRating >= rating) {
-        filteredProducts.push(product);
-      }
-    }
-    let search = req.query.search || ""; 
-
-    const currentProducts = findProducts.slice(startIndex, endIndex);
-    res.render("shop", {
-      user: userData,
-      products: currentProducts,
-      categories: categories,
-      totalPages,
-      currentPage,
-      sortBy,
-      cartItems: cartItems,
-      activePage: "shop",
-      rating,
-      search
-    });
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
+    console.error('Filter error:', error);
+    console.error('Error stack:', error.stack);
     res.redirect("/pageNotFound");
   }
 };
@@ -1143,7 +790,7 @@ const searchProducts = async (req, res) => {
     }
 
     // Pagination logic
-    let itemsPerPage = 6;
+    let itemsPerPage = 9;
     let currentPage = parseInt(req.query.page) || 1;
     if (isNaN(currentPage) || currentPage < 1) {
       currentPage = 1;
@@ -1395,11 +1042,12 @@ module.exports = {
   loadLogin,
   login,
   loadShopping,
-  filterProduct,
-  filterByPrice,
-  filterRating,
-  sortBy,
-  sortByPrice,
+  consolidatedFilter,
+  // filterProduct,
+  // filterByPrice,
+  // filterRating,
+  // sortBy,
+  // sortByPrice,
   searchProducts,
   logout,
   addMoney,
