@@ -237,7 +237,9 @@
       const emailVal = emailId.value;
       const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
 
-      if (!emailPattern.test(emailVal)) {
+      if(emailVal.trim() === "") {
+        showError(emailErr, "Please enter an email");
+      } else if (!emailPattern.test(emailVal)) {
         showError(emailErr, "Invalid format");
       } else {
         hideError(emailErr);
@@ -246,11 +248,29 @@
 
     function phoneValidaterChecking() {
       const phoneVal = phoneId.value;
+      // Check if the phone number is all identical digits
+       const isDummyNumber = /^(\d)\1{9}$/.test(phoneVal);
+       const phoneValWithoutSpaces = phoneVal.replace(/\s+/g, "");
+       if (phoneVal !== phoneValWithoutSpaces) {
+        showError(phoneErr, "Please remove spaces between phone numbers");
+        return;
+      }
 
-      if (phoneVal.trim() === "") {
+      const containsLetters = /[a-zA-Z]/.test(phoneVal);
+
+      if (containsLetters) {
+        showError(phoneErr, "Phone number should not contain letters");
+        return;
+      }
+
+      if (phoneVal.trim() === "" || phoneVal < 0) {
         showError(phoneErr, "Please enter a valid Phone Number");
+      } else if(phoneVal.trim() === " ") {
+        showError(phoneErr, "Please remove the spaces");
       } else if (phoneVal.length !== 10) {
         showError(phoneErr, "Enter a 10-digit Phone number");
+      } else if (isDummyNumber) {
+        showError(phoneErr, "Please enter a valid Phone Number (not a dummy number)");
       } else {
         hideError(phoneErr);
       }
@@ -259,10 +279,12 @@
     function passValidaterChecking() {
       const passVal = passId.value;
       const cPassVal = cPassId.value;
-      const alpha = /^[A-Za-z]/;
+      const alpha = /[A-Za-z]/;
       const digit = /\d/;
 
-      if (passVal.length < 8) {
+      if(passVal.trim() === "") {
+        showError(passErr, "Please enter a password");
+      } else if (passVal.length < 8) {
         showError(passErr, "Should contain at least 8 characters");
       } else if (!alpha.test(passVal) || !digit.test(passVal)) {
         showError(passErr, "Should contain numbers and alphabets");
@@ -270,7 +292,17 @@
         hideError(passErr);
       }
 
-      if (passVal !== cPassVal && cPassVal !== "") {
+      if(cPassVal.trim() === "") {
+        showError(cPassErr, "Please enter a password");
+      } else if (cPassVal.length < 8) {
+        showError(cPassErr, "Should contain at least 8 characters");
+      } else if (!alpha.test(cPassVal) || !digit.test(cPassVal)) {
+        showError(cPassErr, "Should contain numbers and alphabets");
+      } else {
+        hideError(cPassErr);
+      }
+
+      if (passVal !== cPassVal) {
         showError(cPassErr, "Passwords didn't match");
       } else {
         hideError(cPassErr);

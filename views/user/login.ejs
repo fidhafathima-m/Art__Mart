@@ -42,7 +42,7 @@
           <% } %>
 
           <div class="form-group">
-            <input type="email" name="email" id="email" class="input-line" placeholder="Email Address" />
+            <input type="text" name="email" id="email" class="input-line" placeholder="Email Address" />
             <div class="error-message" id="email-error"></div>
           </div>
 
@@ -112,7 +112,7 @@
       if (!emailVal) {
         showError(emailErr, "Please Enter an Email Address");
       } else if (!emailPattern.test(emailVal)) {
-        showError(emailErr, "Invalid format");
+        showError(emailErr, "Invalid format. Eg: example@gmail.com");
       } else {
         hideError(emailErr);
       }
@@ -120,7 +120,7 @@
 
     function passValidaterChecking() {
       const passVal = passId.value;
-      const alpha = /^[A-Za-z]/;
+      const alpha = /[A-Za-z]/;
       const digit = /\d/;
 
       if (!passVal) {
