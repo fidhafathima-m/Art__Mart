@@ -1001,11 +1001,38 @@ const cancelOrder = async (req, res) => {
     order.status = "Cancelled";
     await order.save();
 
-    // Handle different payment methods
     if (order.paymentMethod === "prepaid" || order.paymentMethod === "wallet") {
+      let wallet = await Wallet.findOne({ userId: order.userId._id });
+
+      if (!wallet) {
+        // If no wallet exists, create a new one
+        wallet = new Wallet({
+          userId: order.userId._id,
+          balance: order.finalAmount,
+        });
+        await wallet.save();
+      } else {
+        // Add the order's finalAmount to the wallet balance
+        wallet.balance += order.finalAmount;
+        await wallet.save();
+      }
+
+      // Create a transaction for the refund
+      const transaction = new Transaction({
+        userId: order.userId._id,
+        type: "Order cancelled",
+        amount: order.finalAmount,
+        balance: wallet.balance,
+      });
+
+      await transaction.save();
+
+      order.moneySent = true;
+      await order.save();
+
       return res.json({
         success: true,
-        message: `Your order has been cancelled. The prepaid amount of ₹${order.finalAmount} will be credited to your wallet within 24 hours.`,
+        message: `Your order has been cancelled. The prepaid amount of ₹${order.finalAmount} has been refunded to your wallet.`,
       });
     }
 

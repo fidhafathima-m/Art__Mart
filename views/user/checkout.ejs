@@ -661,7 +661,6 @@
         </div>
         
         <button id="usePaymentMethodBtn" class="btn btn-success col-md-12 mt-5">Place Order</button>
-        <p class="text-muted small text-center">Please wait few seconds after clicking the button to download the invoice. Thank You</p>
 
 
         <!-- Loading Overlay -->
@@ -1104,71 +1103,71 @@
   });
 
   applyCouponBtn.addEventListener('click', () => {
-    const couponCode = couponInput.value;
+  const couponCode = couponInput.value;
 
-    if (couponCode) {
-      fetch('/api/apply-coupon', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            code: couponCode,
-            totalPrice
-          })
+  if (couponCode) {
+    fetch('/api/apply-coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          code: couponCode,
+          totalPrice
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            discount = data.offerPrice; // Update discount with the coupon offer price
-            totalPrice = data.newTotalPrice; // Update total price with the new total
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Use the values directly from the response
+          discount = data.offerPrice;
+          totalPrice = data.newTotalPrice;
 
-            // Update the UI with the new discount and total
-            discountAmountElement.textContent = `₹${discount}`;
-            totalAmountElement.textContent = `₹${totalPrice}`;
+          // Update the UI with the new discount and total
+          discountAmountElement.textContent = `₹${discount}`;
+          totalAmountElement.textContent = `₹${totalPrice}`;
 
-            // Hide Apply Coupon button and show Remove Coupon button
-            applyCouponBtn.style.display = 'none';
-            removeCouponBtn.style.display = 'block';
+          // Hide Apply Coupon button and show Remove Coupon button
+          applyCouponBtn.style.display = 'none';
+          removeCouponBtn.style.display = 'block';
 
-            // Add Remove Coupon button to the DOM (if it's not already added)
-            if (!document.contains(removeCouponBtn)) {
-              applyCouponBtn.parentElement.appendChild(removeCouponBtn);
-            }
-
-            Swal.fire({
-              title: 'Coupon Applied!',
-              text: `You saved ₹${discount}. Your new total is ₹${totalPrice}`,
-              icon: 'success',
-              confirmButtonText: 'OK'
-            });
-          } else {
-            Swal.fire({
-              title: 'Error!',
-              text: data.message,
-              icon: 'error',
-              confirmButtonText: 'Try Again'
-            });
+          // Add Remove Coupon button to the DOM (if it's not already added)
+          if (!document.contains(removeCouponBtn)) {
+            applyCouponBtn.parentElement.appendChild(removeCouponBtn);
           }
-        })
-        .catch(error => {
+
           Swal.fire({
-            title: 'Error!',
-            text: 'An unexpected error occurred. Please try again later.',
-            icon: 'error',
+            title: 'Coupon Applied!',
+            text: `You saved ₹${discount}. Your new total is ₹${totalPrice}`,
+            icon: 'success', 
             confirmButtonText: 'OK'
           });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: data.message,
+            icon: 'error',
+            confirmButtonText: 'Try Again'
+          });
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          title: 'Error!',
+          text: 'An unexpected error occurred. Please try again later.',
+          icon: 'error',
+          confirmButtonText: 'OK'
         });
-    } else {
-      Swal.fire({
-        title: 'Error!',
-        text: 'Please enter a valid coupon code.',
-        icon: 'error',
-        confirmButtonText: 'OK'
       });
-    }
-  });
-
+  } else {
+    Swal.fire({
+      title: 'Error!',
+      text: 'Please enter a valid coupon code.',
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+});
   // Handle removing coupon when Remove Coupon button is clicked
   removeCouponBtn.addEventListener('click', () => {
     const couponCode = couponInput.value;
@@ -1346,7 +1345,7 @@
                   icon: 'success',
                   confirmButtonText: 'OK'
                 }).then(() => {
-                  downloadInvoice(data.orderId);
+                  window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
                 });
               },
               // Adding a failure handler to the Razorpay options
@@ -1387,7 +1386,7 @@
             });
 
           } else {
-            downloadInvoice(data.orderId);
+            window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
           }
         } else {
           console.log('Error');

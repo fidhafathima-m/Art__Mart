@@ -382,7 +382,7 @@
           <div class="card-body">
             <div class="row align-items-center">
               <div class="col-12">
-                <h5>Order ID: <%= order._id %></h5>
+                <h5 class="text-black py-3">Order ID: <%= order._id %></h5>
                 <p>
                   Placed on: <%= new Date(order.createdOn).toLocaleDateString()
                   %>
@@ -528,10 +528,8 @@
       </div>
     </div>
   
-    <% if (transactions.length > 0) { %>
-    <!-- Transaction History Table -->
-    <h4 class="mb-3">Transaction History</h4>
-    <div class="table-responsive">
+    <% if (transactions.length > 0) { %>  
+      <h3>Transaction History</h3>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -542,30 +540,36 @@
           </tr>
         </thead>
         <tbody>
-          <% transactions.forEach(function(transaction) { %>
+        <% 
+        // Sort transactions by date (newest first)
+        transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        transactions.forEach(function(transaction, index) { 
+          // Determine if this transaction increased or decreased the balance
+          let isIncrease;
+          if (index === transactions.length - 1) {
+            // For the oldest transaction, compare with 0 (assuming it's the first)
+            isIncrease = transaction.balance > 0;
+          } else {
+            // Compare with the next oldest transaction
+            const nextTransaction = transactions[index + 1];
+            isIncrease = transaction.balance > nextTransaction.balance;
+          }
+          
+          // Set text color class based on whether balance increased or decrease
+          const amountColorClass = isIncrease ? 'text-success' : 'text-danger';
+        %>
           <tr>
-            <td>
-              <%= new Date(transaction.date).toLocaleString('en-US', {
-                weekday: 'short',   
-                year: 'numeric',    
-                month: 'short',    
-                day: 'numeric',     
-                hour: '2-digit',   
-                minute: '2-digit',  
-                second: '2-digit',  
-                hour12: true        
-              }) %>
-            </td>
+            <td><%= new Date(transaction.date).toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) %></td>
             <td><%= transaction.type %></td>
-            <td>&#8377; <%= transaction.amount.toFixed(2) %></td>
-            <td>&#8377; <%= transaction.balance.toFixed(2) %></td>
+            <td class="<%= amountColorClass %>">₹ <%= transaction.amount.toFixed(2) %></td>
+            <td>₹ <%= transaction.balance.toFixed(2) %></td>
           </tr>
-          <% }) %>
+        <% }) %>
         </tbody>
       </table>
-    </div>
-    <% } else { %>
-    <p class="text-center">No transactions found.</p>
+    <% } else { %> 
+      <p>No transactions found.</p>
     <% } %>
     
     <!-- Pagination -->

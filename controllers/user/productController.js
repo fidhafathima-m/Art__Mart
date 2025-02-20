@@ -517,6 +517,16 @@ const codPlaceOrder = async (req, res) => {
         .json({ success: false, message: "No default address found" });
     }
 
+    // After successful order placement, mark the coupon as used if one was applied
+    if (couponApplied && req.session.pendingCoupon) {
+      await Coupon.findByIdAndUpdate(
+        req.session.pendingCoupon.couponId,
+        { userId: userId }
+      );
+      // Clear the pending coupon from session
+      delete req.session.pendingCoupon;
+    }
+
     const newOrder = new Order({
       userId: userId,
       ordereditems,
@@ -1271,7 +1281,6 @@ const coupons = async (req, res) => {
 
 const applyCoupon = async (req, res) => {
   const { code, totalPrice } = req.body;
-  const userId = req.session.user;
 
   try {
     const coupon = await Coupon.findOne({ name: code, isDeleted: false });
@@ -1290,28 +1299,42 @@ const applyCoupon = async (req, res) => {
       });
     }
 
-    if (coupon.userId && coupon.userId.toString() === userId.toString()) {
+    // Check if coupon has been used already
+    if (coupon.userId) {
       return res
         .status(400)
-        .json({ message: "Coupon has already been used by you" });
+        .json({ message: "Coupon has already been used" });
     }
-
-    coupon.userId = userId;
-
-    await coupon.save();
-
+    
+    // Check if coupon offer price is greater than the total price
+    if (coupon.offerPrice >= totalPrice) {
+      return res.status(400).json({
+        message: `This coupon offers ₹${coupon.offerPrice} discount. Please add more items worth at least ₹${coupon.offerPrice - totalPrice + 1} to your cart to use this coupon.`
+      });
+    }
+    
+    // Calculate new total price
     const newTotalPrice = totalPrice - coupon.offerPrice;
 
-    res.json({ success: true, offerPrice: coupon.offerPrice, newTotalPrice });
-    // eslint-disable-next-line no-unused-vars
+    // Store the coupon in session for later use during order placement
+    req.session.pendingCoupon = {
+      couponId: coupon._id,
+      code: coupon.name,
+      offerPrice: coupon.offerPrice
+    };
+
+    res.json({ 
+      success: true, 
+      offerPrice: coupon.offerPrice, 
+      newTotalPrice: newTotalPrice
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error applying coupon" });
+    res.status(500).json({ message: "Error applying coupon", error });
   }
 };
 
 const removeCoupon = async (req, res) => {
   const { code, totalPrice } = req.body;
-  const userId = req.session.user;
 
   try {
     const coupon = await Coupon.findOne({ name: code, isDeleted: false });
@@ -1320,21 +1343,18 @@ const removeCoupon = async (req, res) => {
       return res.status(400).json({ message: "Coupon not found" });
     }
 
-    if (coupon.userId && coupon.userId.toString() === userId.toString()) {
-      coupon.userId = null;
-      await coupon.save();
-
-      const newTotalPrice = totalPrice + coupon.offerPrice;
-
-      res.json({ success: true, newTotalPrice });
-    } else {
-      res.status(400).json({ message: "Coupon was not applied by you" });
+    // Clear the pending coupon from session
+    if (req.session.pendingCoupon) {
+      delete req.session.pendingCoupon;
     }
-    // eslint-disable-next-line no-unused-vars
+
+    const newTotalPrice = totalPrice + coupon.offerPrice;
+    res.json({ success: true, newTotalPrice });
   } catch (error) {
-    res.status(500).json({ message: "Error removing coupon" });
+    res.status(500).json({ message: "Error removing coupon", error });
   }
 };
+
 
 const generateInvoice = async (req, res) => {
   const { orderId } = req.params;
