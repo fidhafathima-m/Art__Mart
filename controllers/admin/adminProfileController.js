@@ -37,7 +37,7 @@ const sendVeificationMail = async (email, otp) => {
     return true;
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    return false;
+    throw new Error('Failed to send verification mail');
   }
 };
 
@@ -123,7 +123,7 @@ const resendForgetPassOtp = async (req, res) => {
     const otp = generateOtp();
     req.session.otp = otp;
     const email = req.session.email;
-    const emailSent = sendVeificationMail(email, otp);
+    const emailSent = await sendVeificationMail(email, otp);
 
     if (emailSent) {
       res

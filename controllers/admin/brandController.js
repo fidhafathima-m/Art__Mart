@@ -58,7 +58,7 @@ const addBrand = async (req, res) => {
         brandImage: image,
       });
       await newBrand.save();
-      res.json({ success: true, message: "Brand added successfully!" });
+      res.json({ success: true, message: "Brand added successfully!"});
     } else {
       // Send failure response if brand already exists
       res.json({ success: false, message: "Brand already exists!" });
