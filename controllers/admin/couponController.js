@@ -1,7 +1,8 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Coupon = require("../../models/couponSchema");
-// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
+const { OK, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 
 const loadCoupon = async (req, res) => {
   try {
@@ -93,8 +94,8 @@ const addCoupon = async (req, res) => {
   } catch (error) {
     console.error("Error adding coupon:", error);
     return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error" });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -154,18 +155,18 @@ const editCoupon = async (req, res) => {
 
     if (updatedCoupon) {
       return res
-        .status(200)
+        .status(OK)
         .json({ success: true, message: "Coupon updated successfully!" });
     } else {
       return res
-        .status(500)
+        .status(InternalServerError)
         .json({ success: false, message: "Failed to update coupon" });
     }
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     return res
-      .status(500)
-      .json({ success: false, message: "An error occurred" });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -183,7 +184,7 @@ const deleteCoupon = async (req, res) => {
 
     if (!coupon) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Coupon not found." });
     }
 
@@ -194,7 +195,7 @@ const deleteCoupon = async (req, res) => {
   } catch (error) {
     console.error("Error soft deleting coupon:", error);
     return res
-      .status(500)
+      .status(InternalServerError)
       .json({ success: false, message: "Server error while deleting coupon." });
   }
 };
@@ -213,21 +214,20 @@ const restoreCoupon = async (req, res) => {
 
     if (!coupon) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Coupon not found." });
     }
 
     return res.json({ success: true, message: "Coupon restored successfully" });
   } catch (error) {
     console.error("Error restoring coupon:", error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       success: false,
       message: "Server error while restoring coupon.",
     });
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   loadCoupon,
   LoadAddCoupon,

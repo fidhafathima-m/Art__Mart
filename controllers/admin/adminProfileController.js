@@ -1,10 +1,9 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const User = require("../../models/userSchema");
-// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
-// eslint-disable-next-line no-undef, no-unused-vars
-const env = require("dotenv").config();
-// eslint-disable-next-line no-undef
+require("dotenv").config();
+const { OK, BadRequest, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 const bcrypt = require("bcrypt");
 
 // generate OTP
@@ -21,15 +20,12 @@ const sendVeificationMail = async (email, otp) => {
       secure: false,
       requireTLS: true,
       auth: {
-        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
-        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const mailOptions = {
-      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Password Reset Request",
@@ -93,8 +89,8 @@ const forgotPassValid = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res
-      .status(500)
-      .json({ success: false, message: "Internal server error." });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -114,11 +110,11 @@ const verifyForgetPassOtp = async (req, res) => {
     if (otp === req.session.otp) {
       res.json({ success: true, redirectUrl: "/admin/reset-password" });
     } else {
-      res.status(400).json({ success: false, message: "OTP doesn't match" });
+      res.status(BadRequest).json({ success: false, message: "OTP doesn't match" });
     }
   } catch (error) {
     console.error("Error verifying OTP", error);
-    res.status(500).json({ success: false, message: "An error occured." });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -131,12 +127,12 @@ const resendForgetPassOtp = async (req, res) => {
 
     if (emailSent) {
       res
-        .status(200)
+        .status(OK)
         .json({ success: true, message: "OTP Resent Successfully" });
     }
   } catch (error) {
     console.error("Error resending OTP", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -168,7 +164,6 @@ const resetPassword = async (req, res) => {
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   getForgetPass,
   forgetPassOtpPage,

@@ -1,9 +1,9 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Product = require("../../models/productSchema");
-// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
-// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
+const { InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 
 const loadOffer = async (req, res) => {
   try {
@@ -24,7 +24,7 @@ const loadOffer = async (req, res) => {
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -244,11 +244,10 @@ const getReferredUsers = async (req, res) => {
     res.json({ success: true, users });
   } catch (error) {
     console.error("Error fetching referral users:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error." });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   loadOffer,
   addCategoryOffer,

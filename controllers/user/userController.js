@@ -1,28 +1,18 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const User = require("../../models/userSchema");
-// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
-// eslint-disable-next-line no-undef
 const Category = require("../../models/categorySchema");
-// eslint-disable-next-line no-undef
 const Cart = require("../../models/cartSchema");
-// eslint-disable-next-line no-undef
 const Review = require("../../models/reviewSchema");
-// eslint-disable-next-line no-undef
 const Wallet = require("../../models/walletSchema");
-// eslint-disable-next-line no-undef
 const Transaction = require("../../models/transactionSchema");
-// eslint-disable-next-line no-undef
+const { OK, BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 const mongoose = require("mongoose");
-// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
-// eslint-disable-next-line no-undef, no-unused-vars
-const env = require("dotenv").config();
-// eslint-disable-next-line no-undef
+require("dotenv").config();
 const bcrypt = require("bcrypt");
-// eslint-disable-next-line no-undef
 const Brand = require("../../models/brandSchema");
-// eslint-disable-next-line no-undef
 const Fuse = require('fuse.js'); 
 
 // generate OTP
@@ -39,15 +29,12 @@ const sendVeificationMail = async (email, otp) => {
       secure: false,
       requireTLS: true,
       auth: {
-        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
-        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const info = await transporter.sendMail({
-      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Verify your account",
@@ -75,10 +62,10 @@ const securePassword = async (password) => {
 
 const pageNotFound = async (req, res) => {
   try {
-    res.render("page-404");
+    res.render("page-NotFound");
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).send("Internal Server Error: Unable to load page.");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -128,12 +115,12 @@ const loadHomePage = async (req, res) => {
 
   } catch (error) {
     // Even in error case, we need to pass cartItems
-    res.status(500).render("home", {
+    res.status(InternalServerError).render("home", {
       user: null,
       cartItems: [],
       activePage: "home",
       product: [],
-      error: `Internal Server Error: Unable to load home page. Error: ${error.message}`
+      error: INTERNAL_SERVER_ERROR + `. Error: ${error.message}`
     });
   }
 };
@@ -143,9 +130,9 @@ const loadSignUp = async (req, res) => {
     res.render("signup");
   } catch (error) {
     res
-      .status(500)
+      .status(InternalServerError)
       .send(
-        "Internal Server Error: Unable to load sign-up page.",
+        INTERNAL_SERVER_ERROR,
         error.message
       );
   }
@@ -191,7 +178,7 @@ const signUp = async (req, res) => {
     res.render("verify-otp");
   } catch (error) {
     console.error("Error during signup", error);
-    res.status(500).send("Internal Server Error: Failed to complete signup.");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -268,14 +255,14 @@ const verifyOtp = async (req, res) => {
       res.json({ success: true, redirectUrl: "/" });
     } else {
       res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Invalid OTP, Please try again." });
     }
   } catch (error) {
     console.error("Error verifying OTP", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "Internal Server Error: Unable to verify OTP.",
+      message: INTERNAL_SERVER_ERROR + ": Unable to verify OTP.",
     });
   }
 };
@@ -320,8 +307,8 @@ const veryreferralCode = async (req, res) => {
   } catch (error) {
     console.error("Error verifying referral code:", error);
     return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error." });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -329,7 +316,7 @@ const resendOtp = async (req, res) => {
   try {
     if (!req.session.userData || !req.session.userData.email) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Email not found in session" });
     }
 
@@ -342,19 +329,19 @@ const resendOtp = async (req, res) => {
 
     if (emailSent) {
       res
-        .status(200)
+        .status(OK)
         .json({ success: true, message: "OTP resent successfully" });
     } else {
-      res.status(400).json({
+      res.status(BadRequest).json({
         success: false,
         message: "Failed to resend OTP, please try again",
       });
     }
   } catch (error) {
     console.error("Error resending OTP:", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "Internal Server Error: Failed to resend OTP",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -368,8 +355,8 @@ const loadLogin = async (req, res) => {
     }
   } catch (error) {
     res
-      .status(500)
-      .send("Internal Server Error: Unable to load login page.", error.message);
+      .status(InternalServerError)
+      .send(INTERNAL_SERVER_ERROR, error.message);
   }
 };
 
@@ -409,8 +396,8 @@ const login = async (req, res) => {
     res.redirect("/");
   } catch (error) {
     console.error("Login error", error);
-    res.status(500).render("login", {
-      message: "Internal Server Error: Login failed. Please try again later.",
+    res.status(InternalServerError).render("login", {
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -519,7 +506,7 @@ const loadShopping = async (req, res) => {
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).send("Internal Server Error");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -828,13 +815,13 @@ const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
       if (err) {
-        return res.status(500).redirect("/pageNotFound");
+        return res.status(InternalServerError).redirect("/pageNotFound");
       }
       return res.redirect("/");
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).redirect("/pageNotFound");
+    res.status(InternalServerError).redirect("/pageNotFound");
   }
 };
 
@@ -847,7 +834,7 @@ const addMoney = async (req, res) => {
 
   if (!parsedAmount || parsedAmount <= 0) {
     return res
-      .status(400)
+      .status(BadRequest)
       .json({ message: "Please enter a valid amount greater than 0." });
   }
 
@@ -874,13 +861,13 @@ const addMoney = async (req, res) => {
     });
     await transaction.save();
 
-    res.status(200).json({
+    res.status(OK).json({
       message: "Money added to wallet successfully!",
       wallet,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "An error occurred while adding money." });
+    res.status(InternalServerError).json({ message: "An error occurred while adding money." });
   }
 };
 
@@ -889,7 +876,7 @@ const withdrawMoney = async (req, res) => {
   const userId = req.session.user;
 
   if (isNaN(amount) || amount <= 0) {
-    return res.status(400).json({
+    return res.status(BadRequest).json({
       success: false,
       message: "Please enter a valid amount greater than 0.",
     });
@@ -899,14 +886,14 @@ const withdrawMoney = async (req, res) => {
     const wallet = await Wallet.findOne({ userId });
 
     if (!wallet) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         success: false,
         message: "Wallet not found.",
       });
     }
 
     if (wallet.balance < amount) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "Insufficient balance.",
       });
@@ -924,14 +911,14 @@ const withdrawMoney = async (req, res) => {
     });
     await transaction.save();
 
-    res.status(200).json({
+    res.status(OK).json({
       success: true,
       message: "Money withdrawn successfully!",
       wallet,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
       message: "An error occurred while withdrawing money.",
     });
@@ -951,9 +938,9 @@ const loadAbout = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "An error occurred.",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -971,9 +958,9 @@ const loadContact = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "An error occurred.",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -984,9 +971,7 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // Set to true if using SSL (e.g., Gmail uses true for port 465)
   auth: {
-    // eslint-disable-next-line no-undef
     user: process.env.NODEMAILER_EMAIL,
-    // eslint-disable-next-line no-undef
     pass: process.env.NODEMAILER_PASSWORD,
   },
 });
@@ -998,7 +983,6 @@ const sendContactEmail = (req, res) => {
   // Define the email options
   const mailOptions = {
     from: email, // Sender's email address
-    // eslint-disable-next-line no-undef
     to: process.env.NODEMAILER_EMAIL, // Admin email from the .env file
     subject: `New Contact Form Submission: ${subject}`, // Email subject
     text: `You have received a new message from ${name} (${email}).\n\nMessage:\n${message}`, // Plain text body
@@ -1014,15 +998,15 @@ const sendContactEmail = (req, res) => {
     if (error) {
       console.error("Error sending email:", error);
       return res
-        .status(500)
+        .status(InternalServerError)
         .json({
           success: false,
-          message: "Failed to send message. Please try again later.",
+          message: INTERNAL_SERVER_ERROR,
         });
     }
 
     return res
-      .status(200)
+      .status(OK)
       .json({
         success: true,
         message: "Your message has been sent successfully!",
@@ -1030,7 +1014,6 @@ const sendContactEmail = (req, res) => {
   });
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   loadHomePage,
   pageNotFound,

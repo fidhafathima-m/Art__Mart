@@ -4,6 +4,8 @@ const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 const mongoose = require("mongoose");
 const multer = require("multer");
+const { OK, BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 
 const cloudinary = require('cloudinary').v2;
 
@@ -93,7 +95,7 @@ const addProduct = async (req, res) => {
             images.push(result.secure_url);
           } catch (uploadError) {
             console.error('Cloudinary upload error:', uploadError);
-            return res.status(400).json({ 
+            return res.status(BadRequest).json({ 
               success: false, 
               message: "Error uploading image to cloud storage" 
             });
@@ -110,7 +112,7 @@ const addProduct = async (req, res) => {
 
       if (!categoryId) {
         return res
-          .status(400)
+          .status(BadRequest)
           .json({ success: false, message: "Invalid category ID" });
       }
 
@@ -121,7 +123,7 @@ const addProduct = async (req, res) => {
 
       if (!brandId) {
         return res
-          .status(400)
+          .status(BadRequest)
           .json({ success: false, message: "Invalid brand ID" });
       }
 
@@ -132,7 +134,7 @@ const addProduct = async (req, res) => {
         Math.floor(products.regularPrice * (percentage / 100));
 
       if (salePrice < 0) {
-        return res.status(400).json({
+        return res.status(BadRequest).json({
           success: false,
           message:
             "Invalid percentage: The offer leads to a negative sale price. Please adjust the percentage.",
@@ -162,22 +164,22 @@ const addProduct = async (req, res) => {
 
       await newProduct.save();
       return res
-        .status(200)
+        .status(OK)
         .json({ success: true, message: "Product added successfully" });
     } else {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Product already exists" });
     }
   } catch (error) {
     if (error instanceof multer.MulterError) {
       res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Only image files are allowed" });
     } else {
       res
-        .status(500)
-        .json({ success: false, message: "Internal Server Error" });
+        .status(InternalServerError)
+        .json({ success: false, message: INTERNAL_SERVER_ERROR });
     }
   }
 };
@@ -226,10 +228,10 @@ const deleteProduct = async (req, res) => {
     if (product) {
       res.json({ message: "Product soft deleted successfully" });
     } else {
-      res.status(404).json({ message: "Product not found" });
+      res.status(NotFound).json({ message: "Product not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error deleting product", error });
+    res.status(InternalServerError).json({ message: "Error deleting product", error });
   }
 };
 
@@ -246,10 +248,10 @@ const restoreProduct = async (req, res) => {
     if (product) {
       res.json({ message: "Product restored successfully" });
     } else {
-      res.status(404).json({ message: "Product not found" });
+      res.status(NotFound).json({ message: "Product not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error restoring product", error });
+    res.status(InternalServerError).json({ message: "Error restoring product", error });
   }
 };
 
@@ -261,7 +263,7 @@ const editProduct = async (req, res) => {
     
     if (!product) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Product not found" });
     }
 
@@ -284,7 +286,7 @@ const editProduct = async (req, res) => {
           images.push(result.secure_url);
         } catch (uploadError) {
           console.error('Cloudinary upload error:', uploadError);
-          return res.status(400).json({ 
+          return res.status(BadRequest).json({ 
             success: false, 
             message: "Error uploading image to cloud storage" 
           });
@@ -300,7 +302,7 @@ const editProduct = async (req, res) => {
     
     if (!categoryId) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Invalid category ID" });
     }
 
@@ -311,7 +313,7 @@ const editProduct = async (req, res) => {
     
     if (!brandId) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Invalid brand ID" });
     }
 
@@ -327,7 +329,7 @@ const editProduct = async (req, res) => {
     const status = products.quantity > 0 ? "Available" : "Out of Stock";
 
     if (salePrice < 0) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message:
           "Invalid percentage: The offer leads to a negative sale price. Please adjust the percentage.",
@@ -350,11 +352,11 @@ const editProduct = async (req, res) => {
 
     await Product.findByIdAndUpdate(id, updateData, { new: true });
     res
-      .status(200)
+      .status(OK)
       .json({ success: true, message: "Product updated successfully" });
   } catch (error) {
     console.error('Product update error:', error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -364,14 +366,14 @@ const deleteSingleImage = async (req, res) => {
     
     if (!imageNameToServer || !productIdToServer) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ status: false, message: "Missing image name or product ID." });
     }
 
     const product = await Product.findById(productIdToServer);
     if (!product) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ status: false, message: "Product not found." });
     }
 
@@ -379,7 +381,7 @@ const deleteSingleImage = async (req, res) => {
     const imageIndex = product.productImage.indexOf(imageNameToServer);
     if (imageIndex === -1) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ status: false, message: "Image not found in product." });
     }
 
@@ -402,7 +404,7 @@ const deleteSingleImage = async (req, res) => {
     return res.json({ status: true, message: "Image deleted successfully." });
   } catch (error) {
     console.error("Error deleting image:", error.message || error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       status: false,
       message: "Error deleting image or updating product.",
     });
@@ -419,7 +421,7 @@ const addProductOffer = async (req, res) => {
     findProduct.productOffer = parseInt(percentage);
 
     if (findProduct.salePrice < 0) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message:
           "Invalid percentage: The offer leads to a negative sale price. Please adjust the percentage.",
@@ -430,7 +432,7 @@ const addProductOffer = async (req, res) => {
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/admin/pageError");
-    res.status(500).json({ status: false, message: "Internal Server Error" });
+    res.status(InternalServerError).json({ status: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 

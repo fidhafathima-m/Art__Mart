@@ -1,28 +1,18 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const User = require("../../models/userSchema");
-// eslint-disable-next-line no-undef
 const Address = require("../../models/addressSchema");
-// eslint-disable-next-line no-undef
 const Cart = require("../../models/cartSchema");
-// eslint-disable-next-line no-undef
 const Order = require("../../models/orderSchema");
-// eslint-disable-next-line no-undef
 const Review = require("../../models/reviewSchema");
-// eslint-disable-next-line no-undef
 const Wishlist = require("../../models/wishlistSchema");
-// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
-// eslint-disable-next-line no-undef
 const Wallet = require("../../models/walletSchema");
-// eslint-disable-next-line no-undef
 const Transaction = require("../../models/transactionSchema");
-// eslint-disable-next-line no-undef
+const { OK, BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 const mongoose = require("mongoose");
-// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
-// eslint-disable-next-line no-undef, no-unused-vars
-const env = require("dotenv").config();
-// eslint-disable-next-line no-undef
+require("dotenv").config();
 const bcrypt = require("bcrypt");
 
 // generate OTP
@@ -39,15 +29,12 @@ const sendVeificationMail = async (email, otp) => {
       secure: false,
       requireTLS: true,
       auth: {
-        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
-        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const mailOptions = {
-      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Password Reset Request",
@@ -111,8 +98,8 @@ const forgotPassValid = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res
-      .status(500)
-      .json({ success: false, message: "Internal server error." });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR});
   }
 };
 
@@ -132,11 +119,11 @@ const verifyForgetPassOtp = async (req, res) => {
     if (otp === req.session.otp) {
       res.json({ success: true, redirectUrl: "/reset-password" });
     } else {
-      res.status(400).json({ success: false, message: "OTP doesn't match" });
+      res.status(BadRequest).json({ success: false, message: "OTP doesn't match" });
     }
   } catch (error) {
     console.error("Error verifying OTP", error);
-    res.status(500).json({ success: false, message: "An error occured." });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -149,12 +136,12 @@ const resendForgetPassOtp = async (req, res) => {
 
     if (emailSent) {
       res
-        .status(200)
+        .status(OK)
         .json({ success: true, message: "OTP Resent Successfully" });
     }
   } catch (error) {
     console.error("Error resending OTP", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -579,8 +566,8 @@ const verifyChangePassOtp = async (req, res) => {
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res
-      .status(500)
-      .json({ success: false, message: "An error occured, please try again" });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -597,7 +584,7 @@ const loadAddAddress = async (req, res) => {
     });
   } catch (error) {
     console.error("Error loading:", error);
-    res.status(500).send("Error loading addresses");
+    res.status(InternalServerError).send("Error loading addresses");
   }
 };
 
@@ -607,7 +594,7 @@ const addAddress = async (req, res) => {
     const userData = await User.findOne({ _id: userId });
     if (!userData) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "User not found" });
     }
 
@@ -624,7 +611,7 @@ const addAddress = async (req, res) => {
     } = req.body;
 
     if (!addressType || !name || !city || !state || !pincode || !phone) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "All required fields must be filled",
       });
@@ -636,7 +623,7 @@ const addAddress = async (req, res) => {
     });
 
     if (addressExists) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "This location address already exists",
       });
@@ -674,16 +661,16 @@ const addAddress = async (req, res) => {
       await userAddress.save();
     }
 
-    res.status(200).json({
+    res.status(OK).json({
       success: true,
       message: "Address added successfully",
       newAddress: newAddress,
     });
   } catch (error) {
     console.error("Error in adding address:", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "An error occurred, please try again.",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -736,7 +723,7 @@ const editAddress = async (req, res) => {
     const findAddress = await Address.findOne({ "address._id": addressId });
     if (!findAddress) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Address not found" });
     }
 
@@ -747,7 +734,7 @@ const editAddress = async (req, res) => {
     });
 
     if (addressExists) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "This pincode is already associated with another address",
       });
@@ -784,9 +771,9 @@ const editAddress = async (req, res) => {
     res.json({ success: true, message: "Address updated successfully" });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "An error occurred, please try again.",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -798,7 +785,7 @@ const deleteAddress = async (req, res) => {
     const findAddress = await Address.findOne({ "address._id": addressId });
     if (!findAddress) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Address not found" });
     }
 
@@ -816,9 +803,9 @@ const deleteAddress = async (req, res) => {
     res.json({ success: true, message: "Address deleted successfully" });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "An error occurred, please try again.",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -832,14 +819,14 @@ const editAddressInCheckout = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(addressId)) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Invalid address ID" });
     }
 
     const findAddress = await Address.findOne({ "address._id": addressId });
     if (!findAddress) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Address not found" });
     }
 
@@ -850,7 +837,7 @@ const editAddressInCheckout = async (req, res) => {
     });
 
     if (addressExists) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "This pincode is already associated with another address",
       });
@@ -883,9 +870,9 @@ const editAddressInCheckout = async (req, res) => {
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "An error occurred, please try again.",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -955,7 +942,7 @@ const cancelOrder = async (req, res) => {
     );
 
     if (!order || order.userId.toString() !== userId) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         success: false,
         message:
           "Order not found or you are not authorized to cancel this order.",
@@ -963,7 +950,7 @@ const cancelOrder = async (req, res) => {
     }
 
     if (order.status !== "Order Placed" && order.status !== "Processing") {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "Order cannot be canceled at this stage.",
       });
@@ -1042,7 +1029,7 @@ const cancelOrder = async (req, res) => {
     });
   } catch (error) {
     console.error("Error cancelling order:", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
       message: "An error occurred while cancelling the order.",
     });
@@ -1057,13 +1044,13 @@ const returnOrder = async (req, res) => {
 
     if (!order) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Order not found" });
     }
 
     if (order.status !== "Delivered") {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "This order cannot be returned" });
     }
 
@@ -1082,7 +1069,7 @@ const returnOrder = async (req, res) => {
   } catch (error) {
     console.error(error);
     res
-      .status(500)
+      .status(InternalServerError)
       .json({ success: false, message: "Error processing the return request" });
   }
 };
@@ -1095,7 +1082,7 @@ const cancelReturn = async (req, res) => {
 
     if (!order) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Order not found" });
     }
 
@@ -1104,7 +1091,7 @@ const cancelReturn = async (req, res) => {
     );
 
     if (!returnRequestedItem) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "No active return request to cancel",
       });
@@ -1126,7 +1113,7 @@ const cancelReturn = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: "Server error" });
+    return res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -1175,7 +1162,6 @@ const editProfile = async (req, res) => {
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   getForgetPass,
   forgotPassOtpLoad,

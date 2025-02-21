@@ -1,9 +1,9 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Transaction = require("../../models/transactionSchema");
-// eslint-disable-next-line no-undef
 const Order = require("../../models/orderSchema");
-// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
+const { InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 
 const getLedger = async (req, res) => {
   try {
@@ -92,11 +92,10 @@ const getLedger = async (req, res) => {
     res.render("ledger", { transactions, pagination, search }); // Pass transactions, pagination, and search to the view
   } catch (error) {
     console.error("Error fetching ledger:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
-// eslint-disable-next-line no-undef
 const PdfPrinter = require("pdfmake");
 
 // Define fonts
@@ -294,11 +293,10 @@ const exportPDF = async (req, res) => {
     pdfDoc.end();
   } catch (error) {
     console.error("PDF generation error:", error);
-    res.status(500).send("Error generating PDF report");
+    res.status(InternalServerError).send("Error generating PDF report");
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   getLedger,
   exportPDF,

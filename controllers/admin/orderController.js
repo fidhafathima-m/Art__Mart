@@ -1,15 +1,12 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Order = require("../../models/orderSchema");
-// eslint-disable-next-line no-undef
 const Address = require("../../models/addressSchema");
-// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
-// eslint-disable-next-line no-undef
 const Wallet = require("../../models/walletSchema");
-// eslint-disable-next-line no-undef
 const Transaction = require("../../models/transactionSchema");
-// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
+const { BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 
 const loadOrder = async (req, res) => {
   try {
@@ -54,7 +51,7 @@ const loadOrder = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Server Error");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -68,7 +65,7 @@ const viewOrderDetails = async (req, res) => {
       .exec();
 
     if (!order) {
-      return res.status(404).send("Order not found");
+      return res.status(NotFound).send("Order not found");
     }
 
     const userAddresses = await Address.findOne({ userId: order.userId });
@@ -95,7 +92,7 @@ const viewOrderDetails = async (req, res) => {
     res.render("orderDetails", { orderDetails });
   } catch (error) {
     console.error("Error loading order details:", error);
-    res.status(500).send("Server Error");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -114,7 +111,7 @@ const updateOrderStatus = async (req, res) => {
 
     // Validate the status
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "Invalid status",
       });
@@ -123,7 +120,7 @@ const updateOrderStatus = async (req, res) => {
     // Find the order
     const order = await Order.findOne({ orderId });
     if (!order) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         success: false,
         message: "Order not found",
       });
@@ -208,9 +205,9 @@ const updateOrderStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating order status:", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "Server Error",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -222,7 +219,7 @@ const sendMoneyToWallet = async (req, res) => {
     const order = await Order.findOne({ orderId }).populate("userId");
 
     if (!order) {
-      return res.status(404).send("Order not found");
+      return res.status(NotFound).send("Order not found");
     }
 
     if (
@@ -264,18 +261,17 @@ const sendMoneyToWallet = async (req, res) => {
         message: "Money has been sent to the user's wallet.",
       });
     } else {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "Order is not eligible for money transfer.",
       });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("Server Error");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   loadOrder,
   viewOrderDetails,

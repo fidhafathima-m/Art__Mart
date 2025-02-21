@@ -1,36 +1,23 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Product = require("../../models/productSchema");
-// eslint-disable-next-line no-undef
 const User = require("../../models/userSchema");
-// eslint-disable-next-line no-undef
 const Coupon = require("../../models/couponSchema");
-// eslint-disable-next-line no-undef
 const Review = require("../../models/reviewSchema");
-// eslint-disable-next-line no-undef
 const Address = require("../../models/addressSchema");
-// eslint-disable-next-line no-undef
 const Cart = require("../../models/cartSchema");
-// eslint-disable-next-line no-undef
 const Order = require("../../models/orderSchema");
-// eslint-disable-next-line no-undef
 const Wishlist = require("../../models/wishlistSchema");
-// eslint-disable-next-line no-undef
 const Wallet = require("../../models/walletSchema");
-// eslint-disable-next-line no-undef
 const Transaction = require("../../models/transactionSchema");
-// eslint-disable-next-line no-undef
+const { OK, BadRequest, Unauthorized, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 const mongoose = require("mongoose");
-// eslint-disable-next-line no-undef
 const nodemailer = require("nodemailer");
-// eslint-disable-next-line no-undef
 const Razorpay = require("razorpay");
 const razorpay = new Razorpay({
-  // eslint-disable-next-line no-undef
   key_id: process.env.RAZORPAY_ID_KEY,
-  // eslint-disable-next-line no-undef
   key_secret: process.env.RAZORPAY_SECRET_KEY,
 });
-// eslint-disable-next-line no-undef
 const { generateInvoicePDF } = require("../../helpers/generateInvoicePDF");
 
 const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
@@ -90,15 +77,12 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
       secure: false,
       requireTLS: true,
       auth: {
-        // eslint-disable-next-line no-undef
         user: process.env.NODEMAILER_EMAIL,
-        // eslint-disable-next-line no-undef
         pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
     const info = await transporter.sendMail({
-      // eslint-disable-next-line no-undef
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Order Confirmation - Thank you for your purchase!",
@@ -233,7 +217,7 @@ const loadCart = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error loading cart");
+    res.status(InternalServerError).send("Error loading cart");
   }
 };
 
@@ -242,7 +226,7 @@ const addToCart = async (req, res) => {
     const userId = req.session.user;
 
     if (!userId) {
-      return res.status(401).json({
+      return res.status(Unauthorized).json({
         success: false,
         message: "Please log in to add items to the cart.",
       });
@@ -253,7 +237,7 @@ const addToCart = async (req, res) => {
     const product = await Product.findById(productId);
 
     if (!product) {
-      return res.status(404).send("Product not found");
+      return res.status(NotFound).send("Product not found");
     }
 
     let cart = await Cart.findOne({ userId });
@@ -298,7 +282,7 @@ const addToCart = async (req, res) => {
     res.json({ success: true, message: "Item added to cart" });
   } catch (error) {
     console.error(error);
-    return res.status(500).send("Error adding item to cart");
+    return res.status(InternalServerError).send("Error adding item to cart");
   }
 };
 
@@ -309,7 +293,7 @@ const updateCartQuantity = async (req, res) => {
     const product = await Product.findOne({ _id: productId });
 
     if (quantity > 5) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "Cannot add more than 5 of this product.",
       });
@@ -369,7 +353,7 @@ const updateCartQuantity = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: "Failed to update cart" });
+    res.status(InternalServerError).json({ success: false, message: "Failed to update cart" });
   }
 };
 
@@ -406,14 +390,14 @@ const deletFromCart = async (req, res) => {
       return res.json({ success: true });
     } else {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Item not found in cart." });
     }
   } catch (error) {
     console.error("Error deleting item:", error);
     return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error" });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -458,7 +442,7 @@ const updateDefaultAddress = async (req, res) => {
 
     if (!userId) {
       return res
-        .status(401)
+        .status(Unauthorized)
         .json({ success: false, message: "User is not authenticated" });
     }
 
@@ -473,18 +457,18 @@ const updateDefaultAddress = async (req, res) => {
     );
 
     if (updatedAddress.nModified === 0) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "Address not found or already set as default",
       });
     }
 
     res
-      .status(200)
+      .status(OK)
       .json({ success: true, message: "Default address updated successfully" });
   } catch (error) {
     console.error("Error updating default address:", error);
-    res.status(500).json({ success: false, message: "An error occurred" });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -503,7 +487,7 @@ const codPlaceOrder = async (req, res) => {
     const userAddresses = await Address.find({ userId: userId });
     if (!userAddresses || userAddresses.length === 0) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "No addresses found for the user" });
     }
 
@@ -513,7 +497,7 @@ const codPlaceOrder = async (req, res) => {
 
     if (!defaultAddress) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "No default address found" });
     }
 
@@ -550,7 +534,7 @@ const codPlaceOrder = async (req, res) => {
       const product = await Product.findById(productId);
       if (product) {
         if (product.quantity < orderedQuantity) {
-          return res.status(400).json({
+          return res.status(BadRequest).json({
             success: false,
             message: `Not enough stock for product ${product.productName}`,
           });
@@ -581,20 +565,20 @@ const codPlaceOrder = async (req, res) => {
     );
 
     if (!emailSent) {
-      return res.status(500).json({
+      return res.status(InternalServerError).json({
         success: false,
         message: "Failed to send order confirmation email.",
       });
     }
 
-    return res.status(200).json({
+    return res.status(OK).json({
       success: true,
       message: "Order placed successfully!",
       orderId: savedOrder.orderId,
     });
   } catch (error) {
     console.error("Error placing order:", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       message: "An error occurred while placing the order. Please try again.",
     });
   }
@@ -612,7 +596,7 @@ const codOrderSuccess = async (req, res) => {
     const order = await Order.findOne({ orderId: orderId });
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(NotFound).json({ message: "Order not found" });
     }
 
     res.render("order-success", {
@@ -625,7 +609,7 @@ const codOrderSuccess = async (req, res) => {
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     return res
-      .status(500)
+      .status(InternalServerError)
       .json({ message: "An error occurred while fetching the order details." });
   }
 };
@@ -642,7 +626,7 @@ const razorpayOrderFailed = async (req, res) => {
     const order = await Order.findOne({ orderId: orderId });
 
     if (!order) {
-      return res.status(404).json({ message: "Order not found" });
+      return res.status(NotFound).json({ message: "Order not found" });
     }
 
     // Update order status to "Payment Pending"
@@ -658,7 +642,7 @@ const razorpayOrderFailed = async (req, res) => {
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     return res
-      .status(500)
+      .status(InternalServerError)
       .json({ message: "An error occurred while fetching the order details." });
   }
 };
@@ -669,7 +653,7 @@ const loadRetryPayment = async (req, res) => {
   try {
     const order = await Order.findOne({ orderId: orderId });
     if (!order) {
-      return res.status(404).send("Order not found");
+      return res.status(NotFound).send("Order not found");
     }
     const user = req.session.user;
 
@@ -703,7 +687,7 @@ const retryPayment = async (req, res) => {
     const order = await Order.findOne({ orderId: orderId });
     if (!order) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Order not found" });
     }
 
@@ -739,7 +723,6 @@ const retryPayment = async (req, res) => {
         orderId: razorpayOrder.id,
         amount: orderData.finalAmount,
         currency: "INR",
-        // eslint-disable-next-line no-undef
         razorpayKey: process.env.RAZORPAY_ID_KEY,
         paymentMethod: "razorpay",
       });
@@ -794,7 +777,7 @@ const retryPayment = async (req, res) => {
 
     // If none of the conditions match, return an error
     return res
-      .status(400)
+      .status(BadRequest)
       .json({ success: false, message: "Invalid payment method" });
   } catch (error) {
     console.error("Error processing retry payment:", error);
@@ -810,13 +793,13 @@ const walletBalanceCheck = async (req, res) => {
     const wallet = await Wallet.findOne({ userId: userId });
     if (!wallet || wallet.balance < amount) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Insufficient balance" });
     }
-    return res.status(200).json({ success: true });
+    return res.status(OK).json({ success: true });
   } catch (error) {
     console.error("Error checking wallet balance:", error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       success: false,
       message: "An error occurred while checking the wallet balance.",
     });
@@ -839,7 +822,7 @@ const walletPlaceOrder = async (req, res) => {
     const userAddresses = await Address.find({ userId: userId });
     if (!userAddresses || userAddresses.length === 0) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "No addresses found for the user" });
     }
 
@@ -849,7 +832,7 @@ const walletPlaceOrder = async (req, res) => {
 
     if (!defaultAddress) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "No default address found" });
     }
 
@@ -857,7 +840,7 @@ const walletPlaceOrder = async (req, res) => {
     const wallet = await Wallet.findOne({ userId: userId });
     if (!wallet || wallet.balance < finalAmount) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "Insufficient wallet balance" });
     }
 
@@ -899,7 +882,7 @@ const walletPlaceOrder = async (req, res) => {
       const product = await Product.findById(productId);
       if (product) {
         if (product.quantity < orderedQuantity) {
-          return res.status(400).json({
+          return res.status(BadRequest).json({
             success: false,
             message: `Not enough stock for product ${product.productName}`,
           });
@@ -930,20 +913,20 @@ const walletPlaceOrder = async (req, res) => {
     );
 
     if (!emailSent) {
-      return res.status(500).json({
+      return res.status(InternalServerError).json({
         success: false,
         message: "Failed to send order confirmation email.",
       });
     }
 
-    return res.status(200).json({
+    return res.status(OK).json({
       success: true,
       message: "Order placed successfully!",
       orderId: savedOrder.orderId,
     });
   } catch (error) {
     console.error("Error placing order:", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       message: "An error occurred while placing the order. Please try again.",
     });
   }
@@ -964,7 +947,7 @@ const razorpayPlaceOrder = async (req, res) => {
     const userAddresses = await Address.find({ userId: userId });
     if (!userAddresses || userAddresses.length === 0) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "No addresses found for the user" });
     }
 
@@ -974,7 +957,7 @@ const razorpayPlaceOrder = async (req, res) => {
 
     if (!defaultAddress) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ success: false, message: "No default address found" });
     }
 
@@ -1002,7 +985,7 @@ const razorpayPlaceOrder = async (req, res) => {
       const product = await Product.findById(productId);
       if (product) {
         if (product.quantity < orderedQuantity) {
-          return res.status(400).json({
+          return res.status(BadRequest).json({
             success: false,
             message: `Not enough stock for product ${product.productName}`,
           });
@@ -1045,14 +1028,13 @@ const razorpayPlaceOrder = async (req, res) => {
       orderId: razorpayOrder.id,
       amount: finalAmount,
       currency: "INR",
-      // eslint-disable-next-line no-undef
       razorpayKey: process.env.RAZORPAY_ID_KEY,
       paymentMethod: "razorpay",
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res
-      .status(500)
+      .status(InternalServerError)
       .json({ success: false, message: "Failed to create Razorpay order" });
   }
 };
@@ -1090,7 +1072,7 @@ const loadReview = async (req, res) => {
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to load review" });
+    res.status(InternalServerError).json({ success: false, message: "Failed to load review" });
   }
 };
 
@@ -1102,7 +1084,7 @@ const postReview = async (req, res) => {
     const { rating, review_text } = req.body;
 
     if (rating < 1 || rating > 5) {
-      return res.status(400).send("Rating must be between 1 and 5");
+      return res.status(BadRequest).send("Rating must be between 1 and 5");
     }
 
     const order = await Order.findById(orderId).populate(
@@ -1110,7 +1092,7 @@ const postReview = async (req, res) => {
     );
 
     if (!order) {
-      return res.status(404).send("Order not found");
+      return res.status(NotFound).send("Order not found");
     }
 
     const orderedItem = order.ordereditems.find(
@@ -1118,7 +1100,7 @@ const postReview = async (req, res) => {
     );
 
     if (!orderedItem) {
-      return res.status(400).send("Product not found in this order");
+      return res.status(BadRequest).send("Product not found in this order");
     }
 
     const newReview = new Review({
@@ -1136,14 +1118,14 @@ const postReview = async (req, res) => {
     product.reviews.push(newReview._id);
     await product.save();
 
-    res.status(200).json({
+    res.status(OK).json({
       success: true,
       message: "Thank you for your review!",
       review: newReview,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Something went wrong while submitting your review");
+    res.status(InternalServerError).send("Something went wrong while submitting your review");
   }
 };
 
@@ -1153,7 +1135,7 @@ const addToWishlist = async (req, res) => {
 
     // Check if the user is logged in
     if (!userId) {
-      return res.status(401).json({
+      return res.status(Unauthorized).json({
         success: false,
         message: "Please log in to add items to the wishlist.",
       });
@@ -1164,7 +1146,7 @@ const addToWishlist = async (req, res) => {
     // Check if the product exists
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         success: false,
         message: "Product not found.",
       });
@@ -1190,7 +1172,7 @@ const addToWishlist = async (req, res) => {
         (item) => item.productId.toString() === productId
       );
       if (productExists) {
-        return res.status(400).json({
+        return res.status(BadRequest).json({
           success: false,
           message: "This product is already in your wishlist.",
         });
@@ -1210,7 +1192,7 @@ const addToWishlist = async (req, res) => {
     res.json({ success: true, message: "Item added to wishlist" });
   } catch (error) {
     console.error("Error adding item to wishlist:", error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
       message: "An error occurred while adding the item to the wishlist.",
     });
@@ -1223,7 +1205,7 @@ const deleteFromWishlist = async (req, res) => {
     const productId = req.body.productId;
 
     if (!userId) {
-      return res.status(401).json({
+      return res.status(Unauthorized).json({
         success: false,
         message: "Please log in to remove items from the wishlist.",
       });
@@ -1232,7 +1214,7 @@ const deleteFromWishlist = async (req, res) => {
     const wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         success: false,
         message: "Wishlist not found.",
       });
@@ -1243,7 +1225,7 @@ const deleteFromWishlist = async (req, res) => {
     );
 
     if (productIndex === -1) {
-      return res.status(404).json({
+      return res.status(NotFound).json({
         success: false,
         message: "Product not found in your wishlist.",
       });
@@ -1259,7 +1241,7 @@ const deleteFromWishlist = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
+    return res.status(InternalServerError).json({
       success: false,
       message: "Error removing item from wishlist.",
     });
@@ -1275,7 +1257,7 @@ const coupons = async (req, res) => {
     res.json(coupons);
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).json({ message: "Error fetching coupons" });
+    res.status(InternalServerError).json({ message: "Error fetching coupons" });
   }
 };
 
@@ -1286,15 +1268,15 @@ const applyCoupon = async (req, res) => {
     const coupon = await Coupon.findOne({ name: code, isDeleted: false });
 
     if (!coupon) {
-      return res.status(400).json({ message: "Coupon not found" });
+      return res.status(BadRequest).json({ message: "Coupon not found" });
     }
 
     if (coupon.expireOn < new Date()) {
-      return res.status(400).json({ message: "Coupon has expired" });
+      return res.status(BadRequest).json({ message: "Coupon has expired" });
     }
 
     if (totalPrice < coupon.minPurchaseAmount) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         message: `Minimum purchase amount of ₹${coupon.minPurchaseAmount} not met`,
       });
     }
@@ -1302,13 +1284,13 @@ const applyCoupon = async (req, res) => {
     // Check if coupon has been used already
     if (coupon.userId) {
       return res
-        .status(400)
+        .status(BadRequest)
         .json({ message: "Coupon has already been used" });
     }
     
     // Check if coupon offer price is greater than the total price
     if (coupon.offerPrice >= totalPrice) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         message: `This coupon offers ₹${coupon.offerPrice} discount. Please add more items worth at least ₹${coupon.offerPrice - totalPrice + 1} to your cart to use this coupon.`
       });
     }
@@ -1329,7 +1311,7 @@ const applyCoupon = async (req, res) => {
       newTotalPrice: newTotalPrice
     });
   } catch (error) {
-    res.status(500).json({ message: "Error applying coupon", error });
+    res.status(InternalServerError).json({ message: "Error applying coupon", error });
   }
 };
 
@@ -1340,7 +1322,7 @@ const removeCoupon = async (req, res) => {
     const coupon = await Coupon.findOne({ name: code, isDeleted: false });
 
     if (!coupon) {
-      return res.status(400).json({ message: "Coupon not found" });
+      return res.status(BadRequest).json({ message: "Coupon not found" });
     }
 
     // Clear the pending coupon from session
@@ -1351,7 +1333,7 @@ const removeCoupon = async (req, res) => {
     const newTotalPrice = totalPrice + coupon.offerPrice;
     res.json({ success: true, newTotalPrice });
   } catch (error) {
-    res.status(500).json({ message: "Error removing coupon", error });
+    res.status(InternalServerError).json({ message: "Error removing coupon", error });
   }
 };
 
@@ -1371,11 +1353,10 @@ const generateInvoice = async (req, res) => {
     res.send(pdfBuffer);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error generating invoice" });
+    res.status(InternalServerError).json({ message: "Error generating invoice" });
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   loadProductDetails,
   loadCart,

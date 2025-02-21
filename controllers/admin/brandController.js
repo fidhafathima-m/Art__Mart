@@ -1,8 +1,8 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Brand = require("../../models/brandSchema");
-// eslint-disable-next-line no-undef
 const fs = require("fs");
-// eslint-disable-next-line no-undef
+const { NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 const path = require("path");
 
 const getBrand = async (req, res) => {
@@ -90,7 +90,6 @@ const deleteLogo = async (req, res) => {
     }
 
     // Delete the image file from the filesystem
-    // eslint-disable-next-line no-undef
     const imagePath = path.join(__dirname, "../uploads/brand-images", imageId);
     fs.unlink(imagePath, (err) => {
       if (err) {
@@ -148,10 +147,10 @@ const deleteBrand = async (req, res) => {
     if (brand) {
       res.json({ message: "Brand soft deleted successfully" });
     } else {
-      res.status(404).json({ message: "Brand not found" });
+      res.status(NotFound).json({ message: "Brand not found" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting brand", error });
+  } catch {
+    res.status(InternalServerError).json({ message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -168,14 +167,13 @@ const restoreBrand = async (req, res) => {
     if (brand) {
       res.json({ message: "Brand restored successfully" });
     } else {
-      res.status(404).json({ message: "Brand not found" });
+      res.status(NotFound).json({ message: "Brand not found" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Error restoring brand", error });
+  } catch {
+    res.status(InternalServerError).json({ message: INTERNAL_SERVER_ERROR });
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   getBrand,
   loadAddBrand,

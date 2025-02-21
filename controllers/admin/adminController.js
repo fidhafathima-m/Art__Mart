@@ -5,6 +5,8 @@ const Category = require("../../models/categorySchema");
 const Order = require("../../models/orderSchema");
 const bcrypt = require("bcrypt");
 const {generatePDFReport,generateExcelReport } = require("../../helpers/generateReports");
+const { OK, BadRequest, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 const nodemailer = require("nodemailer");
 
 const pageError = (req, res) => {
@@ -41,7 +43,7 @@ const login = async (req, res) => {
       return res.redirect("/admin/login");
     }
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(InternalServerError).json({ success: false, message: error.message });
     return res.redirect("/pageError");
   }
 };
@@ -226,7 +228,7 @@ const loadDashboard = async (req, res) => {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).send("Server Error");
+      res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
     }
   }
 };
@@ -380,15 +382,15 @@ const logout = async (req, res) => {
   try {
     req.session.destroy((err) => {
       if (err) {
-        res.status(500).json({ success: false, message: err.message });
+        res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
 
         return res.redirect("/pageError");
       }
       res.clearCookie("connect.sid");
       res.redirect("/admin/login");
     });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+  } catch {
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
     res.redirect("/pageError");
   }
 };
@@ -440,8 +442,8 @@ const salesReport = async (req, res) => {
 
     // Send the data to the frontend
     res.render("reports", { topProducts, leastProducts });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch {
+    res.status(InternalServerError).json({ message: INTERNAL_SERVER_ERRORe });
   }
 };
 
@@ -488,8 +490,8 @@ const salesStatistics = async (req, res) => {
       overallOrderAmount: overallOrderAmount.toFixed(2),
       overallDiscount,
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch {
+    res.status(InternalServerError).json({ message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -532,15 +534,15 @@ const exportSalesReport = async (req, res) => {
     );
     res.send(excelBuffer);
   } else {
-    res.status(400).json({ message: "Invalid format" });
+    res.status(BadRequest).json({ message: "Invalid format" });
   }
 };
 
 const loadAbout = async (req, res) => {
   try {
     res.render("admin-about");
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch {
+    res.status(InternalServerError).json({ message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -557,9 +559,9 @@ const loadContact = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({
+    res.status(InternalServerError).json({
       success: false,
-      message: "An error occurred.",
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -596,13 +598,13 @@ const sendContactEmail = (req, res) => {
   transporter.sendMail(mailOptions, (error) => {
     if (error) {
       console.error("Error sending email:", error);
-      return res.status(500).json({
+      return res.status(InternalServerError).json({
         success: false,
         message: "Failed to send message. Please try again later.",
       });
     }
 
-    return res.status(200).json({
+    return res.status(OK).json({
       success: true,
       message: "Your message has been sent successfully!",
     });

@@ -1,5 +1,7 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const User = require("../../models/userSchema");
+const { InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 
 const customerInfo = async (req, res) => {
   try {
@@ -40,7 +42,7 @@ const customerInfo = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching users:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -66,7 +68,6 @@ const customerUnblocked = async (req, res) => {
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   customerInfo,
   customerBlocked,

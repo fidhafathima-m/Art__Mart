@@ -1,8 +1,8 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const Category = require("../../models/categorySchema");
-// eslint-disable-next-line no-undef
 const Product = require("../../models/productSchema");
-// eslint-disable-next-line no-undef
+const { OK, BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 const mongoose = require("mongoose");
 
 const categoryInfo = async (req, res) => {
@@ -91,8 +91,8 @@ const addCategory = async (req, res) => {
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     return res
-      .status(500)
-      .json({ success: false, message: "Internal Server Error" });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -132,7 +132,7 @@ const editCategory = async (req, res) => {
     const existingCategory = await Category.findById(id);
     if (!existingCategory) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Category not found" });
     }
 
@@ -144,18 +144,18 @@ const editCategory = async (req, res) => {
 
     if (updatedCategory) {
       return res
-        .status(200)
+        .status(OK)
         .json({ success: true, message: "Category updated successfully!" });
     } else {
       return res
-        .status(500)
+        .status(InternalServerError)
         .json({ success: false, message: "Failed to update category" });
     }
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     return res
-      .status(500)
-      .json({ success: false, message: "An error occurred" });
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -166,7 +166,7 @@ const addCategoryOffer = async (req, res) => {
     const category = await Category.findById(categoryId);
     if (!category) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Category not found" });
     }
 
@@ -176,10 +176,10 @@ const addCategoryOffer = async (req, res) => {
       (product) => product.productOffer > percentage
     );
     if (hasProductOffer) {
-      return res.status(400).json({
+      return res.status(BadRequest).json({
         success: false,
         message: "Category already has a product offer",
-      }); // Change to 400
+      });
     }
 
     // Update category offer
@@ -196,7 +196,7 @@ const addCategoryOffer = async (req, res) => {
     res.json({ success: true });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR});
   }
 };
 
@@ -206,7 +206,7 @@ const removeCategoryOffer = async (req, res) => {
     const category = await Category.findById(categoryId);
     if (!category) {
       return res
-        .status(404)
+        .status(NotFound)
         .json({ success: false, message: "Category not found" });
     }
 
@@ -228,7 +228,7 @@ const removeCategoryOffer = async (req, res) => {
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res
-      .status(500)
+      .status(InternalServerError)
       .json({ success: false, message: "Failed to remove product offer" });
   }
 };
@@ -246,10 +246,10 @@ const deleteCategory = async (req, res) => {
     if (category) {
       res.json({ message: "Category soft deleted successfully" });
     } else {
-      res.status(404).json({ message: "Category not found" });
+      res.status(NotFound).json({ message: "Category not found" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting category", error });
+  } catch {
+    res.status(InternalServerError).json({ message: "Error deleting category"});
   }
 };
 
@@ -266,14 +266,13 @@ const restoreCategory = async (req, res) => {
     if (category) {
       res.json({ message: "Category restored successfully" });
     } else {
-      res.status(404).json({ message: "Category not found" });
+      res.status(NotFound).json({ message: "Category not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error restoring category", error });
+    res.status(InternalServerError).json({ message: "Error restoring category", error });
   }
 };
 
-// eslint-disable-next-line no-undef
 module.exports = {
   categoryInfo,
   getListCategory,
