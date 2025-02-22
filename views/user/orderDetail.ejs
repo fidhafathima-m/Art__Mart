@@ -1,168 +1,234 @@
 <style>
-  #loadingOverlay {
-  display: flex; /* Use flexbox to center the spinner */
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
-  z-index: 9999; /* Ensure it appears above other content */
-}
+  /* General Styles */
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;
+  }
 
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-}
+  .container.mt-5 {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 20px auto;
+  }
+
+  /* Breadcrumbs */
+  .breadcrumb {
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+
+  .breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  .breadcrumb-item.active {
+    color: #6c757d;
+  }
+
+  /* Order Header */
+  .display-4 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .btn-dark {
+    background-color: #343a40;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-dark:hover {
+    background-color: #23272b;
+  }
+
+  .text-muted {
+    color: #6c757d !important;
+  }
+
+  /* Order Items */
+  .card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-body {
+    padding: 15px;
+  }
+
+  .img-fluid {
+    max-height: 100px;
+    width: auto;
+    border-radius: 5px;
+  }
+
+  .font-weight-bold {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 5px;
+  }
+
+  .text-end {
+    text-align: right;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+
+  .text-success {
+    color: #28a745 !important;
+  }
+
+  .text-danger {
+    color: #dc3545 !important;
+  }
+
+  .text-warning {
+    color: #ffc107 !important;
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn-danger {
+    background-color: #dc3545;
+    border: none;
+  }
+
+  .btn-danger:hover {
+    background-color: #c82333;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  /* Address Section */
+  .text-center.mb-4 {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .text-center.mb-4 p {
+    margin: 0;
+    color: #333;
+  }
+
+  /* Return Reason Section */
+  .return-reason {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .return-reason p {
+    margin: 0;
+    color: #333;
+  }
+
+  /* Loading Overlay */
+  #loadingOverlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Responsive Design */
   @media (max-width: 768px) {
-    /* Container adjustments */
     .container.mt-5 {
       padding: 10px;
-      margin-top: 1rem !important;
     }
 
-    /* Header section */
     .display-4 {
       font-size: 1.8rem;
-      margin-bottom: 1rem !important;
     }
 
-    /* Download invoice button */
     .btn-dark {
-      position: static !important;
-      display: block;
+      position: static;
       width: 100%;
       margin: 10px 0;
     }
 
-    /* Order ID and date */
-    h5.text-muted {
-      font-size: 1rem;
-      text-align: center;
-    }
-
-    /* Breadcrumb */
-    .breadcrumb {
-      font-size: 0.8rem;
-      flex-wrap: wrap;
-      padding: 0.5rem !important;
-    }
-
-    /* Order item cards */
     .card {
       margin: 10px 0;
-      padding: 10px !important;
     }
 
-    .card-body {
-      padding: 0.5rem !important;
-    }
-
-    /* Order item layout */
-    .row.align-items-center {
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .row.align-items-center > div {
-      width: 100% !important;
-      max-width: 100% !important;
-      flex: 0 0 100% !important;
-      margin-bottom: 10px;
-    }
-
-    /* Product image */
     .img-fluid {
-      max-height: 120px !important;
-      margin: 0 auto;
-      display: block;
+      max-height: 80px;
     }
 
-    /* Product details */
     .font-weight-bold {
       font-size: 1rem;
-      margin: 8px 0;
     }
 
-    /* Price and discount */
-    .text-end {
-      text-align: center !important;
-    }
-
-    /* Status indicator */
-    .status-dot {
-      margin: 5px !important;
-    }
-
-    /* Action buttons */
     .btn {
       width: 100%;
       margin: 5px 0;
-      padding: 8px;
-    }
-
-    /* Address section */
-    .text-center.mb-4 {
-      margin: 15px 0;
-      padding: 10px;
-      background-color: #f8f9fa;
-      border-radius: 5px;
-    }
-
-    /* Return reason section */
-    .return-reason {
-      padding: 10px;
-      margin: 10px 0;
-    }
-
-    /* Status messages */
-    .text-success,
-    .text-danger {
-      text-align: center;
-      margin: 10px 0;
-      padding: 5px;
     }
   }
 
-  /* Extra small devices */
   @media (max-width: 480px) {
-    /* Further reduce font sizes */
     .display-4 {
       font-size: 1.5rem;
     }
 
-    /* Adjust product image size */
     .img-fluid {
-      max-height: 100px !important;
+      max-height: 60px;
     }
 
-    /* Make prices and text more readable */
-    span, p {
+    .font-weight-bold {
       font-size: 0.9rem;
     }
 
-    /* Tighten up spacing */
-    .card {
-      margin: 5px 0;
-    }
-
-    /* Adjust button sizes */
     .btn {
       font-size: 0.9rem;
       padding: 6px;
-    }
-
-    /* Status indicator adjustments */
-    .status-dot {
-      width: 12px !important;
-      height: 12px !important;
-    }
-
-    /* Rate & Review link */
-    .text-muted.fw-bolder {
-      font-size: 0.8rem;
-    }
-
-    /* Already reviewed text */
-    .text-warning {
-      font-size: 0.8rem !important;
     }
   }
 </style>
@@ -175,118 +241,109 @@
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/">Home</a></li>
       <li class="breadcrumb-item"><a href="/userProfile">Profile</a></li>
-      <li class="breadcrumb-item">
-        <a href="/userProfile?section=orders">Order</a>
-      </li>
+      <li class="breadcrumb-item"><a href="/userProfile?section=orders">Order</a></li>
       <li class="breadcrumb-item active" aria-current="page">Order Details</li>
     </ol>
   </nav>
 
-  <div class="mb-5" style="position: relative;">
-    <h3 class="display-4 text-center mb-0">Order Details</h3>
+  <!-- Order Header -->
+  <div class="mb-5">
+    <h3 class="display-4 text-center mb-3">Order Details</h3>
     <% if (order.status === 'Delivered' || order.status === 'Return Request') { %>
-    <button class="btn btn-dark text-center" onclick="downloadInvoice('<%= order.orderId %>')" style="position: absolute; right: 0; top: -20px;">Download Invoice</button>
+    <div class="text-center">
+      <button class="btn btn-dark" onclick="downloadInvoice('<%= order.orderId %>')">Download Invoice</button>
+    </div>
     <% } %>
-    <h5 class="text-muted">Order ID: <%= order.orderId %></h5>
-    <% if (order.status !== 'Cancelled' && order.status !== 'Returned' && order.status !== 'Return Request' && order.status !== 'Payment Pending') { %>
-      <p class="text-center">You can download the invoice once the product is delivered. Thank you for shopping with us.</p>
-      <% } %>
-    <p class="text-center">
+    <h5 class="text-muted text-center mt-3">Order ID: <%= order.orderId %></h5>
+    <% if (order.status !== 'Cancelled' && order.status !== 'Returned' && order.status !== 'Return Request' && order.status !== 'Payment Pending' && order.status !== 'Delivered') { %>
+    <p class="text-center text-muted">You can download the invoice once the product is delivered. Thank you for shopping with us.</p>
+    <% } %>
+    <p class="text-center text-muted">
       <strong>Placed on:</strong> <%= new Date(order.createdOn).toLocaleDateString() %> - <%= order.paymentMethod %>
     </p>
   </div>
 
   <!-- Loading Overlay -->
-<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; justify-content: center; align-items: center;">
-  <div class="spinner-border" role="status">
-    <span class="visually-hidden">Loading...</span>
+  <div id="loadingOverlay" style="display: none;">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
-</div>
 
-
-  <div class="d-flex justify-content-center">
+  <!-- Action Buttons -->
+  <div class="text-center mb-4">
     <% if ((order.status === 'Processing' || order.status === 'Order Placed' || !order.status === 'Payment Pending')) { %>
-    <button class="btn btn-danger my-2 cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
+    <button class="btn btn-danger cancel-order-btn" data-order-id="<%= order._id %>">Cancel Order</button>
     <% } %>
     <% if (order.status === 'Payment Pending') { %>
-    <div class="text-center">
-      <a href="/retry-payment?orderId=<%= order.orderId %>" class="btn btn-primary mb-4">Retry Payment</a>
-    </div>
+    <a href="/retry-payment?orderId=<%= order.orderId %>" class="btn btn-primary">Retry Payment</a>
     <% } %>
     <% if (order.status === 'Delivered') { %>
-    <button class="btn btn-danger my-2 return-order-btn" data-order-id="<%= order._id %>" data-payment-method="<%= order.paymentMethod %>">Return Order</button>
+    <button class="btn btn-danger return-order-btn" data-order-id="<%= order._id %>" data-payment-method="<%= order.paymentMethod %>">Return Order</button>
     <% } %>
     <% if (order.status === 'Return Request') { %>
-    <div class="return-reason text-center">
+    <div class="return-reason">
       <p class="text-muted">Return Reason: <span class="text-black"><%= order.ordereditems[0].returnReason %></span></p>
-      <button class="btn btn-danger my-2 cancel-return-order-btn" data-order-id="<%= order._id %>">Cancel Return Request</button>
+      <button class="btn btn-danger cancel-return-order-btn" data-order-id="<%= order._id %>">Cancel Return Request</button>
     </div>
     <% } %>
     <% if (order.status === 'Cancelled') { %>
-      <p class="text-center text-danger">Your Order is cancelled for the reason: <%= order.cancellationReason %>. </p>
-      <% } %>
-    <% if (order.status === 'Returned') { %>
-    <p class="text-center">Your Order is returned for the reason: <%= order.ordereditems[0].returnReason %>. </p>
+    <p class="text-center text-danger">Your Order is cancelled for the reason: <%= order.cancellationReason %>.</p>
     <% } %>
-
-    <% if(order.moneySent) { %>
+    <% if (order.status === 'Returned') { %>
+    <p class="text-center text-muted">Your Order is returned for the reason: <%= order.ordereditems[0].returnReason %>.</p>
+    <% } %>
+    <% if (order.moneySent) { %>
     <p class="text-success text-center">The prepaid money is credited to your wallet</p>
     <% } %>
-
   </div>
 
+  <!-- Address Section -->
   <div class="text-center mb-4">
     <p><span class="text-muted">Selected Address:</span> <br>
       <%= address.name %><br>
       <%= address.city %>, <% if (address.landMark) {%> <%= address.landMark %>, <% } %><br>
       <%= address.state %>, <%= address.pincode %>
     </p>
-    <span>Amount paid: ₹<%= order.finalAmount %></span>
+    <p>Amount paid: ₹<%= order.finalAmount %></p>
     <% if (order.discount > 0) { %>
-      <span class="text-success small pl-3">You saved ₹<%= order.discount %>.</span>
-      <% } %>
+    <p class="text-success small">You saved ₹<%= order.discount %>.</p>
+    <% } %>
   </div>
 
-  <div class="d-flex justify-content-center">
+  <!-- Order Items -->
+  <div class="row justify-content-center">
     <div class="col-12 col-md-8">
       <% order.ordereditems.forEach(item => { %>
-      <div class="card mb-4 shadow-sm p-3" style="max-width: 900px;">
+      <div class="card mb-4">
         <div class="card-body">
           <div class="row align-items-center">
-            <div class="col-2">
+            <div class="col-3">
               <a href="/product-details?id=<%= item.product._id %>">
-                <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="img-fluid" style="max-height: 80px; width: auto;" />
+                <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="img-fluid" />
               </a>
             </div>
-            <div class="col-5">
+            <div class="col-6">
               <a href="/product-details?id=<%= item.product._id %>">
                 <p class="font-weight-bold"><%= item.product.productName %></p>
               </a>
-              <span>Price: ₹<%= item.product.salePrice %></span>
-             
+              <p>Price: ₹<%= item.product.salePrice %></p>
             </div>
             <div class="col-3 text-end">
-              <div class="text-end justify-content-center">
+              <div class="d-flex align-items-center justify-content-end">
                 <% let statusColor = 'gray'; if (order.status === 'Delivered') { statusColor = 'green'; } else if (order.status === 'Processing') { statusColor = 'yellow'; } else if (order.status === 'Cancelled') { statusColor = 'red'; } %>
-                <span class="status-dot" style="background-color: <%= statusColor %>; border-radius: 50%; display: inline-block; width: 15px; height: 15px; margin-top: 10px;"></span>
-                <span class="card-text ml-3 font-weight-bold"><%= order.status %></span>
-
-                <!-- Rate and Review Link -->
-                <% if (order.status === 'Delivered') { %>
-                <% 
-                    const review = reviews.find(r => r.productId.toString() === item.product._id.toString());
-                    if (review && !review.existingReview) { 
-                  %>
-                <p class="mt-4">
-                  <a href="/profile/order/<%= order._id %>/review?product_id=<%= item.product._id %>" class="text-muted fw-bolder">Rate & Review</a>
-                </p>
-                <% 
-                    } else if (review && review.existingReview) { 
-                  %>
-                <p class="text-warning" style="font-size: 13px">Already reviewed</p>
-                <% } %>
-                <% } %>
+                <span class="status-dot" style="background-color: <%= statusColor %>;"></span>
+                <span class="font-weight-bold"><%= order.status %></span>
               </div>
+              <% if (order.status === 'Delivered') { %>
+              <% const review = reviews.find(r => r.productId.toString() === item.product._id.toString()); if (review && !review.existingReview) { %>
+              <p class="mt-3">
+                <a href="/profile/order/<%= order._id %>/review?product_id=<%= item.product._id %>" class="text-muted fw-bolder">Rate & Review</a>
+              </p>
+              <% } else if (review && review.existingReview) { %>
+              <p class="text-warning small">Already reviewed</p>
+              <% } %>
+              <% } %>
             </div>
           </div>
         </div>
