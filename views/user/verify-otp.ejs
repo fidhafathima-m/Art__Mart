@@ -214,6 +214,18 @@
       }
     }
 
+    function handleBackSpace(event, currentInputIndex) {
+      if(event.key === 'Backspace' || event.key === 'Delete'){
+        const currentInput = document.querySelectorAll(".otp-input")[currentInputIndex];
+        if (currentInput.value === "") {
+          const prevInput = document.querySelectorAll(".otp-input")[(currentInputIndex - 1)];
+          if (prevInput) {
+            prevInput.focus();
+          }
+        }
+      }
+    }
+
     function validateOTPForm(event) {
       event.preventDefault(); // Prevent form submission to manually handle it with AJAX
 
@@ -276,6 +288,13 @@
 
       return false; // Prevent form submission
     }
+
+    const otpInputs = document.querySelectorAll(".otp-input");
+      otpInputs.forEach((input, index) => {
+        input.addEventListener("input", (event) => moveFocus(event, index + 1));
+        input.addEventListener("keydown", (event) => handleBackSpace(event, index));
+      });
+
 
     // Start the timer when the page loads
     window.onload = function() {

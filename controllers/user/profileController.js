@@ -147,7 +147,8 @@ const resendForgetPassOtp = async (req, res) => {
 
 const resetPasswordLoad = async (req, res) => {
   try {
-    res.render("reset-password");
+    const user = req.session.user;
+    res.render("reset-password", {user});
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -302,197 +303,16 @@ const loadUserProfile = async (req, res) => {
   }
 };
 
-const loadChangeEmail = async (req, res) => {
-  try {
-    const user = req.session.user;
 
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
-
-    res.render("change-email", {
-      user: user || null,
-      activePage: "userProfile",
-      cartItems: cartItems,
-    });
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.redirect("/userProfile");
-  }
-};
-
-const changeEmail = async (req, res) => {
-  try {
-    const user = req.session.user;
-    await Cart.findOne({ userId: user });
-
-    const { currentEmail } = req.body;
-    const userData = await User.findById(user);
-
-    if (userData.email !== currentEmail) {
-      return res.json({
-        success: false,
-        message: "This is not your current email address.",
-      });
-    }
-
-    const otp = generateOtp();
-    const emailSent = await sendVeificationMail(currentEmail, otp);
-
-    if (emailSent) {
-      req.session.userOtp = otp;
-      req.session.userData = req.body;
-      req.session.email = currentEmail;
-
-      return res.json({
-        success: true,
-        message: "OTP sent successfully. Please check your email.",
-      });
-    } else {
-      return res.json({
-        success: false,
-        message: "Error sending OTP. Please try again later.",
-      });
-    }
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.json({
-      success: false,
-      message: "An unexpected error occurred. Please try again.",
-    });
-  }
-};
-
-const otpPage = async (req, res) => {
-  try {
-    const userId = req.session.user;
-    res.render("change-email-otp", { user: userId });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const verifyEmailOtp = async (req, res) => {
-  try {
-    const user = req.session.user;
-
-    const otp = req.body.otp ? req.body.otp.trim() : undefined;
-    const sessionOtp = req.session.userOtp
-      ? req.session.userOtp.trim()
-      : undefined;
-
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
-
-    if (!otp || !sessionOtp) {
-      return res.render("change-email-otp", {
-        message: "OTP not received or session expired",
-        userData: req.session.userData,
-        activePage: "userProfile",
-        cartItems: cartItems,
-      });
-    }
-
-    if (otp === sessionOtp) {
-      req.session.userData = req.body.userData;
-      res.json({
-        success: true,
-        message: "OTP verified successfully",
-        redirectUrl: "/profile/new-email",
-      });
-    } else {
-      res.json({
-        success: false,
-        message: "OTP not matching",
-      });
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    res.redirect("/pageNotFound");
-  }
-};
-
-const emailResentOtp = async (req, res) => {
-  try {
-    const email = req.session.email;
-    if (!email) {
-      return res.json({ success: false, message: "No email found in session" });
-    }
-
-    const otp = generateOtp();
-    const emailSent = await sendVeificationMail(email, otp);
-
-    if (emailSent) {
-      req.session.userOtp = otp;
-      res.json({ success: true, message: "OTP resent successfully" });
-    } else {
-      res.json({
-        success: false,
-        message: "Failed to resend OTP. Please try again.",
-      });
-    }
-  } catch (error) {
-    console.error("Error while resending OTP:", error);
-    res.json({
-      success: false,
-      message: "An error occurred. Please try again later.",
-    });
-  }
-};
-
-const loadNewMail = async (req, res) => {
-  try {
-    const user = req.session.user;
-
-    const cart = await Cart.findOne({ userId: user });
-    const cartItems = cart ? cart.items : [];
-
-    res.render("new-email", {
-      user: req.session.user || null,
-      activePage: "userProfile",
-      cartItems: cartItems,
-    });
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.redirect("/pageNotFound");
-  }
-};
-
-const updateEmail = async (req, res) => {
-  try {
-    const newEmail = req.body.newEmail;
-    const userId = req.session.user;
-
-    const existingUser = await User.findOne({ email: newEmail });
-
-    const cart = await Cart.findOne({ userId: userId });
-    const cartItems = cart ? cart.items : [];
-
-    if (existingUser) {
-      return res.render("new-email", {
-        message: "This email is already in use. Please choose a different one.",
-        activePage: "userProfile",
-        cartItems: cartItems,
-        user: userId,
-      });
-    }
-
-    await User.findByIdAndUpdate(userId, { email: newEmail });
-
-    res.redirect("/userProfile");
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.redirect("/pageNotFound");
-  }
-};
 
 const loadEmailPageforPassChange = async (req, res) => {
   try {
-    const user = req.session.user;
+    const user = await User.findById(req.session.user).select('name email');
 
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
     res.render("change-pass", {
-      user: req.session.user || null,
+      user: user || null,
       activePage: "userProfile",
       cartItems: cartItems,
     });
@@ -881,6 +701,7 @@ const viewOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;
     const userId = req.session.user;
+    const user = await User.findById(req.session.user).select('name email')
 
     const order = await Order.findOne({ orderId: orderId })
       .populate(
@@ -917,7 +738,7 @@ const viewOrderDetails = async (req, res) => {
 
     res.render("orderDetail", {
       order,
-      user: userId,
+      user: user || null,
       activePage: "profile",
       cartItems: cartItems,
       reviews,
@@ -1171,13 +992,6 @@ module.exports = {
   resetPasswordLoad,
   resetPassword,
   loadUserProfile,
-  loadChangeEmail,
-  changeEmail,
-  otpPage,
-  emailResentOtp,
-  verifyEmailOtp,
-  loadNewMail,
-  updateEmail,
   loadEmailPageforPassChange,
   changePassValid,
   passOtpPage,

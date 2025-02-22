@@ -127,13 +127,6 @@ router.post("/resend-forgot-otp", profileController.resendForgetPassOtp);
 router.get("/reset-password", profileController.resetPasswordLoad);
 router.post("/reset-password", profileController.resetPassword);
 router.get("/userProfile", profileController.loadUserProfile);
-router.get("/profile/change-email", profileController.loadChangeEmail);
-router.post("/profile/change-email", profileController.changeEmail);
-router.get("/profile/otp-verification", profileController.otpPage);
-router.post("/resend-email-otp", profileController.emailResentOtp);
-router.post("/profile/verify-email-otp", profileController.verifyEmailOtp);
-router.get("/profile/new-email", profileController.loadNewMail);
-router.post("/profile/update-email", profileController.updateEmail);
 router.get(
   "/profile/change-password",
   profileController.loadEmailPageforPassChange

@@ -25,17 +25,27 @@
       font-size: 20px;
     }
 
-    /* Header Styling */
-    .contact_title h3 {
-      text-align: center;
-      font-size: 38px;
-      color: #34495e;
-      padding-top: 20px;
-    }
+    .contact-section {
+  background: url("/img/contact.jpg") no-repeat center center;
+  background-size: cover; /* Ensures the image covers the entire section */
+  background-position: center; /* Centers the image */
+  padding: 10px 0;
+  color: white;
+  height: 350px; /* Adjust height as needed */
+}
+
+/* Ensure the image scales properly on mobile */
+@media (max-width: 767px) {
+  .contact-section {
+    background-size: 100% auto; /* Stretch the image to full width */
+    background-position: top center; /* Align the image to the top */
+    height: 100px; /* Adjust height for mobile */
+  }
+}
 
     /* Breadcrumb Styling */
     .breadcrumb__text {
-      padding: 15px;
+      padding-top: 20%;
       border-radius: 5px;
     }
 
@@ -48,12 +58,6 @@
 
     .breadcrumb__links span {
       color: #7f8c8d;
-    }
-
-    /* Contact Section */
-    .contact-section {
-      background-color: #f4f6f6;
-      padding: 50px 0;
     }
 
     .contact-section .container {
@@ -158,9 +162,6 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-12">
-        <div class="contact_title">
-          <h3>Contact Us</h3>
-        </div>
         <div class="breadcrumb__text">
           <div class="breadcrumb__links">
             <a href="/">Home</a>

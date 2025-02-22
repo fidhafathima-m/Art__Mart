@@ -3,23 +3,88 @@
 <div class="container mt-5">
   <h2 class="mb-4 text-center">Retry Payment</h2>
 
-  <!-- Centering the content with 50% width (col-md-6) -->
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="order-summary bg-light p-4 rounded shadow-lg">
-        <h3 class="mb-4">Order Summary</h3>
+  <div class="row">
+    <!-- Left Column -->
+    <div class="col-md-8">
+      <div class="order-summary bg-light p-4 rounded shadow-lg mb-4">
+        <h3 class="section-title">Order Summary</h3>
         <hr />
-        <p><strong>Order ID:</strong> <%= order.orderId %></p>
-        <p><strong>Amount:</strong> &#8377; <%= order.finalAmount %></p>
-        <p><strong>Status:</strong> <%= order.status %></p>
-        <div>
-          <p><span class="fw-bold">Selected Address:</span> <br>
-            <%= address.name %><br>
-            <%= address.city %>, <% if (address.landMark) {%> <%= address.landMark %>, <% } %><br>
-            <%= address.state %>, <%= address.pincode %></p>
+        
+        <!-- Order Details -->
+        <div class="order-details mb-4">
+          <p class="order-id"><strong>Order ID:</strong> <%= order.orderId %></p>
+          <p class="order-date"><strong>Order Date:</strong> <%= new Date(order.createdOn).toLocaleDateString() %></p>
         </div>
 
-        <form id="retryPaymentForm" action="/retry-payment" method="POST" class="mt-4">
+        <!-- Product Information -->
+        <div class="products-list mb-4">
+          <h4 class="subsection-title">Products</h4>
+          <% order.ordereditems.forEach(item => { %>
+            <div class="product-item">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="product-info">
+                  <div class="row">
+                    <div class="col-md-4">
+                        <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" class="w-50">
+                    </div>
+                    <div class="col-md-8">
+                      <p class="product-name mb-1"><%= item.product.productName %></p>
+                      <p class="product-details mb-0">
+                        Quantity: <%= item.quantity %> × ₹<%= item.price %>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="product-total">
+                  ₹<%= item.quantity * item.price %>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="shipping-address mb-4">
+          <h4 class="subsection-title">Delivery Address</h4>
+          <div class="address-details">
+            <p class="mb-1"><%= address.name %></p>
+            <p class="mb-1"><%= address.city %></p>
+            <% if (address.landMark) { %>
+              <p class="mb-1"><%= address.landMark %></p>
+            <% } %>
+            <p class="mb-1"><%= address.state %>, <%= address.pincode %></p>
+          </div>
+        </div>
+
+        <!-- Price Details -->
+        <div class="price-summary mb-4">
+          <h4 class="subsection-title">Price Details</h4>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Subtotal</span>
+            <span>₹<%= order.finalAmount %></span>
+          </div>
+          <% if (order.couponDiscount) { %>
+            <div class="d-flex justify-content-between mb-2 discount-applied">
+              <span>Coupon Applied (<%= order.couponCode %>)</span>
+              <span>-₹<%= order.couponDiscount %></span>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-md-4">
+      <div class="payment-summary bg-light p-4 rounded shadow-lg">
+        <h3 class="section-title">Payment Details</h3>
+        <hr />
+        
+        <div class="total-amount mb-4">
+          <h4 class="amount-title">Amount to Pay</h4>
+          <p class="final-amount" id="amount">₹<%= order.finalAmount %></p>
+        </div>
+
+        <form id="retryPaymentForm" action="/retry-payment" method="POST">
           <input type="hidden" name="orderId" value="<%= order.orderId %>">
 
           <div class="form-group mb-3">
@@ -32,70 +97,131 @@
           </div>
 
           <button type="submit" class="btn btn-primary w-100 mt-3 shadow-sm">Retry Payment</button>
-          <p class="text-muted small text-center">Please wait 3s after clciking the button to download the invoice. Thank You</p>
         </form>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="d-none">
-    <div id="loadingSpinner" class="text-center">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="text-white">Processing your request...</p>
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="d-none">
+  <div id="loadingSpinner" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+    <p class="text-white">Processing your request...</p>
   </div>
 </div>
 
 <%- include("../../views/partials/user/footer") %>
 
-
-
-<!-- Custom Styles -->
+<!-- Enhanced Styles -->
 <style>
-  .order-summary {
+  .section-title {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .subsection-title {
+    color: #34495e;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .order-summary, .payment-summary {
+    background: white !important;
     border: 1px solid #e3e3e3;
+    transition: all 0.3s ease;
   }
 
-  .order-summary h3 {
-    color: #007bff;
+  .order-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
   }
 
-  .order-summary p {
-    font-size: 1.1rem;
+  .product-item {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
   }
 
-  .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+  .product-item:last-child {
+    border-bottom: none;
   }
 
-  .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004085;
+  .product-name {
+    font-weight: 500;
+    color: #2c3e50;
+  }
+
+  .product-details {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+  }
+
+  .product-total {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+
+  .shipping-address {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .price-summary {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .discount-applied {
+    color: #27ae60;
+    font-weight: 500;
+  }
+
+  .final-amount {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 1rem 0;
   }
 
   .form-select {
-    background-color: #f8f9fa;
-    border-color: #ddd;
-    border-radius: 0.375rem;
+    border: 2px solid #eee;
+    padding: 0.8rem;
   }
 
-  .form-select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+  .btn-primary {
+    background: #3498db;
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
   }
 
-  /* Responsive Design */
-  @media (max-width: 576px) {
-    .order-summary {
-      padding: 2rem;
+  .btn-primary:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .col-md-8, .col-md-4 {
+      padding: 0 1rem;
     }
 
-    .container {
-      margin-top: 2rem;
+    .order-summary, .payment-summary {
+      margin-bottom: 1rem;
+    }
+
+    .final-amount {
+      font-size: 1.5rem;
     }
   }
 </style>
@@ -106,8 +232,42 @@
 
 
 <script>
-  document.getElementById('retryPaymentForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
+  // Wait for the DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Get references to commonly used elements
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const retryPaymentForm = document.getElementById('retryPaymentForm');
+
+  // Helper function to show loading overlay
+  function showLoading() {
+    loadingOverlay.classList.remove('d-none');
+  }
+
+  // Helper function to hide loading overlay
+  function hideLoading() {
+    loadingOverlay.classList.add('d-none');
+  }
+
+  // Helper function to extract amount from the page
+  function getOrderAmount() {
+    const amountText = document.getElementById('amount').textContent;
+    return parseFloat(amountText.replace(/[^0-9.]/g, ''));
+  }
+
+  // Helper function to show error message
+  function showError(title, message) {
+    Swal.fire({
+      title: title,
+      text: message,
+      icon: 'error',
+      confirmButtonText: 'OK'
+    });
+  }
+
+  // Handle form submission
+  retryPaymentForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+    showLoading();
 
     const formData = new FormData(this);
     const data = {};
@@ -115,145 +275,162 @@
       data[key] = value;
     });
 
+    // Get order amount
+    const amount = getOrderAmount();
 
+    // Check COD limit
+    if (data.paymentMethod === 'cod' && amount > 1000) {
+      hideLoading();
+      showError('Exceeded Limit', 'Sorry, COD is not available for orders above ₹1000');
+      return;
+    }
 
-    // Send the payment method and order ID to the backend
-    fetch('/retry-payment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
-      .then(response => {
-        if (!response.ok) {
-          // If the response is not OK, throw an error
-          return response.text().then(text => {
-            throw new Error(text);
-          });
-        }
-        return response.json(); // Parse the response as JSON
-      })
-      .then(data => {
-        if (data.success) {
-          if (data.paymentMethod === 'razorpay') {
-            // Initialize Razorpay payment
-            const options = {
-              key: data.razorpayKey, // Your Razorpay key
-              amount: data.amount * 100, // Amount in paise
-              currency: data.currency,
-              order_id: data.orderId, // Order ID returned from the backend
-              handler: function(response) {
-                // Handle successful payment
-                console.log('Payment Successful:', response);
-                downloadInvoice(data.orderId);
-              },
-              modal: {
-                ondismiss: function() {
-                  console.log('Payment window was closed before completing.');
-                },
-              },
-            };
-
-            const rzp1 = new Razorpay(options);
-            rzp1.open(); // Open the Razorpay payment modal
-
-            // Handle Razorpay payment failure
-            rzp1.on('payment.failed', function(response) {
-              console.log('Payment Failed:', response);
-              Swal.fire({
-                title: 'Payment Failed',
-                text: 'There was an issue with the payment. Please try again later.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-              }).then(() => {
-                window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`; // Redirect to "order failed" page
-              });
-            });
-
-          } else if (data.paymentMethod === 'wallet') {
-            fetch('/wallet/check-balance', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  amount: order.finalAmount
-                }),
-              })
-              .then(response => response.json()) // Ensure that the response is parsed as JSON
-              .then(data => {
-                if (data.success) {
-                  downloadInvoice(data.orderId);
-
-                } else {
-                  // If balance is insufficient, show an alert
-                  this.disabled = false; // Re-enable the submit button
-                  document.getElementById('loadingOverlay').classList.add('d-none');
-
-                  // Show SweetAlert with the error message
-                  Swal.fire({
-                    title: 'Insufficient Balance',
-                    text: 'You do not have enough balance in your wallet to complete this purchase.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                  }).then(() => {
-                    this.disabled = false; // Re-enable the button after alert
-                    document.getElementById('loadingOverlay').classList.add('d-none');
-                  });
-                }
-              })
-              .catch(error => {
-                // Handle any unexpected errors with the wallet balance check
-                console.error('Error checking wallet balance:', error);
-                this.disabled = false; // Re-enable the button in case of error
-                document.getElementById('loadingOverlay').classList.add('d-none');
-                Swal.fire({
-                  title: 'Error!',
-                  text: 'There was an issue checking your wallet balance. Please try again later.',
-                  icon: 'error',
-                  confirmButtonText: 'OK'
-                });
-              });
-          } else if (data.paymentMethod === 'cod') {
-            console.log('order id: ', data.orderId);
-            downloadInvoice(data.orderId);
-          }
-
-        } else {
-          // Handle error
-          console.error('Error:', data.message);
-          Swal.fire({
-            title: 'Error!',
-            text: data.message || 'An unexpected error occurred. Please try again later.',
-            icon: 'error',
-            confirmButtonText: 'OK',
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'An unexpected error occurred. Please try again later.',
-          icon: 'error',
-          confirmButtonText: 'OK',
-        });
-      });
+    // Process payment
+    processPayment(data, amount);
   });
 
-  function downloadInvoice(orderId) {
+  // Main payment processing function
+  function processPayment(data, amount) {
+    fetch('/retry-payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => {
+          throw new Error(text);
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        console.log("Payment Method:", data.paymentMethod);
+        
+        switch(data.paymentMethod) {
+          case 'wallet':
+            return handleWalletPayment(amount, data.orderId);
+          case 'razorpay':
+            return handleRazorpayPayment(data);
+          case 'cod':
+            return handleCODPayment(data.orderId);
+          default:
+            throw new Error('Invalid payment method');
+        }
+      } else {
+        throw new Error(data.message || 'Payment initialization failed');
+      }
+    })
+    .catch(error => {
+      hideLoading();
+      console.error('Error:', error);
+      showError('Error!', error.message, 'An unexpected error occurred. Please try again later.');
+    });
+  }
 
+  // Handle Wallet Payment
+  function handleWalletPayment(amount, orderId) {
+    return fetch('/wallet/check-balance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount, orderId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      hideLoading();
+      if (data.success) {
+        window.location.href = `/checkout/orderSuccess?orderId=${orderId}`;
+      } else {
+        throw new Error('You do not have enough balance in your wallet to complete this purchase.');
+      }
+    })
+    .catch(error => {
+      hideLoading();
+      console.error('Wallet payment error:', error);
+      showError('Wallet Error', 'Failed to process wallet payment. Please try again.');
+    });
+  }
+
+  // Handle Razorpay Payment
+  function handleRazorpayPayment(data) {
+    const options = {
+      key: data.razorpayKey,
+      amount: data.amount * 100,
+      currency: data.currency,
+      order_id: data.orderId,
+      handler: function(response) {
+        hideLoading();
+        window.location.href = `/checkout/orderSuccess?orderId=${data.orderId}`;
+      },
+      modal: {
+        ondismiss: function() {
+          hideLoading();
+          Swal.fire({
+            title: 'Payment Cancelled',
+            text: 'You closed the payment window without completing the payment.',
+            icon: 'warning',
+            confirmButtonText: 'OK',
+          }).then(() => {
+            window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`;
+          });
+        },
+      },
+      prefill: {
+        name: data.customerName || '',
+        email: data.customerEmail || '',
+        contact: data.customerPhone || ''
+      },
+      theme: {
+        color: '#007bff'
+      }
+    };
+
+    const rzp1 = new Razorpay(options);
+    
+    rzp1.on('payment.failed', function(response) {
+      hideLoading();
+      console.error('Razorpay payment failed:', response);
+      Swal.fire({
+        title: 'Payment Failed',
+        text: 'There was an issue with the payment. Please try again later.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.href = `/checkout/orderFailed?orderId=${data.orderId}`;
+      });
+    });
+
+    rzp1.open();
+    return Promise.resolve();
+  }
+
+  // Handle COD Payment
+  function handleCODPayment(orderId) {
+    hideLoading();
+    window.location.href = `/checkout/orderSuccess?orderId=${orderId}`;
+    return Promise.resolve();
+  }
+
+  // Handle Invoice Download
+  window.downloadInvoice = function(orderId) {
+    showLoading();
+    
     fetch(`/checkout/generate-invoice/${orderId}`)
       .then(response => {
-        console.log('Response status:', response.status);
+        console.log('Invoice response status:', response.status);
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.blob();
       })
       .then(blob => {
-        console.log('Blob received:', blob);
+        console.log('Invoice blob received:', blob);
+        // Create and trigger download
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -261,21 +438,19 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url); // Clean up the object URL
+        URL.revokeObjectURL(url);
 
+        // Redirect after successful download
         setTimeout(() => {
+          hideLoading();
           window.location.href = `/checkout/orderSuccess?orderId=${orderId}`;
         }, 1000);
-
       })
       .catch(error => {
+        hideLoading();
         console.error('Error downloading invoice:', error);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to download the invoice. Please try again later.',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
+        showError('Invoice Error', 'Failed to download the invoice. Please try again later.');
       });
-  }
+  };
+});
 </script>
