@@ -701,6 +701,7 @@ const viewOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;
     const userId = req.session.user;
+    const user = await User.findById(req.session.user).select('name email')
 
     const order = await Order.findOne({ orderId: orderId })
       .populate(
@@ -737,7 +738,7 @@ const viewOrderDetails = async (req, res) => {
 
     res.render("orderDetail", {
       order,
-      user: userId,
+      user: user || null,
       activePage: "profile",
       cartItems: cartItems,
       reviews,
