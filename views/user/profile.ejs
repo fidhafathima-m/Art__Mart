@@ -718,7 +718,7 @@
       <!-- Profile Information -->
       <div class="card mb-4">
         <div class="card-body p-3">
-          <h5 class="card-title">Profile Information</h5>
+          <h5 class="card-title text-black">Profile Information</h5>
           <p><strong>Email:</strong> <%= user.email %></p>
           <% if (user.phone) {%>
           <p><strong>Phone Number:</strong> <%= user.phone %></p>
@@ -736,7 +736,6 @@
             <i class="fas fa-user-edit"></i> Edit Profile
           </a>
 
-          <a href="/profile/change-email" class="btn btn-primary">Change Email</a>
           <a href="/profile/change-password" class="btn btn-warning">Change Password</a>
         </div>
       </div>
