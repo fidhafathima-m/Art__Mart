@@ -147,7 +147,8 @@ const resendForgetPassOtp = async (req, res) => {
 
 const resetPasswordLoad = async (req, res) => {
   try {
-    res.render("reset-password");
+    const user = req.session.user;
+    res.render("reset-password", {user});
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
