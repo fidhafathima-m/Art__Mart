@@ -62,7 +62,7 @@ const securePassword = async (password) => {
 
 const pageNotFound = async (req, res) => {
   try {
-    res.render("page-NotFound");
+    res.render("page-404");
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);

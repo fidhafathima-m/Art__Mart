@@ -188,7 +188,7 @@
     <button class="btn btn-dark text-center" onclick="downloadInvoice('<%= order.orderId %>')" style="position: absolute; right: 0; top: -20px;">Download Invoice</button>
     <% } %>
     <h5 class="text-muted">Order ID: <%= order.orderId %></h5>
-    <% if (order.status !== 'Cancelled' && order.status !== 'Returned' && order.status !== 'Return Request') { %>
+    <% if (order.status !== 'Cancelled' && order.status !== 'Returned' && order.status !== 'Return Request' && order.status !== 'Payment Pending') { %>
       <p class="text-center">You can download the invoice once the product is delivered. Thank you for shopping with us.</p>
       <% } %>
     <p class="text-center">

@@ -404,6 +404,7 @@ const deletFromCart = async (req, res) => {
 const loadCheckout = async (req, res) => {
   try {
     const userId = req.session.user;
+    const user = await User.findById(userId).select('name email')
 
     const cart = await Cart.findOne({ userId: userId }).populate(
       "items.productId"
@@ -423,7 +424,7 @@ const loadCheckout = async (req, res) => {
 
     res.render("checkout", {
       activePage: "shop",
-      user: userId,
+      user: user,
       cartItems: cartItems,
       addresses: userAddress ? userAddress.address : [],
       defaultAddress: defaultAddress || {},
@@ -588,8 +589,9 @@ const codOrderSuccess = async (req, res) => {
   try {
     const { orderId } = req.query;
 
-    const user = req.session.user;
-    const cart = await Cart.findOne({ userId: user });
+    const userId = req.session.user;
+    const user = await User.findById(userId).select('name email')
+    const cart = await Cart.findOne({ userId: userId });
 
     const cartItems = cart ? cart.items : [];
 
@@ -618,8 +620,9 @@ const razorpayOrderFailed = async (req, res) => {
   try {
     const { orderId } = req.query;
 
-    const user = req.session.user;
-    const cart = await Cart.findOne({ userId: user });
+    const userId = req.session.user;
+    const user = await User.findById(userId).select('name email')
+    const cart = await Cart.findOne({ userId: userId });
 
     const cartItems = cart ? cart.items : [];
 
@@ -651,25 +654,26 @@ const loadRetryPayment = async (req, res) => {
   const { orderId } = req.query;
 
   try {
-    const order = await Order.findOne({ orderId: orderId });
+    const order = await Order.findOne({ orderId: orderId }).populate('ordereditems.product');
     if (!order) {
       return res.status(NotFound).send("Order not found");
     }
-    const user = req.session.user;
+    const userId = req.session.user;
+    const user = await User.findById(userId).select('name email')
 
-    const userAddresses = await Address.findOne({ userId: user });
+    const userAddresses = await Address.findOne({ userId: userId });
 
     const address = userAddresses
       ? userAddresses.address.find((addr) => addr.isDefault)
       : null;
 
-    const cart = await Cart.findOne({ userId: user });
+    const cart = await Cart.findOne({ userId: userId });
 
     const cartItems = cart ? cart.items : [];
 
     res.render("retry-checkout", {
       order: order,
-      activePage: "shop",
+      activePage: "profile",
       user: user,
       cartItems,
       address: address,
