@@ -927,7 +927,8 @@ const withdrawMoney = async (req, res) => {
 
 const loadAbout = async (req, res) => {
   try {
-    const user = req.session.user || null;
+    const findUser = await User.findById(req.session.user).select('name email');
+    const user = findUser ? findUser : null;
     const cart = user ? await Cart.findOne({ userId: user }) : null;
     const cartItems = cart ? cart.items : [];
 
@@ -947,14 +948,15 @@ const loadAbout = async (req, res) => {
 
 const loadContact = async (req, res) => {
   try {
-    const user = req.session.user || "";
-    // const cart = await Cart.findOne({ userId: user });
-    // const cartItems = cart ? cart.items : [];
+    const findUser = await User.findById(req.session.user).select('name email');
+    const user = findUser ? findUser : null;
+    const cart = user ? await Cart.findOne({ userId: user }) : null;
+    const cartItems = cart ? cart.items : [];
 
     res.render("contact", {
       activePage: "contact",
       user,
-      cartItems: "",
+      cartItems,
     });
   } catch (error) {
     console.error(error);

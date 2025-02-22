@@ -187,7 +187,6 @@
         </div>
         <div class="col-lg-3 col-md-3" style="margin-left: -10px;">
           <div class="header__nav__option">
-            <% console.log(user); %>
             <%if(user) {%>
             <a href="/userProfile?section=wishlist"><img src="/img/icon/heart.png" alt="wishlist icon" /></a>
             <a href="/cart" class="cart-icon">
@@ -199,7 +198,7 @@
             </a>
 
             <div class="dropdown">
-              <a href="#" class="sign-in-link"><%=user.name%></a>
+              <a href="#" class="sign-in-link"><%= user.name || 'Guest' %></a>
               <div class="dropdown-content">
                 <!-- <a href="/userProfile">Profile</a> -->
                 <a href="/logout">Logout</a>

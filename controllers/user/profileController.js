@@ -307,12 +307,12 @@ const loadUserProfile = async (req, res) => {
 
 const loadEmailPageforPassChange = async (req, res) => {
   try {
-    const user = req.session.user;
+    const user = await User.findById(req.session.user).select('name email');
 
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
     res.render("change-pass", {
-      user: req.session.user || null,
+      user: user || null,
       activePage: "userProfile",
       cartItems: cartItems,
     });
