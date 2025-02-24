@@ -104,13 +104,6 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
         <!-- Delivery Address -->
         ${deliveryAddress}
 
-        <!-- Notification Message -->
-        <div style="background-color: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 0; font-size: 14px;">
-            <strong>Note:</strong> We'll send you another notification when your order is out for delivery.
-          </p>
-        </div>
-
         <!-- Footer -->
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
           <p style="margin: 0; color: #666; font-size: 14px;">Thank you for choosing Art Mart!</p>
