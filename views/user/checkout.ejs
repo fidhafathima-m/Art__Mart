@@ -185,6 +185,10 @@
     <div class="checkout-details bg-white p-4 rounded" style="width: 70%">
       <h2>Checkout</h2>
 
+      <% if (!(defaultAddress && defaultAddress.name)) { %>
+      <p class="text-center text-warning">Please select an address to proceed with and to add coupon.</p>
+      <% } %>
+
       <!-- Shipping Address -->
       <div class="row mt-4">
         <div class="shipping-address mb-4 col-md-3">
@@ -1231,6 +1235,7 @@
   document.getElementById('usePaymentMethodBtn').addEventListener('click', function() {
     document.getElementById('loadingOverlay').classList.remove('d-none');
     this.disabled = true; // Disable the button to prevent multiple clicks
+
 
     const orderedItems = <%- JSON.stringify(cartItemsData) %>;
     const totalPrice = <%= totalPrice %>; // Get total price from server

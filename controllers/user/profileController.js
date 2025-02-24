@@ -393,8 +393,9 @@ const verifyChangePassOtp = async (req, res) => {
 
 const loadAddAddress = async (req, res) => {
   try {
-    const user = req.session.user;
-    const cart = await Cart.findOne({ userId: user });
+    const userId = req.session.user;
+    const user = await User.findById(userId).select('name email')
+    const cart = await Cart.findOne({ userId: userId });
     const cartItems = cart ? cart.items : [];
 
     res.render("add-address", {
@@ -499,6 +500,8 @@ const loadEditAddress = async (req, res) => {
   try {
     const addressId = req.query.id;
     const user = req.session.user;
+    const userDetails = await User.findById(user).select('name email')
+
 
     if (!user) {
       return res.redirect("/login");
@@ -524,7 +527,7 @@ const loadEditAddress = async (req, res) => {
 
     res.render("edit-address", {
       address: addressData,
-      user: user,
+      user: userDetails,
       activePage: "userProfile",
       cartItems: cartItems,
     });
