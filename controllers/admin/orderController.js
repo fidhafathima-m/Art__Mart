@@ -7,6 +7,35 @@ const Transaction = require("../../models/transactionSchema");
 const Product = require("../../models/productSchema");
 const { BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
 const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
+const nodemailer = require('nodemailer');
+
+
+const sendShippedMail = async(email) => {
+  try {
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // or 'STARTTLS'
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
+    });
+    const mailOptions = {
+      from: process.env.NODEMAILER_EMAIL,
+      to: email,
+      subject: 'Order Shipped!',
+      text: 'Your order has been been shipped.',
+      html: '<b>Order Shipped</b><br> Your order has been shipped.',
+    };
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
 const loadOrder = async (req, res) => {
   try {
@@ -164,6 +193,15 @@ const updateOrderStatus = async (req, res) => {
     if (status === "Delivered" && !order.firstDeliveredAt) {
       order.firstDeliveredAt = Date.now();
       order.deliveredAt = Date.now();
+    }
+
+    const user = await User.findOne({_id: order.userId});
+
+    if(status === "Shipped") {
+      const sendMail = await sendShippedMail(user.email);
+      if(sendMail) {
+        console.log('Email sent to user');
+      }
     }
 
     if (status === "Cancelled") {
