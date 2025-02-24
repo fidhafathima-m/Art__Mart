@@ -33,9 +33,11 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
     const orderedItems = order.ordereditems
       .map(
         (item) =>
-          `<li>${productMap[item.product]} (Qty: ${item.quantity}) - ₹${
-            item.price
-          }</li>`
+          `<tr>
+            <td style="padding: 12px; border-bottom: 1px solid #eee;">${productMap[item.product]}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price}</td>
+           </tr>`
       )
       .join("");
 
@@ -43,32 +45,81 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
     const paymentMethod = "Cash on Delivery (COD)";
 
     const deliveryAddress = `
-      <p><b>Delivery Address:</b></p>
-      <p>${defaultAddress.name}</p>
-      <p>${defaultAddress.city}, ${defaultAddress.state} - ${
-      defaultAddress.pincode
-    }</p>
-      <p>Phone: ${defaultAddress.phone}</p>
-      ${
-        defaultAddress.altPhone
-          ? `<p>Alternate Phone: ${defaultAddress.altPhone}</p>`
-          : ""
-      }
+      <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+        <h3 style="color: #2c3e50; margin-bottom: 15px;">Delivery Address</h3>
+        <p style="margin: 5px 0;"><strong>${defaultAddress.name}</strong></p>
+        <p style="margin: 5px 0;">${defaultAddress.city}, ${defaultAddress.state} - ${defaultAddress.pincode}</p>
+        <p style="margin: 5px 0;">Phone: ${defaultAddress.phone}</p>
+        ${
+          defaultAddress.altPhone
+            ? `<p style="margin: 5px 0;">Alternate Phone: ${defaultAddress.altPhone}</p>`
+            : ""
+        }
+      </div>
     `;
 
     const emailContent = `
-      <h2>Order from Art Mart</h2>
-      <h3>Order Confirmation</h3>
-      <p>Thank you for your order! Below are your order details:</p>
-      <p><b>Order ID:</b> ${order._id}</p>
-      <p><b>Payment Method:</b> ${paymentMethod}</p>
-      <p><b>Items Ordered:</b></p>
-      <ul>
-        ${orderedItems}
-      </ul>
-      <p><b>Total Amount:</b> ₹${totalAmount}</p>
-      ${deliveryAddress}
-      <p>We will notify you once your order is out for delivery. Thank you for shopping with us!</p>
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+        <!-- Header -->
+        <div style="text-align: center; padding: 30px 0; background-color:rgb(76, 152, 175); color: white; border-radius: 10px; margin-bottom: 30px;">
+          <h1 style="margin: 0; font-size: 28px;">Order Confirmed!</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px;">Thank you for shopping with Art Mart</p>
+        </div>
+
+        <!-- Order ID and Welcome Message -->
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #2c3e50; font-size: 20px; margin-bottom: 15px;">Order ID: ${order._id}</h2>
+          <p style="font-size: 16px; line-height: 1.6;">Dear Customer,</p>
+          <p style="font-size: 16px; line-height: 1.6;">We're thrilled to confirm your order! Below are your order details:</p>
+        </div>
+
+        <!-- Payment Method -->
+        <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+          <p style="margin: 0;"><strong>Payment Method:</strong> ${paymentMethod}</p>
+        </div>
+
+        <!-- Order Items -->
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #2c3e50; margin-bottom: 15px;">Order Summary</h3>
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background-color: #f5f6fa;">
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Product</th>
+                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Quantity</th>
+                <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${orderedItems}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2" style="padding: 15px; text-align: right; font-weight: bold;">Total Amount:</td>
+                <td style="padding: 15px; text-align: right; font-weight: bold;">₹${totalAmount}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Delivery Address -->
+        ${deliveryAddress}
+
+        <!-- Notification Message -->
+        <div style="background-color: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 0; font-size: 14px;">
+            <strong>Note:</strong> We'll send you another notification when your order is out for delivery.
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+          <p style="margin: 0; color: #666; font-size: 14px;">Thank you for choosing Art Mart!</p>
+          <div style="margin-top: 20px;">
+            <p style="margin: 5px 0; color: #666; font-size: 14px;">Best regards,</p>
+            <p style="margin: 5px 0; color:rgb(73, 171, 210); font-weight: bold; font-size: 16px;">Art Mart Team</p>
+          </div>
+        </div>
+      </div>
     `;
 
     const transporter = nodemailer.createTransport({
@@ -85,7 +136,7 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
     const info = await transporter.sendMail({
       from: process.env.NODEMAILER_EMAIL,
       to: email,
-      subject: "Order Confirmation - Thank you for your purchase!",
+      subject: "Order Confirmation - Thank You for Your Purchase!",
       html: emailContent,
     });
 
@@ -95,6 +146,7 @@ const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
     throw new Error("Failed to send confirmation email");
   }
 };
+
 
 const loadProductDetails = async (req, res) => {
   try {
@@ -1025,6 +1077,22 @@ const razorpayPlaceOrder = async (req, res) => {
 
     savedOrder.orderId = razorpayOrder.id; // Store Razorpay order ID in the order document
     await savedOrder.save();
+
+    const userData = await User.findOne({ _id: userId });
+    const userEmail = userData.email;
+    const emailSent = await sendOrderConfirmationEmail(
+      userEmail,
+      savedOrder,
+      defaultAddress
+    );
+
+    if (!emailSent) {
+      return res.status(InternalServerError).json({
+        success: false,
+        message: "Failed to send order confirmation email.",
+      });
+    }
+
 
     // Return Razorpay order details to frontend
     res.json({

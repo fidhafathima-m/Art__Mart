@@ -38,17 +38,32 @@ const sendVeificationMail = async (email, otp) => {
       from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Password Reset Request",
-      text: `Your otp is ${otp}`,
-      html: `<b><h4>Your OTP: ${otp}</h4><br></b>`,
+      text: `Hello!\n\nWe received a request to reset your password. Use the following One-Time Password (OTP) to proceed:\n\nOTP: ${otp}\n\nIf you didn't request this, please ignore this email.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+          <h2 style="color: #4CAF50;">Hello!</h2>
+          <p>We received a request to reset your password. Please use the following one-time password (OTP) to proceed:</p>
+          <h3 style="background-color: #f0f0f0; padding: 10px; border-radius: 5px; display: inline-block; font-size: 24px; color: #333;">
+            ${otp}
+          </h3>
+          <p style="margin-top: 20px;">If you didn't request this password reset, please ignore this email. Your account is safe with us.</p>
+          <p style="margin-top: 30px; font-size: 14px; color: #777;">If you have any issues, feel free to contact our support team.</p>
+          <footer style="margin-top: 40px; font-size: 12px; text-align: center; color: #888;">
+            <p>Best regards,</p>
+            <p><b>Art·Mart</b></p>
+          </footer>
+        </div>
+      `,
     };
 
     await transporter.sendMail(mailOptions);
     return true;
-    // eslint-disable-next-line no-unused-vars
   } catch (error) {
+    console.error("Error sending password reset email:", error);
     return false;
   }
 };
+
 
 //securing password
 const securePassword = async (password) => {
