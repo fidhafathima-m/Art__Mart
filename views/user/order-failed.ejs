@@ -1,31 +1,231 @@
 <%- include('../../views/partials/user/header') %>
+<style>
+  .failed-container {
+    max-width: 600px;
+    margin: 3rem auto;
+    transform: translateY(20px);
+    opacity: 0;
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+  
+  .failed-card {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .failed-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #e53935, #ff5252);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+  }
+  
+  .failed-icon {
+    width: 80px;
+    height: 80px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    z-index: 1;
+    animation: pulse 2s infinite;
+  }
+  
+  .failed-icon svg {
+    color: #e53935;
+    width: 40px;
+    height: 40px;
+    animation: alert 0.8s ease-in-out forwards;
+  }
+  
+  .order-details {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    animation: fadeIn 1s ease-out 0.3s forwards;
+    opacity: 0;
+  }
+  
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px dashed #e0e0e0;
+    padding-bottom: 0.5rem;
+  }
+  
+  .detail-row:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  
+  .detail-label {
+    font-weight: 500;
+    color: #666;
+  }
+  
+  .detail-value {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .status-value {
+    color: #e53935;
+    font-weight: 600;
+  }
+  
+  .action-button {
+    background: linear-gradient(135deg, #e53935, #ff5252);
+    border: none;
+    border-radius: 50px;
+    padding: 0.75rem 2rem;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(229, 57, 53, 0.2);
+    margin-top: 1rem;
+    animation: fadeIn 1s ease-out 0.6s forwards;
+    opacity: 0;
+  }
+  
+  .action-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(229, 57, 53, 0.3);
+    background: linear-gradient(135deg, #d32f2f, #f44336);
+  }
+  
+  .retry-button {
+    background: linear-gradient(135deg, #424242, #616161);
+    border: none;
+    border-radius: 50px;
+    padding: 0.75rem 2rem;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(66, 66, 66, 0.2);
+    margin: 1rem 0.5rem;
+    animation: fadeIn 1s ease-out 0.6s forwards;
+    opacity: 0;
+  }
+  
+  .retry-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(66, 66, 66, 0.3);
+    background: linear-gradient(135deg, #373737, #505050);
+  }
+  
+  .error-message {
+    margin-top: 1.5rem;
+    color: #555;
+    animation: fadeIn 1s ease-out 0.9s forwards;
+    opacity: 0;
+  }
+  
+  @keyframes fadeUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(229, 57, 53, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(229, 57, 53, 0);
+    }
+  }
+  
+  @keyframes alert {
+    0% {
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+</style>
 
-<div class="container mt-5 mb-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <div class="card">
-        <div class="card-header text-center">
-          <h3>Order Failed</h3>
+<div class="failed-container">
+  <div class="failed-card card">
+    <div class="card-header text-center">
+      <h3 class="mb-0">Order Failed</h3>
+    </div>
+    <div class="card-body text-center p-4">
+      <div class="failed-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="detail-label">Order ID:</span>
+          <span class="detail-value">#<%= order.orderId %></span>
         </div>
-        <div class="card-body text-center">
-          <div class="alert alert-danger mt-3">
-            <p>Unfortunately, your order could not be processed.</p>
-            <p>Order ID: <%= order.orderId %></p>
-            <p>Amount: &#8377; <%= order.finalAmount %></p>
-            <p>Status: <%= order.status %></p>
-          </div>
-
-          <p>
-            There was an issue with your payment. Please try again or choose a different payment method.
-          </p>
-
-          <div class="text-center">
-            <a href="/userProfile?section=orders" class="btn btn-danger mb-4">View Orders</a>
-          </div>
+        <div class="detail-row">
+          <span class="detail-label">Amount:</span>
+          <span class="detail-value">&#8377; <%= order.finalAmount %></span>
         </div>
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="status-value"><%= order.status %></span>
+        </div>
+      </div>
+      
+      <p class="error-message">
+        There was an issue with your payment. Please try again or choose a different payment method.
+      </p>
+      
+      <div>
+        <a href="/userProfile?section=orders" class="btn action-button">
+          View Orders
+        </a>
       </div>
     </div>
   </div>
 </div>
 
+<script>
+  // This small script ensures animations only run after page load
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelector('.failed-container').style.display = 'block';
+  });
+</script>
 <%- include('../../views/partials/user/footer') %>
