@@ -1,9 +1,7 @@
 /* eslint-disable no-undef */
 const Brand = require("../../models/brandSchema");
-const fs = require("fs");
 const { NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
 const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
-const path = require("path");
 
 const getBrand = async (req, res) => {
   try {
@@ -49,22 +47,19 @@ const loadAddBrand = async (req, res) => {
 const addBrand = async (req, res) => {
   try {
     const brand = req.body.name;
+    const description = req.body.brandDescription; // Get the brand description
     const fileBrand = await Brand.findOne({ brandName: brand });
     if (!fileBrand) {
-      const image = req.file.filename;
-      const brandUpper = brand.toUpperCase();
       const newBrand = new Brand({
-        brandName: brandUpper,
-        brandImage: image,
+        brandName: brand.toUpperCase(),
+        brandDescription: description, // Save the brand description
       });
       await newBrand.save();
-      res.json({ success: true, message: "Brand added successfully!"});
+      res.json({ success: true, message: "Brand added successfully!" });
     } else {
-      // Send failure response if brand already exists
       res.json({ success: false, message: "Brand already exists!" });
     }
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
+  } catch{
     res.json({ success: false, message: "Failed to add brand!" });
   }
 };
@@ -74,41 +69,34 @@ const loadEditBrand = async (req, res) => {
     const brandId = req.query.id;
     const brand = await Brand.findById(brandId);
     res.render("edit-brand", { brand });
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.json({ success: false, message: "Failed to add brand!" });
+  } catch {
+    res.json({ success: false, message: "Failed to load brand!" });
   }
 };
 
-const deleteLogo = async (req, res) => {
-  const { imageId } = req.params; // This should be the filename
+const editBrand = async (req, res) => {
+  const { id } = req.params;
+  const { name, brandDescription } = req.body; 
+
   try {
-    // Assuming you have the brand ID to find the brand
-    const brand = await Brand.findOne({ brandImage: imageId });
-    if (!brand) {
-      return res.json({ success: false, message: "Brand logo not found!" });
+    // Find the brand by ID and update it
+    const updatedBrand = await Brand.findByIdAndUpdate(
+      id,
+      {
+        brandName: name.toUpperCase(), 
+        brandDescription: brandDescription, 
+      },
+      { new: true } 
+    );
+
+    if (updatedBrand) {
+      res.json({ success: true, message: "Brand updated successfully!" });
+    } else {
+      res.status(NotFound).json({ success: false, message: "Brand not found" });
     }
-
-    // Delete the image file from the filesystem
-    const imagePath = path.join(__dirname, "../uploads/brand-images", imageId);
-    fs.unlink(imagePath, (err) => {
-      if (err) {
-        console.error("Error deleting file:", err);
-        return res.json({
-          success: false,
-          message: "Failed to delete brand logo!",
-        });
-      }
-    });
-
-    // Optionally, remove the image reference from the database
-    brand.brandImage = null; // or you can use `brand.remove()` if you want to delete the entire brand
-    await brand.save();
-
-    res.json({ success: true, message: "Brand logo deleted successfully!" });
-    // eslint-disable-next-line no-unused-vars
-  } catch (error) {
-    res.json({ success: false, message: "Failed to delete brand logo!" });
+  } catch(error) {
+    console.log(error)
+    res.status(InternalServerError).json({ success: false, message: "Failed to update brand!" });
   }
 };
 
@@ -179,7 +167,7 @@ module.exports = {
   loadAddBrand,
   addBrand,
   loadEditBrand,
-  deleteLogo,
+  editBrand,
   brandBlocked,
   brandUnblocked,
   deleteBrand,

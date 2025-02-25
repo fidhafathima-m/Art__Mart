@@ -40,11 +40,11 @@ const login = async (req, res) => {
         });
       }
     } else {
-      return res.redirect("/admin/login");
+      return res.render("admin-login", {message: "Sorry, You are not an admin."});
     }
   } catch (error) {
     res.status(InternalServerError).json({ success: false, message: error.message });
-    return res.redirect("/pageError");
+    return res.redirect("/admin/pageError");
   }
 };
 
