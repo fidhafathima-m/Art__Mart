@@ -1,29 +1,17 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const express = require("express");
 const router = express.Router();
-// eslint-disable-next-line no-undef
 const adminController = require("../controllers/admin/adminController");
-// eslint-disable-next-line no-undef
 const adminProfileController = require("../controllers/admin/adminProfileController");
-// eslint-disable-next-line no-undef
 const adminAuth = require("../middlewares/adminAuth");
-// eslint-disable-next-line no-undef
 const customerController = require("../controllers/admin/customerController");
-// eslint-disable-next-line no-undef
 const categoryController = require("../controllers/admin/categoryController");
-// eslint-disable-next-line no-undef
 const productController = require("../controllers/admin/productController");
-// eslint-disable-next-line no-undef
 const couponController = require("../controllers/admin/couponController");
-// eslint-disable-next-line no-undef
 const orderController = require("../controllers/admin/orderController");
-// eslint-disable-next-line no-undef
 const offerController = require("../controllers/admin/offerController");
-// eslint-disable-next-line no-undef
 const brandController = require("../controllers/admin/brandController");
-// eslint-disable-next-line no-undef
 const upload = require("../helpers/multerUploads");
-// eslint-disable-next-line no-undef
 const ledgerController = require("../controllers/admin/ledgerController");
 
 router.get("/pageError", adminController.pageError);
@@ -229,8 +217,8 @@ router.post(
   upload.single("brandImage"),
   brandController.addBrand
 );
-// router.get('/brands/edit-brand', adminAuth.isLogin, brandController.loadEditBrand);
-// router.delete('brands/delete-image/:imageId',adminAuth.isLogin, brandController.deleteLogo);
+router.get('/brands/edit-brand', adminAuth.isLogin, brandController.loadEditBrand);
+router.post('/brands/edit-brand/:id', adminAuth.isLogin, brandController.editBrand);
 router.post(
   "/brands/block-brand",
   adminAuth.isLogin,
@@ -251,5 +239,4 @@ router.post("/contact/submit", adminController.sendContactEmail);
 router.get("/ledger", ledgerController.getLedger);
 router.get("/ledger/export-pdf", ledgerController.exportPDF);
 
-// eslint-disable-next-line no-undef
 module.exports = router;

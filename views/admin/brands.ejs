@@ -23,7 +23,7 @@
         <thead>
           <tr>
             <th>Brand Name</th>
-            <th>Brand Logo</th>
+            <th>Brand Description</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -31,11 +31,7 @@
           <% for(let i = 0; i < data.length; i++) { %>
           <tr id="<%= data[i]._id %>">
             <td><%= data[i].brandName %></td>
-            <td>
-              <div class="d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden;">
-                <img src="/uploads/brand-images/<%= data[i].brandImage %>" alt="<%= data[i].brandName %>" class="img-fluid rounded-circle" style="width: 100%; height: auto;">
-              </div>
-            </td>
+            <td><%= data[i].brandDescription %></td> <!-- Updated this line -->
             <td>
               <% if (data[i].isBlocked === false) { %>
               <button class="btn btn-danger block-btn" data-id="<%= data[i]._id %>" style="width: 80px">
@@ -47,7 +43,7 @@
               </button>
               <% } %>
             </td>
-            <!-- <td>
+            <td>
               <button class="btn btn-secondary" style="width: 80px">
                 <a
                   href="/admin/brands/edit-brand?id=<%= data[i]._id %>"
@@ -56,14 +52,13 @@
                   >Edit</a
                 >
               </button>
-            </td> -->
+            </td>
             <td>
               <% if (data[i].isDeleted === false) { %>
               <button class="btn btn-danger" style="width: 80px" onclick="deleteBrand('<%= data[i]._id %>')">
                 Delete
               </button>
               <% } else { %>
-              <!-- If the product is deleted -->
               <button class="btn btn-success" style="width: 80px" onclick="restoreBrand('<%= data[i]._id %>')">
                 Restore
               </button>

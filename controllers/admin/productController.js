@@ -3,7 +3,6 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const Brand = require("../../models/brandSchema");
 const mongoose = require("mongoose");
-const multer = require("multer");
 const { OK, BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
 const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
 
@@ -77,27 +76,38 @@ const addProduct = async (req, res) => {
     if (!productExists) {
       const images = [];
 
-      // Process cropped images (base64 data)
+      // Function to validate base64 image data
+      const validateBase64Image = (base64Data) => {
+        const regex = /^data:image\/(png|jpeg|jpg|gif|webp);base64,/;
+        return regex.test(base64Data);
+      };
+
       for (let i = 1; i <= 3; i++) {
         const base64Data = products[`croppedImage${i}`];
 
         if (base64Data) {
+          if (!validateBase64Image(base64Data)) {
+            console.error('Invalid base64 image data:', base64Data);
+            return res.status(BadRequest).json({
+              success: false,
+              message: `Invalid base64 data for image ${i}. Only PNG, JPEG, JPG, GIF, or WEBP images are allowed.`,
+            });
+          }
+
           try {
-            // Upload to Cloudinary
             const result = await cloudinary.uploader.upload(base64Data, {
               folder: 'product-images',
               transformation: [
                 { width: 440, height: 440, crop: 'fill' }
               ]
             });
-            
-            // Store the Cloudinary URL
+
             images.push(result.secure_url);
           } catch (uploadError) {
             console.error('Cloudinary upload error:', uploadError);
-            return res.status(BadRequest).json({ 
-              success: false, 
-              message: "Error uploading image to cloud storage" 
+            return res.status(BadRequest).json({
+              success: false,
+              message: `Error uploading image ${i} to cloud storage: ${uploadError.message}`,
             });
           }
         }
@@ -116,6 +126,7 @@ const addProduct = async (req, res) => {
           .json({ success: false, message: "Invalid category ID" });
       }
 
+      // Validate brand ID
       const brandId = await Brand.findOne({
         _id: new mongoose.Types.ObjectId(products.brand.trim()),
         isDeleted: false,
@@ -172,18 +183,10 @@ const addProduct = async (req, res) => {
         .json({ success: false, message: "Product already exists" });
     }
   } catch (error) {
-    if (error instanceof multer.MulterError) {
-      res
-        .status(BadRequest)
-        .json({ success: false, message: "Only image files are allowed" });
-    } else {
-      res
-        .status(InternalServerError)
-        .json({ success: false, message: INTERNAL_SERVER_ERROR });
-    }
+    console.error('Product update error:', error);
+    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
-
 const loadEditProduct = async (req, res) => {
   try {
     const id = req.query.id;
@@ -255,6 +258,16 @@ const restoreProduct = async (req, res) => {
   }
 };
 
+const deleteImageFromCloudinary = async (url) => {
+  try {
+    const publicId = url.split('/').pop().split('.')[0];
+    await cloudinary.uploader.destroy(`product-images/${publicId}`);
+  } catch (error) {
+    console.error('Error deleting image from Cloudinary:', error);
+  }
+};
+
+
 const editProduct = async (req, res) => {
   try {
     const id = req.params.id;
@@ -269,30 +282,53 @@ const editProduct = async (req, res) => {
 
     const images = [...product.productImage]; // Start with existing images
 
-    // Process cropped images (base64 data)
-    for (let i = 1; i <= 3; i++) {
-      const base64Data = products[`croppedImage${i}`];
-      if (base64Data) {
-        try {
-          // Upload to Cloudinary
-          const result = await cloudinary.uploader.upload(base64Data, {
-            folder: 'product-images',
-            transformation: [
-              { width: 440, height: 440, crop: 'fill' }
-            ]
-          });
-          
-          // Store the Cloudinary URL
-          images.push(result.secure_url);
-        } catch (uploadError) {
-          console.error('Cloudinary upload error:', uploadError);
-          return res.status(BadRequest).json({ 
-            success: false, 
-            message: "Error uploading image to cloud storage" 
-          });
-        }
+    if (images.length > 0) {
+      for (const oldImage of product.productImage) {
+        await deleteImageFromCloudinary(oldImage);
       }
     }
+
+    // Function to validate base64 image data
+const validateBase64Image = (base64Data) => {
+  // Regex to check if the base64 data is a valid image
+  const regex = /^data:image\/(png|jpeg|jpg|gif|webp);base64,/;
+  return regex.test(base64Data);
+};
+
+// Process cropped images (base64 data)
+for (let i = 1; i <= 3; i++) {
+  const base64Data = products[`croppedImage${i}`];
+
+  if (base64Data) {
+    // Validate the base64 data
+    if (!validateBase64Image(base64Data)) {
+      console.error('Invalid base64 image data:', base64Data);
+      return res.status(BadRequest).json({
+        success: false,
+        message: `Invalid base64 data for image ${i}. Only PNG, JPEG, JPG, GIF, or WEBP images are allowed.`,
+      });
+    }
+
+    try {
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(base64Data, {
+        folder: 'product-images',
+        transformation: [
+          { width: 440, height: 440, crop: 'fill' }
+        ]
+      });
+
+      // Store the Cloudinary URL
+      images.push(result.secure_url);
+    } catch (uploadError) {
+      console.error('Cloudinary upload error:', uploadError);
+      return res.status(BadRequest).json({
+        success: false,
+        message: `Error uploading image ${i} to cloud storage: ${uploadError.message}`,
+      });
+    }
+  }
+}
 
     const categoryId = await Category.findOne({
       _id: new mongoose.Types.ObjectId(products.category.trim()),

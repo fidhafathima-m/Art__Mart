@@ -2,6 +2,7 @@
 
 <head>
   <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <div class="wrapper">
@@ -33,17 +34,20 @@
             </option>
             <% }); %>
           </select>
+          <a href="/admin/brands/add-brand" class="text-muted mt-2 ml-3">Add brand</a>
         </div>
-
       </div>
 
       <!-- Product Description -->
       <div class="form-group">
         <label for="description" class="form-label">Product Description</label>
-        <textarea id="description" name="description" class="form-control" required placeholder="Enter product description">
-<%= product.description %></textarea>
+        <textarea id="description" name="description" class="form-control" placeholder="Enter product description"><%= product.description %></textarea>
+        <div class="invalid-feedback" id="descriptionError">
+          Please enter the product description.
+        </div>
       </div>
 
+      <!-- product highlights -->
       <div class="form-group">
         <label for="highlights">Product Highlights</label>
         <div id="highlights-list">
@@ -51,8 +55,6 @@
           <% product.highlights.forEach((highlight, index) => { %>
           <input type="text" name="highlights[]" class="form-control mb-2" value="<%= highlight %>" placeholder="Enter highlight" />
           <% }) %>
-
-          <!-- Add button for adding more highlights -->
           <input type="text" name="highlights[]" class="form-control mb-2" placeholder="Enter highlight" />
         </div>
         <button type="button" id="add-highlight" class="btn btn-secondary mt-2">
@@ -60,7 +62,7 @@
         </button>
       </div>
 
-      <!-- Price and Quantity -->
+      <!-- Reg Price and Offer price -->
       <div class="form-group row">
         <label for="regularPrice" class="col-sm-2 col-form-label">Regular Price</label>
         <div class="col-sm-4">
@@ -92,76 +94,136 @@
           <select id="category" name="category" class="form-control">
             <% categories.forEach(function(category) { %>
             <option value="<%= category._id %>" <% if (category._id.toString() === product.category.toString()) { %> selected <% } %>>
-              <%= category.name %> <% }); %>
+              <%= category.name %> 
+            </option>
+            <% }); %>
           </select>
         </div>
       </div>
 
-      <div class="card mb-2">
-        <div class="card-header">
-          <h4>Edit images</h4>
+      <!-- Current Images Display -->
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Current Product Images</h5>
+          <p class="text-muted small mb-0">Click the X to delete an image</p>
         </div>
-      </div>
-
-      <% for (let i = 0; i < product.productImage.length; i++) { %>
-      <div class="col-md-12">
-        <div class="mb-4">
-          <td>
-            <input type="hidden" id="imageDatas" value="<%= product.productImage[i] %>" />
-            <img src="<%= product.productImage[i] %>" alt="" class="rounded" style="width: 100px; height: 120px" />
-            <i class="bi bi-x delete-image" data-image-id="<%= product.productImage[i] %>" data-product-id="<%= product._id %>" style="position: absolute; margin-left: 0.5rem; cursor: pointer"></i>
-          </td>
-        </div>
-      </div>
-      <% } %>
-
-      <!-- Image 1 Upload and Cropping -->
-      <div class="form-group">
-        <label for="image1" class="form-label">Choose Image 1</label>
-        <input type="file" id="image1" name="images" class="form-control" accept="image/*" />
-        <div id="image1-preview" class="image-container" style="width: 100%; height: 400px; display: none">
-          <img id="image1-preview-img" src="" alt="Image 1" style="max-width: 100%; height: auto" />
-        </div>
-        <div>
-          <button type="button" id="saveImage1" class="btn btn-secondary" style="display: none">
-            Save Cropped Image
-          </button>
-          <div id="croppedImage1Preview" style="margin-top: 10px">
-            <img id="croppedImage1" src="" alt="Cropped Image 1" style="max-width: 100%; height: auto" />
+        <div class="card-body">
+          <div class="row">
+            <% for (let i = 0; i < product.productImage.length; i++) { %>
+            <div class="col-md-4 mb-3">
+              <div class="position-relative d-inline-block">
+                <input type="hidden" id="imageDatas" value="<%= product.productImage[i] %>" />
+                <img src="<%= product.productImage[i] %>" alt="Product image" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;" />
+                <button type="button" class="btn btn-sm btn-danger position-absolute delete-image" 
+                        data-image-id="<%= product.productImage[i] %>" 
+                        data-product-id="<%= product._id %>" 
+                        style="top: 5px; right: 5px; padding: 0.2rem 0.5rem;">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <% } %>
           </div>
         </div>
       </div>
 
-      <!-- Image 2 Upload and Cropping -->
-      <div class="form-group">
-        <label for="image2" class="form-label">Choose Image 2</label>
-        <input type="file" id="image2" name="images" class="form-control" accept="image/*" />
-        <div id="image2-preview" class="image-container" style="width: 100%; height: 400px; display: none">
-          <img id="image2-preview-img" src="" alt="Image 2" style="max-width: 100%; height: auto" />
+      <!-- Image Upload Container -->
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Update Product Images</h5>
+          <p class="text-muted small mb-0">Upload and crop new product images</p>
         </div>
-        <div>
-          <button type="button" id="saveImage2" class="btn btn-secondary" style="display: none">
-            Save Cropped Image
-          </button>
-          <div id="croppedImage2Preview" style="margin-top: 10px">
-            <img id="croppedImage2" src="" alt="Cropped Image 2" style="max-width: 100%; height: auto" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Image 3 Upload and Cropping -->
-      <div class="form-group">
-        <label for="image3" class="form-label">Choose Image 3</label>
-        <input type="file" id="image3" name="images" class="form-control" accept="image/*" />
-        <div id="image3-preview" class="image-container" style="width: 100%; height: 400px; display: none">
-          <img id="image3-preview-img" src="" alt="Image 3" style="max-width: 100%; height: auto" />
-        </div>
-        <div>
-          <button type="button" id="saveImage3" class="btn btn-secondary" style="display: none">
-            Save Cropped Image
-          </button>
-          <div id="croppedImage3Preview" style="margin-top: 10px">
-            <img id="croppedImage3" src="" alt="Cropped Image 3" style="max-width: 100%; height: auto" />
+        <div class="card-body">
+          <div class="row">
+            <!-- Image 1 Upload -->
+            <div class="col-md-4 mb-3">
+              <div class="image-upload-container">
+                <div class="image-upload-card p-3 border rounded text-center" id="uploadCard1">
+                  <label for="image1" class="form-label">
+                    <i class="fas fa-camera fa-2x mb-2 text-primary"></i>
+                    <h6>Main Image</h6>
+                    <p class="text-muted small">Click to select image</p>
+                  </label>
+                  <input type="file" id="image1" name="images" class="form-control d-none" accept="image/*" />
+                  <img id="image1-thumbnail" src="" alt="Thumbnail" class="img-thumbnail mt-2 d-none" style="max-height: 100px; width: auto;">
+                </div>
+                <!-- Preview Area -->
+                <div id="image1-preview" class="image-container mt-3" style="width: 100%; height: 300px; display: none">
+                  <img id="image1-preview-img" src="" alt="Image 1" style="max-width: 100%; height: auto" />
+                </div>
+                <div class="mt-2">
+                  <button type="button" id="saveImage1" class="btn btn-sm btn-primary" style="display: none">
+                    <i class="fas fa-crop"></i> Crop & Save
+                  </button>
+                  <button type="button" id="deleteImage1" class="btn btn-sm btn-danger" style="display: none">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                  <div id="croppedImage1Preview" class="mt-2 d-none">
+                    <img id="croppedImage1" src="" alt="Cropped Image 1" class="img-thumbnail" style="max-height: 100px; width: auto;" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Image 2 Upload -->
+            <div class="col-md-4 mb-3">
+              <div class="image-upload-container">
+                <div class="image-upload-card p-3 border rounded text-center" id="uploadCard2">
+                  <label for="image2" class="form-label">
+                    <i class="fas fa-camera fa-2x mb-2 text-primary"></i>
+                    <h6>Side View</h6>
+                    <p class="text-muted small">Click to select image</p>
+                  </label>
+                  <input type="file" id="image2" name="images" class="form-control d-none" accept="image/*" />
+                  <img id="image2-thumbnail" src="" alt="Thumbnail" class="img-thumbnail mt-2 d-none" style="max-height: 100px; width: auto;">
+                </div>
+                <!-- Preview Area -->
+                <div id="image2-preview" class="image-container mt-3" style="width: 100%; height: 300px; display: none">
+                  <img id="image2-preview-img" src="" alt="Image 2" style="max-width: 100%; height: auto" />
+                </div>
+                <div class="mt-2">
+                  <button type="button" id="saveImage2" class="btn btn-sm btn-primary" style="display: none">
+                    <i class="fas fa-crop"></i> Crop & Save
+                  </button>
+                  <button type="button" id="deleteImage2" class="btn btn-sm btn-danger" style="display: none">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                  <div id="croppedImage2Preview" class="mt-2 d-none">
+                    <img id="croppedImage2" src="" alt="Cropped Image 2" class="img-thumbnail" style="max-height: 100px; width: auto;" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Image 3 Upload -->
+            <div class="col-md-4 mb-3">
+              <div class="image-upload-container">
+                <div class="image-upload-card p-3 border rounded text-center" id="uploadCard3">
+                  <label for="image3" class="form-label">
+                    <i class="fas fa-camera fa-2x mb-2 text-primary"></i>
+                    <h6>Detail View</h6>
+                    <p class="text-muted small">Click to select image</p>
+                  </label>
+                  <input type="file" id="image3" name="images" class="form-control d-none" accept="image/*" />
+                  <img id="image3-thumbnail" src="" alt="Thumbnail" class="img-thumbnail mt-2 d-none" style="max-height: 100px; width: auto;">
+                </div>
+                <!-- Preview Area -->
+                <div id="image3-preview" class="image-container mt-3" style="width: 100%; height: 300px; display: none">
+                  <img id="image3-preview-img" src="" alt="Image 3" style="max-width: 100%; height: auto" />
+                </div>
+                <div class="mt-2">
+                  <button type="button" id="saveImage3" class="btn btn-sm btn-primary" style="display: none">
+                    <i class="fas fa-crop"></i> Crop & Save
+                  </button>
+                  <button type="button" id="deleteImage3" class="btn btn-sm btn-danger" style="display: none">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                  <div id="croppedImage3Preview" class="mt-2 d-none">
+                    <img id="croppedImage3" src="" alt="Cropped Image 3" class="img-thumbnail" style="max-height: 100px; width: auto;" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -171,15 +233,363 @@
       <input type="hidden" id="croppedImage2Data" name="croppedImage2" />
       <input type="hidden" id="croppedImage3Data" name="croppedImage3" />
 
-      <button type="submit" class="btn btn-primary mb-3">Update Product</button>
-      <a href="/admin/products" class="btn btn-danger mb-3">Cancel</a>
+      <p class="text-muted small">Please wait some time after clicking update product as the uploading of images may take time.</p>
+      <button type="submit" class="btn btn-primary mb-4">Update Product</button>
+      <a href="/admin/products" class="btn btn-danger mb-4">Cancel</a>
     </form>
   </div>
 </div>
+
 <%- include('../../views/partials/admin/footer') %>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
 
-<script src="/js/custom.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+  // Add custom CSS for image upload styling
+  document.head.insertAdjacentHTML('beforeend', `
+    <style>
+      .image-upload-card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa;
+      }
+      
+      .image-upload-card:hover {
+        background-color: #e9ecef;
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      
+      .image-container {
+        border: 1px dashed #ced4da;
+        border-radius: 4px;
+        padding: 10px;
+        background-color: #f8f9fa;
+      }
+      
+      .uploaded-image-container {
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 10px;
+        background-color: white;
+      }
+      
+      .cropper-container {
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+    </style>
+  `);
+
+  // Add highlight functionality
+  document.getElementById("add-highlight").addEventListener("click", function() {
+    const newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.name = "highlights[]";
+    newInput.className = "form-control mb-2";
+    newInput.placeholder = "Enter highlight";
+
+    document.getElementById("highlights-list").appendChild(newInput);
+  });
+
+  // Form Validation
+  window.validateForm = function() {
+    let isValid = true;
+
+    // Check Product Name
+    if (document.getElementById("productName").value.trim() === "") {
+      document.getElementById("productName").classList.add("is-invalid");
+      isValid = false;
+    } else {
+      document.getElementById("productName").classList.remove("is-invalid");
+    }
+
+    // Check Description
+    if (document.getElementById("description").value.trim() === "") {
+      document.getElementById("description").classList.add("is-invalid");
+      isValid = false;
+    } else {
+      document.getElementById("description").classList.remove("is-invalid");
+    }
+
+    // Check Price
+    if (document.getElementById("regularPrice").value <= 0) {
+      document.getElementById("regularPrice").classList.add("is-invalid");
+      isValid = false;
+    } else {
+      document.getElementById("regularPrice").classList.remove("is-invalid");
+    }
+
+    // Check Quantity
+    if (document.getElementById("quantity").value <= 0) {
+      document.getElementById("quantity").classList.add("is-invalid");
+      isValid = false;
+    } else {
+      document.getElementById("quantity").classList.remove("is-invalid");
+    }
+
+     // Count existing images
+  const existingImages = document.querySelectorAll('.delete-image').length;
+  
+  // Count new images that have been cropped (have data in hidden inputs)
+  const newImage1 = document.getElementById("croppedImage1Data").value ? 1 : 0;
+  const newImage2 = document.getElementById("croppedImage2Data").value ? 1 : 0;
+  const newImage3 = document.getElementById("croppedImage3Data").value ? 1 : 0;
+  const newImages = newImage1 + newImage2 + newImage3;
+  
+  // Total image count
+  const totalImages = existingImages + newImages;
+  
+  if (totalImages < 3) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Image Requirement',
+      text: 'At least 3 product images are required. Please add more images.'
+    });
+    isValid = false;
+  }
+
+    return isValid;
+  };
+
+  // Enhanced image upload handler
+  function handleStyledImageUpload(
+    inputId,
+    previewId,
+    saveButtonId,
+    deleteButtonId,
+    croppedPreviewId,
+    hiddenInputId,
+    thumbnailId,
+    cardId
+  ) {
+    const inputElement = document.getElementById(inputId);
+    const previewContainer = document.getElementById(previewId);
+    const imageElement = document.getElementById(previewId + "-img");
+    const saveButton = document.getElementById(saveButtonId);
+    const deleteButton = document.getElementById(deleteButtonId);
+    const croppedPreviewContainer = document.getElementById(croppedPreviewId + "Preview");
+    const croppedPreview = document.getElementById(croppedPreviewId);
+    const hiddenInput = document.getElementById(hiddenInputId);
+    const thumbnail = document.getElementById(thumbnailId);
+    const uploadCard = document.getElementById(cardId);
+
+    let cropper;
+
+    // Reset the image upload section
+    function resetImageSection() {
+      inputElement.value = ""; // Clear the file input
+      previewContainer.style.display = "none"; // Hide the preview
+      saveButton.style.display = "none"; // Hide the save button
+      deleteButton.style.display = "none"; // Hide the delete button
+      croppedPreviewContainer.classList.add("d-none"); // Hide the cropped preview container
+      croppedPreview.src = ""; // Clear the cropped image preview
+      hiddenInput.value = ""; // Clear the hidden input
+      thumbnail.src = ""; // Clear the thumbnail
+      thumbnail.classList.add("d-none"); // Hide the thumbnail
+      uploadCard.style.opacity = "1"; // Show the upload card
+      if (cropper) {
+        cropper.destroy(); // Destroy the cropper instance
+      }
+    }
+
+    // Handle file selection
+    inputElement.addEventListener("change", function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          // Show thumbnail
+          thumbnail.src = e.target.result;
+          thumbnail.classList.remove("d-none");
+          uploadCard.style.opacity = "0.5"; // Dim the upload card
+          
+          // Set up cropper
+          imageElement.src = e.target.result;
+          previewContainer.style.display = "block";
+          saveButton.style.display = "inline-block";
+          deleteButton.style.display = "inline-block";
+
+          // Initialize cropper
+          cropper = new Cropper(imageElement, {
+            viewMode: 1,
+            responsive: true,
+            rotatable: true,
+            scalable: true,
+            guides: true,
+            autoCropArea: 0.8
+          });
+
+          // Save cropped image
+          saveButton.onclick = function() {
+            const croppedCanvas = cropper.getCroppedCanvas({
+              width: 800, // Set standard dimensions
+              height: 800,
+              imageSmoothingEnabled: true,
+              imageSmoothingQuality: 'high'
+            });
+
+            croppedPreview.src = croppedCanvas.toDataURL("image/jpeg", 0.9);
+            croppedPreviewContainer.classList.remove("d-none");
+            hiddenInput.value = croppedCanvas.toDataURL("image/jpeg", 0.9);
+            
+            // Hide the cropper view after saving
+            previewContainer.style.display = "none";
+            saveButton.style.display = "none";
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Handle delete image
+    deleteButton.addEventListener("click", function() {
+      resetImageSection();
+    });
+  }
+
+  // Initialize the styled image upload handlers
+  handleStyledImageUpload(
+    "image1",
+    "image1-preview",
+    "saveImage1",
+    "deleteImage1",
+    "croppedImage1",
+    "croppedImage1Data",
+    "image1-thumbnail",
+    "uploadCard1"
+  );
+  handleStyledImageUpload(
+    "image2",
+    "image2-preview",
+    "saveImage2",
+    "deleteImage2",
+    "croppedImage2",
+    "croppedImage2Data",
+    "image2-thumbnail",
+    "uploadCard2"
+  );
+  handleStyledImageUpload(
+    "image3",
+    "image3-preview",
+    "saveImage3",
+    "deleteImage3",
+    "croppedImage3",
+    "croppedImage3Data",
+    "image3-thumbnail",
+    "uploadCard3"
+  );
+
+  // Handle delete existing image
+  document.querySelectorAll('.delete-image').forEach(function(button) {
+    button.addEventListener('click', function() {
+      const imageId = this.getAttribute('data-image-id');
+      const productId = this.getAttribute('data-product-id');
+      
+      Swal.fire({
+        title: 'Delete Image?',
+        text: "Are you sure you want to delete this image?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deleteSingleImage(imageId, productId);
+        }
+      });
+    });
+  });
+
+  // Delete single image functionality
+  function deleteSingleImage(imageId, productId) {
+    $.ajax({
+      url: "/admin/deleteImage",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        imageNameToServer: imageId,
+        productIdToServer: productId,
+      }),
+      success: function (response) {
+        if (response.status === true) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Image Deleted',
+            text: 'The image has been removed successfully',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: response.message || 'Error deleting image'
+          });
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error deleting image:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Request Failed',
+          text: 'An error occurred while deleting the image.'
+        });
+      },
+    });
+  }
+
+  // Form Submission
+  $("#editProductForm").on("submit", function(e) {
+    if (!validateForm()) {
+      e.preventDefault();
+      return;
+    }
+    e.preventDefault();
+
+    $.ajax({
+      type: "POST",
+      url: $(this).attr("action"),
+      data: new FormData(this),
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        if (response.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Product Updated",
+            text: response.message,
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => {
+            window.location.href = "/admin/products";
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: response.message || "There was an error updating the product.",
+          });
+        }
+      },
+      error: function() {
+        Swal.fire({
+          icon: "error",
+          title: "Request Failed",
+          text: "There was an issue connecting to the server. Please try again.",
+        });
+      },
+    });
+  });
+});
+</script>
