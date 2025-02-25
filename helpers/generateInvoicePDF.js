@@ -66,6 +66,7 @@ async function generateInvoicePDF(orderId) {
   ];
 
   const docDefinition = {
+    pageMargins: [40, 60, 40, 80], // Adjust bottom margin to leave space for the footer
     content: [
       // Header Section
       {
@@ -88,7 +89,7 @@ async function generateInvoicePDF(orderId) {
         alignment: "center",
         margin: [0, 10, 0, 20],
       },
-
+  
       // Invoice and Order Details
       {
         columns: [
@@ -127,7 +128,7 @@ async function generateInvoicePDF(orderId) {
         style: "subheader",
         margin: [0, 0, 0, 20],
       },
-
+  
       // Product Table
       {
         table: {
@@ -146,7 +147,7 @@ async function generateInvoicePDF(orderId) {
             margin: [0, 10, 0, 10],
           }
         : {}, // Only display if coupon was applied
-
+  
       // Final Amount
       {
         text: `Final Amount: ₹${order.finalAmount.toFixed(2)}`,
@@ -154,22 +155,29 @@ async function generateInvoicePDF(orderId) {
         alignment: "right",
         margin: [0, 10, 0, 20],
       },
-
-      // Footer Section
-
       {
         text: `Invoice Bill Generated On: ${new Date().toLocaleString()}`, // Current date and time
         style: "footer",
         alignment: "right",
         margin: [0, 30, 0, 0],
       },
-      {
-        text: "Thank you for shopping with us!",
-        style: "footer",
-        alignment: "center",
-        margin: [0, 20, 0, 0],
-      },
     ],
+    // Modified footer function to only show thank you message on the last page
+    footer: function(currentPage, pageCount) {
+      // Only show the thank you message on the last page
+      if (currentPage === pageCount) {
+        return [
+          {
+            text: "Thank you for shopping with us!",
+            style: "footer",
+            alignment: "center",
+            margin: [0, 20, 0, 0],
+          },
+        ];
+      }
+      // Return empty array for all other pages to have no footer
+      return [];
+    },
     styles: {
       header: {
         fontSize: 24,
@@ -216,6 +224,7 @@ async function generateInvoicePDF(orderId) {
       font: "Roboto",
     },
   };
+  
 
   // Create the PDF and return the buffer
   return new Promise((resolve, reject) => {
