@@ -23,15 +23,60 @@ async function generatePDFReport(
   specificDate,
   startDate,
   endDate,
-  includeDiscounts
+  includeDiscounts,
+  deliveredOnly = true
 ) {
   // Fetch sales data based on filter criteria
   let matchCriteria = {};
-  // Set match criteria based on filterType (existing logic is fine)
+  
+  // Always set status to Delivered when deliveredOnly is true
+  if (deliveredOnly) {
+    matchCriteria.status = "Delivered";
+  }
+
+  // Add date filters based on filterType
+  if (filterType === "custom") {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999); // Set to end of day
+
+    matchCriteria.createdOn = { $gte: start, $lte: end };
+  } else if (filterType === "daily") {
+    if (!specificDate) {
+      throw new Error("Specific date is required for daily report");
+    }
+
+    const specificDateObj = new Date(specificDate);
+    const startOfDay = new Date(
+      specificDateObj.getFullYear(),
+      specificDateObj.getMonth(),
+      specificDateObj.getDate()
+    );
+    const endOfDay = new Date(
+      specificDateObj.getFullYear(),
+      specificDateObj.getMonth(),
+      specificDateObj.getDate() + 1
+    );
+
+    matchCriteria.createdOn = {
+      $gte: startOfDay,
+      $lt: endOfDay,
+    };
+  } else if (filterType === "weekly") {
+    matchCriteria.createdOn = {
+      $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+      $lte: new Date(),
+    };
+  } else if (filterType === "monthly") {
+    matchCriteria.createdOn = {
+      $gte: new Date(new Date().setDate(new Date().getDate() - 30)),
+      $lte: new Date(),
+    };
+  }
 
   const salesData = await Order.find(matchCriteria)
-    .populate("userId", "name")  // Populate the user's name
-    .populate("ordereditems.product", "productName");  // Populate the product's name
+    .populate("userId", "name")  
+    .populate("ordereditems.product", "productName");
 
   if (filterType === "custom" && salesData.length === 0) {
     // eslint-disable-next-line no-undef
@@ -237,12 +282,16 @@ async function generateExcelReport(
   specificDate,
   startDate,
   endDate,
-  includeDiscounts
+  includeDiscounts,
+  deliveredOnly = true
 ) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Sales Report");
 
   let matchCriteria = {};
+  if (deliveredOnly) {
+    matchCriteria.status = "Delivered";
+  }
   if (filterType === "custom") {
     const start = new Date(startDate);
     const end = new Date(endDate);

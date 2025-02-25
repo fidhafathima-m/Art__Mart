@@ -450,7 +450,11 @@ const salesReport = async (req, res) => {
 const salesStatistics = async (req, res) => {
   const { filterType, startDate, endDate } = req.body;
 
-  let matchCriteria = {};
+  let matchCriteria = {
+    // Only count orders with status "Delivered" as actual sales
+    status: "Delivered"
+  };
+  
   if (filterType === "custom") {
     matchCriteria.createdOn = {
       $gte: new Date(startDate),
@@ -488,53 +492,67 @@ const salesStatistics = async (req, res) => {
     res.json({
       overallSalesCount,
       overallOrderAmount: overallOrderAmount.toFixed(2),
-      overallDiscount,
+      overallDiscount: overallDiscount.toFixed(2),
     });
-  } catch {
-    res.status(InternalServerError).json({ message: INTERNAL_SERVER_ERROR });
+  } catch (error) {
+    res.status(InternalServerError).json({ 
+      message: INTERNAL_SERVER_ERROR,
+      error: error.message 
+    });
   }
 };
 
 const exportSalesReport = async (req, res) => {
   const { format, filterType, startDate, endDate, specificDate } = req.query;
-
   // Assume discounts and coupons are always included by default
   const showDiscounts = true;
-
-  // Logic to generate the report based on the format
-  if (format === "pdf") {
-    const pdfBuffer = await generatePDFReport(
-      filterType,
-      specificDate,
-      startDate,
-      endDate,
-      showDiscounts
-    );
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=sales_report.pdf"
-    );
-    res.send(pdfBuffer);
-  } else if (format === "excel") {
-    const excelBuffer = await generateExcelReport(
-      filterType,
-      specificDate,
-      startDate,
-      endDate,
-      showDiscounts
-    );
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=sales_report.xlsx"
-    );
-    res.send(excelBuffer);
-  } else {
-    res.status(BadRequest).json({ message: "Invalid format" });
+ 
+  // Always filter for delivered orders only
+  const deliveredOnly = true;
+  
+  try {
+    // Logic to generate the report based on the format
+    if (format === "pdf") {
+      const pdfBuffer = await generatePDFReport(
+        filterType,
+        specificDate,
+        startDate,
+        endDate,
+        showDiscounts,
+        deliveredOnly  // This ensures only delivered orders are counted
+      );
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=sales_report.pdf"
+      );
+      res.send(pdfBuffer);
+    } else if (format === "excel") {
+      const excelBuffer = await generateExcelReport(
+        filterType,
+        specificDate,
+        startDate,
+        endDate,
+        showDiscounts,
+        deliveredOnly  // This ensures only delivered orders are counted
+      );
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=sales_report.xlsx"
+      );
+      res.send(excelBuffer);
+    } else {
+      res.status(BadRequest).json({ message: "Invalid format" });
+    }
+  } catch (error) {
+    res.status(InternalServerError).json({
+      message: INTERNAL_SERVER_ERROR,
+      error: error.message
+    });
   }
 };
 
