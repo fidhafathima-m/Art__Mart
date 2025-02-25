@@ -465,7 +465,12 @@ const loadCheckout = async (req, res) => {
 
     const cartItems = cart ? cart.items : [];
 
-    const coupon = await Coupon.find();
+    const coupons = await Coupon.find();
+    const currentDate = new Date();
+    const validCoupons = coupons.filter((coupon) => {
+      const expireDtae = new Date(coupon.expireOn);
+      return expireDtae >= currentDate
+    })
 
     res.render("checkout", {
       activePage: "shop",
@@ -473,7 +478,7 @@ const loadCheckout = async (req, res) => {
       cartItems: cartItems,
       addresses: userAddress ? userAddress.address : [],
       defaultAddress: defaultAddress || {},
-      coupon,
+      coupon: validCoupons,
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
