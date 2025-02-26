@@ -175,6 +175,7 @@ const exportPDF = async (req, res) => {
 
     // Prepare document definition
     const docDefinition = {
+      pageSize: { width: 1200, height: 1200 },
       content: [
         {
           image: "public/img/logo.png",
