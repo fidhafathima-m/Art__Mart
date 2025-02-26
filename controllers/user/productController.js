@@ -1332,48 +1332,48 @@ const coupons = async (req, res) => {
 };
 
 const applyCoupon = async (req, res) => {
-  const { code, totalPrice } = req.body;
+  const { code, totalPrice } = req.body; 
+  const userId = req.session.user;
 
   try {
     const coupon = await Coupon.findOne({ name: code, isDeleted: false });
 
     if (!coupon) {
-      return res.status(BadRequest).json({ message: "Coupon not found" });
+      return res.status(400).json({ message: "Coupon not found" });
     }
 
     if (coupon.expireOn < new Date()) {
-      return res.status(BadRequest).json({ message: "Coupon has expired" });
+      return res.status(400).json({ message: "Coupon has expired" });
     }
 
     if (totalPrice < coupon.minPurchaseAmount) {
-      return res.status(BadRequest).json({
+      return res.status(400).json({
         message: `Minimum purchase amount of ₹${coupon.minPurchaseAmount} not met`,
       });
     }
 
-    // Check if coupon has been used already
-    if (coupon.userId) {
-      return res
-        .status(BadRequest)
-        .json({ message: "Coupon has already been used" });
+    if (coupon.usedBy.includes(userId)) {
+      return res.status(400).json({ message: "You have already used this coupon" });
     }
-    
-    // Check if coupon offer price is greater than the total price
+
     if (coupon.offerPrice >= totalPrice) {
-      return res.status(BadRequest).json({
+      return res.status(400).json({
         message: `This coupon offers ₹${coupon.offerPrice} discount. Please add more items worth at least ₹${coupon.offerPrice - totalPrice + 1} to your cart to use this coupon.`
       });
     }
-    
-    // Calculate new total price
+
     const newTotalPrice = totalPrice - coupon.offerPrice;
 
-    // Store the coupon in session for later use during order placement
     req.session.pendingCoupon = {
       couponId: coupon._id,
       code: coupon.name,
       offerPrice: coupon.offerPrice
     };
+
+    await Coupon.updateOne(
+      { _id: coupon._id },
+      { $push: { usedBy: userId } } 
+    );
 
     res.json({ 
       success: true, 
@@ -1381,7 +1381,7 @@ const applyCoupon = async (req, res) => {
       newTotalPrice: newTotalPrice
     });
   } catch (error) {
-    res.status(InternalServerError).json({ message: "Error applying coupon", error });
+    res.status(500).json({ message: "Error applying coupon", error });
   }
 };
 
