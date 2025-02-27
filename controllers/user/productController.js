@@ -745,7 +745,6 @@ const retryPayment = async (req, res) => {
         .json({ success: false, message: "Order not found" });
     }
 
-    // Prepare order data for payment processing
     const orderData = {
       ordereditems: order.ordereditems,
       totalprice: order.totalprice,
@@ -753,12 +752,10 @@ const retryPayment = async (req, res) => {
       address: order.address,
       discount: order.discount,
       couponApplied: order.couponApplied,
-      userId: order.userId, // Include userId for further processing
+      userId: order.userId, 
     };
 
-    // Logic to process the payment based on the selected payment method
     if (paymentMethod === "razorpay") {
-      // Create a Razorpay order
       const options = {
         amount: orderData.finalAmount * 100, // Convert to paise
         currency: "INR",
@@ -767,11 +764,10 @@ const retryPayment = async (req, res) => {
       };
 
       const razorpayOrder = await razorpay.orders.create(options);
-      order.orderId = razorpayOrder.id; // Store Razorpay order ID in the order document
+      order.orderId = razorpayOrder.id; 
       order.status = "Order Placed";
       await order.save();
 
-      // Return Razorpay order details to frontend
       return res.json({
         success: true,
         orderId: razorpayOrder.id,
@@ -781,11 +777,10 @@ const retryPayment = async (req, res) => {
         paymentMethod: "razorpay",
       });
     } else if (paymentMethod === "cod") {
-      order.status = "Order Placed"; // Update the order status
+      order.status = "Order Placed"; 
       order.paymentMethod = "COD";
       await order.save();
 
-      // Return a JSON response with the redirect URL
       return res.json({
         success: true,
         paymentMethod: "cod",
@@ -802,11 +797,9 @@ const retryPayment = async (req, res) => {
         });
       }
 
-      // Deduct the amount from the wallet
       wallet.balance -= orderData.finalAmount;
       await wallet.save();
 
-      // Create a transaction record
       const transaction = new Transaction({
         userId: orderData.userId,
         type: "Purchased using wallet - Debit",
@@ -815,12 +808,10 @@ const retryPayment = async (req, res) => {
       });
       await transaction.save();
 
-      // Update order status to "Paid"
-      order.status = "Order Placed"; // Update the order status
+      order.status = "Order Placed"; 
       order.paymentMethod = "wallet";
       await order.save();
 
-      // Return a JSON response with the redirect URL
       return res.json({
         success: true,
         paymentMethod: "wallet",
@@ -829,7 +820,6 @@ const retryPayment = async (req, res) => {
       });
     }
 
-    // If none of the conditions match, return an error
     return res
       .status(BadRequest)
       .json({ success: false, message: "Invalid payment method" });

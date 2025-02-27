@@ -33,7 +33,7 @@ const productInfo = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("category", "name") // Populate the category field with only the 'name' field
+      .populate("category", "name") 
       .populate("brand", "brandName");
 
     const totalProducts = await Product.countDocuments(searchQuery);

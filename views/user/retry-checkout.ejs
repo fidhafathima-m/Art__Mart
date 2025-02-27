@@ -4,13 +4,11 @@
   <h2 class="mb-4 text-center">Retry Payment</h2>
 
   <div class="row">
-    <!-- Left Column -->
     <div class="col-md-8">
       <div class="order-summary bg-light p-4 rounded shadow-lg mb-4">
         <h3 class="section-title">Order Summary</h3>
         <hr />
         
-        <!-- Order Details -->
         <div class="order-details mb-4">
           <p class="order-id"><strong>Order ID:</strong> <%= order.orderId %></p>
           <p class="order-date"><strong>Order Date:</strong> <%= new Date(order.createdOn).toLocaleDateString() %></p>
@@ -73,7 +71,6 @@
       </div>
     </div>
 
-    <!-- Right Column -->
     <div class="col-md-4">
       <div class="payment-summary bg-light p-4 rounded shadow-lg">
         <h3 class="section-title">Payment Details</h3>
@@ -115,7 +112,6 @@
 
 <%- include("../../views/partials/user/footer") %>
 
-<!-- Enhanced Styles -->
 <style>
   .section-title {
     color: #2c3e50;
@@ -232,29 +228,23 @@
 
 
 <script>
-  // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // Get references to commonly used elements
   const loadingOverlay = document.getElementById('loadingOverlay');
   const retryPaymentForm = document.getElementById('retryPaymentForm');
 
-  // Helper function to show loading overlay
   function showLoading() {
     loadingOverlay.classList.remove('d-none');
   }
 
-  // Helper function to hide loading overlay
   function hideLoading() {
     loadingOverlay.classList.add('d-none');
   }
 
-  // Helper function to extract amount from the page
   function getOrderAmount() {
     const amountText = document.getElementById('amount').textContent;
     return parseFloat(amountText.replace(/[^0-9.]/g, ''));
   }
 
-  // Helper function to show error message
   function showError(title, message) {
     Swal.fire({
       title: title,
@@ -264,7 +254,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Handle form submission
   retryPaymentForm.addEventListener('submit', function(event) {
     event.preventDefault();
     showLoading();
@@ -275,21 +264,17 @@ document.addEventListener('DOMContentLoaded', function() {
       data[key] = value;
     });
 
-    // Get order amount
     const amount = getOrderAmount();
 
-    // Check COD limit
     if (data.paymentMethod === 'cod' && amount > 1000) {
       hideLoading();
       showError('Exceeded Limit', 'Sorry, COD is not available for orders above ₹1000');
       return;
     }
 
-    // Process payment
     processPayment(data, amount);
   });
 
-  // Main payment processing function
   function processPayment(data, amount) {
     fetch('/retry-payment', {
       method: 'POST',
@@ -331,7 +316,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Handle Wallet Payment
   function handleWalletPayment(amount, orderId) {
     return fetch('/wallet/check-balance', {
       method: 'POST',
@@ -356,7 +340,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Handle Razorpay Payment
   function handleRazorpayPayment(data) {
     const options = {
       key: data.razorpayKey,
@@ -409,14 +392,12 @@ document.addEventListener('DOMContentLoaded', function() {
     return Promise.resolve();
   }
 
-  // Handle COD Payment
   function handleCODPayment(orderId) {
     hideLoading();
     window.location.href = `/checkout/orderSuccess?orderId=${orderId}`;
     return Promise.resolve();
   }
 
-  // Handle Invoice Download
   window.downloadInvoice = function(orderId) {
     showLoading();
     
