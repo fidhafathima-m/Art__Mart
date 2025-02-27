@@ -367,7 +367,7 @@
               </a>
               <ul class="product__hover">
                 <li>
-                  <a href="javascript:void(0);" data-product-id="<%= products._id %>" class="add-wishlist">
+                  <a href="javascript:void(0);" data-product-id="<%= relatedProducts[i]._id %>" class="add-wishlist-related">
                     <img src="img/icon/heart.png" alt="Add to Wishlist" />
                   </a>
                 </li>
@@ -375,7 +375,7 @@
             </div>
             <div class="product__item__text" style="text-align: left">
               <h6><%= relatedProducts[i].productName %></h6>
-              <a href="/addToCart?id=<%= relatedProducts[i]._id %>" class="add-cart">+ Add To Cart</a>
+              <a href="javascript:void(0);" data-product-id="<%= relatedProducts[i]._id %>" class="add-cart-related">+ Add To Cart</a>
               <span class="h5">&#8377; <%=
                 relatedProducts[i].salePrice.toLocaleString('en-IN') %></span>
 
@@ -409,13 +409,15 @@
               </a>
               <ul class="product__hover">
                 <li>
-                  <a href="#"><img src="img/icon/heart.png" alt="" /></a>
+                  <a href="javascript:void(0);" data-product-id="<%= randomProducts[i]._id %>" class="add-wishlist-random">
+                    <img src="img/icon/heart.png" alt="Add to Wishlist" />
+                  </a>
                 </li>
               </ul>
             </div>
             <div class="product__item__text" style="text-align: left">
               <h6><%= randomProducts[i].productName %></h6>
-              <a href="/addToCart?id=<%= randomProducts[i]._id %>" class="add-cart">+ Add To Cart</a>
+              <a href="javascript:void(0);" data-product-id="<%= randomProducts[i]._id %>" class="add-cart-random">+ Add To Cart</a>
               <span class="h5">&#8377; <%= randomProducts[i].salePrice.toLocaleString('en-IN') %></span>
     
               <% if (randomProducts[i].productOffer > 0) { %>
@@ -644,6 +646,163 @@
     }
   });
 });
+});
 
-  });
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to handle adding to cart
+    async function addToCart(productId) {
+        try {
+            const response = await fetch('/addToCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId }),
+                credentials: 'same-origin',
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Item added to cart',
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK',
+                }).then(() => {
+                    location.reload(); // Reload the page to update cart count
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Login',
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/login';
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("There was an error adding the item to the cart.");
+        }
+    }
+
+    // Function to handle adding to wishlist
+    async function addToWishlist(productId) {
+        console.log("Add to Wishlist button clicked for product ID:", productId);
+        try {
+            const response = await fetch('/addToWishlist', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId }),
+                credentials: 'same-origin',
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Item added to wishlist',
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Go to Wishlist',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/userProfile?section=wishlist";
+                    }
+                });
+            } else {
+                let confirmButtonText = 'OK';
+                let redirectUrl = null;
+
+                if (data.message === 'Please log in to add items to the wishlist.') {
+                    confirmButtonText = 'Login';
+                    redirectUrl = '/login';
+                } else if (data.message === 'This product is already in your wishlist.') {
+                    confirmButtonText = 'Go to wishlist';
+                    redirectUrl = '/userProfile?section=wishlist';
+                }
+
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: confirmButtonText,
+                    cancelButtonText: 'Cancel',
+                }).then((result) => {
+                    if (result.isConfirmed && redirectUrl) {
+                        window.location.href = redirectUrl;
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('There was an error adding the item to the wishlist.');
+        }
+    }
+
+    // Add to Cart for Related Products
+    const addToCartRelatedButtons = document.querySelectorAll('.add-cart-related');
+    addToCartRelatedButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const productId = event.target.getAttribute('data-product-id');
+            if (productId) {
+                await addToCart(productId);
+            }
+        });
+    });
+
+    // Add to Wishlist for Related Products
+    const addToWishlistRelatedButtons = document.querySelectorAll('.add-wishlist-related');
+    addToWishlistRelatedButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const productId = event.target.closest('a').getAttribute('data-product-id');
+            console.log("Related Product ID:", productId);
+            if (productId) {
+                await addToWishlist(productId);
+            }
+        });
+    });
+
+    // Add to Cart for Random Products
+    const addToCartRandomButtons = document.querySelectorAll('.add-cart-random');
+    addToCartRandomButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const productId = event.target.getAttribute('data-product-id');
+            if (productId) {
+                await addToCart(productId);
+            }
+        });
+    });
+
+    // Add to Wishlist for Random Products
+     const addToWishlistRandomButtons = document.querySelectorAll('.add-wishlist-random');
+    addToWishlistRandomButtons.forEach(button => {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const productId = event.target.closest('a').getAttribute('data-product-id');
+            console.log("Random Product ID:", productId);
+            if (productId) {
+                await addToWishlist(productId);
+            }
+        });
+    });
+});
 </script>
