@@ -393,8 +393,10 @@
                 <p>
                   <strong>Items: </strong>
                   <% order.ordereditems.forEach((item, index) => { %>
-                  <span><%= item.product.productName %><%= index <
-                    order.ordereditems.length - 1 ? ', ' : '' %></span>
+                    <span>
+                      <%= item.product ? item.product.productName : 'Product Deleted' %>
+                      <%= index < order.ordereditems.length - 1 ? ', ' : '' %>
+                    </span>
                   <% }) %>
                 </p>
                 <% if(order.status === 'Payment Pending') { %>
