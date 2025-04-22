@@ -107,7 +107,9 @@
             <ul id="leastProductsList" class="list-unstyled">
               <% leastProducts.forEach(product => { %>
               <li class="list-item d-flex justify-content-between align-items-center mb-3">
-                <span><i class="bi bi-cart-dash-fill text-warning"></i> <%= product.productDetails[0].productName %></span>
+                <span><i class="bi bi-cart-dash-fill text-warning"></i> 
+                  <%= product.productDetails && product.productDetails[0] ? product.productDetails[0].productName : "Unknown Product" %>
+                </span>
                 <span class="badge bg-warning text-dark rounded-pill"><%= product.totalQuantity %></span>
               </li>
               <% }) %>
