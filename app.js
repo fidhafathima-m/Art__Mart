@@ -28,6 +28,8 @@ const app = express();
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ limit: "100mb", extended: true }));
 
+app.set('trust proxy', 1);
+
 // Session middleware (must be before flash middleware)
 app.use(
   session({
@@ -43,14 +45,12 @@ app.use(
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
       sameSite: 'lax',
-      // eslint-disable-next-line no-undef
-      domain: process.env.NODE_ENV === 'production' ? 'www.art-mart.shop' : null
     }
     
   })
 );
 
-app.set('trust proxy', 1);
+
 
 // Flash middleware (after session middleware)
 app.use(flash());
