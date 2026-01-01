@@ -1,8 +1,13 @@
 /* eslint-disable no-undef */
 const Coupon = require("../../models/couponSchema");
 const User = require("../../models/userSchema");
-const { OK, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
-const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
+const {
+  OK,
+  NotFound,
+  InternalServerError,
+} = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } =
+  require("../../helpers/constants").ERROR_MESSAGES;
 
 const loadCoupon = async (req, res) => {
   try {
@@ -18,7 +23,7 @@ const loadCoupon = async (req, res) => {
     }
 
     const couponData = await Coupon.find(searchQuery)
-      .sort({ createdAt: -1 })
+      .sort({ createdOn: -1 })
       .skip(skip)
       .limit(limit);
 
@@ -67,6 +72,32 @@ const addCoupon = async (req, res) => {
     });
   }
 
+  // Validate offer price and min purchase amount
+  const offerPriceNum = parseFloat(offerPrice);
+  const minPurchaseAmountNum = parseFloat(minPurchaseAmount);
+
+  if (isNaN(offerPriceNum) || offerPriceNum <= 0) {
+    return res.json({
+      success: false,
+      message: "Offer price must be a positive number.",
+    });
+  }
+
+  if (isNaN(minPurchaseAmountNum) || minPurchaseAmountNum <= 0) {
+    return res.json({
+      success: false,
+      message: "Minimum purchase amount must be a positive number.",
+    });
+  }
+
+  // IMPORTANT: Validate that minPurchaseAmount > offerPrice
+  if (minPurchaseAmountNum <= offerPriceNum) {
+    return res.json({
+      success: false,
+      message: "Minimum purchase amount must be greater than the offer price.",
+    });
+  }
+
   const lowerCaseName = name.trim().replace(/\s+/g, " ").toLowerCase();
 
   try {
@@ -83,8 +114,8 @@ const addCoupon = async (req, res) => {
     const newCoupon = new Coupon({
       name,
       expireOn: expirationDate,
-      minPurchaseAmount,
-      offerPrice,
+      minPurchaseAmount: minPurchaseAmountNum,
+      offerPrice: offerPriceNum,
       isList: true,
       isDeleted: false,
     });
@@ -142,13 +173,74 @@ const editCoupon = async (req, res) => {
     const id = req.params.id;
     const { name, expireOn, offerPrice, minPurchaseAmount } = req.body;
 
+    // Validate required fields
+    if (!name || typeof name !== "string" || name.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Coupon name is required.",
+      });
+    }
+
+    // Check if the expiration date is in the future
+    const expirationDate = new Date(expireOn);
+    const currentDate = new Date();
+
+    if (expirationDate <= currentDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Expiration date must be in the future.",
+      });
+    }
+
+    // Validate numerical values
+    const offerPriceNum = parseFloat(offerPrice);
+    const minPurchaseAmountNum = parseFloat(minPurchaseAmount);
+
+    if (isNaN(offerPriceNum) || offerPriceNum <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Offer price must be a positive number.",
+      });
+    }
+
+    if (isNaN(minPurchaseAmountNum) || minPurchaseAmountNum <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Minimum purchase amount must be a positive number.",
+      });
+    }
+
+    // IMPORTANT: Validate that minPurchaseAmount > offerPrice
+    if (minPurchaseAmountNum <= offerPriceNum) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Minimum purchase amount must be greater than the offer price.",
+      });
+    }
+
+    // Check if coupon name already exists (excluding current coupon)
+    const lowerCaseName = name.trim().replace(/\s+/g, " ").toLowerCase();
+    const existingCoupon = await Coupon.findOne({
+      _id: { $ne: id },
+      name: { $regex: new RegExp("^" + lowerCaseName + "$", "i") },
+    });
+
+    if (existingCoupon) {
+      return res.status(400).json({
+        success: false,
+        message: "Coupon with this name already exists.",
+      });
+    }
+
+    // Update coupon
     const updatedCoupon = await Coupon.findByIdAndUpdate(
       id,
       {
-        name: name,
-        expireOn: expireOn,
-        offerPrice: offerPrice,
-        minPurchaseAmount: minPurchaseAmount,
+        name: name.trim(),
+        expireOn: expirationDate,
+        offerPrice: offerPriceNum,
+        minPurchaseAmount: minPurchaseAmountNum,
       },
       { new: true }
     );
@@ -159,11 +251,11 @@ const editCoupon = async (req, res) => {
         .json({ success: true, message: "Coupon updated successfully!" });
     } else {
       return res
-        .status(InternalServerError)
-        .json({ success: false, message: "Failed to update coupon" });
+        .status(NotFound)
+        .json({ success: false, message: "Coupon not found." });
     }
-    // eslint-disable-next-line no-unused-vars
   } catch (error) {
+    console.error("Error editing coupon:", error);
     return res
       .status(InternalServerError)
       .json({ success: false, message: INTERNAL_SERVER_ERROR });

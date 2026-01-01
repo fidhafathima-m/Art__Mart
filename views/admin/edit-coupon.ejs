@@ -4,29 +4,48 @@
   <%- include('../../views/partials/admin/sidebar') %>
 
   <div class="container">
-    <h1>Edit Coupon</h1>
-    <form action="/admin/edit-coupon/<%= coupon._id %>" method="POST" id="editCategoryForm">
-      <div class="form-group">
+    <h1 class="my-4">Edit Coupon</h1>
+
+    <div class="alert alert-info mb-4">
+      <h5><i class="fas fa-info-circle"></i> Coupon Details</h5>
+      <p class="mb-0"><strong>How this coupon works:</strong> User gets ₹<span id="discountPreview"><%= coupon.offerPrice %></span> discount when their cart total is ₹<span id="minAmountPreview"><%= coupon.minPurchaseAmount %></span> or more.</p>
+    </div>
+
+    <form action="/admin/edit-coupon/<%= coupon._id %>" method="POST" id="editCouponForm">
+      <div class="form-group mb-3">
         <label for="name">Coupon Name</label>
         <input type="text" class="form-control" id="name" name="name" value="<%= coupon.name %>" required />
+        <small class="form-text text-muted">Unique name for the coupon.</small>
       </div>
 
-      <div class="form-group">
+      <div class="form-group mb-3">
         <label for="expireOn">Expiration Date</label>
         <input type="datetime-local" class="form-control" id="expireOn" name="expireOn" value="<%= coupon.expireOn.toISOString().slice(0, 16) %>" required />
+        <small class="form-text text-muted">Coupon will be valid until this date and time.</small>
       </div>
 
-      <div class="form-group">
-        <label for="offerPrice">Offer Price</label>
-        <input type="number" class="form-control" id="offerPrice" name="offerPrice" value="<%= coupon.offerPrice %>" required />
+      <div class="form-group mb-3">
+        <label for="offerPrice">Discount Amount</label>
+        <input type="number" class="form-control" id="offerPrice" name="offerPrice" value="<%= coupon.offerPrice %>" required min="1" step="0.01" />
+        <small class="form-text text-muted">This is the discount amount that will be applied to the order.</small>
       </div>
 
-      <div class="form-group">
+      <div class="form-group mb-3">
         <label for="minPurchaseAmount">Minimum Purchase Amount</label>
-        <input type="number" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount" value="<%= coupon.minPurchaseAmount %>" required />
+        <input type="number" class="form-control" id="minPurchaseAmount" name="minPurchaseAmount" value="<%= coupon.minPurchaseAmount %>" required min="1" step="0.01" />
+        <small class="form-text text-muted">Cart total must be equal to or greater than this amount to use the coupon.</small>
+        <small class="form-text text-warning"><strong>Important:</strong> Must be greater than the discount amount above.</small>
+      </div>
+
+      <div class="form-group mb-4 p-3 border rounded bg-light">
+        <h6><i class="fas fa-calculator"></i> Coupon Preview</h6>
+        <p class="mb-1"><strong>Discount:</strong> ₹<span id="previewOfferPrice"><%= coupon.offerPrice %></span></p>
+        <p class="mb-1"><strong>Minimum Purchase:</strong> ₹<span id="previewMinPurchase"><%= coupon.minPurchaseAmount %></span></p>
+        <p class="mb-0 text-success"><strong>User Benefit:</strong> Get ₹<span id="previewOfferPrice2"><%= coupon.offerPrice %></span> off on orders of ₹<span id="previewMinPurchase2"><%= coupon.minPurchaseAmount %></span> or more</p>
       </div>
 
       <button type="submit" class="btn btn-primary">Update Coupon</button>
+      <a href="/admin/coupons" class="btn btn-secondary">Cancel</a>
     </form>
   </div>
 </div>
@@ -37,39 +56,182 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-  $("#editCategoryForm").on("submit", function(e) {
-    e.preventDefault(); // Prevent normal form submission
+  // Real-time validation and preview
+  $(document).ready(function() {
+    function updatePreview() {
+      const offerPrice = parseFloat($("#offerPrice").val()) || 0;
+      const minPurchase = parseFloat($("#minPurchaseAmount").val()) || 0;
 
-    $.ajax({
-      type: "POST",
-      url: $(this).attr("action"),
-      data: $(this).serialize(),
-      success: function(response) {
-        if (response.success) {
-          Swal.fire({
-            icon: "success",
-            title: response.message,
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => {
-            // Redirect to categories page after the alert
-            window.location.href = "/admin/coupons"; // Replace with your categories page URL
-          });
+      $("#previewOfferPrice").text(offerPrice.toFixed(2));
+      $("#previewMinPurchase").text(minPurchase.toFixed(2));
+      $("#previewOfferPrice2").text(offerPrice.toFixed(2));
+      $("#previewMinPurchase2").text(minPurchase.toFixed(2));
+
+      // Validate in real-time
+      const offerInput = $("#offerPrice");
+      const minInput = $("#minPurchaseAmount");
+
+      if (offerPrice > 0 && minPurchase > 0) {
+        if (minPurchase <= offerPrice) {
+          minInput.addClass('is-invalid');
+          offerInput.addClass('is-invalid');
+          $(".text-warning").addClass('text-danger').removeClass('text-warning');
+          $(".text-warning strong").text('Error:');
         } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: response.message,
-          });
+          minInput.removeClass('is-invalid');
+          offerInput.removeClass('is-invalid');
+          $(".text-warning").addClass('text-warning').removeClass('text-danger');
+          $(".text-warning strong").text('Important:');
         }
-      },
-      error: function() {
-        Swal.fire({
-          icon: "error",
-          title: "Request Failed",
-          text: "There was an issue connecting to the server. Please try again.",
+      }
+    }
+
+    $("#offerPrice, #minPurchaseAmount").on('input', updatePreview);
+
+    // Initial preview update
+    updatePreview();
+  });
+
+  // Form submission handler
+  $("#editCouponForm").on("submit", function(e) {
+    e.preventDefault();
+
+    const formData = {
+      name: $("#name").val().trim(),
+      expireOn: $("#expireOn").val(),
+      offerPrice: parseFloat($("#offerPrice").val()),
+      minPurchaseAmount: parseFloat($("#minPurchaseAmount").val()),
+    };
+
+    // Check for empty fields
+    if (!formData.name || !formData.expireOn || !formData.offerPrice || !formData.minPurchaseAmount) {
+      Swal.fire({
+        icon: "error",
+        title: "All fields are required!",
+        text: "Please fill in all the fields.",
+      });
+      return;
+    }
+
+    // Check if expiration date is valid
+    const expireDate = new Date(formData.expireOn);
+    if (isNaN(expireDate)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid expiration date",
+        text: "Please enter a valid expiration date.",
+      });
+      return;
+    }
+
+    // Check if expiration date is in the future
+    const currentDate = new Date();
+    if (expireDate <= currentDate) {
+      Swal.fire({
+        icon: "error",
+        title: "Expiration Date Must Be in the Future",
+        text: "The expiration date you entered is not valid. Please select a future date.",
+      });
+      return;
+    }
+
+    // Validate numerical values
+    if (formData.offerPrice <= 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Discount Amount",
+        text: "Discount amount must be a positive number.",
+      });
+      return;
+    }
+
+    if (formData.minPurchaseAmount <= 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Minimum Purchase Amount",
+        text: "Minimum purchase amount must be a positive number.",
+      });
+      return;
+    }
+
+    // CRITICAL: Validate that minPurchaseAmount > offerPrice
+    if (formData.minPurchaseAmount <= formData.offerPrice) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Amounts",
+        html: `
+          <div style="text-align: left;">
+            <p><strong>Validation Error:</strong></p>
+            <p>• Discount amount: ₹${formData.offerPrice.toFixed(2)}</p>
+            <p>• Minimum purchase amount: ₹${formData.minPurchaseAmount.toFixed(2)}</p>
+            <hr>
+            <p><strong>Rule:</strong> Minimum purchase amount must be <strong>greater than</strong> the discount amount.</p>
+            <p><strong>Current Issue:</strong> Minimum purchase (₹${formData.minPurchaseAmount.toFixed(2)}) is not greater than discount (₹${formData.offerPrice.toFixed(2)})</p>
+            <p><strong>Suggestion:</strong> Increase minimum purchase amount to at least ₹${(formData.offerPrice + 1).toFixed(2)}</p>
+          </div>
+        `,
+      });
+      return;
+    }
+
+    // Show summary before submission
+    Swal.fire({
+      title: 'Confirm Coupon Update',
+      html: `
+        <div style="text-align: left; padding: 10px;">
+          <p><strong>Updated Coupon Details:</strong></p>
+          <p><strong>Name:</strong> ${formData.name}</p>
+          <p><strong>Expires On:</strong> ${new Date(formData.expireOn).toLocaleString()}</p>
+          <p><strong>Discount Amount:</strong> ₹${formData.offerPrice.toFixed(2)}</p>
+          <p><strong>Minimum Purchase Required:</strong> ₹${formData.minPurchaseAmount.toFixed(2)}</p>
+          <hr>
+          <p><strong>How it will work:</strong></p>
+          <p>✓ Users get ₹${formData.offerPrice.toFixed(2)} discount</p>
+          <p>✓ When their cart total is ₹${formData.minPurchaseAmount.toFixed(2)} or more</p>
+          <p class="text-info"><i class="fas fa-check-circle"></i> Validation passed: Minimum purchase > Discount amount</p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update Coupon',
+      cancelButtonText: 'Review Changes',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Send the form data via AJAX
+        $.ajax({
+          type: "POST",
+          url: $(this).attr("action"),
+          data: $(this).serialize(),
+          success: function(response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Success!",
+                text: response.message || "Coupon has been updated successfully!",
+                showConfirmButton: false,
+                timer: 1500
+              }).then(() => {
+                window.location.href = "/admin/coupons";
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Update Failed",
+                text: response.message || "There was an issue updating the coupon.",
+              });
+            }
+          },
+          error: function(xhr, status, error) {
+            Swal.fire({
+              icon: "error",
+              title: "Request Failed",
+              text: "There was an issue connecting to the server. Please try again.",
+            });
+          }
         });
-      },
+      }
     });
   });
 </script>
