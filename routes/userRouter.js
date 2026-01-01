@@ -177,10 +177,12 @@ router.delete("/deleteFromWishlist", productController.deleteFromWishlist);
 router.get("/checkout", productController.loadCheckout);
 router.post("/update-default-address", productController.updateDefaultAddress);
 router.post("/checkout/place-order", productController.codPlaceOrder);
-router.post(
-  "/checkout/razorpay-place-order",
-  productController.razorpayPlaceOrder
-);
+// router.post(
+//   "/checkout/razorpay-place-order",
+//   productController.razorpayPlaceOrder
+// );
+router.post('/checkout/create-razorpay-order', productController.createRazorpayOrder);
+router.post('/checkout/verify-razorpay-payment', productController.verifyRazorpayPayment);
 router.post("/wallet/check-balance", productController.walletBalanceCheck);
 router.post("/checkout/wallet-place-order", productController.walletPlaceOrder);
 router.get("/checkout/orderSuccess", productController.codOrderSuccess);

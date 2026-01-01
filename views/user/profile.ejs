@@ -318,8 +318,7 @@
 <div class="wrapper">
   <div class="row">
     <!-- Sidebar -->
-    <%- include('../../views/partials/user/sidebar', { currentPage: currentPage
-    }) %>
+    <%- include('../../views/partials/user/sidebar', { currentPage: sidebarCurrentPage || section }) %>
 
     <!-- Main Content -->
     <div class="ml-md-5 col-md-8 main-content">
@@ -435,7 +434,7 @@
         <nav aria-label="Page navigation">
           <ul class="pagination justify-content-center mb-20" style="margin-right: 200px">
             <% for(let i = 1; i <= totalPages; i++) { %>
-            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+            <li class="page-item <%= (i === pageNumber) ? 'active' : '' %>">
               <a class="page-link" href="/userProfile?section=orders&page=<%= i %>"><%= i %></a>
             </li>
             <% } %>
@@ -590,7 +589,7 @@
           <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center flex-wrap">
               <% for(let i = 1; i <= totalPages; i++) { %>
-              <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+              <li class="page-item <%= (i === pageNumber) ? 'active' : '' %>">
                 <a class="page-link" href="/userProfile?section=wallet&page=<%= i %>"><%= i %></a>
               </li>
               <% } %>
@@ -670,11 +669,44 @@
           }
 
           .pagination {
-            margin: 0;
+            margin-top: 20px;
+            margin-bottom: 20px;
           }
 
           .pagination .page-link {
             padding: 0.4rem 0.75rem;
+          }
+
+          .page-link {
+            color: #495057;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.3s ease;
+          }
+
+          .page-link:hover {
+            color: #0056b3;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+          }
+
+          /* Active page styling */
+          .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+            font-weight: bold;
+            transform: scale(1.05);
+            box-shadow: 0 2px 5px rgba(0, 123, 255, 0.3);
+          }
+
+          /* Disabled page styling */
+          .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
           }
 
           .modal-dialog {
@@ -692,6 +724,22 @@
           .modal-footer .btn {
             width: auto;
             margin-bottom: 0;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+          }
+
+          .page-item {
+            margin: 2px;
+          }
+
+          .page-link {
+            padding: 0.4rem 0.65rem;
+            font-size: 0.9rem;
           }
         }
       </style>

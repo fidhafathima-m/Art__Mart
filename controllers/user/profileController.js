@@ -236,27 +236,28 @@ const loadUserProfile = async (req, res) => {
         content = { addresses: [], defaultAddress: null };
       }
     } else if (section === "orders") {
-      const page = parseInt(req.query.page) || 1; // Get the current page from the query parameters
-      const limit = 3; // Set the number of orders to display per page
-      const skip = (page - 1) * limit; // Calculate the number of orders to skip
+      const page = parseInt(req.query.page) || 1;
+      const limit = 3;
+      const skip = (page - 1) * limit;
 
-      // Fetch the total number of orders for the user
       const totalOrders = await Order.countDocuments({ userId });
 
-      // Fetch the orders for the user with pagination
       const orders = await Order.find({ userId })
-        .populate("ordereditems.product", "productName productImage") // Populate product details
-        .sort({ createdOn: -1 }) // Sort orders by creation date in descending order
-        .skip(skip) // Skip the calculated number of orders
-        .limit(limit) // Limit the number of orders returned
+        .populate("ordereditems.product", "productName productImage")
+        .sort({ createdOn: -1 })
+        .skip(skip)
+        .limit(limit)
         .exec();
 
-      const totalPages = Math.ceil(totalOrders / limit); // Calculate total pages
+      const totalPages = Math.ceil(totalOrders / limit);
 
-      // Prepare the content to be sent to the client
-      content = { orders, totalPages, totalOrders, currentPage: page };
+      content = {
+        orders,
+        totalPages,
+        totalOrders,
+        pageNumber: page, // For pagination
+      };
     } else if (section === "wishlist") {
-      // Fetch Wishlist Logic
       const wishlist = await Wishlist.findOne({ userId }).populate({
         path: "products.productId",
         model: Product,
@@ -301,7 +302,7 @@ const loadUserProfile = async (req, res) => {
         transactions,
         totalPages,
         totalTransactions,
-        currentPage: page,
+        pageNumber: page, // For pagination
       };
     } else if (section === "referrals") {
       const usersWhoUsedReferral = await User.find({
@@ -312,14 +313,23 @@ const loadUserProfile = async (req, res) => {
     } else {
       content = { userProfile: true };
     }
+
     const cart = await Cart.findOne({ userId: userId });
     const cartItems = cart ? cart.items : [];
+
+    // Determine what to pass to sidebar
+    let sidebarCurrentPage;
+    if (section === "orders" || section === "wallet") {
+      sidebarCurrentPage = section; // For sidebar, use section name
+    } else {
+      sidebarCurrentPage = section;
+    }
 
     res.render("profile", {
       user: userData,
       ...content,
       section,
-      currentPage: section,
+      sidebarCurrentPage: sidebarCurrentPage, // Pass this to sidebar
       activePage: "userProfile",
       cartItems: cartItems,
     });
@@ -799,7 +809,8 @@ const cancelOrder = async (req, res) => {
       if (!order || order.userId.toString() !== userId) {
         return res.status(NotFound).json({
           success: false,
-          message: "Order not found or you are not authorized to cancel this order.",
+          message:
+            "Order not found or you are not authorized to cancel this order.",
         });
       }
 
@@ -848,7 +859,7 @@ const cancelOrder = async (req, res) => {
 
       // Update order status
       order.status = "Cancelled";
-      
+
       // Update current totals to reflect full cancellation
       order.currentTotalPrice = 0;
       order.currentDiscount = 0;
@@ -859,7 +870,10 @@ const cancelOrder = async (req, res) => {
       await order.save();
 
       // Handle refund for prepaid orders
-      if (order.paymentMethod === "prepaid" || order.paymentMethod === "wallet") {
+      if (
+        order.paymentMethod === "prepaid" ||
+        order.paymentMethod === "wallet"
+      ) {
         let wallet = await Wallet.findOne({ userId: order.userId._id });
 
         if (!wallet) {
@@ -892,7 +906,7 @@ const cancelOrder = async (req, res) => {
           message: `Your order has been cancelled. The prepaid amount of ₹${order.originalFinalAmount} has been refunded to your wallet.`,
           refundAmount: order.originalFinalAmount,
           originalOrderTotal: order.originalFinalAmount,
-          totalRefunded: order.totalRefunded
+          totalRefunded: order.totalRefunded,
         });
       }
 
@@ -976,7 +990,8 @@ const cancelUserOrderItem = async (req, res) => {
       // Fallback calculation
       const itemTotal = item.price * item.quantity;
       if (order.originalDiscount > 0 && order.originalTotalPrice > 0) {
-        const discountPercentage = (order.originalDiscount / order.originalTotalPrice) * 100;
+        const discountPercentage =
+          (order.originalDiscount / order.originalTotalPrice) * 100;
         const itemDiscount = (itemTotal * discountPercentage) / 100;
         refundAmount = itemTotal - itemDiscount;
       } else {
@@ -1002,16 +1017,17 @@ const cancelUserOrderItem = async (req, res) => {
     // Recalculate CURRENT order totals (preserve originals)
     const cancelledItemTotal = item.price * item.quantity;
     order.currentTotalPrice -= cancelledItemTotal;
-    
+
     // Adjust current discount proportionally
     if (order.currentDiscount > 0) {
-      const discountPercentage = 
+      const discountPercentage =
         (order.originalDiscount / order.originalTotalPrice) * 100;
-      order.currentDiscount = (order.currentTotalPrice * discountPercentage) / 100;
+      order.currentDiscount =
+        (order.currentTotalPrice * discountPercentage) / 100;
     }
-    
+
     order.currentFinalAmount = order.currentTotalPrice - order.currentDiscount;
-    
+
     // Update total refunded
     order.totalRefunded += refundAmount;
 
@@ -1039,7 +1055,9 @@ const cancelUserOrderItem = async (req, res) => {
         orderId: orderId,
         itemId: itemId,
         productName: item.product?.productName || "Unknown Product",
-        description: `Partial refund for cancelled item: ${item.product?.productName || "Item"}`,
+        description: `Partial refund for cancelled item: ${
+          item.product?.productName || "Item"
+        }`,
       });
 
       const savedTransaction = await transaction.save();
@@ -1099,9 +1117,13 @@ const cancelUserOrderItem = async (req, res) => {
     await order.save();
 
     // Response
-    let message = `Item "${item.product?.productName || 'Product'}" cancelled successfully`;
+    let message = `Item "${
+      item.product?.productName || "Product"
+    }" cancelled successfully`;
     if (order.paymentMethod === "prepaid" && refundAmount > 0) {
-      message += `. ₹${refundAmount.toFixed(2)} has been refunded to your wallet.`;
+      message += `. ₹${refundAmount.toFixed(
+        2
+      )} has been refunded to your wallet.`;
     }
 
     res.json({
