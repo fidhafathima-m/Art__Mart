@@ -8,8 +8,14 @@ const Wishlist = require("../../models/wishlistSchema");
 const Product = require("../../models/productSchema");
 const Wallet = require("../../models/walletSchema");
 const Transaction = require("../../models/transactionSchema");
-const { OK, BadRequest, NotFound, InternalServerError } = require("../../helpers/httpStatusCodes");
-const { INTERNAL_SERVER_ERROR } = require("../../helpers/constants").ERROR_MESSAGES;
+const {
+  OK,
+  BadRequest,
+  NotFound,
+  InternalServerError,
+} = require("../../helpers/httpStatusCodes");
+const { INTERNAL_SERVER_ERROR } =
+  require("../../helpers/constants").ERROR_MESSAGES;
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
@@ -64,7 +70,6 @@ const sendVeificationMail = async (email, otp) => {
   }
 };
 
-
 //securing password
 const securePassword = async (password) => {
   try {
@@ -114,7 +119,7 @@ const forgotPassValid = async (req, res) => {
     console.error(error);
     return res
       .status(InternalServerError)
-      .json({ success: false, message: INTERNAL_SERVER_ERROR});
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -134,11 +139,15 @@ const verifyForgetPassOtp = async (req, res) => {
     if (otp === req.session.otp) {
       res.json({ success: true, redirectUrl: "/reset-password" });
     } else {
-      res.status(BadRequest).json({ success: false, message: "OTP doesn't match" });
+      res
+        .status(BadRequest)
+        .json({ success: false, message: "OTP doesn't match" });
     }
   } catch (error) {
     console.error("Error verifying OTP", error);
-    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
+    res
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -156,14 +165,16 @@ const resendForgetPassOtp = async (req, res) => {
     }
   } catch (error) {
     console.error("Error resending OTP", error);
-    res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
+    res
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
 const resetPasswordLoad = async (req, res) => {
   try {
     const user = req.session.user;
-    res.render("reset-password", {user});
+    res.render("reset-password", { user });
   } catch (error) {
     console.error(error);
     res.redirect("/pageNotFound");
@@ -318,11 +329,9 @@ const loadUserProfile = async (req, res) => {
   }
 };
 
-
-
 const loadEmailPageforPassChange = async (req, res) => {
   try {
-    const user = await User.findById(req.session.user).select('name email');
+    const user = await User.findById(req.session.user).select("name email");
 
     const cart = await Cart.findOne({ userId: user });
     const cartItems = cart ? cart.items : [];
@@ -409,7 +418,7 @@ const verifyChangePassOtp = async (req, res) => {
 const loadAddAddress = async (req, res) => {
   try {
     const userId = req.session.user;
-    const user = await User.findById(userId).select('name email')
+    const user = await User.findById(userId).select("name email");
     const cart = await Cart.findOne({ userId: userId });
     const cartItems = cart ? cart.items : [];
 
@@ -515,8 +524,7 @@ const loadEditAddress = async (req, res) => {
   try {
     const addressId = req.query.id;
     const user = req.session.user;
-    const userDetails = await User.findById(user).select('name email')
-
+    const userDetails = await User.findById(user).select("name email");
 
     if (!user) {
       return res.redirect("/login");
@@ -719,7 +727,7 @@ const viewOrderDetails = async (req, res) => {
   try {
     const orderId = req.params.orderId;
     const userId = req.session.user;
-    const user = await User.findById(req.session.user).select('name email')
+    const user = await User.findById(req.session.user).select("name email");
 
     const order = await Order.findOne({ orderId: orderId })
       .populate(
@@ -773,104 +781,343 @@ const cancelOrder = async (req, res) => {
   try {
     const orderId = req.params.orderId;
     const userId = req.session.user;
-    const { cancelReason } = req.body; 
+    const { cancelReason, cancelType = "full", itemId } = req.body;
 
-    // Populate the product details in ordereditems
-    const order = await Order.findById(orderId).populate(
-      "ordereditems.product"
-    );
-
-    if (!order || order.userId.toString() !== userId) {
-      return res.status(NotFound).json({
-        success: false,
-        message:
-          "Order not found or you are not authorized to cancel this order.",
-      });
+    // Handle individual item cancellation
+    if (cancelType === "item" && itemId) {
+      // Forward the request to the individual item cancellation function
+      req.body.orderId = req.params.orderId;
+      return cancelUserOrderItem(req, res);
     }
+    // Handle full order cancellation
+    else {
+      // Populate the product details in ordereditems
+      const order = await Order.findById(orderId).populate(
+        "ordereditems.product"
+      );
 
-    if (order.status !== "Order Placed" && order.status !== "Processing") {
-      return res.status(BadRequest).json({
-        success: false,
-        message: "Order cannot be canceled at this stage.",
-      });
-    }
-
-    order.cancellationReason = cancelReason;
-
-    // Get all items from the order
-    const orderItems = order.ordereditems;
-
-    // Update product quantities for each item in the order
-    for (const item of orderItems) {
-      try {
-        const product = await Product.findById(item.product);
-
-        if (product) {
-          // Add back the cancelled quantity to product stock
-          product.quantity = (product.quantity || 0) + item.quantity;
-
-          // Update status if necessary
-          if (product.status === "Out of Stock" && product.quantity > 0) {
-            product.status = "Available";
-          }
-
-          // Save the updated product
-          await product.save();
-        }
-      } catch (err) {
-        console.error(`Error updating product ${item.product} stock:`, err);
-        // Continue with other products even if one fails
-      }
-    }
-
-    // Update order status
-    order.status = "Cancelled";
-    await order.save();
-
-    if (order.paymentMethod === "prepaid" || order.paymentMethod === "wallet") {
-      let wallet = await Wallet.findOne({ userId: order.userId._id });
-
-      if (!wallet) {
-        // If no wallet exists, create a new one
-        wallet = new Wallet({
-          userId: order.userId._id,
-          balance: order.finalAmount,
+      if (!order || order.userId.toString() !== userId) {
+        return res.status(NotFound).json({
+          success: false,
+          message: "Order not found or you are not authorized to cancel this order.",
         });
-        await wallet.save();
-      } else {
-        // Add the order's finalAmount to the wallet balance
-        wallet.balance += order.finalAmount;
-        await wallet.save();
       }
 
-      // Create a transaction for the refund
-      const transaction = new Transaction({
-        userId: order.userId._id,
-        type: "Order cancelled",
-        amount: order.finalAmount,
-        balance: wallet.balance,
-      });
+      if (order.status !== "Order Placed" && order.status !== "Processing") {
+        return res.status(BadRequest).json({
+          success: false,
+          message: "Order cannot be canceled at this stage.",
+        });
+      }
 
-      await transaction.save();
+      order.cancellationReason = cancelReason;
 
-      order.moneySent = true;
+      // Update each item's status
+      for (const item of order.ordereditems) {
+        if (item.status !== "cancelled") {
+          item.status = "cancelled";
+          item.cancellationReason = "Full order cancellation";
+          item.cancelledAt = new Date();
+        }
+      }
+
+      // Get all items from the order
+      const orderItems = order.ordereditems;
+
+      // Update product quantities for each item in the order
+      for (const item of orderItems) {
+        try {
+          const product = await Product.findById(item.product);
+
+          if (product) {
+            // Add back the cancelled quantity to product stock
+            product.quantity = (product.quantity || 0) + item.quantity;
+
+            // Update status if necessary
+            if (product.status === "Out of Stock" && product.quantity > 0) {
+              product.status = "Available";
+            }
+
+            // Save the updated product
+            await product.save();
+          }
+        } catch (err) {
+          console.error(`Error updating product ${item.product} stock:`, err);
+        }
+      }
+
+      // Update order status
+      order.status = "Cancelled";
+      
+      // Update current totals to reflect full cancellation
+      order.currentTotalPrice = 0;
+      order.currentDiscount = 0;
+      order.currentFinalAmount = 0;
+      order.totalRefunded = order.originalFinalAmount;
+
+      // Save order
       await order.save();
 
-      return res.json({
+      // Handle refund for prepaid orders
+      if (order.paymentMethod === "prepaid" || order.paymentMethod === "wallet") {
+        let wallet = await Wallet.findOne({ userId: order.userId._id });
+
+        if (!wallet) {
+          wallet = new Wallet({
+            userId: order.userId._id,
+            balance: order.originalFinalAmount,
+          });
+        } else {
+          wallet.balance += order.originalFinalAmount;
+        }
+        await wallet.save();
+
+        // Create transaction for the refund
+        const transaction = new Transaction({
+          userId: order.userId._id,
+          type: "Order cancelled",
+          amount: order.originalFinalAmount,
+          balance: wallet.balance,
+          orderId: order.orderId,
+          description: `Full order cancellation refund for order: ${order.orderId}`,
+        });
+
+        await transaction.save();
+
+        order.moneySent = true;
+        await order.save();
+
+        return res.json({
+          success: true,
+          message: `Your order has been cancelled. The prepaid amount of ₹${order.originalFinalAmount} has been refunded to your wallet.`,
+          refundAmount: order.originalFinalAmount,
+          originalOrderTotal: order.originalFinalAmount,
+          totalRefunded: order.totalRefunded
+        });
+      }
+
+      res.json({
         success: true,
-        message: `Your order has been cancelled. The prepaid amount of ₹${order.finalAmount} has been refunded to your wallet.`,
+        message: "Order has been cancelled.",
+        originalOrderTotal: order.originalFinalAmount,
       });
     }
-
-    res.json({
-      success: true,
-      message: "Order has been cancelled.",
-    });
   } catch (error) {
     console.error("Error cancelling order:", error);
     res.status(InternalServerError).json({
       success: false,
       message: "An error occurred while cancelling the order.",
+    });
+  }
+};
+
+// Individual item cancellation for user
+const cancelUserOrderItem = async (req, res) => {
+  try {
+    const { orderId, itemId, cancelReason } = req.body;
+    const userId = req.session.user;
+
+    if (!cancelReason || cancelReason.trim() === "") {
+      return res.status(BadRequest).json({
+        success: false,
+        message: "Cancellation reason is required",
+      });
+    }
+
+    // Find the order with populated product
+    const order = await Order.findOne({
+      orderId: orderId,
+      userId: userId,
+    }).populate("ordereditems.product", "productName");
+
+    if (!order) {
+      return res.status(NotFound).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Check if order can be cancelled
+    const allowedStatuses = ["Order Placed", "Processing", "Payment Pending"];
+    if (!allowedStatuses.includes(order.status)) {
+      return res.status(BadRequest).json({
+        success: false,
+        message: `Cannot cancel items in ${order.status} status`,
+      });
+    }
+
+    // Find the specific item
+    const itemIndex = order.ordereditems.findIndex(
+      (item) => item._id.toString() === itemId
+    );
+
+    if (itemIndex === -1) {
+      return res.status(NotFound).json({
+        success: false,
+        message: "Order item not found",
+      });
+    }
+
+    const item = order.ordereditems[itemIndex];
+
+    // Check if item can be cancelled
+    if (item.status === "cancelled") {
+      return res.status(BadRequest).json({
+        success: false,
+        message: "Item is already cancelled",
+      });
+    }
+
+    // Calculate refund amount using item's finalPrice or discountApplied
+    let refundAmount = 0;
+    if (item.finalPrice > 0) {
+      refundAmount = item.finalPrice * item.quantity;
+    } else {
+      // Fallback calculation
+      const itemTotal = item.price * item.quantity;
+      if (order.originalDiscount > 0 && order.originalTotalPrice > 0) {
+        const discountPercentage = (order.originalDiscount / order.originalTotalPrice) * 100;
+        const itemDiscount = (itemTotal * discountPercentage) / 100;
+        refundAmount = itemTotal - itemDiscount;
+      } else {
+        refundAmount = itemTotal;
+      }
+    }
+
+    // Update item status
+    item.status = "cancelled";
+    item.cancellationReason = cancelReason;
+    item.cancelledAt = new Date();
+
+    // Update product stock
+    const product = await Product.findById(item.product);
+    if (product) {
+      product.quantity += item.quantity;
+      if (product.status === "Out of Stock" && product.quantity > 0) {
+        product.status = "Available";
+      }
+      await product.save();
+    }
+
+    // Recalculate CURRENT order totals (preserve originals)
+    const cancelledItemTotal = item.price * item.quantity;
+    order.currentTotalPrice -= cancelledItemTotal;
+    
+    // Adjust current discount proportionally
+    if (order.currentDiscount > 0) {
+      const discountPercentage = 
+        (order.originalDiscount / order.originalTotalPrice) * 100;
+      order.currentDiscount = (order.currentTotalPrice * discountPercentage) / 100;
+    }
+    
+    order.currentFinalAmount = order.currentTotalPrice - order.currentDiscount;
+    
+    // Update total refunded
+    order.totalRefunded += refundAmount;
+
+    // Handle prepaid refund
+    if (order.paymentMethod === "prepaid" && refundAmount > 0) {
+      let wallet = await Wallet.findOne({ userId: userId });
+
+      if (!wallet) {
+        wallet = new Wallet({
+          userId: userId,
+          balance: refundAmount,
+        });
+      } else {
+        wallet.balance += refundAmount;
+      }
+
+      await wallet.save();
+
+      // Create transaction
+      const transaction = new Transaction({
+        userId: userId,
+        type: "Partial refund for cancelled item",
+        amount: refundAmount,
+        balance: wallet.balance,
+        orderId: orderId,
+        itemId: itemId,
+        productName: item.product?.productName || "Unknown Product",
+        description: `Partial refund for cancelled item: ${item.product?.productName || "Item"}`,
+      });
+
+      const savedTransaction = await transaction.save();
+
+      // Add to partialRefunds array
+      if (!order.partialRefunds) order.partialRefunds = [];
+
+      order.partialRefunds.push({
+        itemId: itemId,
+        amount: refundAmount,
+        refundedAt: new Date(),
+        transactionId: savedTransaction._id,
+        reason: cancelReason,
+      });
+      order.moneySent = true;
+    }
+
+    // Check if all items are cancelled
+    const remainingItems = order.ordereditems.filter(
+      (item) => item.status !== "cancelled"
+    );
+
+    if (remainingItems.length === 0) {
+      order.status = "Cancelled";
+      order.cancellationReason = "All items cancelled by user";
+
+      // If there's any remaining amount to refund
+      if (order.paymentMethod === "prepaid" && order.currentFinalAmount > 0) {
+        let wallet = await Wallet.findOne({ userId: userId });
+
+        if (!wallet) {
+          wallet = new Wallet({
+            userId: userId,
+            balance: order.currentFinalAmount,
+          });
+        } else {
+          wallet.balance += order.currentFinalAmount;
+        }
+
+        await wallet.save();
+
+        const transaction = new Transaction({
+          userId: userId,
+          type: "Full order cancellation refund",
+          amount: order.currentFinalAmount,
+          balance: wallet.balance,
+          orderId: orderId,
+          description: `Final refund for cancelled order: ${orderId}`,
+        });
+
+        await transaction.save();
+        order.totalRefunded += order.currentFinalAmount;
+        order.moneySent = true;
+      }
+    }
+
+    await order.save();
+
+    // Response
+    let message = `Item "${item.product?.productName || 'Product'}" cancelled successfully`;
+    if (order.paymentMethod === "prepaid" && refundAmount > 0) {
+      message += `. ₹${refundAmount.toFixed(2)} has been refunded to your wallet.`;
+    }
+
+    res.json({
+      success: true,
+      message: message,
+      refundAmount: refundAmount,
+      originalOrderTotal: order.originalFinalAmount,
+      currentOrderTotal: order.currentFinalAmount,
+      totalRefunded: order.totalRefunded,
+      remainingItems: remainingItems.length,
+    });
+  } catch (error) {
+    console.error("Error cancelling user order item:", error);
+    res.status(InternalServerError).json({
+      success: false,
+      message: INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -952,7 +1199,9 @@ const cancelReturn = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(InternalServerError).json({ success: false, message: INTERNAL_SERVER_ERROR });
+    return res
+      .status(InternalServerError)
+      .json({ success: false, message: INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -1022,6 +1271,7 @@ module.exports = {
   editAddressInCheckout,
   viewOrderDetails,
   cancelOrder,
+  cancelUserOrderItem,
   returnOrder,
   cancelReturn,
   loadEditProfile,

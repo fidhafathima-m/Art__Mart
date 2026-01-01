@@ -156,7 +156,7 @@ router.get("/edit-coupon", adminAuth.isLogin, couponController.loadEditCoupon);
 router.post("/edit-coupon/:id", adminAuth.isLogin, couponController.editCoupon);
 router.patch("/delete-coupon/:couponId", couponController.deleteCoupon);
 router.patch("/restore-coupon/:couponId", couponController.restoreCoupon);
- 
+
 // Order Management
 router.get("/orders", adminAuth.isLogin, orderController.loadOrder);
 router.get(
@@ -169,6 +169,7 @@ router.post(
   adminAuth.isLogin,
   orderController.updateOrderStatus
 );
+router.post("/cancel-item", adminAuth.isLogin, orderController.cancelOrderItem);
 router.post(
   "/sendMoneyToWallet",
   adminAuth.isLogin,
@@ -217,8 +218,16 @@ router.post(
   upload.single("brandImage"),
   brandController.addBrand
 );
-router.get('/brands/edit-brand', adminAuth.isLogin, brandController.loadEditBrand);
-router.post('/brands/edit-brand/:id', adminAuth.isLogin, brandController.editBrand);
+router.get(
+  "/brands/edit-brand",
+  adminAuth.isLogin,
+  brandController.loadEditBrand
+);
+router.post(
+  "/brands/edit-brand/:id",
+  adminAuth.isLogin,
+  brandController.editBrand
+);
 router.post(
   "/brands/block-brand",
   adminAuth.isLogin,

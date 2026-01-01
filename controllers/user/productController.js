@@ -562,17 +562,51 @@ const codPlaceOrder = async (req, res) => {
       delete req.session.pendingCoupon;
     }
 
+    // Update ordered items with the new schema fields
+    const updatedOrderedItems = ordereditems.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      price: item.price,
+      originalPrice: item.price,
+      finalPrice: item.price, // Will be updated if discount exists
+      status: 'ordered'
+    }));
+
+    // Calculate discount per item if discount exists
+    if (discount > 0) {
+      const discountPercentage = (discount / totalprice) * 100;
+      updatedOrderedItems.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        item.discountApplied = (itemTotal * discountPercentage) / 100;
+        item.finalPrice = item.price - (item.discountApplied / item.quantity);
+      });
+    }
+
     const newOrder = new Order({
       userId: userId,
-      ordereditems,
-      totalprice,
-      finalAmount,
+      ordereditems: updatedOrderedItems,
+      
+      // New schema fields
+      originalTotalPrice: totalprice,
+      originalDiscount: discount || 0,
+      originalFinalAmount: finalAmount,
+      
+      currentTotalPrice: totalprice,
+      currentDiscount: discount || 0,
+      currentFinalAmount: finalAmount,
+      
+      totalRefunded: 0,
+      
+      // Old fields for backward compatibility
+      totalprice: totalprice,
+      discount: discount || 0,
+      finalAmount: finalAmount,
+      
       address: defaultAddress._id,
       status: status || "Order Placed",
       createdOn: new Date(),
       invoiceDate: new Date(),
-      couponApplied, // Store if the coupon was applied
-      discount, // Store the discount value
+      couponApplied: couponApplied || false,
       paymentMethod: "COD",
     });
 
@@ -901,19 +935,53 @@ const walletPlaceOrder = async (req, res) => {
     });
     await transaction.save();
 
+    // Update ordered items with the new schema fields
+    const updatedOrderedItems = ordereditems.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      price: item.price,
+      originalPrice: item.price,
+      finalPrice: item.price, // Will be updated if discount exists
+      status: 'ordered'
+    }));
+
+    // Calculate discount per item if discount exists
+    if (discount > 0) {
+      const discountPercentage = (discount / totalprice) * 100;
+      updatedOrderedItems.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        item.discountApplied = (itemTotal * discountPercentage) / 100;
+        item.finalPrice = item.price - (item.discountApplied / item.quantity);
+      });
+    }
+
     // Create the order
     const newOrder = new Order({
       userId: userId,
-      ordereditems,
-      totalprice,
-      finalAmount,
+      ordereditems: updatedOrderedItems,
+      
+      // New schema fields
+      originalTotalPrice: totalprice,
+      originalDiscount: discount || 0,
+      originalFinalAmount: finalAmount,
+      
+      currentTotalPrice: totalprice,
+      currentDiscount: discount || 0,
+      currentFinalAmount: finalAmount,
+      
+      totalRefunded: 0,
+      
+      // Old fields for backward compatibility
+      totalprice: totalprice,
+      discount: discount || 0,
+      finalAmount: finalAmount,
+      
       address: defaultAddress._id,
       status: status || "Order Placed",
       createdOn: new Date(),
       invoiceDate: new Date(),
-      couponApplied,
-      discount,
-      paymentMethod: "wallet", // Set payment method to Wallet
+      couponApplied: couponApplied || false,
+      paymentMethod: "wallet",
     });
 
     const savedOrder = await newOrder.save();
@@ -1005,17 +1073,51 @@ const razorpayPlaceOrder = async (req, res) => {
         .json({ success: false, message: "No default address found" });
     }
 
+    // Update ordered items with the new schema fields
+    const updatedOrderedItems = ordereditems.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      price: item.price,
+      originalPrice: item.price,
+      finalPrice: item.price, // Will be updated if discount exists
+      status: 'ordered'
+    }));
+
+    // Calculate discount per item if discount exists
+    if (discount > 0) {
+      const discountPercentage = (discount / totalprice) * 100;
+      updatedOrderedItems.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        item.discountApplied = (itemTotal * discountPercentage) / 100;
+        item.finalPrice = item.price - (item.discountApplied / item.quantity);
+      });
+    }
+
     const newOrder = new Order({
       userId: userId,
-      ordereditems,
-      totalprice,
-      finalAmount,
+      ordereditems: updatedOrderedItems,
+      
+      // New schema fields
+      originalTotalPrice: totalprice,
+      originalDiscount: discount || 0,
+      originalFinalAmount: finalAmount,
+      
+      currentTotalPrice: totalprice,
+      currentDiscount: discount || 0,
+      currentFinalAmount: finalAmount,
+      
+      totalRefunded: 0,
+      
+      // Old fields for backward compatibility
+      totalprice: totalprice,
+      discount: discount || 0,
+      finalAmount: finalAmount,
+      
       address: defaultAddress._id,
       status: status || "Order Placed",
       createdOn: new Date(),
       invoiceDate: new Date(),
-      couponApplied,
-      discount,
+      couponApplied: couponApplied || false,
       paymentMethod: "prepaid",
     });
 
@@ -1081,7 +1183,6 @@ const razorpayPlaceOrder = async (req, res) => {
       });
     }
 
-
     // Return Razorpay order details to frontend
     res.json({
       success: true,
@@ -1091,8 +1192,8 @@ const razorpayPlaceOrder = async (req, res) => {
       razorpayKey: process.env.RAZORPAY_ID_KEY,
       paymentMethod: "razorpay",
     });
-    // eslint-disable-next-line no-unused-vars
   } catch (error) {
+    console.error("Error in razorpayPlaceOrder:", error);
     res
       .status(InternalServerError)
       .json({ success: false, message: "Failed to create Razorpay order" });
@@ -1402,9 +1503,8 @@ const generateInvoice = async (req, res) => {
   const { orderId } = req.params;
 
   try {
-    const pdfBuffer = await generateInvoicePDF(orderId); // Call the helper function to generate the PDF
-
-    // Send the PDF as a response
+    const pdfBuffer = await generateInvoicePDF(orderId);
+    
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
@@ -1413,7 +1513,14 @@ const generateInvoice = async (req, res) => {
     res.send(pdfBuffer);
   } catch (error) {
     console.error(error);
-    res.status(InternalServerError).json({ message: "Error generating invoice" });
+    
+    if (error.message === "No delivered items in this order to generate invoice for") {
+      return res.status(400).json({ 
+        message: "Cannot generate invoice as there are no delivered items in this order" 
+      });
+    }
+    
+    res.status(500).json({ message: "Error generating invoice" });
   }
 };
 

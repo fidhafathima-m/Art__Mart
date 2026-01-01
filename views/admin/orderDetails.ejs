@@ -6,87 +6,267 @@
   <div class="container mt-4">
     <h1 class="my-4 text-center">Order Details - <%= orderDetails.orderId %></h1>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons text-center mt-4">
-      <% if (orderDetails.status === 'Order Placed') { %>
-      <button class="btn btn-info status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Processing" style="width: 120px">Process</button>
-      <% } else if (orderDetails.status === 'Processing') { %>
-      <button class="btn btn-secondary status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Shipped" style="width: 120px">Ship</button>
-      <% } else if (orderDetails.status === 'Shipped') { %>
-      <button class="btn btn-success status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Delivered" style="width: 120px">Deliver</button>
-      <% } else if (orderDetails.status === 'Delivered') { %>
-      <button class="btn btn-warning status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Return Request" style="width: 120px">Return Request</button>
-      <% } else if (orderDetails.status === 'Return Request') { %>
-      <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Returned" style="width: 120px">Returned</button>
-      <% } %>
-
-      <% if (orderDetails.status === 'Cancelled') { %>
-      <% if ((orderDetails.paymentMethod === 'prepaid' || orderDetails.paymentMethod === 'wallet') && !orderDetails.moneySent) { %>
-      <button class="btn btn-primary send-money-btn mt-2" data-id="<%= orderDetails.orderId %>" style="width: 120px">Send Money</button>
-      <% } else if ((orderDetails.paymentMethod === 'prepaid' || orderDetails.paymentMethod === 'wallet') && orderDetails.moneySent) { %>
-      <p class="text-success mt-2">Money has already been sent to the wallet.</p>
-      <% } else if (orderDetails.paymentMethod === 'COD') { %>
-      <p class="text-danger mt-2">Order is cancelled. No payment is required for COD.</p>
-      <% } %>
-      <% } %>
-
-      <% if (orderDetails.status !== 'Cancelled' && orderDetails.status !== 'Returned') { %>
-      <button class="btn btn-danger status-btn mt-2" data-id="<%= orderDetails.orderId %>" data-status="Cancelled" style="width: 120px">Cancel</button>
-      <% } %>
-    </div>
-
-
-    <!-- Order Information -->
+    <!-- Order Information Card -->
     <div class="order-info mb-4 p-4 border rounded shadow-sm">
       <h4 class="mb-3">Order Information</h4>
-      <p><strong>Order ID:</strong> <%= orderDetails.orderId %></p>
-      <p><strong>Payment Method:</strong> <%= orderDetails.paymentMethod %></p>
-      <p><strong>User Name:</strong> <%= orderDetails.Id.name %></p>
-      <p><strong>Total Price:</strong> &#8377;<%= orderDetails.totalPrice %></p>
-      <p><strong>Discount:</strong> &#8377;<%= orderDetails.discount %></p>
-      <p><strong>Final Amount:</strong> &#8377;<%= orderDetails.finalAmount %></p>
-      <p><strong>Status:</strong> <%= orderDetails.status %></p>
-      <p><strong>Coupon Applied:</strong> <%= orderDetails.couponApplied ? 'Yes' : 'No' %></p>
-      <p><strong>Order Date:</strong> <%= new Date(orderDetails.createdOn).toLocaleString() %></p>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Order ID:</strong> <%= orderDetails.orderId %></p>
+          <p><strong>Payment Method:</strong> <%= orderDetails.paymentMethod %></p>
+          <p><strong>User Name:</strong> <%= orderDetails.Id.name %></p>
+          <p><strong>Status:</strong>
+            <span class="badge bg-<%=
+              orderDetails.status === 'Delivered' ? 'success' :
+              orderDetails.status === 'Processing' ? 'info' :
+              orderDetails.status === 'Shipped' ? 'primary' :
+              orderDetails.status === 'Cancelled' ? 'danger' :
+              orderDetails.status === 'Returned' ? 'warning' : 'secondary'
+            %>">
+              <%= orderDetails.status %>
+            </span>
+          </p>
+          <p><strong>Coupon Applied:</strong>
+            <span class="badge bg-<%= orderDetails.couponApplied ? 'success' : 'secondary' %>">
+              <%= orderDetails.couponApplied ? 'Yes' : 'No' %>
+            </span>
+          </p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>Total Price:</strong> &#8377;<%= orderDetails.totalPrice.toFixed(2) %></p>
+          <p><strong>Discount:</strong> &#8377;<%= orderDetails.discount.toFixed(2) %></p>
+          <p><strong>Final Amount:</strong> &#8377;<%= orderDetails.finalAmount.toFixed(2) %></p>
+          <p><strong>Money Sent to Wallet:</strong>
+            <span class="badge bg-<%= orderDetails.moneySent ? 'success' : 'warning' %>">
+              <%= orderDetails.moneySent ? 'Yes' : 'No' %>
+            </span>
+          </p>
+          <p><strong>Order Date:</strong> <%= new Date(orderDetails.createdOn).toLocaleString() %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons text-center mb-4 p-4 border rounded bg-light">
+      <h5 class="mb-3">Order Actions</h5>
+      <div class="d-flex flex-wrap justify-content-center gap-2">
+        <% if (orderDetails.status === 'Order Placed') { %>
+        <button class="btn btn-info status-btn" data-id="<%= orderDetails.orderId %>" data-status="Processing">Process Order</button>
+        <% } else if (orderDetails.status === 'Processing') { %>
+        <button class="btn btn-primary status-btn" data-id="<%= orderDetails.orderId %>" data-status="Shipped">Ship Order</button>
+        <% } else if (orderDetails.status === 'Shipped') { %>
+        <button class="btn btn-success status-btn" data-id="<%= orderDetails.orderId %>" data-status="Delivered">Mark as Delivered</button>
+        <% } else if (orderDetails.status === 'Delivered') { %>
+        <button class="btn btn-warning status-btn" data-id="<%= orderDetails.orderId %>" data-status="Return Request">Mark as Return Request</button>
+        <% } else if (orderDetails.status === 'Return Request') { %>
+        <button class="btn btn-danger status-btn" data-id="<%= orderDetails.orderId %>" data-status="Returned">Mark as Returned</button>
+        <% } %>
+
+        <!-- Cancel Order Button (only if not already cancelled/returned) -->
+        <% if (orderDetails.status !== 'Cancelled' && orderDetails.status !== 'Returned' && orderDetails.status !== 'Delivered') { %>
+        <button class="btn btn-danger status-btn" data-id="<%= orderDetails.orderId %>" data-status="Cancelled">Cancel Entire Order</button>
+        <% } %>
+      </div>
+
+      <!-- Wallet Actions -->
+      <% if (orderDetails.status === 'Cancelled') { %>
+      <div class="mt-3 pt-3 border-top">
+        <h6>Wallet Actions</h6>
+        <% if ((orderDetails.paymentMethod === 'prepaid' || orderDetails.paymentMethod === 'wallet') && !orderDetails.moneySent) { %>
+        <button class="btn btn-primary send-money-btn" data-id="<%= orderDetails.orderId %>">Send Money to Wallet</button>
+        <% } else if ((orderDetails.paymentMethod === 'prepaid' || orderDetails.paymentMethod === 'wallet') && orderDetails.moneySent) { %>
+        <p class="text-success mt-2"><i class="fas fa-check-circle"></i> Money has been sent to user's wallet</p>
+        <% } else if (orderDetails.paymentMethod === 'COD') { %>
+        <p class="text-muted mt-2"><i class="fas fa-info-circle"></i> COD order - No refund required</p>
+        <% } %>
+      </div>
+      <% } %>
     </div>
 
     <!-- Address Information -->
     <div class="address-info mb-4 p-4 border rounded shadow-sm">
-      <h4 class="mb-3">Address</h4>
-      <p><strong>Name:</strong> <%= orderDetails.address.name %></p>
-      <p><strong>City:</strong> <%= orderDetails.address.city %></p>
-      <p><strong>Landmark:</strong> <%= orderDetails.address.landMark || 'N/A' %></p>
-      <p><strong>State:</strong> <%= orderDetails.address.state %></p>
-      <p><strong>Pincode:</strong> <%= orderDetails.address.pincode %></p>
+      <h4 class="mb-3">Shipping Address</h4>
+      <div class="row">
+        <div class="col-md-6">
+          <p><strong>Name:</strong> <%= orderDetails.address.name %></p>
+          <p><strong>City:</strong> <%= orderDetails.address.city %></p>
+          <p><strong>Landmark:</strong> <%= orderDetails.address.landMark || 'N/A' %></p>
+        </div>
+        <div class="col-md-6">
+          <p><strong>State:</strong> <%= orderDetails.address.state %></p>
+          <p><strong>Pincode:</strong> <%= orderDetails.address.pincode %></p>
+          <p><strong>Phone:</strong> <%= orderDetails.address.phone %></p>
+          <% if (orderDetails.address.altPhone) { %>
+          <p><strong>Alternate Phone:</strong> <%= orderDetails.address.altPhone %></p>
+          <% } %>
+        </div>
+      </div>
     </div>
 
-    <!-- Ordered Items -->
+    <!-- Ordered Items with Individual Actions -->
     <div class="ordered-items mb-4">
       <h4 class="mb-3">Ordered Items</h4>
-      <table class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>Product Image</th>
-            <th>Product Name</th>
-            <th>Price</th>
-            <th>Quantity</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% orderDetails.orderedItems.forEach(item => { %>
-          <tr>
-            <td><img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" width="100" class="img-fluid rounded"></td>
-            <td><%= item.product.productName %></td>
-            <td>&#8377;<%= item.price %></td>
-            <td><%= item.quantity %></td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Product Image</th>
+              <th>Product Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Item Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orderDetails.orderedItems.forEach((item, index) => {
+              const isCancelled = item.status === 'cancelled';
+              const canCancel = !isCancelled &&
+                orderDetails.status !== 'Cancelled' &&
+                orderDetails.status !== 'Returned' &&
+                orderDetails.status !== 'Delivered' &&
+                orderDetails.status !== 'Shipped';
+            %>
+            <tr class="<%= isCancelled ? 'table-secondary' : '' %>">
+              <td>
+                <img src="<%= item.product.productImage[0] %>" alt="<%= item.product.productName %>" width="80" class="img-fluid rounded shadow-sm">
+              </td>
+              <td>
+                <strong><%= item.product.productName %></strong>
+                <% if (item.cancellationReason) { %>
+                <br>
+                <small class="text-danger">
+                  <strong>Cancellation Reason:</strong> <%= item.cancellationReason %>
+                </small>
+                <% } %>
+              </td>
+              <td>&#8377;<%= item.price.toFixed(2) %></td>
+              <td><%= item.quantity %></td>
+              <td>
+                <span class="badge bg-<%=
+                  item.status === 'cancelled' ? 'danger' :
+                  item.status === 'delivered' ? 'success' :
+                  item.status === 'shipped' ? 'primary' : 'info'
+                %>">
+                  <%= item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Ordered' %>
+                </span>
+              </td>
+              <td>
+                <% if (canCancel) { %>
+                <button class="btn btn-sm btn-outline-danger cancel-item-btn" data-order-id="<%= orderDetails.orderId %>" data-item-id="<%= item._id %>" data-product-name="<%= item.product.productName %>">
+                  <i class="fas fa-times"></i> Cancel Item
+                </button>
+                <% } else if (isCancelled) { %>
+                <span class="text-muted">Cancelled</span>
+                <% } else { %>
+                <span class="text-muted">No actions available</span>
+                <% } %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Order Summary</h5>
+            </div>
+            <div class="card-body">
+              <!-- Original Order -->
+              <div class="mb-3">
+                <h6><i class="fas fa-shopping-cart"></i> Original Order</h6>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Original Total:</span>
+                  <strong>&#8377;<%= orderDetails.originalTotalPrice.toFixed(2) %></strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Original Discount:</span>
+                  <strong class="text-danger">-&#8377;<%= orderDetails.originalDiscount.toFixed(2) %></strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Original Final Amount:</span>
+                  <strong class="text-success">&#8377;<%= orderDetails.originalFinalAmount.toFixed(2) %></strong>
+                </div>
+              </div>
+
+              <hr>
+
+              <!-- Current Order (After Cancellations) -->
+              <div class="mt-3">
+                <h6><i class="fas fa-redo"></i> Current Status</h6>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Current Total:</span>
+                  <strong>&#8377;<%= orderDetails.currentTotalPrice.toFixed(2) %></strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Current Discount:</span>
+                  <strong class="text-danger">-&#8377;<%= orderDetails.currentDiscount.toFixed(2) %></strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Current Amount Due:</span>
+                  <strong class="text-info">&#8377;<%= orderDetails.currentFinalAmount.toFixed(2) %></strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card border-info">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0">Refund Information</h5>
+            </div>
+            <div class="card-body">
+              <p><strong>Payment Method:</strong> <%= orderDetails.paymentMethod %></p>
+
+              <% if (orderDetails.status === 'Cancelled') { %>
+              <div class="d-flex justify-content-between mb-2">
+                <span>Total Refunded:</span>
+                <strong class="text-success">&#8377;<%= orderDetails.totalRefunded.toFixed(2) %></strong>
+              </div>
+
+              <% if (orderDetails.paymentMethod === 'prepaid' || orderDetails.paymentMethod === 'wallet') { %>
+              <p><strong>Refund Status:</strong>
+                <span class="badge bg-<%= orderDetails.moneySent ? 'success' : 'warning' %>">
+                  <%= orderDetails.moneySent ? 'Fully Refunded' : 'Pending Refund' %>
+                </span>
+              </p>
+
+              <% if (!orderDetails.moneySent && orderDetails.currentFinalAmount > 0) { %>
+              <p class="text-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Amount pending: &#8377;<%= orderDetails.currentFinalAmount.toFixed(2) %>
+              </p>
+              <% } %>
+              <% } else { %>
+              <p class="text-muted">No refund required for <%= orderDetails.paymentMethod %> orders</p>
+              <% } %>
+
+              <% } else if (orderDetails.partialRefunds && orderDetails.partialRefunds.length > 0) { %>
+              <p><strong>Partial Refunds:</strong> <%= orderDetails.partialRefunds.length %> item(s)</p>
+              <div class="d-flex justify-content-between">
+                <span>Total Refunded:</span>
+                <strong class="text-success">&#8377;<%= orderDetails.totalRefunded.toFixed(2) %></strong>
+              </div>
+              <p class="small text-muted mt-2">
+                Remaining: &#8377;<%= orderDetails.currentFinalAmount.toFixed(2) %>
+              </p>
+              <% } else { %>
+              <p class="text-muted">No refunds processed yet</p>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="text-center mb-3">
-      <a href="/admin/orders" class="btn btn-outline-dark">Go back</a>
+    <div class="text-center mb-5">
+      <a href="/admin/orders" class="btn btn-outline-dark">
+        <i class="fas fa-arrow-left"></i> Back to Orders
+      </a>
     </div>
   </div>
 </div>
@@ -97,63 +277,197 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+  // Status update for entire order
   $(document).on("click", ".status-btn", function() {
     var orderId = $(this).data("id");
     var status = $(this).data("status");
 
+    let confirmText = `Are you sure you want to mark this order as ${status}?`;
+    let confirmButtonText = `Yes, ${status}!`;
+
+    if (status === 'Cancelled') {
+      confirmText = `Are you sure you want to cancel this entire order?`;
+      confirmButtonText = 'Yes, Cancel Order!';
+    }
+
     Swal.fire({
-      title: `Are you sure you want to mark this order as ${status}?`,
+      title: confirmText,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: `Yes, ${status}!`,
+      confirmButtonText: confirmButtonText,
       cancelButtonText: "No, Cancel",
       reverseButtons: true,
+      input: status === 'Cancelled' ? 'textarea' : null,
+      inputPlaceholder: status === 'Cancelled' ? 'Please provide a reason for cancellation...' : '',
+      inputAttributes: {
+        'aria-label': 'Cancellation reason',
+        'maxlength': 300
+      },
+      showLoaderOnConfirm: true,
+      preConfirm: (cancelReason) => {
+        if (status === 'Cancelled' && (!cancelReason || cancelReason.trim() === '')) {
+          Swal.showValidationMessage('Please provide a cancellation reason');
+          return false;
+        }
+
+        const requestData = {
+          orderId: orderId,
+          status: status
+        };
+
+        if (status === 'Cancelled' && cancelReason) {
+          requestData.cancelReason = cancelReason;
+        }
+
+        return fetch("/admin/updateOrderStatus", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData)
+          })
+          .then(response => response.json())
+          .catch(error => {
+            Swal.showValidationMessage(`Request failed: ${error}`);
+          });
+      }
     }).then((result) => {
       if (result.isConfirmed) {
-        $.ajax({
-          type: "POST",
-          url: "/admin/updateOrderStatus",
-          data: {
-            orderId: orderId,
-            status: status
-          },
-          success: function(response) {
-            if (response.success) {
-              Swal.fire({
-                icon: "success",
-                title: response.message,
-                showConfirmButton: false,
-                timer: 1500,
-              }).then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "An error occurred while updating the order status. Please try again.",
-              });
-            }
-          },
-          error: function() {
-            Swal.fire({
-              icon: "error",
-              title: "Request Failed",
-              text: "There was an issue connecting to the server. Please try again.",
-            });
-          },
-        });
-      } else {
-        Swal.fire("Cancelled", `Order status change was cancelled.`, "info");
+        const response = result.value;
+        if (response.success) {
+          let successMessage = response.message;
+
+          if (status === 'Cancelled' && response.refundAmount) {
+            successMessage += `<br><br><strong>Refund Information:</strong><br>`;
+            successMessage += `• Refund Amount: ₹${response.refundAmount.toFixed(2)}<br>`;
+            successMessage += `• Refund method: User's wallet`;
+          }
+
+          Swal.fire({
+            title: "Success!",
+            html: successMessage,
+            icon: "success",
+            confirmButtonText: "OK",
+            width: 500
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: response.message || "An error occurred. Please try again.",
+          });
+        }
       }
     });
   });
 
+  // Individual item cancellation
+  $(document).on("click", ".cancel-item-btn", function() {
+    const orderId = $(this).data("order-id");
+    const itemId = $(this).data("item-id");
+    const productName = $(this).data("product-name");
+
+    Swal.fire({
+      title: `Cancel Item: ${productName}`,
+      text: `Are you sure you want to cancel this specific item?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, cancel item!",
+      cancelButtonText: "No, keep it",
+      input: 'textarea',
+      inputPlaceholder: 'Please provide a reason for cancelling this item...',
+      inputAttributes: {
+        'aria-label': 'Reason for cancelling item',
+        'maxlength': 300
+      },
+      showLoaderOnConfirm: true,
+      preConfirm: (cancelReason) => {
+        if (!cancelReason || cancelReason.trim() === '') {
+          Swal.showValidationMessage('You must provide a reason for cancelling');
+          return false;
+        }
+
+        return fetch("/admin/cancel-item", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              orderId: orderId,
+              itemId: itemId,
+              cancelReason: cancelReason
+            })
+          })
+          .then(response => response.json())
+          .catch(error => {
+            Swal.showValidationMessage(`Request failed: ${error}`);
+          });
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const response = result.value;
+        if (response.success) {
+          let htmlContent = `
+            <div style="text-align: center;">
+              <div style="margin-bottom: 15px;">
+                <i class="fas fa-check-circle" style="font-size: 48px; color: #28a745;"></i>
+                <h4 style="margin-top: 10px; color: #28a745;">Item Cancelled</h4>
+                <p>${response.message}</p>
+              </div>
+          `;
+
+          if (response.refundAmount && response.refundAmount > 0) {
+            htmlContent += `
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                          color: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                <h5 style="margin: 0 0 10px 0;">💰 Refund Processed</h5>
+                <p style="font-size: 24px; margin: 10px 0; font-weight: bold;">
+                  ₹${response.refundAmount.toFixed(2)}
+                </p>
+                <p style="margin: 5px 0; font-size: 14px;">
+                  Has been credited to user's wallet
+                </p>
+              </div>
+              
+              <div style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                <p style="margin: 5px 0;"><strong>Updated Order Total:</strong> ₹${response.orderTotal.toFixed(2)}</p>
+                <p style="margin: 5px 0;"><strong>Remaining Items:</strong> ${response.remainingItems}</p>
+              </div>
+            `;
+          }
+
+          htmlContent += `</div>`;
+
+          Swal.fire({
+            title: '',
+            html: htmlContent,
+            icon: 'success',
+            confirmButtonText: 'Continue',
+            confirmButtonColor: '#3085d6',
+            width: '500px'
+          }).then(() => {
+            location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: response.message || "Failed to cancel item.",
+          });
+        }
+      }
+    });
+  });
+
+  // Send money to wallet
   $(document).on("click", ".send-money-btn", function() {
     var orderId = $(this).data("id");
 
     Swal.fire({
-      title: "Are you sure you want to send money to the user's wallet?",
+      title: "Send Money to User's Wallet",
+      text: "Are you sure you want to send the refund amount to the user's wallet?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, send money!",
@@ -181,7 +495,7 @@
               Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: "An error occurred while sending money. Please try again.",
+                text: response.message || "An error occurred while sending money.",
               });
             }
           },
@@ -189,7 +503,7 @@
             Swal.fire({
               icon: "error",
               title: "Request Failed",
-              text: "There was an issue connecting to the server. Please try again.",
+              text: "There was an issue connecting to the server.",
             });
           },
         });
@@ -202,7 +516,8 @@
 
 <style>
   .order-info,
-  .address-info {
+  .address-info,
+  .action-buttons {
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -219,36 +534,43 @@
   .table td {
     padding: 12px;
     text-align: center;
-    border: 1px solid #ddd;
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
   }
 
-  .table th {
-    background-color: #f8f9fa;
+  .table thead th {
+    background-color: #343a40;
+    color: white;
+    border-color: #454d55;
   }
 
   .action-buttons .btn {
     margin: 5px;
-    width: auto;
+    min-width: 150px;
+    padding: 8px 16px;
   }
 
-  .btn-info,
-  .btn-secondary,
-  .btn-success,
-  .btn-warning,
-  .btn-danger {
-    font-size: 14px;
-    border-radius: 5px;
+  .badge {
+    font-size: 0.85em;
+    padding: 0.4em 0.8em;
   }
 
-  .status-btn {
-    transition: background-color 0.3s ease, transform 0.3s ease;
+  .card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: none;
   }
 
-  .status-btn:hover {
-    transform: scale(1.05);
+  .card-header {
+    font-weight: bold;
+  }
+
+  .cancel-item-btn {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
   }
 
   .img-fluid {
     border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 </style>

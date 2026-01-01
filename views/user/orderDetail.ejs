@@ -328,13 +328,35 @@
                 <p class="font-weight-bold"><%= item.product.productName %></p>
               </a>
               <p>Price: ₹<%= item.product.salePrice %></p>
+              <p>Quantity: <%= item.quantity %></p>
+
+              <% if (item.cancellationReason) { %>
+              <p class="text-danger small">
+                <strong>Cancellation Reason:</strong> <%= item.cancellationReason %>
+              </p>
+              <% } %>
             </div>
             <div class="col-3 text-end">
               <div class="d-flex align-items-center justify-content-end">
-                <% let statusColor = 'gray'; if (order.status === 'Delivered') { statusColor = 'green'; } else if (order.status === 'Processing') { statusColor = 'yellow'; } else if (order.status === 'Cancelled') { statusColor = 'red'; } %>
-                <span class="status-dot" style="background-color: <%= statusColor %>;"></span>
-                <span class="font-weight-bold"><%= order.status %></span>
+                <% let itemStatusColor = 
+                item.status === 'cancelled' ? 'red' :
+                item.status === 'delivered' ? 'green' :
+                item.status === 'returned' ? 'orange' :
+                item.status === 'return requested' ? 'purple' : 'blue'
+              %>
+                <span class="status-dot" style="background-color: <%= itemStatusColor %>;"></span>
+                <span class="font-weight-bold"><%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %></span>
               </div>
+              <!-- Individual cancel button (only for certain statuses) -->
+              <% const canCancelItem = (order.status === 'Order Placed' || order.status === 'Processing' || order.status === 'Payment Pending') && 
+               item.status !== 'cancelled' && item.status !== 'delivered' && item.status !== 'returned' &&
+               item.status !== 'return requested'; %>
+
+              <% if (canCancelItem) { %>
+              <button class="btn btn-sm btn-outline-danger mt-2 cancel-item-btn" data-order-id="<%= order.orderId %>" data-item-id="<%= item._id %>">
+                Cancel Item
+              </button>
+              <% } %>
               <% if (order.status === 'Delivered') { %>
               <% const review = reviews.find(r => r.productId.toString() === item.product._id.toString()); if (review && !review.existingReview) { %>
               <p class="mt-3">
@@ -359,12 +381,115 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-$('.cancel-order-btn').on('click', function() {
+  // Individual item cancellation
+  // Individual item cancellation - FIXED VERSION
+  $(document).on('click', '.cancel-item-btn', function(e) {
+    console.log('Cancel button clicked!', {
+      orderId: $(this).data('order-id'),
+      element: this
+    });
+    e.preventDefault();
+    e.stopPropagation();
+
     const orderId = $(this).data('order-id');
+    const itemId = $(this).data('item-id');
+
+    Swal.fire({
+      title: 'Cancel Order Item',
+      text: 'Are you sure you want to cancel this specific item?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, keep it',
+      input: 'textarea',
+      inputPlaceholder: 'Please provide a reason for cancelling this item...',
+      inputAttributes: {
+        'aria-label': 'Reason for cancelling item',
+        'maxlength': 300
+      },
+      showLoaderOnConfirm: true,
+      preConfirm: (cancelReason) => {
+        if (!cancelReason || cancelReason.trim() === '') {
+          Swal.showValidationMessage('You must provide a reason for cancelling');
+          return false;
+        }
+
+        return fetch(`/order/cancel-item`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              orderId: orderId,
+              itemId: itemId,
+              cancelReason: cancelReason
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              throw new Error(data.message || 'Failed to cancel item');
+            }
+            return data;
+          })
+          .catch(error => {
+            console.error('Error cancelling item:', error);
+            Swal.showValidationMessage(`Request failed: ${error.message}`);
+          });
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Check if result.value exists (data from preConfirm)
+        if (result.value) {
+          const resultData = result.value;
+          let successMessage = 'The item has been cancelled successfully.';
+
+          if (resultData.refundAmount && resultData.refundAmount > 0) {
+            successMessage += `<br><br><strong>Refund Information:</strong><br>`;
+            successMessage += `• Refund Amount: ₹${resultData.refundAmount.toFixed(2)}<br>`;
+            successMessage += `• Updated Order Total: ₹${resultData.currentOrderTotal.toFixed(2)}<br>`;
+            successMessage += `• Remaining Items: ${resultData.remainingItems}<br>`;
+            successMessage += `• Refund has been credited to your wallet.`;
+          }
+
+          // Show success message and reload
+          Swal.fire({
+            title: 'Success!',
+            html: successMessage,
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            // FIX: Reload the page after user clicks OK
+            if (result.isConfirmed || result.dismiss === Swal.DismissReason.close) {
+              location.reload();
+            }
+          });
+        } else {
+          // If result.value is undefined but isConfirmed is true, still reload
+          Swal.fire({
+            title: 'Success!',
+            text: 'Item cancelled successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            location.reload();
+          });
+        }
+      }
+    });
+  });
+
+  // Full order cancellation - SINGLE event handler
+  $(document).on('click', '.cancel-order-btn', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const orderId = $(this).data('order-id');
+    const orderStatus = '<%= order.status %>';
 
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to cancel this order? Please provide a reason.',
+      text: 'Do you want to cancel this entire order? Please provide a reason.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Yes, cancel it!',
@@ -392,21 +517,48 @@ $('.cancel-order-btn').on('click', function() {
               'Content-Type': 'application/json'
             },
           })
-          .then(response => response.json())
-          .catch(error => Swal.showValidationMessage('Request failed: ' + error));
+          .then(response => {
+            // Check if response is valid JSON
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              return response.json();
+            } else {
+              return response.text().then(text => {
+                throw new Error('Server returned non-JSON response');
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error cancelling order:', error);
+            Swal.showValidationMessage('Request failed: ' + error);
+          });
       },
     }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire('Cancelled', 'Your order has been cancelled.', 'success').then(() => {
+      if (result.isConfirmed && result.value) {
+        const resultData = result.value;
+        let successMessage = 'Your order has been cancelled.';
+
+        if (resultData.refundAmount && resultData.refundAmount > 0) {
+          successMessage += ` The prepaid amount of ₹${resultData.refundAmount.toFixed(2)} has been refunded to your wallet.`;
+        }
+
+        Swal.fire({
+          title: 'Cancelled!',
+          html: successMessage,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
           location.reload(); // Reload page after cancelling
         });
       }
     });
-});
-
+  });
 
   // Handle return order action
-  $('.return-order-btn').on('click', function() {
+  $('.return-order-btn').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
     const orderId = $(this).data('order-id');
     const paymentMethod = $(this).data('payment-method');
 
@@ -440,16 +592,36 @@ $('.cancel-order-btn').on('click', function() {
               'Content-Type': 'application/json'
             },
           })
-          .then(response => response.json())
-          .catch(error => Swal.showValidationMessage('Request failed: ' + error));
+          .then(response => {
+            // Check if response is valid JSON
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              return response.json();
+            } else {
+              return response.text().then(text => {
+                throw new Error('Server returned non-JSON response');
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error returning order:', error);
+            Swal.showValidationMessage('Request failed: ' + error);
+          });
       },
     }).then((result) => {
-      if (result.isConfirmed) {
+      if (result.isConfirmed && result.value) {
+        const resultData = result.value;
         let successMessage = 'Your return request is under review.';
         if (paymentMethod === 'prepaid') {
           successMessage += ' Your prepaid money will be credited after the request is approved.';
         }
-        Swal.fire('Return Requested', successMessage, 'success').then(() => {
+
+        Swal.fire({
+          title: 'Return Requested!',
+          html: successMessage,
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
           location.reload(); // Reload page after returning
         });
       }
@@ -458,7 +630,10 @@ $('.cancel-order-btn').on('click', function() {
 
   // Cancel return request
   document.querySelectorAll('.cancel-return-order-btn').forEach(button => {
-    button.addEventListener('click', function() {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+
       const orderId = this.dataset.orderId;
 
       Swal.fire({
@@ -476,17 +651,43 @@ $('.cancel-order-btn').on('click', function() {
                 'Content-Type': 'application/json'
               },
             })
-            .then(response => response.json())
+            .then(response => {
+              // Check if response is valid JSON
+              const contentType = response.headers.get("content-type");
+              if (contentType && contentType.includes("application/json")) {
+                return response.json();
+              } else {
+                return response.text().then(text => {
+                  throw new Error('Server returned non-JSON response');
+                });
+              }
+            })
             .then(data => {
               if (data.success) {
-                Swal.fire('Cancelled!', 'Your return request has been cancelled.', 'success').then(() => {
+                Swal.fire({
+                  title: 'Cancelled!',
+                  text: 'Your return request has been cancelled.',
+                  icon: 'success',
+                  confirmButtonText: 'OK'
+                }).then(() => {
                   location.reload();
                 });
               } else {
-                Swal.fire('Error!', data.message, 'error');
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: data.message || 'Failed to cancel return request',
+                });
               }
             })
-            .catch(error => Swal.fire('Error!', 'An error occurred while cancelling the return request. Please try again.', 'error'));
+            .catch(error => {
+              console.error('Error cancelling return:', error);
+              Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: 'An error occurred while cancelling the return request. Please try again.',
+              });
+            });
         }
       });
     });

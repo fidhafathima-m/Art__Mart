@@ -10,6 +10,19 @@ const transactionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
+    enum: [
+      "credit",
+      "debit",
+      "refund for returned prepaid order",
+      "Order cancelled",
+      "Partial refund for cancelled item",
+      "Full order cancellation refund",
+      "Order cancelled - full refund",
+      "Wallet payment",
+      "Coupon refund",
+      "Shipping refund",
+      "Tax refund",
+    ],
   },
   amount: {
     type: Number,
@@ -22,6 +35,41 @@ const transactionSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now,
+  },
+  orderId: {
+    type: String,
+    required: function () {
+      return (
+        this.type.includes("order") ||
+        this.type.includes("refund") ||
+        this.type.includes("cancelled")
+      );
+    },
+  },
+  itemId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: function () {
+      return this.type.includes("Partial refund");
+    },
+  },
+  description: {
+    type: String,
+    required: false,
+  },
+  productName: {
+    type: String,
+    required: function () {
+      return this.type.includes("Partial refund");
+    },
+  },
+  status: {
+    type: String,
+    enum: ["pending", "completed", "failed"],
+    default: "completed",
+  },
+  partialRefundId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
   },
 });
 

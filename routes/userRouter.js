@@ -136,6 +136,7 @@ router.post("/profile/change-password", profileController.changePassValid);
 router.post("/profile/verify-pass-otp", profileController.verifyChangePassOtp);
 router.get("/profile/order/:orderId", profileController.viewOrderDetails);
 router.post("/order/cancel/:orderId", profileController.cancelOrder);
+router.post("/order/cancel-item", profileController.cancelUserOrderItem);
 router.post("/order/return/:orderId", profileController.returnOrder);
 router.post("/order/cancel-return/:orderId", profileController.cancelReturn);
 router.get("/profile/edit", profileController.loadEditProfile);
