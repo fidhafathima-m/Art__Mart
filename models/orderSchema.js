@@ -10,6 +10,10 @@ const orderSchema = new Schema({
     default: () => uuidv4(),
     unique: true,
   },
+  orderNumber: {
+    type: String,
+    unique: true,
+  },
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User",

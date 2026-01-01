@@ -4,7 +4,12 @@
   <%- include('../../views/partials/admin/sidebar') %>
 
   <div class="container mt-4">
-    <h1 class="my-4 text-center">Order Details - <%= orderDetails.orderId %></h1>
+    <div class="text-center">
+      <h1>Order Details</h1>
+      <% if(orderDetails.orderNumber) { %>
+      <h5>Order Number: <%= orderDetails.orderNumber %></h5>
+      <% } %>
+    </div>
 
     <!-- Order Information Card -->
     <div class="order-info mb-4 p-4 border rounded shadow-sm">

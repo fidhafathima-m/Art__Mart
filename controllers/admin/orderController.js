@@ -108,6 +108,7 @@ const viewOrderDetails = async (req, res) => {
 
     const orderDetails = {
       orderId: order.orderId,
+      orderNumber: order.orderNumber,
       Id: order.userId,
       
       totalPrice: order.originalTotalPrice || order.totalprice || 0,

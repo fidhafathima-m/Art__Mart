@@ -22,15 +22,15 @@ const printer = new PdfPrinter(fonts);
 async function generateInvoicePDF(orderId) {
   const order = await Order.findOne({ orderId: orderId }).populate(
     "ordereditems.product"
-  ); 
+  );
 
   if (!order) {
     throw new Error("Order not found");
   }
 
   // Filter only delivered items (not cancelled items)
-  const deliveredItems = order.ordereditems.filter(item => 
-    item.status !== 'cancelled' && item.status !== 'returned'
+  const deliveredItems = order.ordereditems.filter(
+    (item) => item.status !== "cancelled" && item.status !== "returned"
   );
 
   // Check if there are any delivered items to generate invoice for
@@ -77,21 +77,22 @@ async function generateInvoicePDF(orderId) {
   // Calculate totals for delivered items only
   const deliveredItemsTotal = deliveredItems.reduce((sum, item) => {
     const price = item.price || item.product.salePrice;
-    return sum + (price * item.quantity);
+    return sum + price * item.quantity;
   }, 0);
 
   // Calculate discount proportionally based on delivered items
   let deliveredItemsDiscount = 0;
   if (order.originalDiscount > 0 && order.originalTotalPrice > 0) {
-    const discountPercentage = (order.originalDiscount / order.originalTotalPrice) * 100;
+    const discountPercentage =
+      (order.originalDiscount / order.originalTotalPrice) * 100;
     deliveredItemsDiscount = (deliveredItemsTotal * discountPercentage) / 100;
   }
 
   const deliveredFinalAmount = deliveredItemsTotal - deliveredItemsDiscount;
 
   // Check if there were cancelled items
-  const cancelledItems = order.ordereditems.filter(item => 
-    item.status === 'cancelled'
+  const cancelledItems = order.ordereditems.filter(
+    (item) => item.status === "cancelled"
   );
 
   const docDefinition = {
@@ -118,7 +119,7 @@ async function generateInvoicePDF(orderId) {
         alignment: "center",
         margin: [0, 10, 0, 20],
       },
-  
+
       // Invoice and Order Details
       {
         columns: [
@@ -135,6 +136,11 @@ async function generateInvoicePDF(orderId) {
         margin: [0, 0, 0, 10],
       },
       {
+        text: `Order Number: ${order.orderNumber}`,
+        style: "subheader",
+        margin: [0, 0, 0, 5],
+      },
+      {
         text: `Order ID: ${orderId}`,
         style: "subheader",
         margin: [0, 0, 0, 10],
@@ -144,14 +150,18 @@ async function generateInvoicePDF(orderId) {
         style: "subheader",
         margin: [0, 0, 0, 10],
       },
-      
+
       // Show note if there were cancelled items
-      ...(cancelledItems.length > 0 ? [{
-        text: "Note: This invoice only includes delivered items. Some items were cancelled and refunded separately.",
-        style: "note",
-        margin: [0, 0, 0, 10],
-      }] : []),
-      
+      ...(cancelledItems.length > 0
+        ? [
+            {
+              text: "Note: This invoice only includes delivered items. Some items were cancelled and refunded separately.",
+              style: "note",
+              margin: [0, 0, 0, 10],
+            },
+          ]
+        : []),
+
       {
         text: [
           { text: "Delivery Address:\n\n", style: "subheaderBold" },
@@ -165,7 +175,7 @@ async function generateInvoicePDF(orderId) {
         style: "subheader",
         margin: [0, 0, 0, 20],
       },
-  
+
       // Product Table (only delivered items)
       {
         table: {
@@ -176,15 +186,21 @@ async function generateInvoicePDF(orderId) {
         layout: "lightHorizontalLines",
         margin: [0, 0, 0, 20],
       },
-      
+
       // Show refund details if there were cancelled items
-      ...(order.totalRefunded > 0 ? [{
-        text: `Amount Refunded for Cancelled Items: ₹${order.totalRefunded.toFixed(2)}`,
-        style: "refund",
-        alignment: "right",
-        margin: [0, 10, 0, 10],
-      }] : []),
-      
+      ...(order.totalRefunded > 0
+        ? [
+            {
+              text: `Amount Refunded for Cancelled Items: ₹${order.totalRefunded.toFixed(
+                2
+              )}`,
+              style: "refund",
+              alignment: "right",
+              margin: [0, 10, 0, 10],
+            },
+          ]
+        : []),
+
       // Original order total (for reference)
       {
         text: `Original Order Total: ₹${order.originalFinalAmount.toFixed(2)}`,
@@ -192,15 +208,17 @@ async function generateInvoicePDF(orderId) {
         alignment: "right",
         margin: [0, 0, 0, 5],
       },
-      
+
       // Discount for delivered items
-      deliveredItemsDiscount > 0 ? {
-        text: `Discount Applied: -₹${deliveredItemsDiscount.toFixed(2)}`,
-        style: "discount",
-        alignment: "right",
-        margin: [0, 0, 0, 5],
-      } : {},
-      
+      deliveredItemsDiscount > 0
+        ? {
+            text: `Discount Applied: -₹${deliveredItemsDiscount.toFixed(2)}`,
+            style: "discount",
+            alignment: "right",
+            margin: [0, 0, 0, 5],
+          }
+        : {},
+
       // Final Amount for delivered items
       {
         text: `Amount Paid: ₹${deliveredFinalAmount.toFixed(2)}`,
@@ -208,7 +226,7 @@ async function generateInvoicePDF(orderId) {
         alignment: "right",
         margin: [0, 10, 0, 20],
       },
-      
+
       {
         text: `Invoice Bill Generated On: ${new Date().toLocaleString()}`,
         style: "footer",
@@ -216,14 +234,16 @@ async function generateInvoicePDF(orderId) {
         margin: [0, 30, 0, 0],
       },
     ],
-    footer: function(currentPage, pageCount) {
+    footer: function (currentPage, pageCount) {
       if (currentPage === pageCount) {
-        return [{
-          text: "Thank you for shopping with us!",
-          style: "footer",
-          alignment: "center",
-          margin: [0, 20, 0, 0],
-        }];
+        return [
+          {
+            text: "Thank you for shopping with us!",
+            style: "footer",
+            alignment: "center",
+            margin: [0, 20, 0, 0],
+          },
+        ];
       }
       return [];
     },
@@ -287,7 +307,6 @@ async function generateInvoicePDF(orderId) {
       font: "Roboto",
     },
   };
-  
 
   return new Promise((resolve, reject) => {
     const pdfDoc = printer.createPdfKitDocument(docDefinition);

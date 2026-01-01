@@ -255,6 +255,7 @@
     </div>
     <% } %>
     <h5 class="text-muted text-center mt-3">Order ID: <%= order.orderId %></h5>
+    <h6 class="text-muted text-center">Order Number: <%= order.orderNumber %></h6>
     <% if (order.status !== 'Cancelled' && order.status !== 'Returned' && order.status !== 'Return Request' && order.status !== 'Payment Pending' && order.status !== 'Delivered') { %>
     <p class="text-center text-muted">You can download the invoice once the product is delivered. Thank you for shopping with us.</p>
     <% } %>

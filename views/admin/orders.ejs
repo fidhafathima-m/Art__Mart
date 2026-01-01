@@ -19,7 +19,7 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th>Order ID</th>
+            <th>Order Number</th>
             <th>User Name</th>
             <th>Total Price(&#8377;)</th>
             <th>Date & Time</th>
@@ -30,7 +30,13 @@
         <tbody id="orderTable">
           <% for(let i = 0; i < data.length; i++) { %>
           <tr>
-            <td><%= data[i].orderId %></td>
+            <td>
+              <% if(data[i].orderNumber) { %>
+              <%= data[i].orderNumber %>
+              <% } else { %>
+              <%= data[i].orderId %>
+              <% } %>
+            </td>
             <td><%= data[i].userId ? data[i].userId.name : 'N/A' %></td>
             <td><%= data[i].totalprice %></td>
             <td><%= new Date(data[i].createdOn).toLocaleString('en-US', { 

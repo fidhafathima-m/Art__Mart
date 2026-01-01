@@ -19,6 +19,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_SECRET_KEY,
 });
 const { generateInvoicePDF } = require("../../helpers/generateInvoicePDF");
+const generateOrderNumber = require("../../helpers/generateOrderNumber");
 
 const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
   try {
@@ -581,9 +582,11 @@ const codPlaceOrder = async (req, res) => {
         item.finalPrice = item.price - (item.discountApplied / item.quantity);
       });
     }
+    const orderNumber = await generateOrderNumber();
 
     const newOrder = new Order({
       userId: userId,
+      orderNumber: orderNumber, 
       ordereditems: updatedOrderedItems,
       
       // New schema fields
@@ -955,9 +958,12 @@ const walletPlaceOrder = async (req, res) => {
       });
     }
 
+    const orderNumber = await generateOrderNumber();
+
     // Create the order
     const newOrder = new Order({
       userId: userId,
+      orderNumber: orderNumber, 
       ordereditems: updatedOrderedItems,
       
       // New schema fields
@@ -1093,8 +1099,11 @@ const razorpayPlaceOrder = async (req, res) => {
       });
     }
 
+    const orderNumber = await generateOrderNumber();
+
     const newOrder = new Order({
       userId: userId,
+      orderNumber: orderNumber, 
       ordereditems: updatedOrderedItems,
       
       // New schema fields

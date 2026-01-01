@@ -1,228 +1,230 @@
 <head>
   <style>
     .sidebar {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 50px;
-  background-color: #f8f9fa;
-  padding-top: 20px;
-  margin-bottom: 30px;
-}
-
-.sidebar a {
-  display: block;
-  padding: 10px 15px;
-  color: #000;
-  text-decoration: none;
-  margin-bottom: 10px;
-}
-
-.sidebar a:hover {
-  background-color: #007bff;
-  color: white;
-}
-
-.sidebar a.active {
-  background-color: #007bff;
-  color: white;
-}
-
-.sidebar a.active i {
-  color: white;
-}
-
-  @media (max-width: 768px) {
-    /* Container adjustments */
-    .container.mt-4 {
-      padding: 10px;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      background-color: #f8f9fa;
+      padding-top: 20px;
+      margin-bottom: 30px;
     }
 
-    /* Wishlist title */
-    h2.text-center {
-      font-size: 1.5rem;
-      margin-bottom: 1rem !important;
+    .sidebar a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      margin-bottom: 10px;
     }
 
-    /* Wishlist items container */
-    .wishlist-items {
-      padding: 10px !important;
+    .sidebar a:hover {
+      background-color: #007bff;
+      color: white;
     }
 
-    /* Individual wishlist item */
-    .wishlist-item {
-      flex-direction: column !important;
-      align-items: center !important;
-      padding: 15px 0 !important;
-      margin-bottom: 15px !important;
-      position: relative;
+    .sidebar a.active {
+      background-color: #007bff;
+      color: white;
     }
 
-    /* Product image column */
-    .wishlist-item .col-md-3 {
-      width: 100% !important;
-      text-align: center;
-      margin-bottom: 15px;
+    .sidebar a.active i {
+      color: white;
     }
 
-    .wishlist-item .col-md-3 img {
-      width: 120px !important;
-      height: 120px !important;
-      margin: 0 auto !important;
+    @media (max-width: 768px) {
+
+      /* Container adjustments */
+      .container.mt-4 {
+        padding: 10px;
+      }
+
+      /* Wishlist title */
+      h2.text-center {
+        font-size: 1.5rem;
+        margin-bottom: 1rem !important;
+      }
+
+      /* Wishlist items container */
+      .wishlist-items {
+        padding: 10px !important;
+      }
+
+      /* Individual wishlist item */
+      .wishlist-item {
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 15px 0 !important;
+        margin-bottom: 15px !important;
+        position: relative;
+      }
+
+      /* Product image column */
+      .wishlist-item .col-md-3 {
+        width: 100% !important;
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      .wishlist-item .col-md-3 img {
+        width: 120px !important;
+        height: 120px !important;
+        margin: 0 auto !important;
+      }
+
+      /* Product info column */
+      .wishlist-item .col-md-6 {
+        width: 100% !important;
+        text-align: center;
+        padding: 0 10px;
+      }
+
+      /* Product name */
+      .wishlist-item h5 {
+        font-size: 1rem;
+        margin-bottom: 8px !important;
+      }
+
+      /* Price section */
+      .wishlist-item p {
+        margin-bottom: 10px !important;
+      }
+
+      /* Quantity input and Add to cart button */
+      .quantity-input {
+        margin: 10px auto !important;
+        display: block !important;
+      }
+
+      .add-cart.btn {
+        display: block !important;
+        width: 100% !important;
+        margin: 10px 0 !important;
+      }
+
+      /* Delete icon column */
+      .wishlist-item .col-md-3.text-right {
+        width: auto !important;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+
+      .delete-wishlist-item {
+        font-size: 1.2rem;
+      }
+
+      /* Empty wishlist message */
+      .text-center h5 {
+        font-size: 1rem;
+        margin: 15px 0;
+      }
+
+      .text-center .btn-primary {
+        width: 80%;
+        max-width: 200px;
+      }
     }
 
-    /* Product info column */
-    .wishlist-item .col-md-6 {
-      width: 100% !important;
-      text-align: center;
-      padding: 0 10px;
+    /* Extra small devices */
+    @media (max-width: 480px) {
+
+      /* Further reduce container padding */
+      .container.mt-4 {
+        padding: 5px;
+      }
+
+      /* Smaller title */
+      h2.text-center {
+        font-size: 1.3rem;
+      }
+
+      /* Adjust product image size */
+      .wishlist-item .col-md-3 img {
+        width: 100px !important;
+        height: 100px !important;
+      }
+
+      /* Make prices and text more compact */
+      .wishlist-item p {
+        font-size: 0.9rem;
+      }
+
+      /* Smaller quantity input */
+      .quantity-input {
+        width: 50px !important;
+        height: 30px !important;
+      }
+
+      /* More compact buttons */
+      .add-cart.btn {
+        padding: 8px !important;
+        font-size: 0.9rem;
+      }
+
+      /* Smaller delete icon */
+      .delete-wishlist-item {
+        font-size: 1rem;
+      }
+
+      /* Empty wishlist adjustments */
+      .text-center .btn-primary {
+        width: 90%;
+        max-width: 180px;
+        font-size: 0.9rem;
+      }
     }
 
-    /* Product name */
-    .wishlist-item h5 {
-      font-size: 1rem;
-      margin-bottom: 8px !important;
+
+    /* Mobile View */
+    @media (max-width: 767.98px) {
+      .wrapper {
+        width: 100%;
+        overflow-x: hidden;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Main content styling */
+      .main-content {
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 50px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding-top: 0;
+        z-index: 1000;
+      }
+
+      .sidebar a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0;
+        padding: 10px;
+        flex: 1;
+      }
+
+      .sidebar a i {
+        font-size: 1.2rem;
+      }
+
+      .sidebar a span {
+        display: none;
+      }
     }
-
-    /* Price section */
-    .wishlist-item p {
-      margin-bottom: 10px !important;
-    }
-
-    /* Quantity input and Add to cart button */
-    .quantity-input {
-      margin: 10px auto !important;
-      display: block !important;
-    }
-
-    .add-cart.btn {
-      display: block !important;
-      width: 100% !important;
-      margin: 10px 0 !important;
-    }
-
-    /* Delete icon column */
-    .wishlist-item .col-md-3.text-right {
-      width: auto !important;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-
-    .delete-wishlist-item {
-      font-size: 1.2rem;
-    }
-
-    /* Empty wishlist message */
-    .text-center h5 {
-      font-size: 1rem;
-      margin: 15px 0;
-    }
-
-    .text-center .btn-primary {
-      width: 80%;
-      max-width: 200px;
-    }
-  }
-
-  /* Extra small devices */
-  @media (max-width: 480px) {
-    /* Further reduce container padding */
-    .container.mt-4 {
-      padding: 5px;
-    }
-
-    /* Smaller title */
-    h2.text-center {
-      font-size: 1.3rem;
-    }
-
-    /* Adjust product image size */
-    .wishlist-item .col-md-3 img {
-      width: 100px !important;
-      height: 100px !important;
-    }
-
-    /* Make prices and text more compact */
-    .wishlist-item p {
-      font-size: 0.9rem;
-    }
-
-    /* Smaller quantity input */
-    .quantity-input {
-      width: 50px !important;
-      height: 30px !important;
-    }
-
-    /* More compact buttons */
-    .add-cart.btn {
-      padding: 8px !important;
-      font-size: 0.9rem;
-    }
-
-    /* Smaller delete icon */
-    .delete-wishlist-item {
-      font-size: 1rem;
-    }
-
-    /* Empty wishlist adjustments */
-    .text-center .btn-primary {
-      width: 90%;
-      max-width: 180px;
-      font-size: 0.9rem;
-    }
-  }
-
-
-/* Mobile View */
-@media (max-width: 767.98px) {
-  .wrapper {
-  width: 100%;
-  overflow-x: hidden;
-  display: flex;
-  justify-content: center;
-}
-
-/* Main content styling */
-.main-content {
-  align-items: center;
-  box-sizing: border-box; 
-}
-
-  .sidebar {
-    position: fixed;
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: 50px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    padding-top: 0;
-    z-index: 1000;
-  }
-
-  .sidebar a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0;
-    padding: 10px;
-    flex: 1;
-  }
-
-  .sidebar a i {
-    font-size: 1.2rem;
-  }
-
-  .sidebar a span {
-    display: none; 
-  }
-}
 
 
     .alert {
@@ -382,21 +384,30 @@
           <div class="card-body">
             <div class="row align-items-center">
               <div class="col-12">
-                <h5 class="text-black py-3">Order ID: <%= order._id %></h5>
+                <% if (order.orderNumber) { %>
+                <h5 class="text-black py-3">
+                  Order Number: <%= order.orderNumber %>
+                </h5>
+                <% } else { %>
+                <h5 class="text-black py-3">
+                  Order ID: <%= order._id %>
+                </h5>
+                <% } %>
+
                 <p>
-                  Placed on: <%= new Date(order.createdOn).toLocaleDateString()
-                  %>
+                  Placed on: <%= new Date(order.createdOn).toLocaleDateString() %>
                 </p>
               </div>
+
 
               <div class="col-12">
                 <p>
                   <strong>Items: </strong>
                   <% order.ordereditems.forEach((item, index) => { %>
-                    <span>
-                      <%= item.product ? item.product.productName : 'Product Deleted' %>
-                      <%= index < order.ordereditems.length - 1 ? ', ' : '' %>
-                    </span>
+                  <span>
+                    <%= item.product ? item.product.productName : 'Product Deleted' %>
+                    <%= index < order.ordereditems.length - 1 ? ', ' : '' %>
+                  </span>
                   <% }) %>
                 </p>
                 <% if(order.status === 'Payment Pending') { %>
@@ -493,56 +504,56 @@
       </div>
 
       <!-- wallet content -->
-<% } else if (section === 'wallet') { %>
+      <% } else if (section === 'wallet') { %>
 
-  <div class="container mt-4">
-    <!-- Wallet Card Section -->
-    <div class="card mb-4 shadow-sm p-3 p-md-5">
-      <div class="card-body">
-        <div class="row align-items-center">
-          <!-- Left Column: Wallet Icon -->
-          <div class="col-12 col-md-auto text-center text-md-left mb-3 mb-md-0">
-            <i class="fas fa-wallet fa-3x text-muted"></i>
-          </div>
-  
-          <!-- Middle Column: Wallet Balance -->
-          <div class="col-12 col-md text-center text-md-left mb-3 mb-md-0">
-            <h4 class="card-title mb-2">Wallet Balance</h4>
-            <% if (wallet && wallet.balance !== undefined) { %>
-            <p class="h5 text-muted mb-0">&#8377; <%= wallet.balance.toFixed(2) %></p>
-            <% } else { %>
-            <p class="h5 text-muted mb-0">&#8377; 0.00</p>
-            <% } %>
-          </div>
-  
-          <!-- Right Column: Add Money Button -->
-          <div class="col-12 col-md-auto text-center">
-            <div class="d-flex flex-column flex-md-row justify-content-center">
-              <button class="btn btn-success mb-2 mb-md-0 mr-md-2" data-toggle="modal" data-target="#addMoneyModal">
-                Add Money
-              </button>
-              <button class="btn btn-danger" data-toggle="modal" data-target="#withdrawMoneyModal">
-                Withdraw
-              </button>
+      <div class="container mt-4">
+        <!-- Wallet Card Section -->
+        <div class="card mb-4 shadow-sm p-3 p-md-5">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <!-- Left Column: Wallet Icon -->
+              <div class="col-12 col-md-auto text-center text-md-left mb-3 mb-md-0">
+                <i class="fas fa-wallet fa-3x text-muted"></i>
+              </div>
+
+              <!-- Middle Column: Wallet Balance -->
+              <div class="col-12 col-md text-center text-md-left mb-3 mb-md-0">
+                <h4 class="card-title mb-2">Wallet Balance</h4>
+                <% if (wallet && wallet.balance !== undefined) { %>
+                <p class="h5 text-muted mb-0">&#8377; <%= wallet.balance.toFixed(2) %></p>
+                <% } else { %>
+                <p class="h5 text-muted mb-0">&#8377; 0.00</p>
+                <% } %>
+              </div>
+
+              <!-- Right Column: Add Money Button -->
+              <div class="col-12 col-md-auto text-center">
+                <div class="d-flex flex-column flex-md-row justify-content-center">
+                  <button class="btn btn-success mb-2 mb-md-0 mr-md-2" data-toggle="modal" data-target="#addMoneyModal">
+                    Add Money
+                  </button>
+                  <button class="btn btn-danger" data-toggle="modal" data-target="#withdrawMoneyModal">
+                    Withdraw
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  
-    <% if (transactions.length > 0) { %>  
-      <h3>Transaction History</h3>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Transaction</th>
-            <th>Amount</th>
-            <th>Balance</th>
-          </tr>
-        </thead>
-        <tbody>
-        <% 
+
+        <% if (transactions.length > 0) { %>
+        <h3>Transaction History</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Transaction</th>
+              <th>Amount</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% 
         // Sort transactions by date (newest first)
         transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
         
@@ -561,190 +572,191 @@
           // Set text color class based on whether balance increased or decreased
           const amountColorClass = isIncrease ? 'text-success' : 'text-danger';
         %>
-          <tr>
-            <td><%= new Date(transaction.date).toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) %></td>
-            <td><%= transaction.type %></td>
-            <td class="<%= amountColorClass %>">₹ <%= transaction.amount.toFixed(2) %></td>
-            <td>₹ <%= transaction.balance.toFixed(2) %></td>
-          </tr>
-        <% }) %>
-        </tbody>
-      </table>
-    <% } else { %> 
-      <p>No transactions found.</p>
-    <% } %>
-    
-    <!-- Pagination -->
-    <div class="container mt-3 mb-3">
-      <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center flex-wrap">
-          <% for(let i = 1; i <= totalPages; i++) { %>
-          <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-            <a class="page-link" href="/userProfile?section=wallet&page=<%= i %>"><%= i %></a>
-          </li>
-          <% } %>
-        </ul>
-      </nav>
-    </div>
-  </div>
-  
-  <!-- Modal for Adding Money -->
-  <div class="modal fade" id="addMoneyModal" tabindex="-1" role="dialog" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addMoneyModalLabel">Add Money to Wallet</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <form id="addMoneyForm">
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="amount">Amount</label>
-              <input type="number" class="form-control" id="amount" name="amount" required placeholder="Enter amount to add" min="0.01" step="0.01">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Add Money</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Withdraw Money Modal -->
-  <div class="modal fade" id="withdrawMoneyModal" tabindex="-1" role="dialog" aria-labelledby="withdrawMoneyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="withdrawMoneyModalLabel">Withdraw Money from Wallet</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <form id="withdrawMoneyForm">
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="withdrawAmount">Amount</label>
-              <input type="number" class="form-control" id="withdrawAmount" name="amount" required placeholder="Enter amount to withdraw" min="0.01" step="0.01">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-danger">Withdraw Money</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  
-  <style>
-  @media (max-width: 768px) {
-    .card {
-      padding: 1rem !important;
-    }
-    
-    .table-responsive {
-      margin: 0 -15px;
-      padding: 0 15px;
-      width: calc(100% + 30px);
-    }
-    
-    .table td, .table th {
-      padding: 0.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .pagination {
-      margin: 0;
-    }
-    
-    .pagination .page-link {
-      padding: 0.4rem 0.75rem;
-    }
-    
-    .modal-dialog {
-      margin: 0.5rem;
-    }
-  }
-  
-  /* Ensure buttons have proper spacing on mobile */
-  @media (max-width: 767px) {
-    .btn {
-      width: 100%;
-      margin-bottom: 0.5rem;
-    }
-    
-    .modal-footer .btn {
-      width: auto;
-      margin-bottom: 0;
-    }
-  }
-  </style>
-
-
-    <% } else if (section === 'referrals') { %>
-    <div class="referral-users">
-      <h2>Users Who Used Your Referral Code</h2>
-      <div id="referralUsersList" class="card">
-        <% if (usersWhoUsedReferral && usersWhoUsedReferral.length > 0) { %>
-        <div class="user-list">
-          <% usersWhoUsedReferral.forEach(user => { %>
-          <% user.redeemedUsers.forEach(redeemedUser => { %>
-          <!-- Loop through redeemed users -->
-          <div class="user-item">
-            <span class="user-name"><%= redeemedUser.name %></span>
-            <span class="user-email"><%= redeemedUser.email %></span>
-          </div>
-          <% }) %>
-          <% }) %>
-        </div>
+            <tr>
+              <td><%= new Date(transaction.date).toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) %></td>
+              <td><%= transaction.type %></td>
+              <td class="<%= amountColorClass %>">₹ <%= transaction.amount.toFixed(2) %></td>
+              <td>₹ <%= transaction.balance.toFixed(2) %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
         <% } else { %>
-        <p>No users have used your referral code.</p>
+        <p>No transactions found.</p>
         <% } %>
+
+        <!-- Pagination -->
+        <div class="container mt-3 mb-3">
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center flex-wrap">
+              <% for(let i = 1; i <= totalPages; i++) { %>
+              <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                <a class="page-link" href="/userProfile?section=wallet&page=<%= i %>"><%= i %></a>
+              </li>
+              <% } %>
+            </ul>
+          </nav>
+        </div>
       </div>
-    </div>
 
-  </div>
-</div>
+      <!-- Modal for Adding Money -->
+      <div class="modal fade" id="addMoneyModal" tabindex="-1" role="dialog" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addMoneyModalLabel">Add Money to Wallet</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="addMoneyForm">
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="amount">Amount</label>
+                  <input type="number" class="form-control" id="amount" name="amount" required placeholder="Enter amount to add" min="0.01" step="0.01">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Add Money</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
-<% } else { %>
-<!-- Dashboard content -->
-<div class="card">
-  <div class="card-body">
-    <div class="col-md-9 content">
-      <h2 class="mb-4 text-center mt-4">Hello <%= user.name %>!</h2>
+      <!-- Withdraw Money Modal -->
+      <div class="modal fade" id="withdrawMoneyModal" tabindex="-1" role="dialog" aria-labelledby="withdrawMoneyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="withdrawMoneyModalLabel">Withdraw Money from Wallet</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="withdrawMoneyForm">
+              <div class="modal-body">
+                <div class="form-group">
+                  <label for="withdrawAmount">Amount</label>
+                  <input type="number" class="form-control" id="withdrawAmount" name="amount" required placeholder="Enter amount to withdraw" min="0.01" step="0.01">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger">Withdraw Money</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
-      <!-- Profile Information -->
-      <div class="card mb-4">
-        <div class="card-body p-3">
-          <h5 class="card-title text-black">Profile Information</h5>
-          <p><strong>Email:</strong> <%= user.email %></p>
-          <% if (user.phone) {%>
-          <p><strong>Phone Number:</strong> <%= user.phone %></p>
+      <style>
+        @media (max-width: 768px) {
+          .card {
+            padding: 1rem !important;
+          }
+
+          .table-responsive {
+            margin: 0 -15px;
+            padding: 0 15px;
+            width: calc(100% + 30px);
+          }
+
+          .table td,
+          .table th {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+          }
+
+          .pagination {
+            margin: 0;
+          }
+
+          .pagination .page-link {
+            padding: 0.4rem 0.75rem;
+          }
+
+          .modal-dialog {
+            margin: 0.5rem;
+          }
+        }
+
+        /* Ensure buttons have proper spacing on mobile */
+        @media (max-width: 767px) {
+          .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+          }
+
+          .modal-footer .btn {
+            width: auto;
+            margin-bottom: 0;
+          }
+        }
+      </style>
+
+
+      <% } else if (section === 'referrals') { %>
+      <div class="referral-users">
+        <h2>Users Who Used Your Referral Code</h2>
+        <div id="referralUsersList" class="card">
+          <% if (usersWhoUsedReferral && usersWhoUsedReferral.length > 0) { %>
+          <div class="user-list">
+            <% usersWhoUsedReferral.forEach(user => { %>
+            <% user.redeemedUsers.forEach(redeemedUser => { %>
+            <!-- Loop through redeemed users -->
+            <div class="user-item">
+              <span class="user-name"><%= redeemedUser.name %></span>
+              <span class="user-email"><%= redeemedUser.email %></span>
+            </div>
+            <% }) %>
+            <% }) %>
+          </div>
+          <% } else { %>
+          <p>No users have used your referral code.</p>
           <% } %>
+        </div>
+      </div>
 
-          <p><strong>Referral Code:</strong> <%= user.referralCode %><br>
-            <span class="text-muted small">
-              Refer you friends with the above code to win &#8377;200 and &#8377;100 for your friend
-            </span>
-          </p>
+    </div>
+  </div>
+
+  <% } else { %>
+  <!-- Dashboard content -->
+  <div class="card">
+    <div class="card-body">
+      <div class="col-md-9 content">
+        <h2 class="mb-4 text-center mt-4">Hello <%= user.name %>!</h2>
+
+        <!-- Profile Information -->
+        <div class="card mb-4">
+          <div class="card-body p-3">
+            <h5 class="card-title text-black">Profile Information</h5>
+            <p><strong>Email:</strong> <%= user.email %></p>
+            <% if (user.phone) {%>
+            <p><strong>Phone Number:</strong> <%= user.phone %></p>
+            <% } %>
+
+            <p><strong>Referral Code:</strong> <%= user.referralCode %><br>
+              <span class="text-muted small">
+                Refer you friends with the above code to win &#8377;200 and &#8377;100 for your friend
+              </span>
+            </p>
 
 
 
-          <a href="/profile/edit" class="btn btn-info">
-            <i class="fas fa-user-edit"></i> Edit Profile
-          </a>
+            <a href="/profile/edit" class="btn btn-info">
+              <i class="fas fa-user-edit"></i> Edit Profile
+            </a>
 
-          <a href="/profile/change-password" class="btn btn-warning">Change Password</a>
+            <a href="/profile/change-password" class="btn btn-warning">Change Password</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-<% } %>
+  <% } %>
 </div>
 </div>
 </div>
