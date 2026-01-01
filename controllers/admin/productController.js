@@ -46,6 +46,7 @@ const productInfo = async (req, res) => {
       totalPages: totalPages,
       search: search,
       currentRoute: req.originalUrl,
+      activePage: "products", 
     });
   } catch (error) {
     console.error(error);

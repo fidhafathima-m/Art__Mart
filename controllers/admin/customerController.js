@@ -39,6 +39,7 @@ const customerInfo = async (req, res) => {
       totalPages: totalPages,
       search: search,
       currentRoute: req.originalUrl,
+      activePage: "users", 
     });
   } catch (error) {
     console.error("Error fetching users:", error);

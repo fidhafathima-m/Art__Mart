@@ -36,6 +36,7 @@ const loadCoupon = async (req, res) => {
       totalCoupon: totalCoupon,
       totalPages: totalPages,
       search: search,
+      activePage: "coupon", 
     });
   } catch (error) {
     console.error(error);

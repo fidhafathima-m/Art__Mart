@@ -21,6 +21,7 @@ const loadOffer = async (req, res) => {
     res.render("offers", {
       products: products,
       categories: categories,
+      activePage: "offers", 
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {

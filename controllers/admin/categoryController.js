@@ -33,6 +33,7 @@ const categoryInfo = async (req, res) => {
       totalPages: totalPages,
       search: search,
       currentRoute: req.originalUrl,
+      activePage: "categories", 
     });
   } catch (error) {
     console.error(error);

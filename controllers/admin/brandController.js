@@ -28,6 +28,7 @@ const getBrand = async (req, res) => {
       currentPage: page,
       totalBrands,
       search: search,
+      activePage: "brands", 
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {

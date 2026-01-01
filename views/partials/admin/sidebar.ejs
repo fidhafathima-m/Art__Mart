@@ -1,55 +1,37 @@
 <link rel="stylesheet" href="css/admin_styles.css" type="text/css" />
 
-
 <!-- Sidebar -->
 <div class="sidebar">
   <ul>
-    <li>
+    <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
       <a href="/admin"><i class="fas fa-tachometer-alt icon py-3"></i> <span>Dashboard</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'users' ? 'active' : '' %>">
       <a href="/admin/users"><i class="fas fa-users icon py-3"></i> <span>Manage Users</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'categories' ? 'active' : '' %>">
       <a href="/admin/categories"><i class="fas fa-th icon py-3"></i> <span>Category</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'products' ? 'active' : '' %>">
       <a href="/admin/products"><i class="fas fa-cogs icon py-3"></i> <span>Products</span></a>
     </li>
-    <li>
-      <a href="/admin/orders"><i class="fas fa-box icon py-3"></i> <span>Orders</span>
+    <li class="<%= activePage === 'orders' ? 'active' : '' %>">
+      <a href="/admin/orders"><i class="fas fa-box icon py-3"></i> <span>Orders</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'coupons' ? 'active' : '' %>">
       <a href="/admin/coupons"><i class="fas fa-ticket-alt icon py-3"></i> <span>Coupons</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'reports' ? 'active' : '' %>">
       <a href="/admin/reports"><i class="fa fa-bar-chart icon py-3"></i> <span>Reports</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'offers' ? 'active' : '' %>">
       <a href="/admin/offers"><i class="fas fa-star icon py-3"></i> <span>Offers</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'brands' ? 'active' : '' %>">
       <a href="/admin/brands"><i class="fas fa-archive icon py-3"></i> <span>Brand</span></a>
     </li>
-    <li>
+    <li class="<%= activePage === 'ledger' ? 'active' : '' %>">
       <a href="/admin/ledger"><i class="fas fa-book icon py-3"></i> <span>Ledger</span></a>
     </li>
-
   </ul>
 </div>
-
-<script>
-  // Get the current path
-  const currentPath = window.location.pathname;
-
-  // Select all list items
-  const menuItems = document.querySelectorAll('.sidebar ul li');
-
-  // Loop through the items and add the 'active' class if the path matches
-  menuItems.forEach(item => {
-    const link = item.querySelector('a');
-    if (link.href.includes(currentPath)) {
-      item.classList.add('active');
-    }
-  });
-</script>

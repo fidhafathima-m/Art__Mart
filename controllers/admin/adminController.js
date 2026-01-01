@@ -225,6 +225,7 @@ const loadDashboard = async (req, res) => {
         salesDataPerMonth,
         months,
         currentRoute: req.originalUrl,
+        activePage: "dashboard",
       });
     } catch (error) {
       console.error(error);

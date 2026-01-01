@@ -89,7 +89,7 @@ const getLedger = async (req, res) => {
       nextPage: page + 1,
     };
 
-    res.render("ledger", { transactions, pagination, search }); // Pass transactions, pagination, and search to the view
+    res.render("ledger", { transactions, pagination, search, activePage: "ledger",  }); // Pass transactions, pagination, and search to the view
   } catch (error) {
     console.error("Error fetching ledger:", error);
     res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);

@@ -80,6 +80,7 @@ const loadOrder = async (req, res) => {
       data: orders,
       totalPages,
       currentPage: page,
+      activePage: "orders", 
     });
   } catch (error) {
     console.error(error);

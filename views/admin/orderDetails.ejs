@@ -90,6 +90,7 @@
     <!-- Address Information -->
     <div class="address-info mb-4 p-4 border rounded shadow-sm">
       <h4 class="mb-3">Shipping Address</h4>
+      <% if(orderDetails.address) { %>
       <div class="row">
         <div class="col-md-6">
           <p><strong>Name:</strong> <%= orderDetails.address.name %></p>
@@ -105,6 +106,9 @@
           <% } %>
         </div>
       </div>
+      <% } else { %>
+      <p>No Address found.</p>
+      <% } %>
     </div>
 
     <!-- Ordered Items with Individual Actions -->

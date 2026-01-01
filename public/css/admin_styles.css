@@ -677,6 +677,31 @@ ol {
   background-color: #ffffff;
 }
 
+/* Active state for sidebar items */
+.sidebar li.active {
+  background-color: #007bff !important; /* Blue background for active item */
+}
+
+.sidebar li.active a {
+  color: white !important; /* White text for active item */
+}
+
+.sidebar li.active .icon {
+  color: white !important; /* White icon for active item */
+}
+
+.sidebar li.active:hover {
+  background-color: #0056b3 !important; /* Darker blue on hover */
+}
+
+.sidebar li.active:hover a {
+  color: white !important;
+}
+
+.sidebar li.active:hover .icon {
+  color: white !important;
+}
+
 .icon {
   margin-right: 15px;
   font-size: 1.2em;
