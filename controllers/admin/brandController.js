@@ -38,7 +38,7 @@ const getBrand = async (req, res) => {
 
 const loadAddBrand = async (req, res) => {
   try {
-    res.render("add-brand");
+    res.render("add-brand", {activePage: "brands"});
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/admin/pageError");
@@ -69,7 +69,7 @@ const loadEditBrand = async (req, res) => {
   try {
     const brandId = req.query.id;
     const brand = await Brand.findById(brandId);
-    res.render("edit-brand", { brand });
+    res.render("edit-brand", { brand, activePage: "brands" });
   } catch {
     res.json({ success: false, message: "Failed to load brand!" });
   }

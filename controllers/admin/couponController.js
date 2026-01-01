@@ -36,7 +36,7 @@ const loadCoupon = async (req, res) => {
       totalCoupon: totalCoupon,
       totalPages: totalPages,
       search: search,
-      activePage: "coupon", 
+      activePage: "coupons", 
     });
   } catch (error) {
     console.error(error);
@@ -47,7 +47,7 @@ const loadCoupon = async (req, res) => {
 const LoadAddCoupon = async (req, res) => {
   try {
     const userData = await User.find({ isBlocked: false });
-    res.render("add-coupon", { users: userData });
+    res.render("add-coupon", { users: userData, activePage: "coupons" });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/admin/pageError");
@@ -162,7 +162,7 @@ const loadEditCoupon = async (req, res) => {
       return res.redirect("/admin/pageError");
     }
 
-    res.render("edit-coupon", { coupon: couponData });
+    res.render("edit-coupon", { coupon: couponData, activePage: "coupons" });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/admin/pageError");

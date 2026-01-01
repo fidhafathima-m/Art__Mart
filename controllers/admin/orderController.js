@@ -134,7 +134,7 @@ const viewOrderDetails = async (req, res) => {
       partialRefunds: order.partialRefunds || [],
     };
 
-    res.render("orderDetails", { orderDetails });
+    res.render("orderDetails", { orderDetails, activePage: "orders" });
   } catch (error) {
     console.error("Error loading order details:", error);
     res.status(InternalServerError).send(INTERNAL_SERVER_ERROR);

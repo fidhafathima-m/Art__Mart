@@ -65,7 +65,7 @@ const getUnlistCategory = async (req, res) => {
 
 const loadAddCategory = async (req, res) => {
   try {
-    res.render("add-category", { currentRoute: req.originalUrl });
+    res.render("add-category", { currentRoute: req.originalUrl, activePage: "categories" });
   } catch (error) {
     console.error(error);
   }
@@ -118,6 +118,7 @@ const loadEditCategory = async (req, res) => {
     res.render("edit-category", {
       category: category,
       currentRoute: req.originalUrl,
+      activePage: "categories"
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {

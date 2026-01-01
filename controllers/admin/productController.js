@@ -58,7 +58,7 @@ const loadAddProduct = async (req, res) => {
   try {
     const category = await Category.find({ isListed: true, isDeleted: false });
     const brand = await Brand.find({ isDeleted: false });
-    res.render("add-product", { categories: category, brands: brand });
+    res.render("add-product", { categories: category, brands: brand, activePage: "products" });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
     res.redirect("/pageError");
@@ -212,6 +212,7 @@ const loadEditProduct = async (req, res) => {
       product: product,
       categories: category,
       brands: brand,
+      activePage: "products"
     });
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
