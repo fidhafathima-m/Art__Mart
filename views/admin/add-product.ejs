@@ -3,6 +3,8 @@
 <head>
   <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 </head>
 
 <div class="wrapper">
@@ -24,19 +26,28 @@
             Please enter the product name.
           </div>
         </div>
-        <label for="brandName" class="col-sm-2 col-form-label">
+        <!-- Brand Field -->
+        <label for="brand" class="col-sm-2 col-form-label">
           Brand Name
         </label>
         <div class="col-sm-4">
-          <select id="brand" name="brand" class="form-control">
-            <option selected>No Brand</option>
+          <select id="brand" name="brand" class="form-control select2-dropdown">
+            <option value="">Select Brand</option>
+            <% if (brands && brands.length > 0) { %>
             <% brands.forEach(function(brand) { %>
             <option value="<%= brand._id %>"><%= brand.brandName %></option>
             <% }); %>
+            <% } else { %>
+            <option value="">No brands available</option>
+            <% } %>
           </select>
-          <a href="/admin/brands/add-brand" class="text-muted mt-2 ml-3">Add brand</a>
+          <div class="invalid-feedback" id="brandError">
+            Please select a brand.
+          </div>
+          <a href="/admin/brands/add-brand" class="text-muted mt-2 d-block">Add brand</a>
         </div>
       </div>
+
       <!-- Product Description -->
       <div class="form-group">
         <label for="description" class="form-label">Product Description</label>
@@ -84,17 +95,26 @@
             Please enter the quantity.
           </div>
         </div>
+        <!-- Category Field -->
         <label for="category" class="col-sm-2 col-form-label">Category</label>
         <div class="col-sm-4">
-          <select id="category" name="category" class="form-control">
+          <select id="category" name="category" class="form-control select2-dropdown">
+            <option value="">Select Category</option>
+            <% if (categories && categories.length > 0) { %>
             <% categories.forEach(function(category) { %>
             <option value="<%= category._id %>"><%= category.name %></option>
             <% }); %>
+            <% } else { %>
+            <option value="">No categories available</option>
+            <% } %>
           </select>
+          <div class="invalid-feedback" id="categoryError">
+            Please select a category.
+          </div>
         </div>
       </div>
 
-<!-- Image Upload Container -->
+      <!-- Image Upload Container -->
       <div class="card mb-4">
         <div class="card-header bg-light">
           <h5 class="mb-0">Product Images</h5>
@@ -131,7 +151,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Image 2 Upload -->
             <div class="col-md-4 mb-3">
               <div class="image-upload-container">
@@ -161,7 +181,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Image 3 Upload -->
             <div class="col-md-4 mb-3">
               <div class="image-upload-container">
@@ -212,285 +232,450 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <!-- <script src="/js/custom.js"></script> -->
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-  // Add highlight functionality
-  document.getElementById("add-highlight").addEventListener("click", function() {
-    const newInput = document.createElement("input");
-    newInput.type = "text";
-    newInput.name = "highlights[]";
-    newInput.className = "form-control mb-2";
-    newInput.placeholder = "Enter highlight";
-
-    document.getElementById("highlights-list").appendChild(newInput);
-  });
-
-  // Add custom CSS for image upload styling
-  document.head.insertAdjacentHTML('beforeend', `
-    <style>
-      .image-upload-card {
-        cursor: pointer;
-        transition: all 0.3s ease;
-        height: 180px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-      }
-      
-      .image-upload-card:hover {
-        background-color: #e9ecef;
-        transform: translateY(-5px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      }
-      
-      .image-container {
-        border: 1px dashed #ced4da;
-        border-radius: 4px;
-        padding: 10px;
-        background-color: #f8f9fa;
-      }
-      
-      .uploaded-image-container {
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        padding: 10px;
-        background-color: white;
-      }
-      
-      .cropper-container {
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      }
-    </style>
-  `);
-
-  // Form Validation
-  function validateForm() {
-    let isValid = true;
-
-    // Check Product Name
-    if (document.getElementById("productName").value.trim() === "") {
-      document.getElementById("productName").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("productName").classList.remove("is-invalid");
-    }
-
-    // Check Description
-    if (document.getElementById("description").value.trim() === "") {
-      document.getElementById("description").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("description").classList.remove("is-invalid");
-    }
-
-    // Check Price
-    if (document.getElementById("regularPrice").value <= 0) {
-      document.getElementById("regularPrice").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("regularPrice").classList.remove("is-invalid");
-    }
-
-    // Check Quantity
-    if (document.getElementById("quantity").value <= 0) {
-      document.getElementById("quantity").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("quantity").classList.remove("is-invalid");
-    }
-
-    // Check for cropped images
-    if (
-      !document.getElementById("croppedImage1Data").value ||
-      !document.getElementById("croppedImage2Data").value ||
-      !document.getElementById("croppedImage3Data").value
-    ) {
-      Swal.fire({
-        title: 'Images Required',
-        text: 'Please upload and crop all three product images.',
-        icon: 'warning',
-        confirmButtonText: 'OK'
+    // Initialize Select2 for brand and category AFTER ensuring DOM is ready
+    setTimeout(function() {
+      // Initialize brand dropdown
+      $('#brand').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select Brand',
+        allowClear: false,
+        dropdownAutoWidth: true,
+        dropdownParent: $('#brand').parent(),
+        minimumResultsForSearch: 10,
+        scrollAfterSelect: true
       });
-      isValid = false;
-    }
 
-    return isValid;
-  }
+      // Initialize category dropdown
+      $('#category').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select Category',
+        allowClear: false,
+        dropdownAutoWidth: true,
+        dropdownParent: $('#category').parent(),
+        minimumResultsForSearch: 10,
+        scrollAfterSelect: true
+      });
+    }, 100);
 
-  // Form Submission
-  $("#productForm").on("submit", function(e) {
-    if (!validateForm()) {
-      e.preventDefault();
-      return;
-    }
-    e.preventDefault();
+    // Add highlight functionality
+    document.getElementById("add-highlight").addEventListener("click", function() {
+      const newInput = document.createElement("input");
+      newInput.type = "text";
+      newInput.name = "highlights[]";
+      newInput.className = "form-control mb-2";
+      newInput.placeholder = "Enter highlight";
 
-    $.ajax({
-      type: "POST",
-      url: $(this).attr("action"),
-      data: new FormData(this),
-      processData: false,
-      contentType: false,
-      success: function(response) {
-        if (response.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Product Added",
-            text: response.message,
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => {
-            window.location.href = "/admin/products";
+      document.getElementById("highlights-list").appendChild(newInput);
+    });
+
+    // Add custom CSS for Select2 scrolling
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Custom scrollbar for Select2 dropdown */
+      .select2-results__options {
+        max-height: 250px !important;
+        overflow-y: auto !important;
+      }
+      
+      /* Scrollbar styling */
+      .select2-results__options::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      .select2-results__options::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      
+      .select2-results__options::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      
+      .select2-results__options::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+      
+      /* Ensure Select2 dropdown is properly positioned */
+      .select2-container--bootstrap-5 {
+        width: 100% !important;
+      }
+      
+      .select2-container--bootstrap-5 .select2-dropdown {
+        z-index: 1060 !important;
+      }
+      
+      /* Make sure Select2 matches Bootstrap styling */
+      .select2-container--bootstrap-5 .select2-selection {
+        border: 1px solid #ced4da;
+        height: calc(1.5em + 0.75rem + 2px);
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      
+      .select2-container--bootstrap-5 .select2-selection:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      }
+      
+      /* Error state styling */
+      .select2-container--bootstrap-5 .select2-selection.is-invalid {
+        border-color: #dc3545;
+      }
+      
+      .select2-container--bootstrap-5 .select2-selection.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Form Validation
+    function validateForm() {
+      let isValid = true;
+
+      // Check Product Name
+      if (document.getElementById("productName").value.trim() === "") {
+        document.getElementById("productName").classList.add("is-invalid");
+        isValid = false;
+      } else {
+        document.getElementById("productName").classList.remove("is-invalid");
+      }
+
+      // Check Description
+      if (document.getElementById("description").value.trim() === "") {
+        document.getElementById("description").classList.add("is-invalid");
+        isValid = false;
+      } else {
+        document.getElementById("description").classList.remove("is-invalid");
+      }
+
+      // Check Regular Price
+      const regularPrice = document.getElementById("regularPrice").value;
+      if (regularPrice === "" || parseFloat(regularPrice) <= 0) {
+        document.getElementById("regularPrice").classList.add("is-invalid");
+        isValid = false;
+      } else {
+        document.getElementById("regularPrice").classList.remove("is-invalid");
+      }
+
+      // Check Quantity
+      const quantity = document.getElementById("quantity").value;
+      if (quantity === "" || parseInt(quantity) < 0) {
+        document.getElementById("quantity").classList.add("is-invalid");
+        isValid = false;
+      } else {
+        document.getElementById("quantity").classList.remove("is-invalid");
+      }
+
+      // Check Brand
+      const brand = $('#brand').val();
+      if (!brand) {
+        $('#brand').addClass('is-invalid');
+        $('.select2-container--bootstrap-5 #brand').next('.select2-container').find('.select2-selection').addClass('is-invalid');
+        isValid = false;
+      } else {
+        $('#brand').removeClass('is-invalid');
+        $('.select2-container--bootstrap-5 #brand').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+      }
+
+      // Check Category
+      const category = $('#category').val();
+      if (!category) {
+        $('#category').addClass('is-invalid');
+        $('.select2-container--bootstrap-5 #category').next('.select2-container').find('.select2-selection').addClass('is-invalid');
+        isValid = false;
+      } else {
+        $('#category').removeClass('is-invalid');
+        $('.select2-container--bootstrap-5 #category').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+      }
+
+      // Check for cropped images
+      if (
+        !document.getElementById("croppedImage1Data").value ||
+        !document.getElementById("croppedImage2Data").value ||
+        !document.getElementById("croppedImage3Data").value
+      ) {
+        Swal.fire({
+          title: 'Images Required',
+          text: 'Please upload and crop all three product images.',
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
+        isValid = false;
+      }
+
+      // If any validation failed, scroll to first error
+      if (!isValid) {
+        const firstInvalid = document.querySelector('.is-invalid');
+        if (firstInvalid) {
+          firstInvalid.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
           });
-        } else {
+          if (firstInvalid.tagName === 'SELECT') {
+            $(firstInvalid).select2('open');
+          } else {
+            firstInvalid.focus();
+          }
+        }
+      }
+
+      return isValid;
+    }
+
+    // Form Submission
+    $("#productForm").on("submit", function(e) {
+      e.preventDefault();
+
+      if (!validateForm()) {
+        return false;
+      }
+
+      // Show loading state
+      const submitBtn = $(this).find('button[type="submit"]');
+      const originalText = submitBtn.html();
+      submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Adding Product...');
+
+      $.ajax({
+        type: "POST",
+        url: $(this).attr("action"),
+        data: new FormData(this),
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          if (response.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Product Added",
+              text: response.message,
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              window.location.href = "/admin/products";
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: response.message || "There was an error adding the product.",
+            });
+            submitBtn.prop('disabled', false).html(originalText);
+          }
+        },
+        error: function(xhr, status, error) {
           Swal.fire({
             icon: "error",
-            title: "Error",
-            text: response.message || "There was an error adding the product.",
+            title: "Request Failed",
+            text: "There was an issue connecting to the server. Please try again.",
           });
-        }
-      },
-      error: function() {
-        Swal.fire({
-          icon: "error",
-          title: "Request Failed",
-          text: "There was an issue connecting to the server. Please try again.",
-        });
-      },
+          submitBtn.prop('disabled', false).html(originalText);
+        },
+      });
     });
-  });
 
-  // Enhanced image upload handler
-  function handleStyledImageUpload(
-    inputId,
-    previewId,
-    saveButtonId,
-    deleteButtonId,
-    croppedPreviewId,
-    hiddenInputId,
-    thumbnailId,
-    cardId
-  ) {
-    const inputElement = document.getElementById(inputId);
-    const previewContainer = document.getElementById(previewId);
-    const imageElement = document.getElementById(previewId + "-img");
-    const saveButton = document.getElementById(saveButtonId);
-    const deleteButton = document.getElementById(deleteButtonId);
-    const croppedPreviewContainer = document.getElementById(croppedPreviewId + "Preview");
-    const croppedPreview = document.getElementById(croppedPreviewId);
-    const hiddenInput = document.getElementById(hiddenInputId);
-    const thumbnail = document.getElementById(thumbnailId);
-    const uploadCard = document.getElementById(cardId);
+    // Enhanced image upload handler
+    function handleStyledImageUpload(
+      inputId,
+      previewId,
+      saveButtonId,
+      deleteButtonId,
+      croppedPreviewId,
+      hiddenInputId,
+      thumbnailId,
+      cardId
+    ) {
+      const inputElement = document.getElementById(inputId);
+      const previewContainer = document.getElementById(previewId);
+      const imageElement = document.getElementById(previewId + "-img");
+      const saveButton = document.getElementById(saveButtonId);
+      const deleteButton = document.getElementById(deleteButtonId);
+      const croppedPreviewContainer = document.getElementById(croppedPreviewId + "Preview");
+      const croppedPreview = document.getElementById(croppedPreviewId);
+      const hiddenInput = document.getElementById(hiddenInputId);
+      const thumbnail = document.getElementById(thumbnailId);
+      const uploadCard = document.getElementById(cardId);
 
-    let cropper;
+      let cropper;
 
-    // Reset the image upload section
-    function resetImageSection() {
-      inputElement.value = ""; // Clear the file input
-      previewContainer.style.display = "none"; // Hide the preview
-      saveButton.style.display = "none"; // Hide the save button
-      deleteButton.style.display = "none"; // Hide the delete button
-      croppedPreviewContainer.classList.add("d-none"); // Hide the cropped preview container
-      croppedPreview.src = ""; // Clear the cropped image preview
-      hiddenInput.value = ""; // Clear the hidden input
-      thumbnail.src = ""; // Clear the thumbnail
-      thumbnail.classList.add("d-none"); // Hide the thumbnail
-      uploadCard.style.opacity = "1"; // Show the upload card
-      if (cropper) {
-        cropper.destroy(); // Destroy the cropper instance
+      // Reset the image upload section
+      function resetImageSection() {
+        inputElement.value = ""; // Clear the file input
+        previewContainer.style.display = "none"; // Hide the preview
+        saveButton.style.display = "none"; // Hide the save button
+        deleteButton.style.display = "none"; // Hide the delete button
+        croppedPreviewContainer.classList.add("d-none"); // Hide the cropped preview container
+        croppedPreview.src = ""; // Clear the cropped image preview
+        hiddenInput.value = ""; // Clear the hidden input
+        thumbnail.src = ""; // Clear the thumbnail
+        thumbnail.classList.add("d-none"); // Hide the thumbnail
+        uploadCard.style.opacity = "1"; // Show the upload card
+        if (cropper) {
+          cropper.destroy(); // Destroy the cropper instance
+        }
       }
-    }
 
-    // Handle file selection
-    inputElement.addEventListener("change", function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          // Show thumbnail
-          thumbnail.src = e.target.result;
-          thumbnail.classList.remove("d-none");
-          uploadCard.style.opacity = "0.5"; // Dim the upload card
-          
-          // Set up cropper
-          imageElement.src = e.target.result;
-          previewContainer.style.display = "block";
-          saveButton.style.display = "inline-block";
-          deleteButton.style.display = "inline-block";
+      // Handle file selection
+      inputElement.addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            // Show thumbnail
+            thumbnail.src = e.target.result;
+            thumbnail.classList.remove("d-none");
+            uploadCard.style.opacity = "0.5"; // Dim the upload card
 
-          // Initialize cropper
-          cropper = new Cropper(imageElement, {
-            viewMode: 1,
-            responsive: true,
-            rotatable: true,
-            scalable: true,
-            guides: true,
-            autoCropArea: 0.8
-          });
+            // Set up cropper
+            imageElement.src = e.target.result;
+            previewContainer.style.display = "block";
+            saveButton.style.display = "inline-block";
+            deleteButton.style.display = "inline-block";
 
-          // Save cropped image
-          saveButton.onclick = function() {
-            const croppedCanvas = cropper.getCroppedCanvas({
-              width: 800, // Set standard dimensions
-              height: 800,
-              imageSmoothingEnabled: true,
-              imageSmoothingQuality: 'high'
+            // Initialize cropper
+            cropper = new Cropper(imageElement, {
+              viewMode: 1,
+              responsive: true,
+              rotatable: true,
+              scalable: true,
+              guides: true,
+              autoCropArea: 0.8
             });
 
-            croppedPreview.src = croppedCanvas.toDataURL("image/jpeg", 0.9);
-            croppedPreviewContainer.classList.remove("d-none");
-            hiddenInput.value = croppedCanvas.toDataURL("image/jpeg", 0.9);
-            
-            // Hide the cropper view after saving
-            previewContainer.style.display = "none";
-            saveButton.style.display = "none";
-          };
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+            // Save cropped image
+            saveButton.onclick = function() {
+              const croppedCanvas = cropper.getCroppedCanvas({
+                width: 800, // Set standard dimensions
+                height: 800,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+              });
 
-    // Handle delete image
-    deleteButton.addEventListener("click", function() {
-      resetImageSection();
-    });
+              croppedPreview.src = croppedCanvas.toDataURL("image/jpeg", 0.9);
+              croppedPreviewContainer.classList.remove("d-none");
+              hiddenInput.value = croppedCanvas.toDataURL("image/jpeg", 0.9);
+
+              // Hide the cropper view after saving
+              previewContainer.style.display = "none";
+              saveButton.style.display = "none";
+            };
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Handle delete image
+      deleteButton.addEventListener("click", function() {
+        resetImageSection();
+      });
+    }
+
+    // Initialize the styled image upload handlers
+    handleStyledImageUpload(
+      "image1",
+      "image1-preview",
+      "saveImage1",
+      "deleteImage1",
+      "croppedImage1",
+      "croppedImage1Data",
+      "image1-thumbnail",
+      "uploadCard1"
+    );
+    handleStyledImageUpload(
+      "image2",
+      "image2-preview",
+      "saveImage2",
+      "deleteImage2",
+      "croppedImage2",
+      "croppedImage2Data",
+      "image2-thumbnail",
+      "uploadCard2"
+    );
+    handleStyledImageUpload(
+      "image3",
+      "image3-preview",
+      "saveImage3",
+      "deleteImage3",
+      "croppedImage3",
+      "croppedImage3Data",
+      "image3-thumbnail",
+      "uploadCard3"
+    );
+  });
+</script>
+
+<style>
+  .is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
   }
 
-  // Initialize the styled image upload handlers
-  handleStyledImageUpload(
-    "image1",
-    "image1-preview",
-    "saveImage1",
-    "deleteImage1",
-    "croppedImage1",
-    "croppedImage1Data",
-    "image1-thumbnail",
-    "uploadCard1"
-  );
-  handleStyledImageUpload(
-    "image2",
-    "image2-preview",
-    "saveImage2",
-    "deleteImage2",
-    "croppedImage2",
-    "croppedImage2Data",
-    "image2-thumbnail",
-    "uploadCard2"
-  );
-  handleStyledImageUpload(
-    "image3",
-    "image3-preview",
-    "saveImage3",
-    "deleteImage3",
-    "croppedImage3",
-    "croppedImage3Data",
-    "image3-thumbnail",
-    "uploadCard3"
-  );
-});
-</script>
+  .invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+  }
+
+  .is-invalid~.invalid-feedback {
+    display: block;
+  }
+
+  .form-control.is-invalid,
+  .was-validated .form-control:invalid {
+    background-image: none;
+    /* Remove default Bootstrap icon */
+  }
+
+  select.is-invalid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  }
+
+  /* Select2 error state */
+  .select2-container .select2-selection.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+  }
+
+  /* Select2 dropdown styling */
+  .select2-dropdown {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  /* Custom scrollbar for Select2 */
+  .select2-results__options::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .select2-results__options::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  .select2-results__options::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  .select2-results__options::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+</style>

@@ -3,6 +3,8 @@
 <head>
   <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 </head>
 
 <div class="wrapper">
@@ -26,15 +28,18 @@
         </div>
         <label for="brand" class="col-sm-2 col-form-label">Brand</label>
         <div class="col-sm-4">
-          <select id="brand" name="brand" class="form-control">
-            <option value="" <% if (!product.brand) { %> selected <% } %>>No Brand</option>
+          <select id="brand" name="brand" class="form-control select2-dropdown">
+            <option value="">Select Brand</option>
             <% brands.forEach(function(brand) { %>
             <option value="<%= brand._id %>" <% if (product.brand && brand._id.toString() === product.brand.toString()) { %> selected <% } %>>
               <%= brand.brandName %>
             </option>
             <% }); %>
           </select>
-          <a href="/admin/brands/add-brand" class="text-muted mt-2 ml-3">Add brand</a>
+          <div class="invalid-feedback" id="brandError">
+            Please select a brand.
+          </div>
+          <a href="/admin/brands/add-brand" class="text-muted mt-2 d-block">Add brand</a>
         </div>
       </div>
 
@@ -91,13 +96,17 @@
         </div>
         <label for="category" class="col-sm-2 col-form-label">Category</label>
         <div class="col-sm-4">
-          <select id="category" name="category" class="form-control">
+          <select id="category" name="category" class="form-control select2-dropdown">
+            <option value="">Select Category</option>
             <% categories.forEach(function(category) { %>
             <option value="<%= category._id %>" <% if (category._id.toString() === product.category.toString()) { %> selected <% } %>>
-              <%= category.name %> 
+              <%= category.name %>
             </option>
             <% }); %>
           </select>
+          <div class="invalid-feedback" id="categoryError">
+            Please select a category.
+          </div>
         </div>
       </div>
 
@@ -114,10 +123,7 @@
               <div class="position-relative d-inline-block">
                 <input type="hidden" id="imageDatas" value="<%= product.productImage[i] %>" />
                 <img src="<%= product.productImage[i] %>" alt="Product image" class="img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;" />
-                <button type="button" class="btn btn-sm btn-danger position-absolute delete-image" 
-                        data-image-id="<%= product.productImage[i] %>" 
-                        data-product-id="<%= product._id %>" 
-                        style="top: 5px; right: 5px; padding: 0.2rem 0.5rem;">
+                <button type="button" class="btn btn-sm btn-danger position-absolute delete-image" data-image-id="<%= product.productImage[i] %>" data-product-id="<%= product._id %>" style="top: 5px; right: 5px; padding: 0.2rem 0.5rem;">
                   <i class="fas fa-times"></i>
                 </button>
               </div>
@@ -164,7 +170,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Image 2 Upload -->
             <div class="col-md-4 mb-3">
               <div class="image-upload-container">
@@ -194,7 +200,7 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Image 3 Upload -->
             <div class="col-md-4 mb-3">
               <div class="image-upload-container">
@@ -245,351 +251,474 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-  // Add custom CSS for image upload styling
-  document.head.insertAdjacentHTML('beforeend', `
-    <style>
-      .image-upload-card {
-        cursor: pointer;
-        transition: all 0.3s ease;
-        height: 180px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-      }
-      
-      .image-upload-card:hover {
-        background-color: #e9ecef;
-        transform: translateY(-5px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      }
-      
-      .image-container {
-        border: 1px dashed #ced4da;
-        border-radius: 4px;
-        padding: 10px;
-        background-color: #f8f9fa;
-      }
-      
-      .uploaded-image-container {
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        padding: 10px;
-        background-color: white;
-      }
-      
-      .cropper-container {
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      }
-    </style>
-  `);
+    // Initialize Select2 for brand and category
+    $(document).ready(function() {
+      // Initialize brand dropdown
+      $('#brand').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select Brand',
+        allowClear: false,
+        dropdownAutoWidth: true,
+        dropdownParent: $('#brand').parent(),
+        minimumResultsForSearch: 10,
+        scrollAfterSelect: true
+      });
 
-  // Add highlight functionality
-  document.getElementById("add-highlight").addEventListener("click", function() {
-    const newInput = document.createElement("input");
-    newInput.type = "text";
-    newInput.name = "highlights[]";
-    newInput.className = "form-control mb-2";
-    newInput.placeholder = "Enter highlight";
-
-    document.getElementById("highlights-list").appendChild(newInput);
-  });
-
-  // Form Validation
-  window.validateForm = function() {
-    let isValid = true;
-
-    // Check Product Name
-    if (document.getElementById("productName").value.trim() === "") {
-      document.getElementById("productName").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("productName").classList.remove("is-invalid");
-    }
-
-    // Check Description
-    if (document.getElementById("description").value.trim() === "") {
-      document.getElementById("description").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("description").classList.remove("is-invalid");
-    }
-
-    // Check Price
-    if (document.getElementById("regularPrice").value <= 0) {
-      document.getElementById("regularPrice").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("regularPrice").classList.remove("is-invalid");
-    }
-
-    // Check Quantity
-    if (document.getElementById("quantity").value <= 0) {
-      document.getElementById("quantity").classList.add("is-invalid");
-      isValid = false;
-    } else {
-      document.getElementById("quantity").classList.remove("is-invalid");
-    }
-
-     // Count existing images
-  const existingImages = document.querySelectorAll('.delete-image').length;
-  
-  // Count new images that have been cropped (have data in hidden inputs)
-  const newImage1 = document.getElementById("croppedImage1Data").value ? 1 : 0;
-  const newImage2 = document.getElementById("croppedImage2Data").value ? 1 : 0;
-  const newImage3 = document.getElementById("croppedImage3Data").value ? 1 : 0;
-  const newImages = newImage1 + newImage2 + newImage3;
-  
-  // Total image count
-  const totalImages = existingImages + newImages;
-  
-  if (totalImages < 3) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Image Requirement',
-      text: 'At least 3 product images are required. Please add more images.'
+      // Initialize category dropdown
+      $('#category').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select Category',
+        allowClear: false,
+        dropdownAutoWidth: true,
+        dropdownParent: $('#category').parent(),
+        minimumResultsForSearch: 10,
+        scrollAfterSelect: true
+      });
     });
-    isValid = false;
-  }
 
-    return isValid;
-  };
-
-  // Enhanced image upload handler
-  function handleStyledImageUpload(
-    inputId,
-    previewId,
-    saveButtonId,
-    deleteButtonId,
-    croppedPreviewId,
-    hiddenInputId,
-    thumbnailId,
-    cardId
-  ) {
-    const inputElement = document.getElementById(inputId);
-    const previewContainer = document.getElementById(previewId);
-    const imageElement = document.getElementById(previewId + "-img");
-    const saveButton = document.getElementById(saveButtonId);
-    const deleteButton = document.getElementById(deleteButtonId);
-    const croppedPreviewContainer = document.getElementById(croppedPreviewId + "Preview");
-    const croppedPreview = document.getElementById(croppedPreviewId);
-    const hiddenInput = document.getElementById(hiddenInputId);
-    const thumbnail = document.getElementById(thumbnailId);
-    const uploadCard = document.getElementById(cardId);
-
-    let cropper;
-
-    // Reset the image upload section
-    function resetImageSection() {
-      inputElement.value = ""; // Clear the file input
-      previewContainer.style.display = "none"; // Hide the preview
-      saveButton.style.display = "none"; // Hide the save button
-      deleteButton.style.display = "none"; // Hide the delete button
-      croppedPreviewContainer.classList.add("d-none"); // Hide the cropped preview container
-      croppedPreview.src = ""; // Clear the cropped image preview
-      hiddenInput.value = ""; // Clear the hidden input
-      thumbnail.src = ""; // Clear the thumbnail
-      thumbnail.classList.add("d-none"); // Hide the thumbnail
-      uploadCard.style.opacity = "1"; // Show the upload card
-      if (cropper) {
-        cropper.destroy(); // Destroy the cropper instance
+    // Add custom CSS for Select2 scrolling and styling
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Custom scrollbar for Select2 dropdown */
+      .select2-results__options {
+        max-height: 250px !important;
+        overflow-y: auto !important;
       }
-    }
+      
+      /* Scrollbar styling */
+      .select2-results__options::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      .select2-results__options::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      
+      .select2-results__options::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      
+      .select2-results__options::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+      
+      /* Ensure Select2 dropdown is properly positioned */
+      .select2-container--bootstrap-5 {
+        width: 100% !important;
+      }
+      
+      .select2-container--bootstrap-5 .select2-dropdown {
+        z-index: 1060 !important;
+      }
+      
+      /* Make sure Select2 matches Bootstrap styling */
+      .select2-container--bootstrap-5 .select2-selection {
+        border: 1px solid #ced4da;
+        height: calc(1.5em + 0.75rem + 2px);
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      }
+      
+      .select2-container--bootstrap-5 .select2-selection:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      }
+      
+      /* Error state styling */
+      .select2-container--bootstrap-5 .select2-selection.is-invalid {
+        border-color: #dc3545;
+      }
+      
+      .select2-container--bootstrap-5 .select2-selection.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+      }
+    `;
+    document.head.appendChild(style);
 
-    // Handle file selection
-    inputElement.addEventListener("change", function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          // Show thumbnail
-          thumbnail.src = e.target.result;
-          thumbnail.classList.remove("d-none");
-          uploadCard.style.opacity = "0.5"; // Dim the upload card
-          
-          // Set up cropper
-          imageElement.src = e.target.result;
-          previewContainer.style.display = "block";
-          saveButton.style.display = "inline-block";
-          deleteButton.style.display = "inline-block";
+    // Form Validation
+    window.validateForm = function() {
+      let isValid = true;
 
-          // Initialize cropper
-          cropper = new Cropper(imageElement, {
-            viewMode: 1,
-            responsive: true,
-            rotatable: true,
-            scalable: true,
-            guides: true,
-            autoCropArea: 0.8
+      // Reset error states
+      document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+      document.querySelectorAll('.invalid-feedback').forEach(el => el.style.display = 'none');
+      $('.select2-container .select2-selection').removeClass('is-invalid');
+
+      // Check Product Name
+      const productName = document.getElementById("productName").value.trim();
+      if (productName === "") {
+        document.getElementById("productName").classList.add("is-invalid");
+        document.getElementById("productNameError").style.display = "block";
+        isValid = false;
+      }
+
+      // Check Description
+      const description = document.getElementById("description").value.trim();
+      if (description === "") {
+        document.getElementById("description").classList.add("is-invalid");
+        document.getElementById("descriptionError").style.display = "block";
+        isValid = false;
+      }
+
+      // Check Regular Price
+      const regularPrice = parseFloat(document.getElementById("regularPrice").value);
+      if (isNaN(regularPrice) || regularPrice <= 0) {
+        document.getElementById("regularPrice").classList.add("is-invalid");
+        document.getElementById("regularPriceError").style.display = "block";
+        isValid = false;
+      }
+
+      // Check Quantity
+      const quantity = parseInt(document.getElementById("quantity").value);
+      if (isNaN(quantity) || quantity < 0) {
+        document.getElementById("quantity").classList.add("is-invalid");
+        document.getElementById("quantityError").style.display = "block";
+        isValid = false;
+      }
+
+      // Check Brand
+      const brand = $('#brand').val();
+      if (!brand) {
+        $('#brand').addClass('is-invalid');
+        $('#brand').next('.select2-container').find('.select2-selection').addClass('is-invalid');
+        document.getElementById("brandError").style.display = "block";
+        isValid = false;
+      }
+
+      // Check Category
+      const category = $('#category').val();
+      if (!category) {
+        $('#category').addClass('is-invalid');
+        $('#category').next('.select2-container').find('.select2-selection').addClass('is-invalid');
+        document.getElementById("categoryError").style.display = "block";
+        isValid = false;
+      }
+
+      // Count existing images
+      const existingImages = document.querySelectorAll('.delete-image').length;
+
+      // Count new images that have been cropped (have data in hidden inputs)
+      const newImage1 = document.getElementById("croppedImage1Data").value ? 1 : 0;
+      const newImage2 = document.getElementById("croppedImage2Data").value ? 1 : 0;
+      const newImage3 = document.getElementById("croppedImage3Data").value ? 1 : 0;
+      const newImages = newImage1 + newImage2 + newImage3;
+
+      // Total image count
+      const totalImages = existingImages + newImages;
+
+      // For edit page, warn if less than 3 images
+      if (totalImages < 3) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Image Recommendation',
+          text: 'It is recommended to have at least 3 product images for better presentation.',
+          confirmButtonText: 'Continue Anyway',
+          showCancelButton: true,
+          cancelButtonText: 'Go Back'
+        }).then((result) => {
+          if (result.isDismissed) {
+            isValid = false;
+          }
+        });
+      }
+
+      // If any validation failed, scroll to first error
+      if (!isValid) {
+        const firstInvalid = document.querySelector('.is-invalid');
+        if (firstInvalid) {
+          firstInvalid.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
           });
+          if (firstInvalid.tagName === 'SELECT') {
+            $(firstInvalid).select2('open');
+          } else {
+            firstInvalid.focus();
+          }
+        }
+        return false;
+      }
 
-          // Save cropped image
-          saveButton.onclick = function() {
-            const croppedCanvas = cropper.getCroppedCanvas({
-              width: 800, // Set standard dimensions
-              height: 800,
-              imageSmoothingEnabled: true,
-              imageSmoothingQuality: 'high'
+      return isValid;
+    };
+
+    // Enhanced image upload handler
+    function handleStyledImageUpload(
+      inputId,
+      previewId,
+      saveButtonId,
+      deleteButtonId,
+      croppedPreviewId,
+      hiddenInputId,
+      thumbnailId,
+      cardId
+    ) {
+      const inputElement = document.getElementById(inputId);
+      const previewContainer = document.getElementById(previewId);
+      const imageElement = document.getElementById(previewId + "-img");
+      const saveButton = document.getElementById(saveButtonId);
+      const deleteButton = document.getElementById(deleteButtonId);
+      const croppedPreviewContainer = document.getElementById(croppedPreviewId + "Preview");
+      const croppedPreview = document.getElementById(croppedPreviewId);
+      const hiddenInput = document.getElementById(hiddenInputId);
+      const thumbnail = document.getElementById(thumbnailId);
+      const uploadCard = document.getElementById(cardId);
+
+      let cropper;
+
+      // Reset the image upload section
+      function resetImageSection() {
+        inputElement.value = ""; // Clear the file input
+        previewContainer.style.display = "none"; // Hide the preview
+        saveButton.style.display = "none"; // Hide the save button
+        deleteButton.style.display = "none"; // Hide the delete button
+        croppedPreviewContainer.classList.add("d-none"); // Hide the cropped preview container
+        croppedPreview.src = ""; // Clear the cropped image preview
+        hiddenInput.value = ""; // Clear the hidden input
+        thumbnail.src = ""; // Clear the thumbnail
+        thumbnail.classList.add("d-none"); // Hide the thumbnail
+        uploadCard.style.opacity = "1"; // Show the upload card
+        if (cropper) {
+          cropper.destroy(); // Destroy the cropper instance
+        }
+      }
+
+      // Handle file selection
+      inputElement.addEventListener("change", function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            // Show thumbnail
+            thumbnail.src = e.target.result;
+            thumbnail.classList.remove("d-none");
+            uploadCard.style.opacity = "0.5"; // Dim the upload card
+
+            // Set up cropper
+            imageElement.src = e.target.result;
+            previewContainer.style.display = "block";
+            saveButton.style.display = "inline-block";
+            deleteButton.style.display = "inline-block";
+
+            // Initialize cropper
+            cropper = new Cropper(imageElement, {
+              viewMode: 1,
+              responsive: true,
+              rotatable: true,
+              scalable: true,
+              guides: true,
+              autoCropArea: 0.8
             });
 
-            croppedPreview.src = croppedCanvas.toDataURL("image/jpeg", 0.9);
-            croppedPreviewContainer.classList.remove("d-none");
-            hiddenInput.value = croppedCanvas.toDataURL("image/jpeg", 0.9);
-            
-            // Hide the cropper view after saving
-            previewContainer.style.display = "none";
-            saveButton.style.display = "none";
+            // Save cropped image
+            saveButton.onclick = function() {
+              const croppedCanvas = cropper.getCroppedCanvas({
+                width: 800, // Set standard dimensions
+                height: 800,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+              });
+
+              croppedPreview.src = croppedCanvas.toDataURL("image/jpeg", 0.9);
+              croppedPreviewContainer.classList.remove("d-none");
+              hiddenInput.value = croppedCanvas.toDataURL("image/jpeg", 0.9);
+
+              // Hide the cropper view after saving
+              previewContainer.style.display = "none";
+              saveButton.style.display = "none";
+            };
           };
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+          reader.readAsDataURL(file);
+        }
+      });
 
-    // Handle delete image
-    deleteButton.addEventListener("click", function() {
-      resetImageSection();
-    });
-  }
+      // Handle delete image
+      deleteButton.addEventListener("click", function() {
+        resetImageSection();
+      });
+    }
 
-  // Initialize the styled image upload handlers
-  handleStyledImageUpload(
-    "image1",
-    "image1-preview",
-    "saveImage1",
-    "deleteImage1",
-    "croppedImage1",
-    "croppedImage1Data",
-    "image1-thumbnail",
-    "uploadCard1"
-  );
-  handleStyledImageUpload(
-    "image2",
-    "image2-preview",
-    "saveImage2",
-    "deleteImage2",
-    "croppedImage2",
-    "croppedImage2Data",
-    "image2-thumbnail",
-    "uploadCard2"
-  );
-  handleStyledImageUpload(
-    "image3",
-    "image3-preview",
-    "saveImage3",
-    "deleteImage3",
-    "croppedImage3",
-    "croppedImage3Data",
-    "image3-thumbnail",
-    "uploadCard3"
-  );
+    // Initialize the styled image upload handlers
+    handleStyledImageUpload(
+      "image1",
+      "image1-preview",
+      "saveImage1",
+      "deleteImage1",
+      "croppedImage1",
+      "croppedImage1Data",
+      "image1-thumbnail",
+      "uploadCard1"
+    );
+    handleStyledImageUpload(
+      "image2",
+      "image2-preview",
+      "saveImage2",
+      "deleteImage2",
+      "croppedImage2",
+      "croppedImage2Data",
+      "image2-thumbnail",
+      "uploadCard2"
+    );
+    handleStyledImageUpload(
+      "image3",
+      "image3-preview",
+      "saveImage3",
+      "deleteImage3",
+      "croppedImage3",
+      "croppedImage3Data",
+      "image3-thumbnail",
+      "uploadCard3"
+    );
 
-  // Handle delete existing image
-  document.querySelectorAll('.delete-image').forEach(function(button) {
-    button.addEventListener('click', function() {
-      const imageId = this.getAttribute('data-image-id');
-      const productId = this.getAttribute('data-product-id');
-      
-      Swal.fire({
-        title: 'Delete Image?',
-        text: "Are you sure you want to delete this image?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          deleteSingleImage(imageId, productId);
+    // Handle delete existing image
+    document.querySelectorAll('.delete-image').forEach(function(button) {
+      button.addEventListener('click', function() {
+        const imageId = this.getAttribute('data-image-id');
+        const productId = this.getAttribute('data-product-id');
+
+        // Count existing images before deletion
+        const existingImages = document.querySelectorAll('.delete-image').length;
+
+        // If there are only 3 or fewer images, warn the user
+        if (existingImages <= 3) {
+          Swal.fire({
+            title: 'Warning',
+            text: 'Deleting this image will leave less than 3 images. Are you sure you want to continue?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it',
+            cancelButtonText: 'Cancel'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              deleteSingleImage(imageId, productId);
+            }
+          });
+        } else {
+          Swal.fire({
+            title: 'Delete Image?',
+            text: "Are you sure you want to delete this image?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              deleteSingleImage(imageId, productId);
+            }
+          });
         }
       });
     });
-  });
 
-  // Delete single image functionality
-  function deleteSingleImage(imageId, productId) {
-    $.ajax({
-      url: "/admin/deleteImage",
-      type: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({
-        imageNameToServer: imageId,
-        productIdToServer: productId,
-      }),
-      success: function (response) {
-        if (response.status === true) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Image Deleted',
-            text: 'The image has been removed successfully',
-            showConfirmButton: false,
-            timer: 1500
-          }).then(() => {
-            window.location.reload();
-          });
-        } else {
+    // Delete single image functionality
+    function deleteSingleImage(imageId, productId) {
+      $.ajax({
+        url: "/admin/deleteImage",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({
+          imageNameToServer: imageId,
+          productIdToServer: productId,
+        }),
+        success: function(response) {
+          if (response.status === true) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Image Deleted',
+              text: 'The image has been removed successfully',
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message || 'Error deleting image'
+            });
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error("Error deleting image:", error);
           Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: response.message || 'Error deleting image'
+            title: 'Request Failed',
+            text: 'An error occurred while deleting the image.'
           });
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("Error deleting image:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Request Failed',
-          text: 'An error occurred while deleting the image.'
-        });
-      },
-    });
-  }
-
-  // Form Submission
-  $("#editProductForm").on("submit", function(e) {
-    if (!validateForm()) {
-      e.preventDefault();
-      return;
+        },
+      });
     }
-    e.preventDefault();
 
-    $.ajax({
-      type: "POST",
-      url: $(this).attr("action"),
-      data: new FormData(this),
-      processData: false,
-      contentType: false,
-      success: function(response) {
-        if (response.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Product Updated",
-            text: response.message,
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => {
-            window.location.href = "/admin/products";
-          });
-        } else {
+    // Form Submission with validation
+    $("#editProductForm").on("submit", function(e) {
+      e.preventDefault();
+
+      // Show loading state
+      const submitBtn = $(this).find('button[type="submit"]');
+      const originalText = submitBtn.html();
+      submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating Product...');
+
+      // Validate form
+      if (!validateForm()) {
+        submitBtn.prop('disabled', false).html(originalText);
+        return false;
+      }
+
+      $.ajax({
+        type: "POST",
+        url: $(this).attr("action"),
+        data: new FormData(this),
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          if (response.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Product Updated",
+              text: response.message,
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              window.location.href = "/admin/products";
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: response.message || "There was an error updating the product.",
+            });
+            submitBtn.prop('disabled', false).html(originalText);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error("AJAX Error:", error);
           Swal.fire({
             icon: "error",
-            title: "Error",
-            text: response.message || "There was an error updating the product.",
+            title: "Request Failed",
+            text: "There was an issue connecting to the server. Please try again.",
           });
-        }
-      },
-      error: function() {
-        Swal.fire({
-          icon: "error",
-          title: "Request Failed",
-          text: "There was an issue connecting to the server. Please try again.",
-        });
-      },
+          submitBtn.prop('disabled', false).html(originalText);
+        },
+      });
     });
   });
-});
 </script>
