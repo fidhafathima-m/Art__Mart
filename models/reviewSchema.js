@@ -37,6 +37,11 @@ const reviewSchema = new mongoose.Schema({
   },
 });
 
+reviewSchema.index({ product_id: 1, created_at: -1 });
+reviewSchema.index({ user_id: 1 });
+reviewSchema.index({ rating: 1 });
+reviewSchema.index({ product_id: 1, rating: 1 });
+
 const Review = mongoose.model("Review", reviewSchema);
 // eslint-disable-next-line no-undef
 module.exports = Review;

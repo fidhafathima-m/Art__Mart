@@ -30,6 +30,10 @@ const brandSchema = new Schema({
   },
 });
 
+brandSchema.index({ brandName: 1 });
+brandSchema.index({ isBlocked: 1, isDeleted: 1 });
+brandSchema.index({ createdAt: -1 });
+
 const Brand = mongoose.model("Brand", brandSchema);
 
 // eslint-disable-next-line no-undef

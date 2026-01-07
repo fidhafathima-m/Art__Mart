@@ -44,6 +44,11 @@ const couponSchema = new Schema({
   },
 });
 
+couponSchema.index({ expireOn: 1 });
+couponSchema.index({ isList: 1, isDeleted: 1 });
+couponSchema.index({ minPurchaseAmount: 1 });
+couponSchema.index({ createdOn: -1 });
+
 const Coupon = mongoose.model("Coupon", couponSchema);
 // eslint-disable-next-line no-undef
 module.exports = Coupon;

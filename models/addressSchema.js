@@ -50,6 +50,9 @@ const addressSchema = new Schema({
   ],
 });
 
+addressSchema.index({ userId: 1 });
+addressSchema.index({ "address.isDefault": 1 });
+
 const Address = mongoose.model("Address", addressSchema);
 
 // eslint-disable-next-line no-undef

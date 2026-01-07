@@ -73,6 +73,13 @@ const transactionSchema = new mongoose.Schema({
   },
 });
 
+transactionSchema.index({ userId: 1, date: -1 });
+transactionSchema.index({ orderId: 1 });
+transactionSchema.index({ type: 1 });
+transactionSchema.index({ date: -1 });
+transactionSchema.index({ userId: 1, type: 1 });
+transactionSchema.index({ status: 1 });
+
 const Transaction = mongoose.model("Transaction", transactionSchema);
 // eslint-disable-next-line no-undef
 module.exports = Transaction;

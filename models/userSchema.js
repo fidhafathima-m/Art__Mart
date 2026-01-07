@@ -94,6 +94,10 @@ const userSchema = new Schema({
   },
 });
 
+userSchema.index({ isBlocked: 1, isAdmin: 1 });
+userSchema.index({ createdOn: -1 });
+userSchema.index({ isDeleted: 1 });
+
 const User = mongoose.model("User", userSchema);
 // eslint-disable-next-line no-undef
 module.exports = User;

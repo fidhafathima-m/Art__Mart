@@ -38,6 +38,9 @@ const categorySchema = new Schema({
   },
 });
 
+categorySchema.index({ isListed: 1, isDeleted: 1 });
+categorySchema.index({ createdAt: -1 });
+
 const Category = mongoose.model("Category", categorySchema);
 // eslint-disable-next-line no-undef
 module.exports = Category;

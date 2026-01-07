@@ -27,6 +27,9 @@ const walletSchema = new Schema({
   },
 });
 
+walletSchema.index({ userId: 1 });
+walletSchema.index({ lastTransactionDate: -1 });
+
 const Wallet = mongoose.model("Wallet", walletSchema);
 // eslint-disable-next-line no-undef
 module.exports = Wallet;

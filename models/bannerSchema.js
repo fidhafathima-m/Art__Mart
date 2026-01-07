@@ -28,6 +28,8 @@ const bannerSchema = new Schema({
   },
 });
 
+bannerSchema.index({ startDate: 1, endDate: 1 });
+
 const Banner = mongoose.model("Banner", bannerSchema);
 
 // eslint-disable-next-line no-undef

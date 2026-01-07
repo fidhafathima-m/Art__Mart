@@ -86,6 +86,18 @@ const productSchema = new Schema(
   { timestamps: true }
 );
 
+productSchema.index({ productName: "text" }); // Text index for search
+productSchema.index({ category: 1, isListed: 1, isDeleted: 1 });
+productSchema.index({ brand: 1, isListed: 1, isDeleted: 1 });
+productSchema.index({ status: 1, isListed: 1 });
+productSchema.index({ regularPrice: 1 });
+productSchema.index({ salePrice: 1 });
+productSchema.index({ createdAt: -1 }); // For new arrivals
+productSchema.index({ updatedAt: -1 }); // For recently updated
+productSchema.index({ quantity: 1 }); // For stock management
+productSchema.index({ category: 1, brand: 1, status: 1 }); // Compound for product listing
+productSchema.index({ isDeleted: 1, isBlocked: 1 }); // For admin queries
+
 const Product = mongoose.model("Product", productSchema);
 // eslint-disable-next-line no-undef
 module.exports = Product;
