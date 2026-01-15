@@ -442,7 +442,7 @@ const salesReport = async (req, res) => {
     ]);
 
     // Send the data to the frontend
-    res.render("reports", { topProducts, leastProducts });
+    res.render("reports", { topProducts, leastProducts, activePage: "reports",  });
   } catch {
     res.status(InternalServerError).json({ message: INTERNAL_SERVER_ERRORe });
   }
