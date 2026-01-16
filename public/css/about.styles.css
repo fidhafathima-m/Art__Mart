@@ -1,0 +1,247 @@
+body {
+      font-family: 'Arial', sans-serif;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    h3,
+    h6 {
+      font-family: 'Georgia', serif;
+      font-weight: bold;
+    }
+
+    h3 {
+      color: #2c3e50;
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    h6 {
+      color: #16a085;
+      font-size: 20px;
+    }
+
+    /* Header Styling */
+    .shop_title h3 {
+      text-align: center;
+      font-size: 38px;
+      color: #34495e;
+      padding-top: 20px;
+    }
+
+    /* Breadcrumb Styling */
+    .breadcrumb__text {
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .breadcrumb__links a {
+      color: #2980b9;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .breadcrumb__links span {
+      color: #7f8c8d;
+    }
+
+    /* About Section */
+    .about-option {
+      background-color: #f4f6f6;
+      padding: 50px 0;
+    }
+
+    .about-option .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .about-option .row {
+      margin: 0;
+    }
+
+    .p-4 {
+      padding: 40px;
+    }
+
+    .p-4 p {
+      font-size: 18px;
+      color: #7f8c8d;
+    }
+
+    /* Image Section */
+    .img-fluid {
+      border-radius: 8px;
+    }
+
+    .col-4 img,
+    .col-3 img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    /* Our Story & Mission Section */
+    h3.pb-2 {
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+
+    .pt-2,
+    .pt-3,
+    .pt-4 {
+      padding-top: 30px;
+    }
+
+    /* What We Offer Section */
+    .row.pt-3 {
+      margin-top: 30px;
+    }
+
+
+    .col-3 h6 {
+      margin-top: 10px;
+    }
+
+    .col-3 p {
+      font-size: 16px;
+      color: #7f8c8d;
+    }
+
+    /* Why Choose Us Section */
+    .row.pt-3.text-center {
+      text-align: center;
+    }
+
+    .row.pt-3.text-center .col-4 {
+      margin-bottom: 30px;
+    }
+
+    .row.pt-3.text-center img {
+      max-width: 50px;
+      margin-bottom: 10px;
+    }
+
+    .row.pt-3.text-center p {
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+    /* Existing styles remain unchanged */
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+  /* General Typography */
+  h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  h6 {
+    font-size: 18px;
+  }
+
+  /* Header Section */
+  .shop_title h3 {
+    font-size: 28px;
+    padding-top: 15px;
+  }
+
+  /* Main Content Layout */
+  .p-4 {
+    padding: 20px;
+  }
+
+  .p-4 p {
+    font-size: 16px;
+  }
+
+  /* Story Section Layout */
+  .row.mt-3 .col-8,
+  .row.mt-3 .col-4 {
+    width: 100%;
+  }
+
+  .row.mt-3 .col-4 {
+    margin-top: 20px;
+  }
+
+  /* What We Offer Section */
+  .row.pt-3 .col-3 {
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .row.pt-3 .col-3 img {
+    width: 180px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  .row.pt-3 .col-3 p br {
+    display: none;
+  }
+
+  .row.pt-3 .col-3 p {
+    margin: 0 auto;
+    max-width: 280px;
+  }
+
+  /* Why Choose Us Section */
+  .row.pt-3.text-center .col-4 {
+    width: 100%;
+    margin-bottom: 40px;
+  }
+
+  .row.pt-3.text-center .col-4:last-child {
+    margin-bottom: 20px;
+  }
+
+  .row.pt-3.text-center p br {
+    display: none;
+  }
+
+  .row.pt-3.text-center p {
+    margin: 0 auto;
+    max-width: 280px;
+  }
+
+  /* Container Padding */
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  /* Spacing Adjustments */
+  .pt-2, .pt-3, .pt-4 {
+    padding-top: 20px;
+  }
+
+  .pb-2, .pb-4 {
+    padding-bottom: 15px;
+  }
+
+  /* About Section */
+  .about-option {
+    padding: 30px 0;
+  }
+}
+
+/* Small Mobile Devices */
+@media screen and (max-width: 480px) {
+  .shop_title h3 {
+    font-size: 24px;
+  }
+
+  .p-4 {
+    padding: 15px;
+  }
+
+  h3 {
+    font-size: 22px;
+  }
+
+  .row.pt-3 .col-3 img {
+    width: 150px;
+  }
+}
