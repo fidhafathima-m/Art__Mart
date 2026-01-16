@@ -1,265 +1,522 @@
-<link rel="stylesheet" href="../../public/css/home.styles.css">
-
-<!-- header -->
-<%- include('../../views/partials/user/header', { activePage: activePage }) %>
-
-<!-- Hero Section Begin -->
-<section class="hero">
-  <div class="hero__slider owl-carousel">
-    <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg" loading="lazy">
-      <div class="container">
-        <div class="row">
-          <div class="col-xl-5 col-lg-7 col-md-8">
-            <div class="hero__text">
-              <h6>Christmas Collection</h6>
-              <h2>Create Christmas Magic with Art Supplies</h2>
-              <p>
-                Unleash your holiday creativity with our festive art supplies –
-                perfect for Christmas crafts and gifts!
-              </p>
-              <a href="/shop" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-              <div class="hero__social">
-                <a href="#"><i class="fa fa-facebook"></i></a>
-                <a href="#"><i class="fa fa-twitter"></i></a>
-                <a href="#"><i class="fa fa-pinterest"></i></a>
-                <a href="#"><i class="fa fa-instagram"></i></a>
-              </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Art Supplies Store</title>
+    
+    <!-- Preload critical assets -->
+    <!-- <link rel="preload" href="../../public/css/home.styles.css" as="style"> -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/sweetalert2@11" as="script">
+    
+    <!-- DNS prefetch for external domains -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../../public/css/home.styles.css" media="all">
+    
+    <!-- Inline critical CSS for mobile product grid -->
+    <style>
+        /* Critical mobile styles */
+        @media screen and (max-width: 767px) {
+            .col-lg-3.col-md-4.col-sm-12 {
+                width: 50%;
+                padding: 0 8px;
+                float: left;
+            }
+            .product__item {
+                margin-bottom: 20px;
+            }
+            .product__item__pic {
+                position: relative;
+                padding-top: 100%;
+            }
+            .product__item__pic img.default-img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                aspect-ratio: 1;
+            }
+            .product__hover {
+                opacity: 1;
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                transform: none;
+                width: auto;
+            }
+            .product__hover li {
+                width: auto;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 50%;
+                margin-bottom: 10px;
+            }
+            .product__item__text {
+                padding: 10px 5px;
+                text-align: center;
+            }
+            .product__item__text h6 {
+                font-size: 14px;
+                margin-bottom: 8px;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                height: 40px;
+            }
+            .product__item__text .add-cart {
+                display: inline-block;
+                padding: 6px 12px;
+                background: #000;
+                color: #fff;
+                border-radius: 4px;
+                margin: 8px 0;
+                font-size: 12px;
+                width: 90%;
+                text-align: center;
+            }
+            .product__item__text .h5 {
+                font-size: 16px;
+                margin: 5px 0;
+            }
+            .product__item__text .small {
+                font-size: 12px;
+            }
+            .product__item__text .text-muted {
+                font-size: 12px;
+                margin: 0;
+            }
+            .badge-danger {
+                font-size: 10px;
+                padding: 3px 6px;
+                margin-top: 5px;
+                display: inline-block;
+            }
+        }
+        
+        /* Optimize images */
+        img {
+            content-visibility: auto;
+        }
+        
+        /* Lazy load for product images */
+        .default-img {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .default-img.loaded {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- header -->
+    <%- include('../../views/partials/user/header', { activePage: activePage }) %>
+    
+    <!-- Hero Section Begin -->
+    <section class="hero">
+        <div class="hero__slider owl-carousel">
+            <div class="hero__items set-bg" data-setbg="img/hero/hero-2.jpg" loading="lazy">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-5 col-lg-7 col-md-8">
+                            <div class="hero__text">
+                                <h6>Christmas Collection</h6>
+                                <h2>Create Christmas Magic with Art Supplies</h2>
+                                <p>
+                                    Unleash your holiday creativity with our festive art supplies –
+                                    perfect for Christmas crafts and gifts!
+                                </p>
+                                <a href="/shop" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                                <div class="hero__social">
+                                    <a href="#" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+                                    <a href="#" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+                                    <a href="#" aria-label="Pinterest"><i class="fa fa-pinterest"></i></a>
+                                    <a href="#" aria-label="Instagram"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg" loading="lazy">
-      <div class="container">
-        <div class="row">
-          <div class="col-xl-5 col-lg-7 col-md-8">
-            <div class="hero__text">
-              <h6>Spring Collection</h6>
-              <h2>Awaken, Blossom, Create, Inspire</h2>
-              <p>
-                Embrace the fresh energy of spring through soft pastels, vibrant
-                pigments, and premium brushes.
-              </p>
-              <a href="#" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-              <div class="hero__social">
-                <a href="#"><i class="fa fa-facebook"></i></a>
-                <a href="#"><i class="fa fa-twitter"></i></a>
-                <a href="#"><i class="fa fa-pinterest"></i></a>
-                <a href="#"><i class="fa fa-instagram"></i></a>
-              </div>
+            <div class="hero__items set-bg" data-setbg="img/hero/hero-1.jpg" loading="lazy">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xl-5 col-lg-7 col-md-8">
+                            <div class="hero__text">
+                                <h6>Spring Collection</h6>
+                                <h2>Awaken, Blossom, Create, Inspire</h2>
+                                <p>
+                                    Embrace the fresh energy of spring through soft pastels, vibrant
+                                    pigments, and premium brushes.
+                                </p>
+                                <a href="/shop" class="primary-btn">Shop now <span class="arrow_right"></span></a>
+                                <div class="hero__social">
+                                    <a href="#" aria-label="Facebook"><i class="fa fa-facebook"></i></a>
+                                    <a href="#" aria-label="Twitter"><i class="fa fa-twitter"></i></a>
+                                    <a href="#" aria-label="Pinterest"><i class="fa fa-pinterest"></i></a>
+                                    <a href="#" aria-label="Instagram"><i class="fa fa-instagram"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- Hero Section End -->
+    </section>
+    <!-- Hero Section End -->
 
-<!-- Product Section Begin -->
+    <!-- Product Section Begin -->
+    <section class="product spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="filter__controls">
+                        <li data-filter=".new-arrivals" class="active">New Arrivals</li>
+                    </ul>
+                </div>
+            </div>
 
-<section class="product spad">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <ul class="filter__controls">
-          <li data-filter=".new-arrivals" class="active">New Arrivals</li>
-        </ul>
-      </div>
-    </div>
+            <div class="row" id="product-grid">
+                <% for (let i = 0; i < Math.min(product.length, 20); i++) { %>
+                <div class="col-lg-3 col-md-4 col-sm-12">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg">
+                            <a href="/product-details?id=<%= product[i]._id %>">
+                                <img 
+                                    class="default-img" 
+                                    src="<%= product[i].productImage[0] %>" 
+                                    alt="<%= product[i].productName %>" 
+                                    loading="lazy"
+                                    width="300"
+                                    height="300"
+                                    onload="this.classList.add('loaded')"
+                                />
+                            </a>
+                            <ul class="product__hover">
+                                <li>
+                                    <button 
+                                        type="button" 
+                                        class="add-wishlist-btn" 
+                                        data-product-id="<%= product[i]._id %>"
+                                        aria-label="Add to Wishlist"
+                                    >
+                                        <img src="img/icon/heart.png" alt="Heart icon" loading="lazy" width="20" height="20"/>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><%= product[i].productName %></h6>
+                            <% if (product[i].quantity > 0) { %>
+                            <button 
+                                type="button" 
+                                class="add-cart" 
+                                data-product-id="<%= product[i]._id %>"
+                            >
+                                Add to cart
+                            </button>
+                            <% } %>
+                            <span class="h5">&#8377; <%= product[i].salePrice.toLocaleString('en-IN') %></span>
+                            <% if (product[i].productOffer > 0) { %>
+                            <span class="small">(<%= product[i].productOffer %>% off)</span>
+                            <% if (product[i].quantity <= 0) { %>
+                            <span class="badge badge-danger">Out of Stock</span><br />
+                            <% } %>
+                            <p class="text-muted">
+                                <strike>&#8377; <%= product[i].regularPrice.toLocaleString('en-IN') %></strike>
+                            </p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
 
-    <div class="row">
-      <% for (let i = 0; i < product.length; i++) { %>
-      <div class="col-lg-3 col-md-4 col-sm-12">
-        <div class="product__item">
-          <div class="product__item__pic set-bg">
-            <a href="/product-details?id=<%= product[i]._id %>">
-              <img class="default-img" src="<%= product[i].productImage[0] %>" alt="<%= product[i].productName %>" />
-            </a>
-            <ul class="product__hover">
-              <li>
-                <a href="javascript:void(0);" data-product-id="<%= product[i]._id %>" class="add-wishlist">
-                  <img src="img/icon/heart.png" alt="Add to Wishlist" loading="lazy"/>
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div class="product__item__text">
-            <h6><%= product[i].productName %></h6>
-            <% if (product[i].quantity > 0) { %>
-            <a href="#" data-product-id="<%= product[i]._id %>" class="add-cart"> Add to cart </a>
+            <!-- Load More Products Button (if you have many products) -->
+            <% if (product.length > 20) { %>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <button id="load-more-products" class="btn btn-secondary">Load More Products</button>
+                </div>
+            </div>
             <% } %>
-            <span class="h5">&#8377; <%= product[i].salePrice.toLocaleString('en-IN')
-                %></span>
-            <% if (product[i].productOffer > 0) { %>
-            <span class="small">(<%= product[i].productOffer %>% off)</span>
-            <% if (product[i].quantity <= 0) { %>
-            <span class="badge badge-danger">Out of Stock</span><br />
-            <% } %>
-            <p class="text-muted">
-              <strike>&#8377; <%=
-                  product[i].regularPrice.toLocaleString('en-IN') %></strike>
-            </p>
-            <% } %>
-          </div>
         </div>
-      </div>
-      <% } %>
-    </div>
+    </section>
+    <!-- Product Section End -->
 
-
-  </div>
-</section>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Add event listener for adding to the cart
-    const addToCartButtons = document.querySelectorAll('.add-cart');
-    addToCartButtons.forEach((button) => {
-      button.addEventListener('click', async (event) => {
-        event.preventDefault(); // Prevent the default link behavior
-
-        const productId = event.target.getAttribute('data-product-id'); // Get the product ID from the data attribute
-
-        // Check if productId exists
-        if (!productId) {
-          console.error('No product ID found!');
-          return;
+    <!-- Deferred Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    
+    <!-- Inline script for critical functionality -->
+    <script>
+        // Debounce function to limit API calls
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
-        try {
-          // Send a POST request to add the item to the cart
-          const response = await fetch('/addToCart', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              productId: productId,
-            }),
-            credentials: 'same-origin', // Make sure session cookies are sent
-          });
-
-          const data = await response.json(); // Parse the response as JSON
-
-          if (data.success) {
-            // Item added successfully, show success alert
-            Swal.fire({
-              title: 'Success!',
-              text: 'Item added to cart',
-              icon: 'success',
-              confirmButtonColor: '#3085d6',
-              confirmButtonText: 'OK',
-            }).then(() => {
-              location.reload(); // Optionally, reload the page or update the cart UI dynamically
-            });
-          } else {
-            // Show an alert if the user is not logged in or some other error occurred
-            Swal.fire({
-              title: 'Error',
-              text: data.message,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'Login',
-              cancelButtonText: 'Cancel',
-            }).then((result) => {
-              if (result.isConfirmed) {
-                window.location.href = '/login'; // Redirect to login page
-              }
-            });
-          }
-        } catch (error) {
-          console.error('Error:', error);
-          alert('There was an error adding the item to the cart.');
-        }
-      });
-    });
-
-    // Add event listener for adding to the wishlist
-    const addToWishlistButtons = document.querySelectorAll('.add-wishlist');
-    addToWishlistButtons.forEach(button => {
-  button.addEventListener('click', async (event) => {
-    event.preventDefault(); // Prevent default anchor behavior
-
-    const productId = event.target.closest('a').getAttribute('data-product-id'); // Get the product ID
-
-    if (!productId) {
-      console.error('No product ID found!');
-      return;
-    }
-
-    // Disable the button to prevent multiple clicks
-    event.target.disabled = true;
-
-    try {
-      const response = await fetch('/addToWishlist', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId }),
-        credentials: 'same-origin',
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        Swal.fire({
-          title: 'Success!',
-          text: 'Item added to wishlist',
-          icon: 'success',
-          confirmButtonColor: '#3085d6',
-          confirmButtonText: 'Go to Wishlist',
-          cancelButtonText: 'Cancel'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "/userProfile?section=wishlist";
-          }
+        // Optimized event delegation for cart and wishlist
+        document.addEventListener('DOMContentLoaded', () => {
+            const productGrid = document.getElementById('product-grid');
+            
+            // Single event listener for all cart buttons
+            productGrid.addEventListener('click', debounce(async (event) => {
+                const cartBtn = event.target.closest('.add-cart');
+                if (cartBtn) {
+                    event.preventDefault();
+                    await handleAddToCart(cartBtn);
+                    return;
+                }
+                
+                const wishlistBtn = event.target.closest('.add-wishlist-btn');
+                if (wishlistBtn) {
+                    event.preventDefault();
+                    await handleAddToWishlist(wishlistBtn);
+                    return;
+                }
+            }, 300));
+            
+            // Load more products functionality
+            const loadMoreBtn = document.getElementById('load-more-products');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', loadMoreProducts);
+            }
+            
+            // Optimize image loading
+            initializeLazyLoading();
         });
-      } else {
-        let confirmButtonText = 'OK';
-        let redirectUrl = null;
-
-        if (data.message === 'Please log in to add items to the wishlist.') {
-          confirmButtonText = 'Login';
-          redirectUrl = '/login';
-        } else if (data.message === 'This product is already in your wishlist.') {
-          confirmButtonText = 'Go to wishlist';
-          redirectUrl = '/userProfile?section=wishlist';
+        
+        async function handleAddToCart(button) {
+            const productId = button.getAttribute('data-product-id');
+            if (!productId) return;
+            
+            const originalText = button.textContent;
+            button.textContent = 'Adding...';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/addToCart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId }),
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update cart count without reloading page
+                    updateCartCount(data.cartCount || 1);
+                    
+                    await Swal.fire({
+                        title: 'Success!',
+                        text: 'Item added to cart',
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK',
+                        timer: 1500
+                    });
+                    
+                    button.textContent = 'Added!';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.disabled = false;
+                    }, 1000);
+                } else {
+                    await handleCartError(data.message, button, originalText);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                button.textContent = originalText;
+                button.disabled = false;
+                Swal.fire('Error', 'Failed to add item to cart', 'error');
+            }
         }
-
-        Swal.fire({
-          title: 'Error',
-          text: data.message,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: confirmButtonText,
-          cancelButtonText: 'Cancel',
-        }).then((result) => {
-          if (result.isConfirmed && redirectUrl) {
-            window.location.href = redirectUrl;
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('There was an error adding the item to the wishlist.');
-    } finally {
-      // Re-enable the button after the request is complete
-      event.target.disabled = false;
-    }
-  });
-});
-  });
-</script>
-
-
-
-<%- include('../../views/partials/user/footer') %>
+        
+        async function handleAddToWishlist(button) {
+            const productId = button.getAttribute('data-product-id');
+            if (!productId) return;
+            
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            button.disabled = true;
+            
+            try {
+                const response = await fetch('/addToWishlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId }),
+                    credentials: 'same-origin'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    button.innerHTML = '✓';
+                    button.style.color = 'green';
+                    
+                    await Swal.fire({
+                        title: 'Success!',
+                        text: 'Item added to wishlist',
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'View Wishlist',
+                        cancelButtonText: 'Continue Shopping',
+                        timer: 2000
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/userProfile?section=wishlist";
+                        }
+                    });
+                    
+                    setTimeout(() => {
+                        button.innerHTML = originalHTML;
+                        button.style.color = '';
+                        button.disabled = false;
+                    }, 2000);
+                } else {
+                    await handleWishlistError(data.message, button, originalHTML);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+                Swal.fire('Error', 'Failed to add item to wishlist', 'error');
+            }
+        }
+        
+        async function handleCartError(message, button, originalText) {
+            let redirectUrl = null;
+            let confirmText = 'OK';
+            
+            if (message.includes('log in')) {
+                confirmText = 'Login';
+                redirectUrl = '/login';
+            }
+            
+            const result = await Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'warning',
+                showCancelButton: !!redirectUrl,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Cancel'
+            });
+            
+            if (result.isConfirmed && redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+        
+        async function handleWishlistError(message, button, originalHTML) {
+            let redirectUrl = null;
+            let confirmText = 'OK';
+            
+            if (message.includes('log in')) {
+                confirmText = 'Login';
+                redirectUrl = '/login';
+            } else if (message.includes('already')) {
+                confirmText = 'View Wishlist';
+                redirectUrl = '/userProfile?section=wishlist';
+            }
+            
+            const result = await Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Cancel'
+            });
+            
+            if (result.isConfirmed && redirectUrl) {
+                window.location.href = redirectUrl;
+            } else {
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+            }
+        }
+        
+        function updateCartCount(count) {
+            const cartCountEl = document.querySelector('.cart-count');
+            if (cartCountEl) {
+                cartCountEl.textContent = count;
+                cartCountEl.classList.add('updated');
+                setTimeout(() => cartCountEl.classList.remove('updated'), 500);
+            }
+        }
+        
+        function initializeLazyLoading() {
+            const images = document.querySelectorAll('img[loading="lazy"]');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.dataset.src || img.src;
+                            observer.unobserve(img);
+                        }
+                    });
+                });
+                
+                images.forEach(img => {
+                    img.dataset.src = img.src;
+                    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // placeholder
+                    observer.observe(img);
+                });
+            }
+        }
+        
+        async function loadMoreProducts() {
+            const loadMoreBtn = document.getElementById('load-more-products');
+            loadMoreBtn.textContent = 'Loading...';
+            loadMoreBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`/api/products?skip=${productGrid.children.length}`);
+                const products = await response.json();
+                
+                if (products.length > 0) {
+                    // Append new products (you'll need to implement this function)
+                    appendProducts(products);
+                    
+                    if (products.length < 20) {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                } else {
+                    loadMoreBtn.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading more products:', error);
+                Swal.fire('Error', 'Failed to load more products', 'error');
+            } finally {
+                loadMoreBtn.textContent = 'Load More Products';
+                loadMoreBtn.disabled = false;
+            }
+        }
+    </script>
+    
+    <%- include('../../views/partials/user/footer') %>
+</body>
+</html>
