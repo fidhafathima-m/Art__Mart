@@ -301,11 +301,18 @@
 
   <!-- Address Section -->
   <div class="text-center mb-4">
+    <% if (address) { %>
     <p><span class="text-muted">Selected Address:</span> <br>
       <%= address.name %><br>
       <%= address.city %>, <% if (address.landMark) {%> <%= address.landMark %>, <% } %><br>
       <%= address.state %>, <%= address.pincode %>
     </p>
+    <% } else { %>
+    <p class="text-danger">
+      <b>!</b> Address information not available
+    </p>
+    <% } %>
+
     <p>Amount paid: ₹<%= order.finalAmount %></p>
     <% if (order.discount > 0) { %>
     <p class="text-success small">You saved ₹<%= order.discount %>.</p>
