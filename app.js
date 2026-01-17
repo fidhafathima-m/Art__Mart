@@ -44,7 +44,8 @@ app.use(
       secure: process.env.NODE_ENV === 'production', 
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000, // 72 hours
-      sameSite: 'lax',
+      // eslint-disable-next-line no-undef
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     }
     
   })
