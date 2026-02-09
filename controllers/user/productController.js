@@ -19,7 +19,7 @@ const {
 const { INTERNAL_SERVER_ERROR } =
   require("../../helpers/constants").ERROR_MESSAGES;
 const mongoose = require("mongoose");
-const nodemailer = require("nodemailer");
+// const nodemailer = require("nodemailer");
 const Razorpay = require("razorpay");
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_ID_KEY,
@@ -28,133 +28,133 @@ const razorpay = new Razorpay({
 const { generateInvoicePDF } = require("../../helpers/generateInvoicePDF");
 const generateOrderNumber = require("../../helpers/generateOrderNumber");
 
-const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
-  try {
-    const productIds = order.ordereditems.map((item) => item.product);
-    const products = await Product.find({ _id: { $in: productIds } });
+// const sendOrderConfirmationEmail = async (email, order, defaultAddress) => {
+//   try {
+//     const productIds = order.ordereditems.map((item) => item.product);
+//     const products = await Product.find({ _id: { $in: productIds } });
 
-    const productMap = {};
-    products.forEach((product) => {
-      productMap[product._id] = product.productName;
-    });
+//     const productMap = {};
+//     products.forEach((product) => {
+//       productMap[product._id] = product.productName;
+//     });
 
-    const orderedItems = order.ordereditems
-      .map(
-        (item) =>
-          `<tr>
-            <td style="padding: 12px; border-bottom: 1px solid #eee;">${
-              productMap[item.product]
-            }</td>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${
-              item.quantity
-            }</td>
-            <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${
-              item.price
-            }</td>
-           </tr>`
-      )
-      .join("");
+//     const orderedItems = order.ordereditems
+//       .map(
+//         (item) =>
+//           `<tr>
+//             <td style="padding: 12px; border-bottom: 1px solid #eee;">${
+//               productMap[item.product]
+//             }</td>
+//             <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: center;">${
+//               item.quantity
+//             }</td>
+//             <td style="padding: 12px; border-bottom: 1px solid #eee; text-align: right;">₹${
+//               item.price
+//             }</td>
+//            </tr>`
+//       )
+//       .join("");
 
-    const totalAmount = order.finalAmount;
-    const paymentMethod = "Cash on Delivery (COD)";
+//     const totalAmount = order.finalAmount;
+//     const paymentMethod = "Cash on Delivery (COD)";
 
-    const deliveryAddress = `
-      <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="color: #2c3e50; margin-bottom: 15px;">Delivery Address</h3>
-        <p style="margin: 5px 0;"><strong>${defaultAddress.name}</strong></p>
-        <p style="margin: 5px 0;">${defaultAddress.city}, ${
-      defaultAddress.state
-    } - ${defaultAddress.pincode}</p>
-        <p style="margin: 5px 0;">Phone: ${defaultAddress.phone}</p>
-        ${
-          defaultAddress.altPhone
-            ? `<p style="margin: 5px 0;">Alternate Phone: ${defaultAddress.altPhone}</p>`
-            : ""
-        }
-      </div>
-    `;
+//     const deliveryAddress = `
+//       <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+//         <h3 style="color: #2c3e50; margin-bottom: 15px;">Delivery Address</h3>
+//         <p style="margin: 5px 0;"><strong>${defaultAddress.name}</strong></p>
+//         <p style="margin: 5px 0;">${defaultAddress.city}, ${
+//       defaultAddress.state
+//     } - ${defaultAddress.pincode}</p>
+//         <p style="margin: 5px 0;">Phone: ${defaultAddress.phone}</p>
+//         ${
+//           defaultAddress.altPhone
+//             ? `<p style="margin: 5px 0;">Alternate Phone: ${defaultAddress.altPhone}</p>`
+//             : ""
+//         }
+//       </div>
+//     `;
 
-    const emailContent = `
-      <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-        <!-- Header -->
-        <div style="text-align: center; padding: 30px 0; background-color:rgb(76, 152, 175); color: white; border-radius: 10px; margin-bottom: 30px;">
-          <h1 style="margin: 0; font-size: 28px;">Order Confirmed!</h1>
-          <p style="margin: 10px 0 0 0; font-size: 16px;">Thank you for shopping with Art Mart</p>
-        </div>
+//     const emailContent = `
+//       <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+//         <!-- Header -->
+//         <div style="text-align: center; padding: 30px 0; background-color:rgb(76, 152, 175); color: white; border-radius: 10px; margin-bottom: 30px;">
+//           <h1 style="margin: 0; font-size: 28px;">Order Confirmed!</h1>
+//           <p style="margin: 10px 0 0 0; font-size: 16px;">Thank you for shopping with Art Mart</p>
+//         </div>
 
-        <!-- Order ID and Welcome Message -->
-        <div style="margin-bottom: 30px;">
-          <h2 style="color: #2c3e50; font-size: 20px; margin-bottom: 15px;">Order ID: ${order._id}</h2>
-          <p style="font-size: 16px; line-height: 1.6;">Dear Customer,</p>
-          <p style="font-size: 16px; line-height: 1.6;">We're thrilled to confirm your order! Below are your order details:</p>
-        </div>
+//         <!-- Order ID and Welcome Message -->
+//         <div style="margin-bottom: 30px;">
+//           <h2 style="color: #2c3e50; font-size: 20px; margin-bottom: 15px;">Order ID: ${order._id}</h2>
+//           <p style="font-size: 16px; line-height: 1.6;">Dear Customer,</p>
+//           <p style="font-size: 16px; line-height: 1.6;">We're thrilled to confirm your order! Below are your order details:</p>
+//         </div>
 
-        <!-- Payment Method -->
-        <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
-          <p style="margin: 0;"><strong>Payment Method:</strong> ${paymentMethod}</p>
-        </div>
+//         <!-- Payment Method -->
+//         <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+//           <p style="margin: 0;"><strong>Payment Method:</strong> ${paymentMethod}</p>
+//         </div>
 
-        <!-- Order Items -->
-        <div style="margin-bottom: 30px;">
-          <h3 style="color: #2c3e50; margin-bottom: 15px;">Order Summary</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="background-color: #f5f6fa;">
-                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Product</th>
-                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Quantity</th>
-                <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${orderedItems}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2" style="padding: 15px; text-align: right; font-weight: bold;">Total Amount:</td>
-                <td style="padding: 15px; text-align: right; font-weight: bold;">₹${totalAmount}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+//         <!-- Order Items -->
+//         <div style="margin-bottom: 30px;">
+//           <h3 style="color: #2c3e50; margin-bottom: 15px;">Order Summary</h3>
+//           <table style="width: 100%; border-collapse: collapse;">
+//             <thead>
+//               <tr style="background-color: #f5f6fa;">
+//                 <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Product</th>
+//                 <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Quantity</th>
+//                 <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Price</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               ${orderedItems}
+//             </tbody>
+//             <tfoot>
+//               <tr>
+//                 <td colspan="2" style="padding: 15px; text-align: right; font-weight: bold;">Total Amount:</td>
+//                 <td style="padding: 15px; text-align: right; font-weight: bold;">₹${totalAmount}</td>
+//               </tr>
+//             </tfoot>
+//           </table>
+//         </div>
 
-        <!-- Delivery Address -->
-        ${deliveryAddress}
+//         <!-- Delivery Address -->
+//         ${deliveryAddress}
 
-        <!-- Footer -->
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
-          <p style="margin: 0; color: #666; font-size: 14px;">Thank you for choosing Art Mart!</p>
-          <div style="margin-top: 20px;">
-            <p style="margin: 5px 0; color: #666; font-size: 14px;">Best regards,</p>
-            <p style="margin: 5px 0; color:rgb(73, 171, 210); font-weight: bold; font-size: 16px;">Art Mart Team</p>
-          </div>
-        </div>
-      </div>
-    `;
+//         <!-- Footer -->
+//         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+//           <p style="margin: 0; color: #666; font-size: 14px;">Thank you for choosing Art Mart!</p>
+//           <div style="margin-top: 20px;">
+//             <p style="margin: 5px 0; color: #666; font-size: 14px;">Best regards,</p>
+//             <p style="margin: 5px 0; color:rgb(73, 171, 210); font-weight: bold; font-size: 16px;">Art Mart Team</p>
+//           </div>
+//         </div>
+//       </div>
+//     `;
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
-    });
+//     const transporter = nodemailer.createTransport({
+//       service: "gmail",
+//       port: 587,
+//       secure: false,
+//       requireTLS: true,
+//       auth: {
+//         user: process.env.NODEMAILER_EMAIL,
+//         pass: process.env.NODEMAILER_PASSWORD,
+//       },
+//     });
 
-    const info = await transporter.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: email,
-      subject: "Order Confirmation - Thank You for Your Purchase!",
-      html: emailContent,
-    });
+//     const info = await transporter.sendMail({
+//       from: process.env.NODEMAILER_EMAIL,
+//       to: email,
+//       subject: "Order Confirmation - Thank You for Your Purchase!",
+//       html: emailContent,
+//     });
 
-    return info.accepted.length > 0;
-  } catch (error) {
-    console.error("Error sending email", error);
-    throw new Error("Failed to send confirmation email");
-  }
-};
+//     return info.accepted.length > 0;
+//   } catch (error) {
+//     console.error("Error sending email", error);
+//     throw new Error("Failed to send confirmation email");
+//   }
+// };
 
 const loadProductDetails = async (req, res) => {
   try {
@@ -661,20 +661,20 @@ const codPlaceOrder = async (req, res) => {
       }
     );
 
-    const userData = await User.findOne({ _id: userId });
-    const userEmail = userData.email;
-    const emailSent = await sendOrderConfirmationEmail(
-      userEmail,
-      savedOrder,
-      defaultAddress
-    );
+    // const userData = await User.findOne({ _id: userId });
+    // const userEmail = userData.email;
+    // const emailSent = await sendOrderConfirmationEmail(
+    //   userEmail,
+    //   savedOrder,
+    //   defaultAddress
+    // );
 
-    if (!emailSent) {
-      return res.status(InternalServerError).json({
-        success: false,
-        message: "Failed to send order confirmation email.",
-      });
-    }
+    // if (!emailSent) {
+    //   return res.status(InternalServerError).json({
+    //     success: false,
+    //     message: "Failed to send order confirmation email.",
+    //   });
+    // }
 
     return res.status(OK).json({
       success: true,
@@ -1041,20 +1041,20 @@ const walletPlaceOrder = async (req, res) => {
       }
     );
 
-    const userData = await User.findOne({ _id: userId });
-    const userEmail = userData.email;
-    const emailSent = await sendOrderConfirmationEmail(
-      userEmail,
-      savedOrder,
-      defaultAddress
-    );
+    // const userData = await User.findOne({ _id: userId });
+    // const userEmail = userData.email;
+    // const emailSent = await sendOrderConfirmationEmail(
+    //   userEmail,
+    //   savedOrder,
+    //   defaultAddress
+    // );
 
-    if (!emailSent) {
-      return res.status(InternalServerError).json({
-        success: false,
-        message: "Failed to send order confirmation email.",
-      });
-    }
+    // if (!emailSent) {
+    //   return res.status(InternalServerError).json({
+    //     success: false,
+    //     message: "Failed to send order confirmation email.",
+    //   });
+    // }
 
     return res.status(OK).json({
       success: true,
@@ -1363,26 +1363,26 @@ const verifyRazorpayPayment = async (req, res) => {
     );
 
     // Send confirmation email
-    const userData = await User.findOne({ _id: userId });
-    const userAddresses = await Address.find({ userId: userId });
-    const defaultAddress = userAddresses
-      .flatMap((addr) => addr.address)
-      .find((addr) => addr._id.toString() === address.toString());
+    // const userData = await User.findOne({ _id: userId });
+    // const userAddresses = await Address.find({ userId: userId });
+    // const defaultAddress = userAddresses
+      // .flatMap((addr) => addr.address)
+      // .find((addr) => addr._id.toString() === address.toString());
 
-    if (userData && userData.email && defaultAddress) {
-      try {
-        const emailSent = await sendOrderConfirmationEmail(
-          userData.email,
-          savedOrder,
-          defaultAddress
-        );
-        if (!emailSent) {
-          console.error("Failed to send order confirmation email.");
-        }
-      } catch (emailError) {
-        console.error("Error sending email:", emailError);
-      }
-    }
+    // if (userData && userData.email && defaultAddress) {
+    //   try {
+    //     const emailSent = await sendOrderConfirmationEmail(
+    //       userData.email,
+    //       savedOrder,
+    //       defaultAddress
+    //     );
+    //     if (!emailSent) {
+    //       console.error("Failed to send order confirmation email.");
+    //     }
+    //   } catch (emailError) {
+    //     console.error("Error sending email:", emailError);
+    //   }
+    // }
 
     // Clear temp order data from session
     delete req.session.tempOrderData;
@@ -1536,20 +1536,20 @@ const razorpayPlaceOrder = async (req, res) => {
     savedOrder.orderId = razorpayOrder.id; // Store Razorpay order ID in the order document
     await savedOrder.save();
 
-    const userData = await User.findOne({ _id: userId });
-    const userEmail = userData.email;
-    const emailSent = await sendOrderConfirmationEmail(
-      userEmail,
-      savedOrder,
-      defaultAddress
-    );
+    // const userData = await User.findOne({ _id: userId });
+    // const userEmail = userData.email;
+    // const emailSent = await sendOrderConfirmationEmail(
+    //   userEmail,
+    //   savedOrder,
+    //   defaultAddress
+    // );
 
-    if (!emailSent) {
-      return res.status(InternalServerError).json({
-        success: false,
-        message: "Failed to send order confirmation email.",
-      });
-    }
+    // if (!emailSent) {
+    //   return res.status(InternalServerError).json({
+    //     success: false,
+    //     message: "Failed to send order confirmation email.",
+    //   });
+    // }
 
     // Return Razorpay order details to frontend
     res.json({
