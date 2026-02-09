@@ -92,7 +92,8 @@ router.get('/auth/google/callback',
       // Redirect based on environment
       // eslint-disable-next-line no-undef
       if (process.env.NODE_ENV === 'production') {
-        res.redirect('https://www.art-mart.shop/');
+        // res.redirect('https://www.art-mart.shop/');
+        res.redirect('https://art-mart.onrender.com/');
       } else {
         res.redirect('http://localhost:3000/');
       }
