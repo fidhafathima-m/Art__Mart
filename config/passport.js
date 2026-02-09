@@ -14,7 +14,7 @@ const { generateRandomReferralCode } = require("../controllers/user/userControll
 // Set the callback URL based on environment
 // eslint-disable-next-line no-undef
 const callbackURL = process.env.NODE_ENV === 'production'
-  ? 'https://www.art-mart.shop/auth/google/callback'
+  ? 'https://art-mart.onrender.com/auth/google/callback'
   : 'http://localhost:3000/auth/google/callback';  
 
 
