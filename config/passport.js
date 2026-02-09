@@ -20,6 +20,9 @@ const callbackURL = process.env.NODE_ENV === 'production'
   // eslint-disable-next-line no-undef
   console.log("NODE_ENV:", process.env.NODE_ENV);
 console.log("Google callback URL:", callbackURL);
+// eslint-disable-next-line no-undef
+console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
+
 
 
 
