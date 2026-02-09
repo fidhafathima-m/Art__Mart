@@ -17,6 +17,11 @@ const callbackURL = process.env.NODE_ENV === 'production'
   ? 'https://art-mart.onrender.com/auth/google/callback'
   : 'http://localhost:3000/auth/google/callback';  
 
+  // eslint-disable-next-line no-undef
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("Google callback URL:", callbackURL);
+
+
 
   passport.use(
     new GoogleStrategy(
