@@ -50,7 +50,7 @@ Art Mart is an e-commerce platform dedicated to artists and art enthusiasts. It 
 
 ## Hosted Website 🌐
 
-Visit our hosted website to explore and shop: [www.art-mart.shop](http://www.art-mart.shop)
+Visit our hosted website to explore and shop: [www.art-mart.shop](http://www.art-mart.shop) - if the link not working, [click here](https://art-mart.onrender.com/)
 
 ## Getting Started 🚀
 
